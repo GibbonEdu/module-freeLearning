@@ -30,24 +30,25 @@ $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
 //Module tables
-$moduleTables[0]="
-CREATE TABLE `freeLearningUnit` (
-`freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
+$moduleTables[0]="CREATE TABLE `freeLearningUnit` (
+`freeLearningUnitID` int(10) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `gibbonDepartmentIDList` text,
   `name` varchar(40) NOT NULL,
+  `active` enum('Y','N') DEFAULT 'Y',
   `difficulty` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `overview` text NOT NULL,
+  `blurb` text NOT NULL,
+  `outline` text NOT NULL,
   `license` varchar(50) DEFAULT NULL,
   `sharedPublic` enum('Y','N') DEFAULT NULL,
   `gibbonPersonIDCreator` int(10) unsigned zerofill NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`freeLearningUnitID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
 
 //Settings
 $moduleTables[1]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of dicciulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
 $moduleTables[2]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'publicUnits', 'Public Units', 'Should selected units be made available to members of the public, via the home page?', 'N');";
-$moduleTables[3]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOverviewTemplate', 'Unit Overview Template', 'An HTML template to be used as the default for all new units.', '');";
+$moduleTables[3]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
 
 //Action rows
 $actionRows[0]["name"]="Manage Units_all" ;
@@ -66,14 +67,14 @@ $actionRows[0]["categoryPermissionStudent"]="N" ;
 $actionRows[0]["categoryPermissionParent"]="N" ;
 $actionRows[0]["categoryPermissionOther"]="N" ;
 
-$actionRows[1]["name"]="Manage Units_department" ;
+$actionRows[1]["name"]="Manage Units_learningAreas" ;
 $actionRows[1]["precedence"]="0";
 $actionRows[1]["category"]="" ;
-$actionRows[1]["description"]="Allows a privileged user within a department to manage all Free Learning units with their department." ;
+$actionRows[1]["description"]="Allows a privileged user within a learning area to manage all Free Learning units with their learning area." ;
 $actionRows[1]["URLList"]="units_manage.php, units_manage_add.php, units_manage_edit.php, units_manage_delete.php" ;
 $actionRows[1]["entryURL"]="units_manage.php" ;
 $actionRows[1]["defaultPermissionAdmin"]="N" ;
-$actionRows[1]["defaultPermissionTeacher"]="N" ;
+$actionRows[1]["defaultPermissionTeacher"]="Y" ;
 $actionRows[1]["defaultPermissionStudent"]="N" ;
 $actionRows[1]["defaultPermissionParent"]="N" ;
 $actionRows[1]["defaultPermissionSupport"]="N" ;
@@ -103,6 +104,6 @@ $array["toggleSettingName"]="publicUnits" ;
 $array["toggleSettingScope"]="Free Learning" ;
 $array["toggleSettingValue"]="Y" ;
 $array["title"]="Free Learning With Us" ;
-$array["text"]="Free Learning is a way to promote student independence and engagement, by encouraging students to find their own path through a set of content. As a member of the public, we invite you to <a href=\\'./index.php?q=/modules/Free Learning/units_browse.php\\'>browse a range of our units</a>." ;
+$array["text"]="Free Learning is a way to promote student independence and engagement, by encouraging students to find their own path through a set of content. As a member of the public, we invite you to <a href=\'./index.php?q=/modules/Free Learning/units_browse.php\'>browse a range of our units</a>." ;
 $hooks[0]="INSERT INTO `gibbonHook` (`gibbonHookID`, `name`, `type`, `options`, gibbonModuleID) VALUES (NULL, 'Free Learning', 'Public Home Page ', '" . serialize($array) . "', (SELECT gibbonModuleID FROM gibbonModule WHERE name='$name'));" ;
 ?>
