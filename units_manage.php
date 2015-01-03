@@ -94,6 +94,9 @@ else {
 					print "<th style='width: 450px'>" ;
 						print _("Learning Areas") ;
 					print "</th>" ;
+					print "<th style='width: 150px'>" ;
+						print _("Active") ;
+					print "</th>" ;
 					print "<th style='width: 120px'>" ;
 						print _("Actions") ;
 					print "</th>" ;
@@ -107,6 +110,10 @@ else {
 					}
 					else {
 						$rowNum="odd" ;
+					}
+											
+					if ($row["active"]=="N") {
+						$rowNum="error" ;
 					}
 					
 					//COLOR ROW BY STATUS!
@@ -127,6 +134,9 @@ else {
 							else {
 								print "<i>" . _('None') . "</i>" ;
 							}
+						print "</td>" ;
+						print "<td>" ;
+							print ynExpander($row["active"]) ;
 						print "</td>" ;
 						print "<td>" ;
 							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_manage_edit.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;

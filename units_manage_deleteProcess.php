@@ -91,7 +91,33 @@ else {
 				header("Location: {$URL}");
 				break ;
 			}
-
+			
+			try {
+				$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
+				$sql="DELETE FROM freeLearningUnitOutcome WHERE freeLearningUnitID=:freeLearningUnitID" ;
+				$result=$connection2->prepare($sql);
+				$result->execute($data);
+			}
+			catch(PDOException $e) { 
+				//Fail 2
+				$URL.="&deleteReturn=fail2" ;
+				header("Location: {$URL}");
+				break ;
+			}
+			
+			try {
+				$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
+				$sql="DELETE FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID" ;
+				$result=$connection2->prepare($sql);
+				$result->execute($data);
+			}
+			catch(PDOException $e) { 
+				//Fail 2
+				$URL.="&deleteReturn=fail2" ;
+				header("Location: {$URL}");
+				break ;
+			}
+			
 			//Success 0
 			$URLDelete=$URLDelete . "&deleteReturn=success0" ;
 			header("Location: {$URLDelete}");

@@ -76,11 +76,14 @@ else {
 				$gibbonDepartmentIDList=NULL ;
 			}
 			$license=$_POST["license"] ;
-			$sharedPublic=$_POST["sharedPublic"] ;
+			$sharedPublic=NULL ;
+			if (isset($_POST["sharedPublic"])) {
+				$sharedPublic=$_POST["sharedPublic"] ;
+			}
 			$active=$_POST["active"] ;
 			$outline=$_POST["outline"] ;
 			
-			if ($name=="" OR $difficulty=="" OR $sharedPublic=="" OR $active=="") {
+			if ($name=="" OR $difficulty=="" OR $active=="") {
 				//Fail 3
 				$URL.="&addReturn=fail3" ;
 				header("Location: {$URL}");
@@ -90,7 +93,7 @@ else {
 				
 				//Lock tables
 				try {
-					$sql="LOCK TABLES freeLearningUnit WRITE" ;
+					$sql="LOCK TABLES freeLearningUnit WRITE, freeLearningUnitAuthor WRITE, freeLearningUnitBlock WRITE" ;
 					$result=$connection2->query($sql);   
 				}
 				catch(PDOException $e) { 
@@ -128,6 +131,56 @@ else {
 					$URL.="&addReturn=fail2" ;
 					header("Location: {$URL}");
 					break ;
+				}
+				
+				//Write author to database
+				try {
+					$data=array("freeLearningUnitID"=>$AI, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"]); 
+					$sql="INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID" ;
+					$result=$connection2->prepare($sql);
+					$result->execute($data);
+				}
+				catch(PDOException $e) { 
+					$partialFail=TRUE ;
+				}
+				
+				//ADD BLOCKS
+				$blockCount=($_POST["blockCount"]-1) ;
+				$sequenceNumber=0 ;
+				if ($blockCount>0) {
+					$order=array() ;
+					if (isset($_POST["order"])) {
+						$order=$_POST["order"] ;
+					}
+					foreach ($order as $i) {
+						$title="";
+						if ($_POST["title$i"]!="Block $i") {
+							$title=$_POST["title$i"] ;
+						}
+						$type2="";
+						if ($_POST["type$i"]!="type (e.g. discussion, outcome)") {
+							$type2=$_POST["type$i"];
+						}
+						$length="";
+						if ($_POST["length$i"]!="length (min)") {
+							$length=$_POST["length$i"];
+						}
+						$contents=$_POST["contents$i"];
+						$teachersNotes=$_POST["teachersNotes$i"];
+								
+						if ($title!="" OR $contents!="") {
+							try {
+								$dataBlock=array("freeLearningUnitID"=>$AI, "title"=>$title, "type"=>$type2, "length"=>$length, "contents"=>$contents, "teachersNotes"=>$teachersNotes, "sequenceNumber"=>$sequenceNumber); 
+								$sqlBlock="INSERT INTO freeLearningUnitBlock SET freeLearningUnitID=:freeLearningUnitID, title=:title, type=:type, length=:length, contents=:contents, teachersNotes=:teachersNotes, sequenceNumber=:sequenceNumber" ;
+								$resultBlock=$connection2->prepare($sqlBlock);
+								$resultBlock->execute($dataBlock);
+							}
+							catch(PDOException $e) { 
+								$partialFail=TRUE ;
+							}
+							$sequenceNumber++ ;
+						}
+					}
 				}
 		
 				//Unlock module table

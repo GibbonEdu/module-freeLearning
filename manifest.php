@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //Basica variables
 $name="Free Learning" ;
 $description="Free Learning is a module which enables a student-focused and student-driven pedagogy that goes by the same name as the module. Read more about Free Learning at http://rossparker.org/free-learning." ;
-$entryURL="units_browse.php" ;
+$entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
 $version="0.1.00" ;
@@ -45,10 +45,38 @@ $moduleTables[0]="CREATE TABLE `freeLearningUnit` (
   PRIMARY KEY (`freeLearningUnitID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
 
+$moduleTables[1]="CREATE TABLE `freeLearningUnitBlock` (
+`freeLearningUnitBlockID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `length` varchar(3) NOT NULL,
+  `contents` text NOT NULL,
+  `teachersNotes` text NOT NULL,
+  `sequenceNumber` int(4) NOT NULL,
+  PRIMARY KEY (`freeLearningUnitBlockID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
+
+$moduleTables[2]="CREATE TABLE `freeLearningUnitOutcome` (
+`freeLearningUnitOutcomeID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
+  `gibbonOutcomeID` int(8) unsigned zerofill NOT NULL,
+  `sequenceNumber` int(4) NOT NULL,
+  `content` text NOT NULL,
+  PRIMARY KEY (`freeLearningUnitOutcomeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
+
+$moduleTables[3]="CREATE TABLE `freeLearningUnitAuthor` (
+`freeLearningUnitAuthorID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
+  `gibbonPersonID` int(8) unsigned zerofill NOT NULL,
+  PRIMARY KEY (`freeLearningUnitAuthorID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
+
 //Settings
-$moduleTables[1]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of dicciulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
-$moduleTables[2]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'publicUnits', 'Public Units', 'Should selected units be made available to members of the public, via the home page?', 'N');";
-$moduleTables[3]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
+$moduleTables[4]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of dicciulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
+$moduleTables[5]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'publicUnits', 'Public Units', 'Should selected units be made available to members of the public, via the home page?', 'N');";
+$moduleTables[6]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
 
 //Action rows
 $actionRows[0]["name"]="Manage Units_all" ;

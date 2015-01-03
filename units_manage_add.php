@@ -206,6 +206,18 @@ else {
 					</td>
 				</tr>
 				
+				<tr class='break'>
+					<td colspan=2> 
+						<h3><?php print _('Outcomes') ?></h3>
+					</td>
+				</tr>
+				<tr>
+					<td colspan=2> 
+						<div class='warning'>
+							<?php print _('Outcomes can only be set after the new unit has been saved once. Click submit below, and when you land on the edit page, you will be able to manage outcomes.') ?>
+						</div>
+					</td>
+				</tr>
 				
 				<tr class='break'>
 					<td colspan=2> 
@@ -219,8 +231,77 @@ else {
 						<?php print getEditor($guid,  TRUE, "outline", $unitOutline, 40, true, false, false) ?>
 					</td>
 				</tr>
+				
+				
+				<tr class='break'>
+					<td colspan=2> 
+						<h3><?php print _('Smart Blocks') ?></h3>
+					</td>
+				</tr>
+				<tr>
+					<td colspan=2> 
+						<p>
+							<?php print _('Smart Blocks aid unit planning by giving teachers help in creating and maintaining new units, splitting material into smaller chunks. As well as predefined fields to fill, Smart Blocks provide a visual view of the content blocks that make up a unit. Blocks may be any kind of content, such as discussion, assessments, group work, outcome etc.') ?>
+						</p>
+						<style>
+							#sortable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+							#sortable div.ui-state-default { margin: 0 0px 5px 0px; padding: 5px; font-size: 100%; min-height: 58px; }
+							div.ui-state-default_dud { margin: 5px 0px 5px 0px; padding: 5px; font-size: 100%; min-height: 58px; }
+							html>body #sortable li { min-height: 58px; line-height: 1.2em; }
+							#sortable .ui-state-highlight { margin-bottom: 5px; min-height: 58px; line-height: 1.2em; width: 100%; }
+						</style>
+						<script>
+							$(function() {
+								$( "#sortable" ).sortable({
+									placeholder: "ui-state-highlight";
+									axis: 'y'
+								});
+							});
+						</script>
+						
+						<div class="sortable" id="sortable" style='width: 100%; padding: 5px 0px 0px 0px'>
+							<?php 
+							for ($i=1; $i<=5; $i++) {
+								makeBlock($guid, $connection2, $i) ;
+							}
+							?>
+						</div>
+						
+						<div style='width: 100%; padding: 0px 0px 0px 0px'>
+							<div class="ui-state-default_dud" style='padding: 0px; height: 40px'>
+								<table class='blank' cellspacing='0' style='width: 100%'>
+									<tr>
+										<td style='width: 50%'>
+											<script type="text/javascript">
+												var count=6 ;
+												/* Unit type control */
+												$(document).ready(function(){
+													$("#new").click(function(){
+														$("#sortable").append('<div id=\'blockOuter' + count + '\'><img style=\'margin: 10px 0 5px 0\' src=\'<?php print $_SESSION[$guid]["absoluteURL"] ?>/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');
+														$("#blockOuter" + count).load("<?php print $_SESSION[$guid]["absoluteURL"] ?>/modules/Planner/units_add_blockAjax.php","id=" + count) ;
+														count++ ;
+													 });
+												});
+											</script>
+											<div id='new' style='cursor: default; float: none; border: 1px dotted #aaa; background: none; margin-left: 3px; color: #999; margin-top: 0px; font-size: 140%; font-weight: bold; width: 350px'><?php print _('Click to create a new block') ?></div><br/>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</td>
+				</tr>
+								
 				<tr>
 					<td class="right" colspan=2>
+						<script type="text/javascript">
+							$(document).ready(function(){
+								$("#submit").click(function(){
+									$("#blockCount").val(count) ;
+								 });
+							});
+						</script>
+						<input name="blockCount" id=blockCount value="5" type="hidden">
 						<input type="submit" id="submit" value="Submit">
 					</td>
 				</tr>
