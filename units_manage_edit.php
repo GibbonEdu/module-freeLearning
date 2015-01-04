@@ -254,6 +254,32 @@ else {
 							</select>
 						</td>
 					</tr>
+					<tr>
+					<td style='width: 275px'> 
+						<b><?php print _('Prerequisite Units') ?></b><br/>
+						<span style="font-size: 90%"><i><?php print _('Use Control, Command and/or Shift to select multiple.') ?></i></span>
+					</td>
+					<td class="right">
+						<select name="prerequisites[]" id="prerequisites[]" multiple style="width: 302px; height: 150px">
+							<?php
+							try {
+								$dataSelect=array("freeLearningUnitID"=>$freeLearningUnitID); 
+								$sqlSelect="SELECT * FROM freeLearningUnit WHERE active='Y' AND NOT freeLearningUnitID=:freeLearningUnitID ORDER BY name" ;
+								$resultSelect=$connection2->prepare($sqlSelect);
+								$resultSelect->execute($dataSelect);
+							}
+							catch(PDOException $e) { }
+							while ($rowSelect=$resultSelect->fetch()) {
+								$selected="" ;
+								if (is_numeric(strpos($row["freeLearningUnitIDPrerequisiteList"],str_pad($rowSelect['freeLearningUnitID'], 10, "0", STR_PAD_LEFT)))) {
+									$selected="selected" ;
+								}
+								print "<option $selected value='" . $rowSelect["freeLearningUnitID"] . "'>" . $rowSelect["name"] . " ( " . $rowSelect["difficulty"] . ")</option>" ;
+							}
+							?>
+							</optgroup>
+						</select>
+					</td>
 					
 					<tr class='break'>
 						<td colspan=2> 

@@ -80,6 +80,14 @@ else {
 				$sharedPublic=$_POST["sharedPublic"] ;
 			}
 			$active=$_POST["active"] ;
+			$freeLearningUnitIDPrerequisiteList=NULL ;
+			if (isset($_POST["prerequisites"])) {
+				$prerequisites=$_POST["prerequisites"] ;
+				foreach ($prerequisites AS $prerequisite) {
+					$freeLearningUnitIDPrerequisiteList.=$prerequisite . "," ;
+				}	
+				$freeLearningUnitIDPrerequisiteList=substr($freeLearningUnitIDPrerequisiteList,0,-1) ;
+			}
 			$outline=$_POST["outline"] ;
 			
 			if ($name=="" OR $difficulty=="" OR $active=="") {
@@ -120,8 +128,8 @@ else {
 				
 					//Write to database
 					try {
-						$data=array("name"=>$name, "difficulty"=>$difficulty, "blurb"=>$blurb, "license"=>$license, "sharedPublic"=>$sharedPublic, "active"=>$active, "gibbonDepartmentIDList"=>$gibbonDepartmentIDList, "outline"=>$outline, "freeLearningUnitID"=>$freeLearningUnitID); 
-						$sql="UPDATE freeLearningUnit SET name=:name, difficulty=:difficulty, blurb=:blurb, license=:license, sharedPublic=:sharedPublic, active=:active, gibbonDepartmentIDList=:gibbonDepartmentIDList, outline=:outline WHERE freeLearningUnitID=:freeLearningUnitID" ;
+						$data=array("name"=>$name, "difficulty"=>$difficulty, "blurb"=>$blurb, "license"=>$license, "sharedPublic"=>$sharedPublic, "active"=>$active, "gibbonDepartmentIDList"=>$gibbonDepartmentIDList, "freeLearningUnitIDPrerequisiteList"=>$freeLearningUnitIDPrerequisiteList, "outline"=>$outline, "freeLearningUnitID"=>$freeLearningUnitID); 
+						$sql="UPDATE freeLearningUnit SET name=:name, difficulty=:difficulty, blurb=:blurb, license=:license, sharedPublic=:sharedPublic, active=:active, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, outline=:outline WHERE freeLearningUnitID=:freeLearningUnitID" ;
 						$result=$connection2->prepare($sql);
 						$result->execute($data);
 					}
