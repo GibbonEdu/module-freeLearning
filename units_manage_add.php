@@ -250,7 +250,7 @@ else {
 				<tr>
 					<td colspan=2> 
 						<?php $unitOutline=getSettingByScope($connection2, "Free Learning", "unitOutlineTemplate" ) ?>
-						<p><?php print _('The contents of this field are viewable only to those with full access to the Planner (usually teachers and administrators, but not students and parents), whereas the downloadable version (below) is available to more users (usually parents).') ?></p>
+						<p><?php print _('The contents of this field are viewable to all users, SO AVOID CONFIDENTIAL OR SENSITIVE DATA!') ?></p>
 						<?php print getEditor($guid,  TRUE, "outline", $unitOutline, 40, true, false, false) ?>
 					</td>
 				</tr>
@@ -276,7 +276,7 @@ else {
 						<script>
 							$(function() {
 								$( "#sortable" ).sortable({
-									placeholder: "ui-state-highlight";
+									placeholder: "ui-state-highlight",
 									axis: 'y'
 								});
 							});
@@ -301,7 +301,7 @@ else {
 												$(document).ready(function(){
 													$("#new").click(function(){
 														$("#sortable").append('<div id=\'blockOuter' + count + '\'><img style=\'margin: 10px 0 5px 0\' src=\'<?php print $_SESSION[$guid]["absoluteURL"] ?>/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');
-														$("#blockOuter" + count).load("<?php print $_SESSION[$guid]["absoluteURL"] ?>/modules/Planner/units_add_blockAjax.php","id=" + count) ;
+														$("#blockOuter" + count).load("<?php print $_SESSION[$guid]["absoluteURL"] ?>/modules/Free%20Learning/units_manage_add_blockAjax.php","id=" + count) ;
 														count++ ;
 													 });
 												});

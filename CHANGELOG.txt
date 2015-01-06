@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v0.2.00
+-------
+Minor bug fixes and enhancements
+Unit browsing
+Unit enrolment
+Unit completion
+
 v0.1.00
 -------
 Added settings page

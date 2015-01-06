@@ -39,6 +39,36 @@ function getLearningAreaArray($connection2) {
 	return $return ;
 }
 
+//If $freeLearningUnitID is NULL, all units are returned: otherwise, only the specified
+function getAuthorsArray($connection2, $freeLearningUnitID=NULL) {
+	$return=FALSE ;
+	
+	try {
+		if (is_null($freeLearningUnitID)) {
+			$data=array(); 
+			$sql="SELECT freeLearningUnitAuthorID, freeLearningUnitID, gibbonPerson.gibbonPersonID, title, surname, preferredName FROM gibbonPerson JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID) ORDER BY surname, preferredName" ;
+		}
+		else {
+			$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
+			$sql="SELECT freeLearningUnitAuthorID, freeLearningUnitID, gibbonPerson.gibbonPersonID, title, surname, preferredName FROM gibbonPerson JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY surname, preferredName" ;
+		}
+		$result=$connection2->prepare($sql);
+		$result->execute($data);
+	}
+	catch(PDOException $e) { }
+	
+	if ($result->rowCount()>0) {
+		$return=array() ;
+		while ($row=$result->fetch()) {
+			$return[$row["freeLearningUnitAuthorID"]][0]=$row["freeLearningUnitID"] ;
+			$return[$row["freeLearningUnitAuthorID"]][1]=formatName($row["title"], $row["preferredName"], $row["surname"], "Staff", false) ;
+			$return[$row["freeLearningUnitAuthorID"]][2]=$row["gibbonPersonID"] ;
+		}
+	}
+	
+	return $return ;
+}
+
 
 //Set $limite=TRUE to only return departments that the user has curriculum editing rights in
 function getLearningAreas($connection2, $guid, $limit=FALSE ) {

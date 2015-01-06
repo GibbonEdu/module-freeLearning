@@ -85,19 +85,19 @@ else {
 		else {
 			print "<table cellspacing='0' style='width: 100%'>" ;
 				print "<tr class='head'>" ;
-					print "<th style='width: 150px'>" ;
+					print "<th>" ;
 						print _("Name") ;
 					print "</th>" ;
-					print "<th style='width: 150px'>" ;
+					print "<th>" ;
 						print _("Difficulty") ;
 					print "</th>" ;
-					print "<th style='width: 450px'>" ;
+					print "<th>" ;
 						print _("Learning Areas") ;
 					print "</th>" ;
-					print "<th style='width: 150px'>" ;
+					print "<th>" ;
 						print _("Active") ;
 					print "</th>" ;
-					print "<th style='width: 120px'>" ;
+					print "<th style='width: 100px'>" ;
 						print _("Actions") ;
 					print "</th>" ;
 				print "</tr>" ;
@@ -139,6 +139,9 @@ else {
 							print ynExpander($row["active"]) ;
 						print "</td>" ;
 						print "<td>" ;
+							if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")) {
+								print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=&difficulty=&name='><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+							}
 							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_manage_edit.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;
 							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_manage_delete.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "'><img title='" . _('Delete') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;
 						print "</td>" ;
