@@ -17,6 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+function getBlocksArray($connection2) {
+	$return=FALSE ;
+	
+	try {
+		$data=array(); 
+		$sql="SELECT * FROM freeLearningUnitBlock ORDER BY freeLearningUnitID" ;
+		$result=$connection2->prepare($sql);
+		$result->execute($data);
+	}
+	catch(PDOException $e) { }
+	
+	if ($result->rowCount()>0) {
+		$return=array() ;
+		while ($row=$result->fetch()) {
+			$return[$row["freeLearningUnitBlockID"]][0]=$row["freeLearningUnitID"] ;
+			$return[$row["freeLearningUnitBlockID"]][1]=$row["title"] ;
+			$return[$row["freeLearningUnitBlockID"]][2]=$row["length"] ;
+		}
+	}
+	
+	return $return ;
+}
 
 function getLearningAreaArray($connection2) {
 	$return=FALSE ;

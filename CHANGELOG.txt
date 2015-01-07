@@ -1,11 +1,15 @@
 CHANGELOG
 =========
+v0.3.00
+-------
+Finished unit browsing
+Unit enrolment
+Unit completion
+
 v0.2.00
 -------
 Minor bug fixes and enhancements
 Unit browsing
-Unit enrolment
-Unit completion
 
 v0.1.00
 -------

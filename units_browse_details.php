@@ -22,14 +22,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //Module includes
 include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 
-if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details.php")==FALSE) {
+$publicUnits=getSettingByScope($connection2, "Free Learning", "publicUnits" ) ;
+if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("Your request failed because you do not have access to this action.") ;
+		print _("You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
-	$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
+	//Get action with highest precendence
+	if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
+		$highestAction="Browse Units_all" ;
+	}
+	else {
+		$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
+	}
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
 		print _("The highest grouped action cannot be determined.") ;
@@ -56,7 +63,12 @@ else {
 		
 		
 		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Browse Units') . "</a> > </div><div class='trailEnd'>" . _('Unit Details') . "</div>" ;
+		if ($publicUnits=="Y") {
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Browse Units') . "</a> > </div><div class='trailEnd'>" . _('Unit Details') . "</div>" ;
+			}
+			else {
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Browse Units') . "</a> > </div><div class='trailEnd'>" . _('Unit Details') . "</div>" ;
+			}
 		print "</div>" ;
 		
 		if ($freeLearningUnitID=="") {
@@ -158,6 +170,14 @@ else {
 						print "<p>" ;
 							print $row["blurb"] ;
 						print "</p>" ;
+						if ($row["license"]!="") {
+							print "<h4>" ;
+								print _("License") ;
+							print "</h4>" ;
+							print "<p>" ;
+								print _("This work is shared under the following license:") . " " . $row["license"] ;
+							print "</p>" ;
+						}
 						if ($row["outline"]!="") {
 							print "<h3>" ;
 								print "Outline" ;

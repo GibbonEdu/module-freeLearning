@@ -22,7 +22,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //Module includes
 include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 
-if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==FALSE) {
+$publicUnits=getSettingByScope($connection2, "Free Learning", "publicUnits" ) ;
+if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
 	//Acess denied
 	print "<div class='error'>" ;
 		print _("You do not have access to this action.") ;
@@ -30,7 +31,12 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse
 }
 else {
 	//Get action with highest precendence
-	$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
+	if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
+		$highestAction="Browse Units_all" ;
+	}
+	else {
+		$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
+	}
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
 		print _("The highest grouped action cannot be determined.") ;
@@ -38,7 +44,12 @@ else {
 	}
 	else {
 		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Browse Units') . "</div>" ;
+			if ($publicUnits=="Y") {
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > </div><div class='trailEnd'>" . _('Browse Units') . "</div>" ;
+			}
+			else {
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Browse Units') . "</div>" ;
+			}
 		print "</div>" ;
 		
 		$gibbonDepartmentID=NULL ;
@@ -56,6 +67,7 @@ else {
 		
 		$learningAreaArray=getLearningAreaArray($connection2) ;
 		$authors=getAuthorsArray($connection2) ;
+		$blocks=getBlocksArray($connection2) ;
 		
 		print "<h3>" ;
 			print _("Filter") ;
@@ -123,7 +135,7 @@ else {
 				print "<tr>" ;
 					print "<td class='right' colspan=2>" ;
 						print "<input type='hidden' name='q' value='" . $_GET["q"] . "'>" ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Behaviour/behaviour_manage.php'>" . _('Clear Filters') . "</a> " ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php'>" . _('Clear Filters') . "</a> " ;
 						print "<input type='submit' value='" . _('Go') . "'>" ;
 					print "</td>" ;
 				print "</tr>" ;
@@ -197,18 +209,20 @@ else {
 		
 			print "<table cellspacing='0' style='width: 100%'>" ;
 				print "<tr class='head'>" ;
-					print "<th>" ;
+					print "<th style='width: 150px!important'>" ;
 						print _("Name") . "</br>" ;
 						print "<span style='font-size: 85%; font-style: italic'>" . _('Learning Areas') . "</span>" ;
 					print "</th>" ;
-					print "<th>" ;
-						print _("Difficulty") ;
-					print "</th>" ;
-					print "<th>" ;
+					print "<th style='width: 100px!important'>" ;
 						print _("Authors") ;
 					print "</th>" ;
+					print "<th style='max-width: 325px!important'>" ;
+						print _("Difficulty") . "</br>" ;
+						print "<span style='font-size: 85%; font-style: italic'>" . _('Blurb') . "</span>" ;
+					print "</th>" ;
 					print "<th>" ;
-						print _("Blurb") ;
+						print _("Length") . "</br>" ;
+						print "<span style='font-size: 85%; font-style: italic'>" . _('Minutes') . "</span>" ;
 					print "</th>" ;
 					print "<th style='min-width: 70px'>" ;
 						print _("Actions") ;
@@ -237,15 +251,14 @@ else {
 					print "<tr class=$rowNum>" ;
 						print "<td>" ;
 							print "<b>" . $row["name"] . "</b><br/>" ;
-							print "<span style='font-size: 85%;'>" ;
-								$departments=explode(",", $row["gibbonDepartmentIDList"]) ;
-								foreach ($departments AS $department) {
-									print $learningAreaArray[$department] . "<br/>" ;
-								}
-							print "</span>" ;
-						print "</td>" ;
-						print "<td>" ;
-							print $row["difficulty"] ;
+							if ($row["gibbonDepartmentIDList"]!="") {
+								print "<span style='font-size: 85%;'>" ;
+									$departments=explode(",", $row["gibbonDepartmentIDList"]) ;
+									foreach ($departments AS $department) {
+										print $learningAreaArray[$department] . "<br/>" ;
+									}
+								print "</span>" ;
+							}
 						print "</td>" ;
 						print "<td>" ;
 							foreach ($authors AS $author) {
@@ -255,7 +268,26 @@ else {
 							}
 						print "</td>" ;
 						print "<td>" ;
-							print $row["blurb"] ;
+							print $row["difficulty"] . "<br/>" ;
+							print "<div style='font-size: 85%; text-align: justify'>" ;
+								print $row["blurb"] ;
+							print "</div>" ;
+						print "</td>" ;
+						print "<td>" ;
+							$timing=NULL ;
+							foreach ($blocks AS $block) {
+								if ($block[0]==$row["freeLearningUnitID"]) {
+									if (is_numeric($block[2])) {
+										$timing+=$block[2] ;
+									}
+								}
+							}
+							if (is_null($timing)) {
+								print "<i>" . _('NA') . "</i>" ;
+							}
+							else {
+								print $timing ;
+							}
 						print "</td>" ;
 						print "<td>" ;
 							if ($highestAction=="Browse Units_all") {
