@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v0.4.00
+-------
+Full screen browsing
+
 v0.3.00
 -------
 Finished unit browsing
