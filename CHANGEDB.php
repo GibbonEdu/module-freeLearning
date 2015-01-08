@@ -28,7 +28,7 @@ CREATE TABLE `freeLearningUnitStudent` (`freeLearningUnitStudentID` int(12) unsi
 $count++ ;
 $sql[$count][0]="0.3.00" ;
 $sql[$count][1]="
-
+ALTER TABLE `freeLearningUnitStudent` CHANGE `freeLearningUnitStudentID` `freeLearningUnitStudentID` INT(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT;end
 " ;
 
 

@@ -75,7 +75,7 @@ $moduleTables[3]="CREATE TABLE `freeLearningUnitAuthor` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
 
 $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
-`freeLearningUnitStudentID` int(12) unsigned zerofill NOT NULL,
+`freeLearningUnitStudentID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `gibbonPersonIDStudent` int(10) unsigned zerofill DEFAULT NULL,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
   `status` enum('Current','Complete - Pending','Complete - Approved') NOT NULL DEFAULT 'Current',

@@ -17,6 +17,72 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+function prerquisitesRemoveInactive($connection2, $prerequisites) {
+	$return=FALSE ;
+	
+	if ($prerequisites=="") {
+		$return="" ;
+	}
+	else {
+		$prerequisites=explode(",", $prerequisites) ;
+		foreach ($prerequisites AS $prerequisite) {
+			try {
+				$data=array("freeLearningUnitID"=>$prerequisite); 
+				$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y'" ;
+				$result=$connection2->prepare($sql);
+				$result->execute($data);
+			}
+			catch(PDOException $e) { }
+			if ($result->rowCount()==1) {
+				$return.=$prerequisite . "," ;
+			}
+		} 
+		if (substr($return, -1)==",") {
+			$return=substr($return, 0, -1) ;
+		}
+	}
+	
+	return $return ;
+}
+
+function prerquisitesMet($connection2, $gibbonPersonID, $prerequisites) {
+	$return=FALSE ;
+	
+	//Get all courses completed
+	$complete=array() ;
+	try {
+		$data=array("gibbonPersonID"=>$gibbonPersonID); 
+		$sql="SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND status='Complete - Approved' ORDER BY freeLearningUnitID" ;
+		$result=$connection2->prepare($sql);
+		$result->execute($data);
+	}
+	catch(PDOException $e) { }
+
+	while ($row=$result->fetch()) {
+		$complete[$row["freeLearningUnitID"]]=TRUE ;
+	}
+	
+	//Check prerequisites against courses completed
+	if ($prerequisites=="") {
+		$return=TRUE ;
+	}
+	else {
+		$prerequisites=explode(",", $prerequisites) ;
+		$prerequisiteCount=count($prerequisites) ;
+		$prerequisiteMet=0 ;
+		foreach ($prerequisites AS $prerequisite) {
+			if (isset($complete[$prerequisite])) {
+				$prerequisiteMet++ ;
+			}
+		}
+		if ($prerequisiteMet==$prerequisiteCount) {
+			$return=TRUE ;
+		}
+	}
+	
+	return $return ;
+}
+
 function getBlocksArray($connection2) {
 	$return=FALSE ;
 	
@@ -85,6 +151,27 @@ function getAuthorsArray($connection2, $freeLearningUnitID=NULL) {
 			$return[$row["freeLearningUnitAuthorID"]][0]=$row["freeLearningUnitID"] ;
 			$return[$row["freeLearningUnitAuthorID"]][1]=formatName($row["title"], $row["preferredName"], $row["surname"], "Staff", false) ;
 			$return[$row["freeLearningUnitAuthorID"]][2]=$row["gibbonPersonID"] ;
+		}
+	}
+	
+	return $return ;
+}
+
+function getUnitsArray($connection2) {
+	$return=FALSE ;
+	
+	try {
+		$data=array(); 
+		$sql="SELECT * FROM freeLearningUnit WHERE active='Y'" ;
+		$result=$connection2->prepare($sql);
+		$result->execute($data);
+	}
+	catch(PDOException $e) { }
+	
+	if ($result->rowCount()>0) {
+		$return=array() ;
+		while ($row=$result->fetch()) {
+			$return[$row["freeLearningUnitID"]][0]=$row["name"] ;
 		}
 	}
 	

@@ -275,10 +275,12 @@ else {
 						print "</td>" ;
 						print "<td>" ;
 							$timing=NULL ;
-							foreach ($blocks AS $block) {
-								if ($block[0]==$row["freeLearningUnitID"]) {
-									if (is_numeric($block[2])) {
-										$timing+=$block[2] ;
+							if ($blocks!=FALSE) {
+								foreach ($blocks AS $block) {
+									if ($block[0]==$row["freeLearningUnitID"]) {
+										if (is_numeric($block[2])) {
+											$timing+=$block[2] ;
+										}
 									}
 								}
 							}
@@ -294,9 +296,25 @@ else {
 								print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 							}
 							else if ($highestAction=="Browse Units_prerequisites") {
-								//Find out if prerequisites met
+								if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
+									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+								}
+								else {
+									$prerequisitesActive=prerquisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
+									$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
+									if ($prerquisitesMet) {
+										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+									}
+									else {
+										print "<b>" . _("Prerequisites Units:") . "<b/><br/>" ;
+										$prerequisites=explode(",", $row["freeLearningUnitIDPrerequisiteList"]) ;
+										$units=getUnitsArray($connection2) ;
+										foreach ($prerequisites AS $prerequisite) {
+											print $units[$prerequisite][0] . "<br/>" ;
+										}
+									}
+								}
 							}
-							
 						print "</td>" ;
 					print "</tr>" ;
 				}
