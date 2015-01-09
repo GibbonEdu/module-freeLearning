@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v0.5.00
+-------
+Install error fix
+
 v0.4.00
 -------
 Full screen browsing
