@@ -123,7 +123,7 @@ else {
 			}
 			
 			?>
-			<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&&address=" . $_GET["q"] ?>">
+			<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&&address=" . $_GET["q"] ?>" enctype="multipart/form-data">
 				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 					<tr class='break'>
 						<td colspan=2> 
@@ -141,6 +141,32 @@ else {
 								var name2=new LiveValidation('name');
 								name2.add(Validate.Presence);
 							 </script>
+						</td>
+					</tr>
+					<tr>
+						<td> 
+							<b><?php print _('Logo') ?></b><br/>
+							<span style="font-size: 90%"><i>125x125px jpg/png/gif</i><br/></span>
+							<?php if ($row["logo"]!="") { ?>
+							<span style="font-size: 90%"><i><?php print _('Will overwrite existing attachment.') ?></i></span>
+							<?php } ?>
+						</td>
+						<td class="right">
+							<?php
+							if ($row["logo"]!="") {
+								print _("Current attachment:") . " <a href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'>" . $row["logo"] . "</a><br/><br/>" ;
+							}
+							?>
+							<input type="file" name="file" id="file"><br/><br/>
+							<?php
+							print getMaxUpload() ;
+							$ext="'.png','.jpeg','.jpg','.gif'" ;
+							?>
+							
+							<script type="text/javascript">
+								var file=new LiveValidation('file');
+								file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "<?php print _('Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
+							</script>
 						</td>
 					</tr>
 					<?php

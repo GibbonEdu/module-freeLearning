@@ -45,5 +45,11 @@ UPDATE gibbonAction SET entrySidebar='N' WHERE gibbonModuleID=(SELECT gibbonModu
 UPDATE gibbonAction SET entrySidebar='N' WHERE gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning') AND name='Browse Units_prerequisites';end
 " ;
 
+//v0.6.00
+$count++ ;
+$sql[$count][0]="0.6.00" ;
+$sql[$count][1]="
+ALTER TABLE `freeLearningUnit` ADD `logo` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;end
+" ;
 
 ?>

@@ -75,7 +75,7 @@ else {
 			
 		
 		?>
-		<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_addProcess.php?address=" . $_GET["q"] ?>">
+		<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_addProcess.php?address=" . $_GET["q"] ?>"  enctype="multipart/form-data">
 			<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 				<tr class='break'>
 					<td colspan=2> 
@@ -93,6 +93,24 @@ else {
 							var name2=new LiveValidation('name');
 							name2.add(Validate.Presence);
 						 </script>
+					</td>
+				</tr>
+				<tr>
+					<td> 
+						<b><?php print _('Logo') ?></b><br/>
+						<span style="font-size: 90%"><i>125x125px jpg/png/gif</i></span>
+					</td>
+					<td class="right">
+						<input type="file" name="file" id="file"><br/><br/>
+						<?php
+						print getMaxUpload() ;
+						$ext="'.png','.jpeg','.jpg','.gif'" ;
+						?>
+					
+						<script type="text/javascript">
+							var file=new LiveValidation('file');
+							file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
+						</script>
 					</td>
 				</tr>
 				<?php

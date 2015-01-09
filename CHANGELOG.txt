@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v0.6.00
+-------
+More stylish browsing, with unit thumbnails
+
 v0.5.00
 -------
 Install error fix

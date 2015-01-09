@@ -127,10 +127,39 @@ else {
 				$AI=str_pad($rowAI['Auto_increment'], 10, "0", STR_PAD_LEFT) ;
 				
 				
+				//Move attached file, if there is one
+				$time=time() ;
+				if ($_FILES['file']["tmp_name"]!="") {
+					//Check for folder in uploads based on today's date
+					$path=$_SESSION[$guid]["absolutePath"] ;
+					if (is_dir($path ."/uploads/" . date("Y", $time) . "/" . date("m", $time))==FALSE) {
+						mkdir($path ."/uploads/" . date("Y", $time) . "/" . date("m", $time), 0777, TRUE) ;
+					}
+					$unique=FALSE;
+					$count=0 ;
+					while ($unique==FALSE AND $count<100) {
+						$suffix=randomPassword(16) ;
+						$attachment="uploads/" . date("Y", $time) . "/" . date("m", $time) . "/" . preg_replace("/[^a-zA-Z0-9]/", "", $name) . "_$suffix" . strrchr($_FILES["file"]["name"], ".") ;
+						if (!(file_exists($path . "/" . $attachment))) {
+							$unique=TRUE ;
+						}
+						$count++ ;
+					}
+			
+					if (!(move_uploaded_file($_FILES["file"]["tmp_name"],$path . "/" . $attachment))) {
+						//Fail 5
+						$URL.="&updateReturn=fail5" ;
+						header("Location: {$URL}");
+					}
+				}
+				else {
+					$attachment=NULL ;
+				}
+				
 				//Write to database
 				try {
-					$data=array("name"=>$name, "difficulty"=>$difficulty, "blurb"=>$blurb, "license"=>$license, "sharedPublic"=>$sharedPublic, "active"=>$active, "gibbonDepartmentIDList"=>$gibbonDepartmentIDList, "freeLearningUnitIDPrerequisiteList"=>$freeLearningUnitIDPrerequisiteList, "outline"=>$outline, "gibbonPersonIDCreator"=>$_SESSION[$guid]["gibbonPersonID"], "timestamp"=>date("Y-m-d H:i:s")); 
-					$sql="INSERT INTO freeLearningUnit SET name=:name, difficulty=:difficulty, blurb=:blurb, license=:license, sharedPublic=:sharedPublic, active=:active, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp" ;
+					$data=array("name"=>$name, "logo"=>$attachment, "difficulty"=>$difficulty, "blurb"=>$blurb, "license"=>$license, "sharedPublic"=>$sharedPublic, "active"=>$active, "gibbonDepartmentIDList"=>$gibbonDepartmentIDList, "freeLearningUnitIDPrerequisiteList"=>$freeLearningUnitIDPrerequisiteList, "outline"=>$outline, "gibbonPersonIDCreator"=>$_SESSION[$guid]["gibbonPersonID"], "timestamp"=>date("Y-m-d H:i:s")); 
+					$sql="INSERT INTO freeLearningUnit SET name=:name, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, sharedPublic=:sharedPublic, active=:active, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp" ;
 					$result=$connection2->prepare($sql);
 					$result->execute($data);
 				}

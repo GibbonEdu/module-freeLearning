@@ -209,7 +209,7 @@ else {
 		
 			print "<table cellspacing='0' style='width: 100%'>" ;
 				print "<tr class='head'>" ;
-					print "<th style='width: 150px!important'>" ;
+					print "<th style='width: 150px!important; text-align: center'>" ;
 						print _("Name") . "</br>" ;
 						print "<span style='font-size: 85%; font-style: italic'>" . _('Learning Areas') . "</span>" ;
 					print "</th>" ;
@@ -252,8 +252,14 @@ else {
 					
 					//COLOR ROW BY STATUS!
 					print "<tr class=$rowNum>" ;
-						print "<td>" ;
-							print "<b>" . $row["name"] . "</b><br/>" ;
+						print "<td style='text-align: center; font-size: 125%'>" ;
+							print "<div style='font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>" . $row["name"] . "</div><br/>" ;
+							if ($row["logo"]==NULL) {
+								print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_125.jpg'/><br/>" ;
+							}
+							else {
+								print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'/><br/>" ;
+							}
 							if ($row["gibbonDepartmentIDList"]!="") {
 								print "<span style='font-size: 85%;'>" ;
 									$departments=explode(",", $row["gibbonDepartmentIDList"]) ;
