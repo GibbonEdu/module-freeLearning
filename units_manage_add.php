@@ -95,24 +95,6 @@ else {
 						 </script>
 					</td>
 				</tr>
-				<tr>
-					<td> 
-						<b><?php print _('Logo') ?></b><br/>
-						<span style="font-size: 90%"><i>125x125px jpg/png/gif</i></span>
-					</td>
-					<td class="right">
-						<input type="file" name="file" id="file"><br/><br/>
-						<?php
-						print getMaxUpload() ;
-						$ext="'.png','.jpeg','.jpg','.gif'" ;
-						?>
-					
-						<script type="text/javascript">
-							var file=new LiveValidation('file');
-							file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
-						</script>
-					</td>
-				</tr>
 				<?php
 				$difficulties=getSettingByScope($connection2, "Free Learning", "difficultyOptions") ;
 				if ($difficulties!=FALSE) {
@@ -224,6 +206,31 @@ else {
 					</td>
 				</tr>
 				<tr>
+					<td> 
+						<b><?php print _('Logo') ?></b><br/>
+						<span style="font-size: 90%"><i>125x125px jpg/png/gif</i></span>
+					</td>
+					<td class="right">
+						<input type="file" name="file" id="file"><br/><br/>
+						<?php
+						print getMaxUpload() ;
+						$ext="'.png','.jpeg','.jpg','.gif'" ;
+						?>
+					
+						<script type="text/javascript">
+							var file=new LiveValidation('file');
+							file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
+						</script>
+					</td>
+				</tr>
+				
+				
+				<tr class='break'>
+					<td colspan=2> 
+						<h3><?php print _('Constraints') ?></h3>
+					</td>
+				</tr>
+				<tr>
 					<td style='width: 275px'> 
 						<b><?php print _('Prerequisite Units') ?></b><br/>
 						<span style="font-size: 90%"><i><?php print _('Use Control, Command and/or Shift to select multiple.') ?></i></span>
@@ -246,6 +253,45 @@ else {
 						</select>
 					</td>
 				</tr>
+				<tr>
+					<td style='width: 275px'> 
+						<b><?php print _('Minimum Year Group') ?></b><br/>
+						<span style="font-size: 90%"><i><?php print _('Lowest age group allowed to view unit.') . "<br/>" . _('Public sharing disabled if set.') ?></i></span>
+					</td>
+					<td class="right">
+						<select name="gibbonYearGroupIDMinimum" id="gibbonYearGroupIDMinimum" style="width: 302px">
+							<?php
+							print "<option value=''></option>" ;
+							try {
+								$dataSelect=array(); 
+								$sqlSelect="SELECT gibbonYearGroupID, name FROM gibbonYearGroup ORDER BY sequenceNumber" ;
+								$resultSelect=$connection2->prepare($sqlSelect);
+								$resultSelect->execute($dataSelect);
+							}
+							catch(PDOException $e) { }
+							while ($rowSelect=$resultSelect->fetch()) {
+								print "<option value='" . $rowSelect["gibbonYearGroupID"] . "'>" . htmlPrep(_($rowSelect["name"])) . "</option>" ;
+							}
+							?>				
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td style='width: 275px'> 
+						<b><?php print _('Grouping') ?></b><br/>
+						<span style="font-size: 90%"><i><?php print _('How should students work during this unit?') ?></i></span>
+					</td>
+					<td class="right">
+						<?php
+						print _("Individual") . "<input checked type='checkbox' name='individual'><br/>" ;
+						print _("Pairs") . "<input checked type='checkbox' name='pairs'><br/>" ;
+						print _("Threes") . "<input checked type='checkbox' name='threes'><br/>" ;
+						print _("Fours") . "<input checked type='checkbox' name='fours'><br/>" ;
+						print _("Fives") . "<input checked type='checkbox' name='fives'><br/>" ;
+						?> 
+					</td>
+				</tr>
+				
 				
 				<tr class='break'>
 					<td colspan=2> 

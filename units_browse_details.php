@@ -78,13 +78,21 @@ else {
 		}
 		else {
 			try {
-				if ($highestAction=="Browse Units_all") {
-					$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
-					$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID" ; 
+				if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
+						$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
+						$sql="SELECT * FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
 				}
-				else if ($highestAction=="Browse Units_prerequisites") {
-					$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
-					$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID" ; 
+				else {
+					if ($highestAction=="Browse Units_all") {
+						$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
+						$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID" ; 
+					}
+					else if ($highestAction=="Browse Units_prerequisites") {
+						$data["freeLearningUnitID"]=$freeLearningUnitID; 
+						$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+						$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
+						$sql="SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
+					}
 				}
 				$result=$connection2->prepare($sql);
 				$result->execute($data);

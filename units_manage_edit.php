@@ -118,7 +118,7 @@ else {
 			
 			if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details.php")) {
 				print "<div class='linkTop'>" ;
-					print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID'>" . _('View') . "<img style='margin: 0 0 -4px 3px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a>" ;
+					print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID'>" . _('View') . "<img style='margin: 0 0 -4px 3px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a>" ;
 				print "</div>" ;
 			}
 			
@@ -141,32 +141,6 @@ else {
 								var name2=new LiveValidation('name');
 								name2.add(Validate.Presence);
 							 </script>
-						</td>
-					</tr>
-					<tr>
-						<td> 
-							<b><?php print _('Logo') ?></b><br/>
-							<span style="font-size: 90%"><i>125x125px jpg/png/gif</i><br/></span>
-							<?php if ($row["logo"]!="") { ?>
-							<span style="font-size: 90%"><i><?php print _('Will overwrite existing attachment.') ?></i></span>
-							<?php } ?>
-						</td>
-						<td class="right">
-							<?php
-							if ($row["logo"]!="") {
-								print _("Current attachment:") . " <a href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'>" . $row["logo"] . "</a><br/><br/>" ;
-							}
-							?>
-							<input type="file" name="file" id="file"><br/><br/>
-							<?php
-							print getMaxUpload() ;
-							$ext="'.png','.jpeg','.jpg','.gif'" ;
-							?>
-							
-							<script type="text/javascript">
-								var file=new LiveValidation('file');
-								file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "<?php print _('Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
-							</script>
 						</td>
 					</tr>
 					<?php
@@ -288,31 +262,126 @@ else {
 						</td>
 					</tr>
 					<tr>
-					<td style='width: 275px'> 
-						<b><?php print _('Prerequisite Units') ?></b><br/>
-						<span style="font-size: 90%"><i><?php print _('Use Control, Command and/or Shift to select multiple.') ?></i></span>
-					</td>
-					<td class="right">
-						<select name="prerequisites[]" id="prerequisites[]" multiple style="width: 302px; height: 150px">
+						<td> 
+							<b><?php print _('Logo') ?></b><br/>
+							<span style="font-size: 90%"><i>125x125px jpg/png/gif</i><br/></span>
+							<?php if ($row["logo"]!="") { ?>
+							<span style="font-size: 90%"><i><?php print _('Will overwrite existing attachment.') ?></i></span>
+							<?php } ?>
+						</td>
+						<td class="right">
 							<?php
-							try {
-								$dataSelect=array("freeLearningUnitID"=>$freeLearningUnitID); 
-								$sqlSelect="SELECT * FROM freeLearningUnit WHERE active='Y' AND NOT freeLearningUnitID=:freeLearningUnitID ORDER BY name" ;
-								$resultSelect=$connection2->prepare($sqlSelect);
-								$resultSelect->execute($dataSelect);
-							}
-							catch(PDOException $e) { }
-							while ($rowSelect=$resultSelect->fetch()) {
-								$selected="" ;
-								if (is_numeric(strpos($row["freeLearningUnitIDPrerequisiteList"],str_pad($rowSelect['freeLearningUnitID'], 10, "0", STR_PAD_LEFT)))) {
-									$selected="selected" ;
-								}
-								print "<option $selected value='" . $rowSelect["freeLearningUnitID"] . "'>" . $rowSelect["name"] . " ( " . $rowSelect["difficulty"] . ")</option>" ;
+							if ($row["logo"]!="") {
+								print _("Current attachment:") . " <a href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'>" . $row["logo"] . "</a><br/><br/>" ;
 							}
 							?>
-							</optgroup>
-						</select>
-					</td>
+							<input type="file" name="file" id="file"><br/><br/>
+							<?php
+							print getMaxUpload() ;
+							$ext="'.png','.jpeg','.jpg','.gif'" ;
+							?>
+							
+							<script type="text/javascript">
+								var file=new LiveValidation('file');
+								file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "<?php print _('Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
+							</script>
+						</td>
+					</tr>
+					
+					<tr class='break'>
+						<td colspan=2> 
+							<h3><?php print _('Constraints') ?></h3>
+						</td>
+					</tr>
+					<tr>
+						<td style='width: 275px'> 
+							<b><?php print _('Prerequisite Units') ?></b><br/>
+							<span style="font-size: 90%"><i><?php print _('Use Control, Command and/or Shift to select multiple.') ?></i></span>
+						</td>
+						<td class="right">
+							<select name="prerequisites[]" id="prerequisites[]" multiple style="width: 302px; height: 150px">
+								<?php
+								try {
+									$dataSelect=array("freeLearningUnitID"=>$freeLearningUnitID); 
+									$sqlSelect="SELECT * FROM freeLearningUnit WHERE active='Y' AND NOT freeLearningUnitID=:freeLearningUnitID ORDER BY name" ;
+									$resultSelect=$connection2->prepare($sqlSelect);
+									$resultSelect->execute($dataSelect);
+								}
+								catch(PDOException $e) { }
+								while ($rowSelect=$resultSelect->fetch()) {
+									$selected="" ;
+									if (is_numeric(strpos($row["freeLearningUnitIDPrerequisiteList"],str_pad($rowSelect['freeLearningUnitID'], 10, "0", STR_PAD_LEFT)))) {
+										$selected="selected" ;
+									}
+									print "<option $selected value='" . $rowSelect["freeLearningUnitID"] . "'>" . $rowSelect["name"] . " ( " . $rowSelect["difficulty"] . ")</option>" ;
+								}
+								?>
+								</optgroup>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td style='width: 275px'> 
+							<b><?php print _('Minimum Year Group') ?></b><br/>
+							<span style="font-size: 90%"><i><?php print _('Lowest age group allowed to view unit.') . "<br/>" . _('Public sharing disabled if set.') ?></i></span>
+						</td>
+						<td class="right">
+							<select name="gibbonYearGroupIDMinimum" id="gibbonYearGroupIDMinimum" style="width: 302px">
+								<?php
+								print "<option value=''></option>" ;
+								try {
+									$dataSelect=array(); 
+									$sqlSelect="SELECT gibbonYearGroupID, name FROM gibbonYearGroup ORDER BY sequenceNumber" ;
+									$resultSelect=$connection2->prepare($sqlSelect);
+									$resultSelect->execute($dataSelect);
+								}
+								catch(PDOException $e) { }
+								while ($rowSelect=$resultSelect->fetch()) {
+									$selected="" ;
+									if ($rowSelect["gibbonYearGroupID"]==$row["gibbonYearGroupIDMinimum"]) {
+										$selected="selected" ;
+									}
+									print "<option $selected value='" . $rowSelect["gibbonYearGroupID"] . "'>" . htmlPrep(_($rowSelect["name"])) . "</option>" ;
+								}
+								?>				
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td style='width: 275px'> 
+							<b><?php print _('Grouping') ?></b><br/>
+							<span style="font-size: 90%"><i><?php print _('How should students work during this unit?') ?></i></span>
+						</td>
+						<td class="right">
+							<?php
+							$checked="" ;
+							if (strpos($row["grouping"], "individual")!==FALSE) {
+								$checked="checked" ;
+							}
+							print _("Individual") . "<input $checked type='checkbox' name='individual'><br/>" ;
+							$checked="" ;
+							if (strpos($row["grouping"], "pairs")!==FALSE) {
+								$checked="checked" ;
+							}
+							print _("Pairs") . "<input $checked type='checkbox' name='pairs'><br/>" ;
+							$checked="" ;
+							if (strpos($row["grouping"], "threes")!==FALSE) {
+								$checked="checked" ;
+							}
+							print _("Threes") . "<input $checked type='checkbox' name='threes'><br/>" ;
+							$checked="" ;
+							if (strpos($row["grouping"], "fours")!==FALSE) {
+								$checked="checked" ;
+							}
+							print _("Fours") . "<input $checked type='checkbox' name='fours'><br/>" ;
+							$checked="" ;
+							if (strpos($row["grouping"], "fives")!==FALSE) {
+								$checked="checked" ;
+							}
+							print _("Fives") . "<input $checked type='checkbox' name='fives'><br/>" ;
+							?> 
+						</td>
+				</tr>
 					
 					<tr class='break'>
 						<td colspan=2> 

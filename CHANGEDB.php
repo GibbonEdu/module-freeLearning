@@ -52,4 +52,11 @@ $sql[$count][1]="
 ALTER TABLE `freeLearningUnit` ADD `logo` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;end
 " ;
 
+//v0.7.00
+$count++ ;
+$sql[$count][0]="0.7.00" ;
+$sql[$count][1]="
+ALTER TABLE `freeLearningUnit` ADD `grouping` VARCHAR(255) NOT NULL AFTER `active`, ADD `gibbonYearGroupIDMinimum` INT(3) UNSIGNED ZEROFILL NULL DEFAULT NULL AFTER `grouping`;end
+" ;
+
 ?>

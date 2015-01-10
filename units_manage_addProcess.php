@@ -81,6 +81,39 @@ else {
 				$sharedPublic=$_POST["sharedPublic"] ;
 			}
 			$active=$_POST["active"] ;
+			$gibbonYearGroupIDMinimum=NULL ;
+			if ($_POST["gibbonYearGroupIDMinimum"]!="") {
+				$gibbonYearGroupIDMinimum=$_POST["gibbonYearGroupIDMinimum"] ;
+			}
+			$grouping="" ;
+			if (isset($_POST["individual"])) {
+				if ($_POST["individual"]=="on") {
+					$grouping.="individual," ;
+				}
+			}
+			if (isset($_POST["pairs"])) {
+				if ($_POST["pairs"]=="on") {
+					$grouping.="pairs," ;
+				}
+			}
+			if (isset($_POST["threes"])) {
+				if ($_POST["threes"]=="on") {
+					$grouping.="threes," ;
+				}
+			}
+			if (isset($_POST["fours"])) {
+				if ($_POST["fours"]=="on") {
+					$grouping.="fours," ;
+				}
+			}
+			if (isset($_POST["fives"])) {
+				if ($_POST["fives"]=="on") {
+					$grouping.="fives," ;
+				}
+			}
+			if (substr($grouping, -1)==",") {
+				$grouping=substr($grouping, 0, -1) ;
+			}
 			$freeLearningUnitIDPrerequisiteList=NULL ;
 			if (isset($_POST["prerequisites"])) {
 				$prerequisites=$_POST["prerequisites"] ;
@@ -158,8 +191,8 @@ else {
 				
 				//Write to database
 				try {
-					$data=array("name"=>$name, "logo"=>$attachment, "difficulty"=>$difficulty, "blurb"=>$blurb, "license"=>$license, "sharedPublic"=>$sharedPublic, "active"=>$active, "gibbonDepartmentIDList"=>$gibbonDepartmentIDList, "freeLearningUnitIDPrerequisiteList"=>$freeLearningUnitIDPrerequisiteList, "outline"=>$outline, "gibbonPersonIDCreator"=>$_SESSION[$guid]["gibbonPersonID"], "timestamp"=>date("Y-m-d H:i:s")); 
-					$sql="INSERT INTO freeLearningUnit SET name=:name, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, sharedPublic=:sharedPublic, active=:active, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp" ;
+					$data=array("name"=>$name, "logo"=>$attachment, "difficulty"=>$difficulty, "blurb"=>$blurb, "license"=>$license, "sharedPublic"=>$sharedPublic, "active"=>$active, "gibbonYearGroupIDMinimum"=>$gibbonYearGroupIDMinimum, "grouping"=>$grouping, "gibbonDepartmentIDList"=>$gibbonDepartmentIDList, "freeLearningUnitIDPrerequisiteList"=>$freeLearningUnitIDPrerequisiteList, "outline"=>$outline, "gibbonPersonIDCreator"=>$_SESSION[$guid]["gibbonPersonID"], "timestamp"=>date("Y-m-d H:i:s")); 
+					$sql="INSERT INTO freeLearningUnit SET name=:name, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, grouping=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp" ;
 					$result=$connection2->prepare($sql);
 					$result->execute($data);
 				}

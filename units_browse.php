@@ -183,11 +183,18 @@ else {
 				}
 				$difficultyOrder.="), " ;
 			}
-			if ($highestAction=="Browse Units_all") {
-				$sql="SELECT * FROM freeLearningUnit WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
+			if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
+				$sql="SELECT * FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
 			}
-			else if ($highestAction=="Browse Units_prerequisites") {
-				$sql="SELECT * FROM freeLearningUnit WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
+			else {
+				if ($highestAction=="Browse Units_all") {
+					$sql="SELECT * FROM freeLearningUnit WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
+				}
+				else if ($highestAction=="Browse Units_prerequisites") {
+					$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+					$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
+					$sql="SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name DESC" ; 
+				}
 			}
 			$result=$connection2->prepare($sql);
 			$result->execute($data);
@@ -223,6 +230,9 @@ else {
 					print "<th>" ;
 						print _("Length") . "</br>" ;
 						print "<span style='font-size: 85%; font-style: italic'>" . _('Minutes') . "</span>" ;
+					print "</th>" ;
+					print "<th>" ;
+						print _("Grouping") . "</br>" ;
 					print "</th>" ;
 					print "<th>" ;
 						print _("Prerequisites") . "</br>" ;
@@ -277,8 +287,8 @@ else {
 							}
 						print "</td>" ;
 						print "<td>" ;
-							print $row["difficulty"] . "<br/>" ;
-							print "<div style='font-size: 85%; text-align: justify'>" ;
+							print "<b>" . $row["difficulty"] . "</b><br/>" ;
+							print "<div style='font-size: 100%; text-align: justify'>" ;
 								print $row["blurb"] ;
 							print "</div>" ;
 						print "</td>" ;
@@ -299,7 +309,15 @@ else {
 							else {
 								print $timing ;
 							}
+						print "</td>" ;print "<td>" ;
+							if ($row["grouping"]!="") {
+								$groupings=explode(",", $row["grouping"]) ;
+								foreach ($groupings AS $grouping) {
+									print ucwords($grouping) . "<br/>" ;
+								}
+							}
 						print "</td>" ;
+						
 						print "<td>" ;
 							$prerequisitesActive=prerquisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
 							if ($prerequisitesActive!=FALSE) {
