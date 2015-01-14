@@ -166,7 +166,7 @@ else {
 			}
 			if ($name!="") {
 				$data["name"]=$name ;
-				$sqlWhere.="name LIKE concat('%', :name, '%') AND " ; 
+				$sqlWhere.="freeLearningUnit.name LIKE concat('%', :name, '%') AND " ; 
 			}
 			if ($sqlWhere=="AND ") {
 				$sqlWhere="" ;

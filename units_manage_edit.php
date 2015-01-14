@@ -355,30 +355,30 @@ else {
 						<td class="right">
 							<?php
 							$checked="" ;
-							if (strpos($row["grouping"], "individual")!==FALSE) {
+							if (strpos($row["grouping"], "Individual")!==FALSE) {
 								$checked="checked" ;
 							}
-							print _("Individual") . "<input $checked type='checkbox' name='individual'><br/>" ;
+							print _("Individual") . "<input $checked type='checkbox' name='Individual'><br/>" ;
 							$checked="" ;
-							if (strpos($row["grouping"], "pairs")!==FALSE) {
+							if (strpos($row["grouping"], "Pairs")!==FALSE) {
 								$checked="checked" ;
 							}
-							print _("Pairs") . "<input $checked type='checkbox' name='pairs'><br/>" ;
+							print _("Pairs") . "<input $checked type='checkbox' name='Pairs'><br/>" ;
 							$checked="" ;
-							if (strpos($row["grouping"], "threes")!==FALSE) {
+							if (strpos($row["grouping"], "Threes")!==FALSE) {
 								$checked="checked" ;
 							}
-							print _("Threes") . "<input $checked type='checkbox' name='threes'><br/>" ;
+							print _("Threes") . "<input $checked type='checkbox' name='Threes'><br/>" ;
 							$checked="" ;
-							if (strpos($row["grouping"], "fours")!==FALSE) {
+							if (strpos($row["grouping"], "Fours")!==FALSE) {
 								$checked="checked" ;
 							}
-							print _("Fours") . "<input $checked type='checkbox' name='fours'><br/>" ;
+							print _("Fours") . "<input $checked type='checkbox' name='Fours'><br/>" ;
 							$checked="" ;
-							if (strpos($row["grouping"], "fives")!==FALSE) {
+							if (strpos($row["grouping"], "Fives")!==FALSE) {
 								$checked="checked" ;
 							}
-							print _("Fives") . "<input $checked type='checkbox' name='fives'><br/>" ;
+							print _("Fives") . "<input $checked type='checkbox' name='Fives'><br/>" ;
 							?> 
 						</td>
 				</tr>

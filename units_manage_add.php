@@ -283,11 +283,11 @@ else {
 					</td>
 					<td class="right">
 						<?php
-						print _("Individual") . "<input checked type='checkbox' name='individual'><br/>" ;
-						print _("Pairs") . "<input checked type='checkbox' name='pairs'><br/>" ;
-						print _("Threes") . "<input checked type='checkbox' name='threes'><br/>" ;
-						print _("Fours") . "<input checked type='checkbox' name='fours'><br/>" ;
-						print _("Fives") . "<input checked type='checkbox' name='fives'><br/>" ;
+						print _("Individual") . "<input checked type='checkbox' name='Individual'><br/>" ;
+						print _("Pairs") . "<input checked type='checkbox' name='Pairs'><br/>" ;
+						print _("Threes") . "<input checked type='checkbox' name='Threes'><br/>" ;
+						print _("Fours") . "<input checked type='checkbox' name='Fours'><br/>" ;
+						print _("Fives") . "<input checked type='checkbox' name='Fives'><br/>" ;
 						?> 
 					</td>
 				</tr>
