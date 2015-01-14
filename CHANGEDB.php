@@ -68,4 +68,13 @@ ALTER TABLE `freeLearningUnitStudent` ADD `grouping` ENUM('Individual','Pairs','
 ALTER TABLE `freeLearningUnitStudent` ADD `collaborationKey` VARCHAR(20) NULL DEFAULT NULL AFTER `grouping`;end
 " ;
 
+//v0.9.00
+$count++ ;
+$sql[$count][0]="0.9.00" ;
+$sql[$count][1]="
+ALTER TABLE `freeLearningUnitStudent` CHANGE `evidenceURL` `evidenceLocation` INT(255) NOT NULL;end
+ALTER TABLE `freeLearningUnitStudent` CHANGE `evidenceLocation` `evidenceLocation` TEXT NOT NULL;end
+ALTER TABLE `freeLearningUnitStudent` ADD `gibbonCourseClassID` INT(8) UNSIGNED ZEROFILL NOT NULL AFTER `gibbonSchoolYearID`;end
+" ;
+
 ?>

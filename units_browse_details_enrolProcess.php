@@ -20,6 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 include "../../functions.php" ;
 include "../../config.php" ;
 
+include "./moduleFunctions.php" ;
+
 //New PDO DB connection
 try {
   	$connection2=new PDO("mysql:host=$databaseServer;dbname=$databaseName;charset=utf8", $databaseUsername, $databasePassword);
@@ -97,7 +99,7 @@ else {
 						$proceed=TRUE ;
 					}
 					else {
-						$prerequisitesActive=prerquisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
+						$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
 						$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
 						if ($prerquisitesMet) {
 							$proceed=TRUE ;
@@ -190,8 +192,8 @@ else {
 							else {
 								//Write to database
 								try {
-									$data=array("gibbonPersonIDStudent"=>$_SESSION[$guid]["gibbonPersonID"], "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-									$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+									$data=array("gibbonPersonIDStudent"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+									$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
 									$result=$connection2->prepare($sql);
 									$result->execute($data);
 								}
@@ -224,8 +226,8 @@ else {
 										else {
 											//Write to database
 											try {
-												$data=array("gibbonPersonIDStudent"=>$collaborator, "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-												$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+												$data=array("gibbonPersonIDStudent"=>$collaborator, "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+												$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
 												$result=$connection2->prepare($sql);
 												$result->execute($data);
 											}

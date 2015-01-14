@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v0.9.00
+-------
+Added unit completion, evidence submission, teacher view of enrolment
+
 v0.8.00
 -------
 Added student enrolment (individual and group)

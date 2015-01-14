@@ -118,7 +118,7 @@ else {
 						$proceed=TRUE ;
 					}
 					else {
-						$prerequisitesActive=prerquisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
+						$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
 						$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
 						if ($prerquisitesMet) {
 							$proceed=TRUE ;
@@ -195,12 +195,19 @@ else {
 						}
 						else if ($roleCategory=="Staff") {
 							$enrolment=TRUE ;
-							$enrolmentType="staff" ;
-							//What do you need to have to manage enrolment...any categories?
+							$enrolmentType="staffView" ;
+							//Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
+							$learningAreas=getLearningAreas($connection2, $guid, TRUE) ;
+							if ($learningAreas!="") {
+								for ($i=0; $i<count($learningAreas); $i=$i+2) {
+									if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
+										$enrolmentType="staffEdit" ;
+									}
+								}
+							}
 						}
 					}
-				
-
+					
 					print "<div id='tabs' style='margin: 20px 0'>" ;
 						//Tab links
 						print "<ul>" ;
@@ -216,35 +223,134 @@ else {
 						//Tabs
 						if ($enrolment) {
 							print "<div id='tabs0'>" ;
-								if ($enrolmentType=="student") { //STUDENT ENROLMENT
-									if (isset($_GET["updateReturn"])) { $updateReturn=$_GET["updateReturn"] ; } else { $updateReturn="" ; }
-										$updateReturnMessage="" ;
-										$class="error" ;
-										if (!($updateReturn=="")) {
-											if ($updateReturn=="fail0") {
-												$updateReturnMessage=_("Your request failed because you do not have access to this action.") ;	
-											}
-											else if ($updateReturn=="fail2") {
-												$updateReturnMessage=_("Your request failed due to a database error.") ;	
-											}
-											else if ($updateReturn=="fail3") {
-												$updateReturnMessage=_("Your request failed because your inputs were invalid.") ;	
-											}
-											else if ($updateReturn=="fail5") {
-												$updateReturnMessage=_("Your request was successful, but some data was not properly saved.") ;	
-											}
-											else if ($updateReturn=="success0") {
-												$updateReturnMessage=_("Your request was completed successfully.") ;	
-												$class="success" ;
-											}
-											print "<div class='$class'>" ;
-												print $updateReturnMessage;
-											print "</div>" ;
-										} 
+								if (isset($_GET["updateReturn"])) { $updateReturn=$_GET["updateReturn"] ; } else { $updateReturn="" ; }
+								$updateReturnMessage="" ;
+								$class="error" ;
+								if (!($updateReturn=="")) {
+									if ($updateReturn=="fail0") {
+										$updateReturnMessage=_("Your request failed because you do not have access to this action.") ;	
+									}
+									else if ($updateReturn=="fail2") {
+										$updateReturnMessage=_("Your request failed due to a database error.") ;	
+									}
+									else if ($updateReturn=="fail3") {
+										$updateReturnMessage=_("Your request failed because your inputs were invalid.") ;	
+									}
+									else if ($updateReturn=="fail5") {
+										$updateReturnMessage=_("Your request was successful, but some data was not properly saved.") ;	
+									}
+									else if ($updateReturn=="fail6") {
+										$updateReturnMessage=_("Your request failed due to an attachment error.") ;	
+									}
+									else if ($updateReturn=="success0") {
+										$updateReturnMessage=_("Your request was completed successfully.") ;	
+										$class="success" ;
+									}
+									print "<div class='$class'>" ;
+										print $updateReturnMessage;
+									print "</div>" ;
+								} 
+								
+								print "<h3>" ;
+									print _("Enrolment") ;
+								print "</h3>" ;
 									
-									print "<h3>" ;
-										print _("Enrolment") ;
-									print "</h3>" ;
+								if ($enrolmentType=="staffView" OR $enrolmentType=="staffEdit") { //STAFF ENROLMENT
+									print "<p>" ;
+										print _("Below you can view the students current enroled in this unit, including both those who are working on it, and those who are awaiting approval.") ;
+									print "</p>" ;
+									//List students whose status is Current or Complete - Pending
+									try {
+										$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+										$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY freeLearningUnitStudent.status DESC, surname, preferredName" ;
+										$resultClass=$connection2->prepare($sqlClass);
+										$resultClass->execute($dataClass);
+									}
+									catch(PDOException $e) { 
+										print "<div class='error'>" . $e->getMessage() . "</div>" ; 
+									}
+									$count=0;
+									$rowNum="odd" ;
+									if ($resultClass->rowCount()>0) {
+										?>
+										<table cellspacing='0' style="width: 100%">	
+											<tr class='head'>
+												<th> 
+													<?php print _('Student') ?><br/>
+												</th>
+												<th> 
+													<?php print _('Status') ?><br/>
+												</th>
+												<th> 
+													<?php print _('View') ?><br/>
+												</th>
+												<th>
+													<?php print _('Action') ?><br/>
+												</th>
+											</tr>
+											<?php
+											while ($rowClass=$resultClass->fetch()) {
+												if ($count%2==0) {
+													$rowNum="even" ;
+												}
+												else {
+													$rowNum="odd" ;
+												}
+												$count++ ;
+											
+												print "<tr class=$rowNum>" ;
+												?>
+													<td> 
+														<?php print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true) . "</a>" ?><br/>
+													</td>
+													<td> 
+														<?php print $rowClass["status"] ?><br/>
+													</td>	
+													<td> 
+														<?php
+														if ($rowClass["evidenceLocation"]!="") {
+															if ($rowClass["evidenceType"]=="Link") {
+																print "<a target='_blank' href='" . $rowClass["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+															}
+															else {
+																print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowClass["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+															}
+														}
+														?>
+													</td>	
+													<td>
+														<?php 
+														print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Planner/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
+														if ($rowClass["commentStudent"]!="") {
+															print "<script type='text/javascript'>" ;	
+																print "$(document).ready(function(){" ;
+																	print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").hide();" ;
+																	print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeIn(1000);" ;
+																	print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").click(function(){" ;
+																	print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeToggle(1000);" ;
+																	print "});" ;
+																print "});" ;
+															print "</script>" ;
+															print "<a title='" . _('Show Comment') . "' class='show_hide-" . $rowClass["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
+														}
+														?>
+													</td>											
+												</tr>
+												<?php
+												if ($rowClass["commentStudent"]!="") {
+													print "<tr class='comment-" . $rowClass["freeLearningUnitStudentID"] . "' id='comment-" . $rowClass["freeLearningUnitStudentID"] . "'>" ;
+														print "<td colspan=4>" ;
+															print $rowClass["commentStudent"] ;
+														print "</td>" ;
+													print "</tr>" ;
+												}
+											}
+											?>
+										</table>
+										<?php
+									}
+								}
+								if ($enrolmentType=="student") { //STUDENT ENROLMENT
 									print "<p>" ;
 										print _("You can be enroled in one unit for each of your units at any one time. Use the information to manage your enrolment for this unit.") ;
 									print "</p>" ;
@@ -253,7 +359,7 @@ else {
 									$enrolCheckFail=FALSE ;
 									try {
 										$dataEnrol=array("freeLearningUnitID"=>$freeLearningUnitID, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"]) ;
-										$sqlEnrol="SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID" ; 
+										$sqlEnrol="SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID" ; 
 										$resultEnrol=$connection2->prepare($sqlEnrol);
 										$resultEnrol->execute($dataEnrol);
 									}
@@ -266,25 +372,240 @@ else {
 										if ($resultEnrol->rowCount()==1) { //Already enroled, deal with different statuses
 											$rowEnrol=$resultEnrol->fetch() ;
 											if ($rowEnrol["status"]=="Current") { //Currently enroled, allow to set status to complete and submit feedback
-												print "<h5>" ;
+												print "<h4>" ;
 													print _("Currently Enroled") ;
-												print "</h5>" ;
+												print "</h4>" ;
+												print "<p>" ;
+													print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your teacher will be notified, and will approve your unit completion in due course.'), $row["name"]) ;
+												print "</p>" ;
+												?>
+												<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_completePendingProcess.php?address=" . $_GET["q"] ?>" enctype="multipart/form-data">
+													<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+														<tr>
+															<td> 
+																<b><?php print _('Status') ?> *</b><br/>
+																<span style="font-size: 90%"><i><?php print _('This value cannot be changed.') ?></i></span>
+															</td>
+															<td class="right">
+																<input readonly style='width: 300px' type='text' value='Complete - Pending' />
+															</td>
+														</tr>
+														<tr>
+															<td> 
+																<b><?php print _('Comment') ?> *</b><br/>
+																<span style="font-size: 90%"><i><?php print _('Leave a brief reflective comment on this unit<br/>and what you learned.') ?></i></span>
+															</td>
+															<td class="right">
+																<script type='text/javascript'>
+																	$(document).ready(function(){
+																		$('#commentStudent').autosize();    
+																	});
+																</script>
+																<textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"></textarea>
+																<script type="text/javascript">
+																	var commentStudent=new LiveValidation('commentStudent');
+																	commentStudent.add(Validate.Presence);
+																</script>
+															</td>
+														</tr>
+														<tr>
+															<td> 
+																<b><?php print _('Type') ?> *</b><br/>
+															</td>
+															<td class="right">
+																<input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
+																<input type="radio" id="type" name="type" class="type" value="File" /> File
+															</td>
+														</tr>
+														<script type="text/javascript">
+															/* Subbmission type control */
+															$(document).ready(function(){
+																$("#fileRow").css("display","none");
+																$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); 
+															
+																$(".type").click(function(){
+																	if ($('input[name=type]:checked').val()=="Link" ) {
+																		$("#fileRow").css("display","none");
+																		$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); 
+																	} else {
+																		$("#linkRow").css("display","none");
+																		$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row")); 
+																	}
+																 });
+															});
+														</script>
+													
+														<tr id="fileRow">
+															<td> 
+																<b><?php print _('Submit File') ?> *</b><br/>
+															</td>
+															<td class="right">
+																<input type="file" name="file" id="file"><br/><br/>
+																<?php
+																print getMaxUpload() ;
+															
+																//Get list of acceptable file extensions
+																try {
+																	$dataExt=array(); 
+																	$sqlExt="SELECT * FROM gibbonFileExtension" ;
+																	$resultExt=$connection2->prepare($sqlExt);
+																	$resultExt->execute($dataExt);
+																}
+																catch(PDOException $e) { }
+																$ext="" ;
+																while ($rowExt=$resultExt->fetch()) {
+																	$ext=$ext . "'." . $rowExt["extension"] . "'," ;
+																}
+																?>
+															
+																<script type="text/javascript">
+																	var file=new LiveValidation('file');
+																	file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
+																</script>
+															</td>
+														</tr>
+														<tr id="linkRow">
+															<td> 
+																<b><?php print _('Submit Link') ?> *</b><br/>
+															</td>
+															<td class="right">
+																<input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
+																<script type="text/javascript">
+																	var link=new LiveValidation('link');
+																	link.add( Validate.Inclusion, { within: ['http://', 'https://'], failureMessage: "Address must start with http:// or https://", partialMatch: true } );
+																</script>
+															</td>
+														</tr>
+														<tr>
+															<td class="right" colspan=2>
+																<input type="hidden" name="freeLearningUnitStudentID" value="<?php print $rowEnrol["freeLearningUnitStudentID"] ?>">
+																<input type="hidden" name="freeLearningUnitID" value="<?php print $freeLearningUnitID ?>">
+																<input type="submit" id="submit" value="Submit">
+															</td>
+														</tr>
+														<tr>
+															<td class="right" colspan=2>
+																<span style="font-size: 90%"><i>* <?php print _("denotes a required field") ; ?></i></span>
+															</td>
+														</tr>
+													</table>
+												</form>
+												<?php
 											}	
 											else if ($rowEnrol["status"]=="Complete - Pending") { //Waiting for teacher feedback
-												print "<h5>" ;
+												print "<h4>" ;
 													print _("Complete - Pending Approval") ;
-												print "</h5>" ;
+												print "</h4>" ;
+												print "<p>" ;
+													print _('Your evidence, shown below, has been submitted to your teacher(s) for approval. This screen will show a teacher comment, once approval has been given.') ;
+												print "</p>" ;
+												?>
+												<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+													<tr>
+														<td> 
+															<b><?php print _('Status') ?></b><br/>
+														</td>
+														<td class="right">
+															<input readonly style='width: 300px' type='text' value='Complete - Pending' />
+														</td>
+													</tr>
+													<tr>
+														<td> 
+															<b><?php print _('Evidence Type') ?></b><br/>
+														</td>
+														<td class="right">
+															<input readonly style='width: 300px' type='text' value='<?php print $rowEnrol["evidenceType"] ?>' />
+														</td>
+													</tr>
+													<tr>
+														<td> 
+															<b><?php print _('Evidence') ?></b><br/>
+														</td>
+														<td class="right">
+															<div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
+																<?php
+																if ($rowEnrol["evidenceType"]=="Link") {
+																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																}
+																else {
+																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																}
+																?>
+															</div>
+														</td>
+													</tr>
+												</table>
+												<?php	
+												print "<h4>" ;
+													print _("Student Comment") ;
+												print "</h4>" ;
+												print "<p>" ;
+													print $rowEnrol["commentStudent"] ;
+												print "</p>" ;
 											}	
 											else if ($rowEnrol["status"]=="Complete - Approved") { //Complete, show status and feedback from teacher.
-												print "<h5>" ;
-													print _("Complete!") ;
-												print "</h5>" ;
+												print "<h4>" ;
+													print _("Complete - Approved") ;
+												print "</h4>" ;
+												print "<p>" ;
+													print _('Congralutation! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') ;
+												print "</p>" ;
+												?>
+												<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+													<tr>
+														<td> 
+															<b><?php print _('Status') ?></b><br/>
+														</td>
+														<td class="right">
+															<input readonly style='width: 300px' type='text' value='Complete - Approved' />
+														</td>
+													</tr>
+													<tr>
+														<td> 
+															<b><?php print _('Evidence Type') ?></b><br/>
+														</td>
+														<td class="right">
+															<input readonly style='width: 300px' type='text' value='<?php print $rowEnrol["evidenceType"] ?>' />
+														</td>
+													</tr>
+													<tr>
+														<td> 
+															<b><?php print _('Evidence') ?></b><br/>
+														</td>
+														<td class="right">
+															<div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
+																<?php
+																if ($rowEnrol["evidenceType"]=="Link") {
+																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																}
+																else {
+																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																}
+																?>
+															</div>
+														</td>
+													</tr>
+												</table>
+												<?php	
+												print "<h4>" ;
+													print _("Teacher Comment") ;
+												print "</h4>" ;
+												print "<p>" ;
+													print $rowEnrol["commentApproval"] ;
+												print "</p>" ;
+												
+												print "<h4>" ;
+													print _("Student Comment") ;
+												print "</h4>" ;
+												print "<p>" ;
+													print $rowEnrol["commentStudent"] ;
+												print "</p>" ;
 											}	
 										}
 										else { //Not enroled, give a chance to enrol
-											print "<h5>" ;
+											print "<h4>" ;
 												print _("Enrol Now") ;
-											print "</h5>" ;
+											print "</h4>" ;
 											?>
 											<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolProcess.php?address=" . $_GET["q"] ?>">
 												<table class='smallIntBorder' cellspacing='0' style="width: 100%">	

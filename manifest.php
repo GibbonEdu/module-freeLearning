@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="0.8.00" ;
+$version="0.9.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -82,6 +82,7 @@ $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
   `gibbonPersonIDStudent` int(10) unsigned zerofill DEFAULT NULL,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
   `gibbonSchoolYearID` INT(3) UNSIGNED ZEROFILL NOT NULL,
+  `gibbonCourseClassID` INT(8) UNSIGNED ZEROFILL NOT NULL,
   `grouping` ENUM('Individual','Pairs','Threes','Fours','Fives') NOT NULL,
   `collaborationKey` VARCHAR(20) NULL DEFAULT NULL,
   `status` enum('Current','Complete - Pending','Complete - Approved') NOT NULL DEFAULT 'Current',
@@ -90,7 +91,7 @@ $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
   `timestampCompleteApproved` timestamp NULL DEFAULT NULL,
   `gibbonPersonIDApproval` int(10) unsigned zerofill DEFAULT NULL,
   `evidenceType` enum('File','Link') NOT NULL,
-  `evidenceURL` int(255) NOT NULL,
+  `evidenceLocation` text NOT NULL,
   `commentStudent` text NOT NULL,
   `commentApproval` text NOT NULL,
   PRIMARY KEY (`freeLearningUnitStudentID`)

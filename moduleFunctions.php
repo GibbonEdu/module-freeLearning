@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function prerquisitesRemoveInactive($connection2, $prerequisites) {
+function prerequisitesRemoveInactive($connection2, $prerequisites) {
 	$return=FALSE ;
 	
 	if ($prerequisites=="") {
@@ -179,7 +179,7 @@ function getUnitsArray($connection2) {
 }
 
 
-//Set $limite=TRUE to only return departments that the user has curriculum editing rights in
+//Set $limit=TRUE to only return departments that the user has curriculum editing rights in
 function getLearningAreas($connection2, $guid, $limit=FALSE ) {
 	$output=FALSE ;
 	try {

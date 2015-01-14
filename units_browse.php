@@ -184,16 +184,18 @@ else {
 				$difficultyOrder.="), " ;
 			}
 			if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
-				$sql="SELECT * FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
+				$sql="SELECT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
 			}
 			else {
 				if ($highestAction=="Browse Units_all") {
-					$sql="SELECT * FROM freeLearningUnit WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
+					$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+					$sql="SELECT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
 				}
 				else if ($highestAction=="Browse Units_prerequisites") {
 					$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+					$data["gibbonPersonID2"]=$_SESSION[$guid]["gibbonPersonID"] ;
 					$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
-					$sql="SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name DESC" ; 
+					$sql="SELECT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name DESC" ; 
 				}
 			}
 			$result=$connection2->prepare($sql);
@@ -218,10 +220,11 @@ else {
 				print "<tr class='head'>" ;
 					print "<th style='width: 150px!important; text-align: center'>" ;
 						print _("Name") . "</br>" ;
-						print "<span style='font-size: 85%; font-style: italic'>" . _('Learning Areas') . "</span>" ;
+						print "<span style='font-size: 85%; font-style: italic'>" . _('Status') . "</span>" ;
 					print "</th>" ;
 					print "<th style='width: 100px!important'>" ;
-						print _("Authors") ;
+						print _("Authors") . "<br/>" ;
+						print "<span style='font-size: 85%; font-style: italic'>" . _('Learning Areas') . "</span>" ;
 					print "</th>" ;
 					print "<th style='max-width: 325px!important'>" ;
 						print _("Difficulty") . "</br>" ;
@@ -258,6 +261,12 @@ else {
 					else {
 						$rowNum="odd" ;
 					}
+					if ($row["status"]=="Complete - Approved") {
+						$rowNum="current" ;
+					}
+					else if ($row["status"]=="Current" OR $row["status"]=="Complete - Pending") {
+						$rowNum="warning" ;
+					}
 					$count++ ;
 					
 					//COLOR ROW BY STATUS!
@@ -270,6 +279,16 @@ else {
 							else {
 								print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'/><br/>" ;
 							}
+							print "<span style='font-size: 85%;'>" ;
+								print $row["status"] ;
+							print "</span>" ;
+						print "</td>" ;
+						print "<td>" ;
+							foreach ($authors AS $author) {
+								if ($author[0]==$row["freeLearningUnitID"]) {
+									print $author[1] . "<br/>" ;
+								}
+							}
 							if ($row["gibbonDepartmentIDList"]!="") {
 								print "<span style='font-size: 85%;'>" ;
 									$departments=explode(",", $row["gibbonDepartmentIDList"]) ;
@@ -277,13 +296,6 @@ else {
 										print $learningAreaArray[$department] . "<br/>" ;
 									}
 								print "</span>" ;
-							}
-						print "</td>" ;
-						print "<td>" ;
-							foreach ($authors AS $author) {
-								if ($author[0]==$row["freeLearningUnitID"]) {
-									print $author[1] . "<br/>" ;
-								}
 							}
 						print "</td>" ;
 						print "<td>" ;
@@ -319,7 +331,7 @@ else {
 						print "</td>" ;
 						
 						print "<td>" ;
-							$prerequisitesActive=prerquisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
+							$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
 							if ($prerequisitesActive!=FALSE) {
 								$prerequisites=explode(",", $prerequisitesActive) ;
 								$units=getUnitsArray($connection2) ;
