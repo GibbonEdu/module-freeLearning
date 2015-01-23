@@ -86,29 +86,29 @@ else {
 				$gibbonYearGroupIDMinimum=$_POST["gibbonYearGroupIDMinimum"] ;
 			}
 			$grouping="" ;
-			if (isset($_POST["individual"])) {
-				if ($_POST["individual"]=="on") {
-					$grouping.="individual," ;
+			if (isset($_POST["Individual"])) {
+				if ($_POST["Individual"]=="on") {
+					$grouping.="Individual," ;
 				}
 			}
-			if (isset($_POST["pairs"])) {
-				if ($_POST["pairs"]=="on") {
-					$grouping.="pairs," ;
+			if (isset($_POST["Pairs"])) {
+				if ($_POST["Pairs"]=="on") {
+					$grouping.="Pairs," ;
 				}
 			}
-			if (isset($_POST["threes"])) {
-				if ($_POST["threes"]=="on") {
-					$grouping.="threes," ;
+			if (isset($_POST["Threes"])) {
+				if ($_POST["Threes"]=="on") {
+					$grouping.="Threes," ;
 				}
 			}
-			if (isset($_POST["fours"])) {
-				if ($_POST["fours"]=="on") {
-					$grouping.="fours," ;
+			if (isset($_POST["Fours"])) {
+				if ($_POST["Fours"]=="on") {
+					$grouping.="Fours," ;
 				}
 			}
-			if (isset($_POST["fives"])) {
-				if ($_POST["fives"]=="on") {
-					$grouping.="fives," ;
+			if (isset($_POST["Fives"])) {
+				if ($_POST["Fives"]=="on") {
+					$grouping.="Fives," ;
 				}
 			}
 			if (substr($grouping, -1)==",") {
