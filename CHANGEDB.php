@@ -78,4 +78,9 @@ ALTER TABLE `freeLearningUnitStudent` ADD `gibbonCourseClassID` INT(8) UNSIGNED 
 UPDATE gibbonAction SET URLList='units_browse.php, units_browse_details.php, units_browse_details_approval.php' WHERE name='Browse Units_all' AND gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning');end
 " ;
 
+//v1.0.00
+$count++ ;
+$sql[$count][0]="1.0.00" ;
+$sql[$count][1]="" ;
+
 ?>

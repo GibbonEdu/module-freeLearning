@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.00
+-------
+Fixed edit bug preventing grouping from being saved
+
 v0.9.00
 -------
 Added unit completion, evidence submission, teacher view of enrolment
