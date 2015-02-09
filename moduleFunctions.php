@@ -52,7 +52,7 @@ function prerquisitesMet($connection2, $gibbonPersonID, $prerequisites) {
 	$complete=array() ;
 	try {
 		$data=array("gibbonPersonID"=>$gibbonPersonID); 
-		$sql="SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND status='Complete - Approved' ORDER BY freeLearningUnitID" ;
+		$sql="SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND (status='Complete - Approved' OR status='Exempt') ORDER BY freeLearningUnitID" ;
 		$result=$connection2->prepare($sql);
 		$result->execute($data);
 	}

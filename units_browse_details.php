@@ -257,12 +257,15 @@ else {
 									
 								if ($enrolmentType=="staffView" OR $enrolmentType=="staffEdit") { //STAFF ENROLMENT
 									print "<p>" ;
-										print _("Below you can view the students current enroled in this unit, including both those who are working on it, and those who are awaiting approval.") ;
+										print _("Below you can view the students currently enroled in this unit, including both those who are working on it, and those who are awaiting approval.") ;
 									print "</p>" ;
+									print "<div class='linkTop'>" ;
+										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID'>" . _('Add Multiple') . "<img style='margin: 0 0 -4px 5px' title='" . _('Add Multiple') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new_multi.png'/></a>" ;
+									print "</div>" ;
 									//List students whose status is Current or Complete - Pending
 									try {
 										$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-										$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY freeLearningUnitStudent.status DESC, surname, preferredName" ;
+										$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY freeLearningUnitStudent.status DESC, surname, preferredName" ;
 										$resultClass=$connection2->prepare($sqlClass);
 										$resultClass->execute($dataClass);
 									}
@@ -271,7 +274,12 @@ else {
 									}
 									$count=0;
 									$rowNum="odd" ;
-									if ($resultClass->rowCount()>0) {
+									if ($resultClass->rowCount()<1) {
+										print "<div class='error'>" ;
+											print _("There are no records to display.") ;
+										print "</div>" ;
+									}
+									else {
 										?>
 										<table cellspacing='0' style="width: 100%">	
 											<tr class='head'>
@@ -603,6 +611,14 @@ else {
 													print $rowEnrol["commentStudent"] ;
 												print "</p>" ;
 											}	
+										}
+										else if ($rowEnrol["status"]=="Exempt") { //Exempt, let student know
+											print "<h4>" ;
+												print _("Exempt") ;
+											print "</h4>" ;
+											print "<p>" ;
+												print _('You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.') ;
+											print "</p>" ;
 										}
 										else { //Not enroled, give a chance to enrol
 											print "<h4>" ;

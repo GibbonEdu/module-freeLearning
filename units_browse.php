@@ -261,7 +261,7 @@ else {
 					else {
 						$rowNum="odd" ;
 					}
-					if ($row["status"]=="Complete - Approved") {
+					if ($row["status"]=="Complete - Approved" OR $row["status"]=="Exempt") {
 						$rowNum="current" ;
 					}
 					else if ($row["status"]=="Current" OR $row["status"]=="Complete - Pending") {

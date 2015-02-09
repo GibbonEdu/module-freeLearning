@@ -85,7 +85,7 @@ $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
   `gibbonCourseClassID` INT(8) UNSIGNED ZEROFILL NOT NULL,
   `grouping` ENUM('Individual','Pairs','Threes','Fours','Fives') NOT NULL,
   `collaborationKey` VARCHAR(20) NULL DEFAULT NULL,
-  `status` enum('Current','Complete - Pending','Complete - Approved') NOT NULL DEFAULT 'Current',
+  `status` enum('Current','Complete - Pending','Complete - Approved','Exempt') NOT NULL DEFAULT 'Current',
   `timestampJoined` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `timestampCompletePending` timestamp NULL DEFAULT NULL,
   `timestampCompleteApproved` timestamp NULL DEFAULT NULL,

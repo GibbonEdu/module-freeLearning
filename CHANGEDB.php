@@ -81,6 +81,8 @@ UPDATE gibbonAction SET URLList='units_browse.php, units_browse_details.php, uni
 //v1.0.00
 $count++ ;
 $sql[$count][0]="1.0.00" ;
-$sql[$count][1]="" ;
+$sql[$count][1]="
+ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','Complete - Pending','Complete - Approved','Exempt') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Current';end
+" ;
 
 ?>

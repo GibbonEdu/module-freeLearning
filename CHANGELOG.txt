@@ -3,6 +3,7 @@ CHANGELOG
 v1.0.00
 -------
 Fixed edit bug preventing grouping from being saved
+Added ability to exempt students from units
 
 v0.9.00
 -------
