@@ -611,14 +611,14 @@ else {
 													print $rowEnrol["commentStudent"] ;
 												print "</p>" ;
 											}	
-										}
-										else if ($rowEnrol["status"]=="Exempt") { //Exempt, let student know
-											print "<h4>" ;
-												print _("Exempt") ;
-											print "</h4>" ;
-											print "<p>" ;
-												print _('You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.') ;
-											print "</p>" ;
+											else if ($rowEnrol["status"]=="Exempt") { //Exempt, let student know
+												print "<h4>" ;
+													print _("Exempt") ;
+												print "</h4>" ;
+												print "<p>" ;
+													print _('You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.') ;
+												print "</p>" ;
+											}
 										}
 										else { //Not enroled, give a chance to enrol
 											print "<h4>" ;

@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v1.1.00
+-------
+Improved ordering of Manage Units listing.
+Added grid view in browse
+Fixed exemption display bug in unit browse details, for students
+Fixed breadcrumb trail issue when added multiple exemptions
+
 v1.0.00
 -------
 Fixed edit bug preventing grouping from being saved

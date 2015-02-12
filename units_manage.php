@@ -55,14 +55,24 @@ else {
 		} 
 			
 		//Fetch units
+		$difficulties=getSettingByScope($connection2, "Free Learning", "difficultyOptions") ;
+		$difficultyOrder="" ;
+		if ($difficulties!=FALSE) {
+			$difficultyOrder="FIELD(difficulty" ;
+			$difficulties=explode(",", $difficulties) ;
+			foreach ($difficulties AS $difficultyOption) {
+				$difficultyOrder.=",'" . $difficultyOption . "'" ;
+			}
+			$difficultyOrder.="), " ;
+			}
 		try {
 			if ($highestAction=="Manage Units_all") {
 				$data=array(); 
-				$sql="SELECT * FROM freeLearningUnit ORDER BY difficulty, name" ;
+				$sql="SELECT * FROM freeLearningUnit ORDER BY $difficultyOrder name" ;
 			}
 			else if ($highestAction=="Manage Units_learningAreas") {
 				$data=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"]); 
-				$sql="SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') ORDER BY difficulty, name" ;
+				$sql="SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') ORDER BY $difficultyOrder name" ;
 			}
 			$result=$connection2->prepare($sql);
 			$result->execute($data);
