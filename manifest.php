@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="1.1.00" ;
+$version="1.2.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -184,6 +184,23 @@ $actionRows[4]["categoryPermissionStaff"]="N" ;
 $actionRows[4]["categoryPermissionStudent"]="Y" ;
 $actionRows[4]["categoryPermissionParent"]="N" ;
 $actionRows[4]["categoryPermissionOther"]="N" ;
+
+$actionRows[5]["name"]="Current Unit By Class" ;
+$actionRows[5]["precedence"]="0";
+$actionRows[5]["category"]="Reports" ;
+$actionRows[5]["description"]="Allows a user to see all classes in the school, with each student\'s current unit choice." ;
+$actionRows[5]["URLList"]="report_currentUnitByClass.php" ;
+$actionRows[5]["entryURL"]="report_currentUnitByClass.php" ;
+$actionRows[5]["entrySidebar"]="Y" ;
+$actionRows[5]["defaultPermissionAdmin"]="Y" ;
+$actionRows[5]["defaultPermissionTeacher"]="Y" ;
+$actionRows[5]["defaultPermissionStudent"]="N" ;
+$actionRows[5]["defaultPermissionParent"]="N" ;
+$actionRows[5]["defaultPermissionSupport"]="N" ;
+$actionRows[5]["categoryPermissionStaff"]="Y" ;
+$actionRows[5]["categoryPermissionStudent"]="Y" ;
+$actionRows[5]["categoryPermissionParent"]="N" ;
+$actionRows[5]["categoryPermissionOther"]="N" ;
 
 $array=array() ;
 $array["toggleSettingName"]="publicUnits" ;

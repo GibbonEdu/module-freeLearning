@@ -154,9 +154,7 @@ else {
 			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=list'>" . _('List') . " <img style='margin-bottom: -5px' title='" . _('List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
 			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=grid'>" . _('Grid') . " <img style='margin-bottom: -5px' title='" . _('Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
 		print "</div>" ;
-		print "<h3>" ;
-			print _("Units") ;
-		print "</h3>" ;
+		
 		//Set pagination variable
 		$page=1 ; if (isset($_GET["page"])) { $page=$_GET["page"] ; }
 		if ((!is_numeric($page)) OR $page<1) {
@@ -216,6 +214,10 @@ else {
 			print "<div class='error'>" . $e->getMessage() . "</div>" ; 
 		}
 		$sqlPage=$sql . " LIMIT " . $_SESSION[$guid]["pagination"] . " OFFSET " . (($page-1)*$_SESSION[$guid]["pagination"]) ;
+		
+		print "<h3>" ;
+			print _("Units") . " <span style='font-size: 65%; font-style: italics'> x" . $result->rowCount() . "</span>" ;
+		print "</h3>" ;
 		
 		if ($result->rowCount()<1) {
 			print "<div class='error'>" ;

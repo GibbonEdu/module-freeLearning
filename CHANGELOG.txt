@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.2.00
+-------
+Added report showing unit choices by class.
+
 v1.1.00
 -------
 Improved ordering of Manage Units listing.
