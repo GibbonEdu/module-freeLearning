@@ -272,7 +272,7 @@ else {
 						<td class="right">
 							<?php
 							if ($row["logo"]!="") {
-								print _("Current attachment:") . " <a href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'>" . $row["logo"] . "</a><br/><br/>" ;
+								print _("Current attachment:") . " <a href='" . $row["logo"] . "'>" . $row["logo"] . "</a><br/><br/>" ;
 							}
 							?>
 							<input type="file" name="file" id="file"><br/><br/>

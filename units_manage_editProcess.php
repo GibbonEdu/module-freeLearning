@@ -183,6 +183,9 @@ else {
 							$URL.="&updateReturn=fail5" ;
 							header("Location: {$URL}");
 						}
+						if ($attachment!=NULL) {
+							$attachment=$_SESSION[$guid]["absoluteURL"] . "/" . $attachment ;
+						}
 					}
 					else {
 						$attachment=$row["logo"] ;
@@ -214,8 +217,8 @@ else {
 					}
 					if ($result->rowCount()<1) {
 						try {
-							$data=array("freeLearningUnitID"=>$freeLearningUnitID, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"]); 
-							$sql="INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID" ;
+							$data=array("freeLearningUnitID"=>$freeLearningUnitID, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "surname"=>$_SESSION[$guid]["surname"], "preferredName"=>$_SESSION[$guid]["preferredName"], "website"=>$_SESSION[$guid]["website"]); 
+							$sql="INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website" ;
 							$result=$connection2->prepare($sql);
 							$result->execute($data);
 						}

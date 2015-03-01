@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="1.2.00" ;
+$version="1.2.01" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -34,7 +34,7 @@ $moduleTables[0]="CREATE TABLE `freeLearningUnit` (
 `freeLearningUnitID` int(10) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `gibbonDepartmentIDList` text,
   `name` varchar(40) NOT NULL,
-  `logo` varchar(255) DEFAULT NULL,
+  `logo` text,
   `active` enum('Y','N') DEFAULT 'Y',
   `grouping` VARCHAR(255) NOT NULL,
   `gibbonYearGroupIDMinimum` INT(3) UNSIGNED ZEROFILL NULL DEFAULT NULL,
@@ -73,7 +73,10 @@ $moduleTables[2]="CREATE TABLE `freeLearningUnitOutcome` (
 $moduleTables[3]="CREATE TABLE `freeLearningUnitAuthor` (
 `freeLearningUnitAuthorID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
-  `gibbonPersonID` int(8) unsigned zerofill NOT NULL,
+  `gibbonPersonID` int(8) unsigned zerofill DEFAULT NULL,
+  `surname` varchar(30) NOT NULL,
+  `preferredName` varchar(30) NOT NULL,
+  `website` varchar(255) NOT NULL,
   PRIMARY KEY (`freeLearningUnitAuthorID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
 

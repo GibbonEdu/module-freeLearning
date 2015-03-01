@@ -109,7 +109,7 @@ else {
 		
 			try {
 				$data=array("gibbonCourseClassID"=>$gibbonCourseClassID); 
-				$sql="SELECT gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnit.name FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role='Student') LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending')) LEFT JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID ORDER BY surname, preferredName" ;
+				$sql="SELECT gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnit.name, timestampJoined FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role='Student') LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending')) LEFT JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID ORDER BY surname, preferredName" ;
 				$result=$connection2->prepare($sql);
 				$result->execute($data);
 			}
@@ -131,6 +131,12 @@ else {
 					print "</th>" ;
 					print "<th>" ;
 						print _("Unit") ;
+					print "</th>" ;
+					print "<th>" ;
+						print _("Date Started") ;
+					print "</th>" ;
+					print "<th>" ;
+						print _("Days Since Started") ;
 					print "</th>" ;
 				print "</tr>" ;
 			
@@ -156,6 +162,17 @@ else {
 						print "<td>" ;
 							print $row["name"] ;
 						print "</td>" ;
+						print "<td>" ;
+							if ($row["timestampJoined"]!="") {
+								print dateConvertBack($guid, substr($row["timestampJoined"], 0, 10)) ;
+							}
+						print "</td>" ;
+						print "<td>" ;
+							if ($row["timestampJoined"]!="") {
+								print round((time()-strtotime($row["timestampJoined"]))/(60*60*24)) ;
+							}
+						print "</td>" ;
+						
 					print "</tr>" ;
 				}
 				if ($count==0) {

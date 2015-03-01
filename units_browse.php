@@ -291,7 +291,7 @@ else {
 									print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_125.jpg'/><br/>" ;
 								}
 								else {
-									print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'/><br/>" ;
+									print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $row["logo"] . "'/><br/>" ;
 								}
 								print "<span style='font-size: 85%;'>" ;
 									print $row["status"] ;
@@ -300,7 +300,12 @@ else {
 							print "<td>" ;
 								foreach ($authors AS $author) {
 									if ($author[0]==$row["freeLearningUnitID"]) {
-										print $author[1] . "<br/>" ;
+										if ($author[3]=="") {
+											print $author[1] . "<br/>" ;
+										}
+										else {
+											print "<a target='_blank' href='" . $author[3] . "'>" . $author[1] . "</a><br/>" ;
+										}
 									}
 								}
 								if ($row["gibbonDepartmentIDList"]!="") {
@@ -388,7 +393,7 @@ else {
 				print "</table>" ;
 			
 				if ($result->rowCount()>$_SESSION[$guid]["pagination"]) {
-					printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]["pagination"], "bottom", "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&type=$type") ;
+					printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]["pagination"], "bottom", "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name") ;
 				}
 			}
 			else if ($view="grid") {
@@ -419,7 +424,7 @@ else {
 								print "<img title='" . htmlPrep($title) . "' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_125.jpg'/><br/>" ;
 							}
 							else {
-								print "<img title='" . htmlPrep($title) . "' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["logo"] . "'/><br/>" ;
+								print "<img title='" . htmlPrep($title) . "' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $row["logo"] . "'/><br/>" ;
 							}
 							
 							//Actions

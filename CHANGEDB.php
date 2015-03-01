@@ -99,4 +99,17 @@ INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`
 INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`) VALUES (NULL , '2', (SELECT gibbonActionID FROM gibbonAction JOIN gibbonModule ON (gibbonAction.gibbonModuleID=gibbonModule.gibbonModuleID) WHERE gibbonModule.name='Free Learning' AND gibbonAction.name='Current Unit By Class'));end
 " ;
 
+//v1.2.01
+$count++ ;
+$sql[$count][0]="1.2.01" ;
+$sql[$count][1]="
+ALTER TABLE `freeLearningUnitAuthor` ADD `surname` VARCHAR(30) NOT NULL , ADD `preferredName` VARCHAR(30) NOT NULL , ADD `website` VARCHAR(255) NOT NULL ;end
+ALTER TABLE `freeLearningUnit` CHANGE `logo` `logo` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;end
+ALTER TABLE `freeLearningUnitAuthor` CHANGE `gibbonPersonID` `gibbonPersonID` INT(8) UNSIGNED ZEROFILL NULL DEFAULT NULL;end
+UPDATE freeLearningUnit SET logo=concat((SELECT value FROM gibbonSetting WHERE name='absoluteURL'), '/', logo) ;end
+UPDATE freeLearningUnitAuthor SET surname=(SELECT surname FROM gibbonPerson WHERE gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID) ;end
+UPDATE freeLearningUnitAuthor SET preferredName=(SELECT preferredName FROM gibbonPerson WHERE gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID) ;end
+UPDATE freeLearningUnitAuthor SET website=(SELECT website FROM gibbonPerson WHERE gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID) ;end
+" ;
+
 ?>

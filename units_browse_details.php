@@ -163,7 +163,12 @@ else {
 								print "<span style='font-size: 115%; font-weight: bold'>" . _('Authors') . "</span><br/>" ;
 								$authors=getAuthorsArray($connection2, $freeLearningUnitID) ;
 								foreach ($authors AS $author) {
-									print $author[1] . "<br/>" ;
+									if ($author[3]=="") {
+										print $author[1] . "<br/>" ;
+									}
+									else {
+										print "<a target='_blank' href='" . $author[3] . "'>" . $author[1] . "</a><br/>" ;
+									}
 								}
 							print "</td>" ;
 						print "</tr>" ;

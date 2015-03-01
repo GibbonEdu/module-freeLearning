@@ -188,6 +188,9 @@ else {
 				else {
 					$attachment=NULL ;
 				}
+				if ($attachment!=NULL) {
+					$attachment=$_SESSION[$guid]["absoluteURL"] . "/" . $attachment ;
+				}
 				
 				//Write to database
 				try {
@@ -205,8 +208,8 @@ else {
 				
 				//Write author to database
 				try {
-					$data=array("freeLearningUnitID"=>$AI, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"]); 
-					$sql="INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID" ;
+					$data=array("freeLearningUnitID"=>$AI, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "surname"=>$_SESSION[$guid]["surname"], "preferredName"=>$_SESSION[$guid]["preferredName"], "website"=>$_SESSION[$guid]["website"]); 
+					$sql="INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website" ;
 					$result=$connection2->prepare($sql);
 					$result->execute($data);
 				}

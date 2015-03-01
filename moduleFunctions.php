@@ -134,23 +134,33 @@ function getAuthorsArray($connection2, $freeLearningUnitID=NULL) {
 	try {
 		if (is_null($freeLearningUnitID)) {
 			$data=array(); 
-			$sql="SELECT freeLearningUnitAuthorID, freeLearningUnitID, gibbonPerson.gibbonPersonID, title, surname, preferredName FROM gibbonPerson JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID) ORDER BY surname, preferredName" ;
+			$sql="SELECT freeLearningUnitAuthorID, freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS gibbonPersonsurname, gibbonPerson.preferredName AS gibbonPersonpreferredName, gibbonPerson.website AS gibbonPersonwebsite, gibbonPerson.gibbonPersonID, freeLearningUnitAuthor.surname AS freeLearningUnitAuthorsurname, freeLearningUnitAuthor.preferredName AS freeLearningUnitAuthorpreferredName, freeLearningUnitAuthor.website AS freeLearningUnitAuthorwebsite FROM freeLearningUnitAuthor LEFT JOIN gibbonPerson ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID) ORDER BY gibbonPersonsurname, freeLearningUnitAuthorsurname, gibbonPersonpreferredName, freeLearningUnitAuthorpreferredName" ;
 		}
 		else {
 			$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
-			$sql="SELECT freeLearningUnitAuthorID, freeLearningUnitID, gibbonPerson.gibbonPersonID, title, surname, preferredName FROM gibbonPerson JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY surname, preferredName" ;
+			$sql="SELECT freeLearningUnitAuthorID, freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS gibbonPersonsurname, gibbonPerson.preferredName AS gibbonPersonpreferredName, gibbonPerson.website AS gibbonPersonwebsite, gibbonPerson.gibbonPersonID, freeLearningUnitAuthor.surname AS freeLearningUnitAuthorsurname, freeLearningUnitAuthor.preferredName AS freeLearningUnitAuthorpreferredName, freeLearningUnitAuthor.website AS freeLearningUnitAuthorwebsite FROM freeLearningUnitAuthor LEFT JOIN gibbonPerson ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY gibbonPersonsurname, freeLearningUnitAuthorsurname, gibbonPersonpreferredName, freeLearningUnitAuthorpreferredName" ;
 		}
 		$result=$connection2->prepare($sql);
 		$result->execute($data);
 	}
-	catch(PDOException $e) { }
+	catch(PDOException $e) { print $e->getMessage() ;}
 	
 	if ($result->rowCount()>0) {
 		$return=array() ;
 		while ($row=$result->fetch()) {
-			$return[$row["freeLearningUnitAuthorID"]][0]=$row["freeLearningUnitID"] ;
-			$return[$row["freeLearningUnitAuthorID"]][1]=formatName($row["title"], $row["preferredName"], $row["surname"], "Staff", false) ;
-			$return[$row["freeLearningUnitAuthorID"]][2]=$row["gibbonPersonID"] ;
+			if ($row["gibbonPersonID"]!=NULL) {
+				$return[$row["freeLearningUnitAuthorID"]][0]=$row["freeLearningUnitID"] ;
+				$return[$row["freeLearningUnitAuthorID"]][1]=formatName("", $row["gibbonPersonpreferredName"], $row["gibbonPersonsurname"], "Student", false) ;
+				$return[$row["freeLearningUnitAuthorID"]][2]=$row["gibbonPersonID"] ;
+				$return[$row["freeLearningUnitAuthorID"]][3]=$row["gibbonPersonwebsite"] ;
+			}
+			else {
+				$return[$row["freeLearningUnitAuthorID"]][0]=$row["freeLearningUnitID"] ;
+				$return[$row["freeLearningUnitAuthorID"]][1]=formatName("", $row["freeLearningUnitAuthorpreferredName"], $row["freeLearningUnitAuthorsurname"], "Student", false) ;
+				$return[$row["freeLearningUnitAuthorID"]][2]=$row["gibbonPersonID"] ;
+				$return[$row["freeLearningUnitAuthorID"]][3]=$row["freeLearningUnitAuthorwebsite"] ;
+			}
+			
 		}
 	}
 	

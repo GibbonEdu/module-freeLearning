@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.2.01
+-------
+Made units exported by SQL more useful by making author and images absolute rather than relative
+
 v1.2.00
 -------
 Added report showing unit choices by class.
