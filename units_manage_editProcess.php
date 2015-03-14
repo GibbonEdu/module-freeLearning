@@ -36,7 +36,7 @@ catch(PDOException $e) {
 date_default_timezone_set($_SESSION[$guid]["timezone"]);
 
 $freeLearningUnitID=$_GET["freeLearningUnitID"] ;
-$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["address"]) . "/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID" ;
+$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["address"]) . "/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=" . $_GET["gibbonDepartmentID"] . "&difficulty=" . $_GET["difficulty"] . "&name=" . $_GET["name"] ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage_edit.php")==FALSE) {
 	//Fail 0

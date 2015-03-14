@@ -37,8 +37,19 @@ else {
 		print "</div>" ;
 	}
 	else {
-		//IF UNIT DOES NOT CONTAIN HYPHEN, IT IS A GIBBON UNIT
 		$freeLearningUnitID=$_GET["freeLearningUnitID"]; 
+		$gibbonDepartmentID="" ;
+		if (isset($_GET["gibbonDepartmentID"])) {
+			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
+		}
+		$difficulty="" ;
+		if (isset($_GET["difficulty"])) {
+			$difficulty=$_GET["difficulty"] ;
+		}
+		$name="" ;
+		if (isset($_GET["name"])) {
+			$name=$_GET["name"] ;
+		}
 		
 		//Proceed!
 		print "<div class='trail'>" ;
@@ -115,6 +126,11 @@ else {
 		else {
 			//Let's go!
 			$row=$result->fetch() ;
+			if ($gibbonDepartmentID!="" OR $difficulty!="" OR $name!="") {
+				print "<div class='linkTop'>" ;
+					print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Back to Search Results') . "</a>" ;
+				print "</div>" ;
+			}
 			
 			if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details.php")) {
 				print "<div class='linkTop'>" ;
@@ -123,7 +139,7 @@ else {
 			}
 			
 			?>
-			<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&&address=" . $_GET["q"] ?>" enctype="multipart/form-data">
+			<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&address=" . $_GET["q"] ?>" enctype="multipart/form-data">
 				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 					<tr class='break'>
 						<td colspan=2> 

@@ -61,7 +61,6 @@ else {
 			$name=$_GET["name"] ;
 		}
 		
-		
 		print "<div class='trail'>" ;
 		if ($publicUnits=="Y") {
 				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Browse Units') . "</a> > </div><div class='trailEnd'>" . _('Unit Details') . "</div>" ;
@@ -108,6 +107,11 @@ else {
 			}
 			else {
 				$row=$result->fetch() ;
+				if ($gibbonDepartmentID!="" OR $difficulty!="" OR $name!="") {
+					print "<div class='linkTop'>" ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Back to Search Results') . "</a>" ;
+					print "</div>" ;
+				}
 				
 				$proceed=FALSE ;
 				if ($highestAction=="Browse Units_all") {
@@ -141,11 +145,61 @@ else {
 					
 					print "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>" ;
 						print "<tr>" ;
-							print "<td style='width: 33%; vertical-align: top'>" ;
+							print "<td style='width: 50%; vertical-align: top'>" ;
 								print "<span style='font-size: 115%; font-weight: bold'>" . _('Unit Name') . "</span><br/>" ;
-								print $row["name"] ;
+								print "<i>" . $row["name"] . "</i>" ;
 							print "</td>" ;
-							print "<td style='width: 34%; vertical-align: top'>" ;
+							print "<td style='width: 50%; vertical-align: top'>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . _('Time') . "</span><br/>" ;
+								$timing=NULL ;
+								$blocks=getBlocksArray($connection2, $freeLearningUnitID) ;
+								if ($blocks!=FALSE) {
+									foreach ($blocks AS $block) {
+										if ($block[0]==$row["freeLearningUnitID"]) {
+											if (is_numeric($block[2])) {
+												$timing+=$block[2] ;
+											}
+										}
+									}
+								}
+								if (is_null($timing)) {
+									print "<i>" . _('NA') . "</i>" ;
+								}
+								else {
+									print "<i>" . $timing . "</i>" ;
+								}
+							print "</td>" ;
+							print "<td style='width: 135%!important; vertical-align: top; text-align: right' rowspan=3>" ;
+								if ($row["logo"]==NULL) {
+									print "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_125.jpg'/><br/>" ;
+								}
+								else {
+									print "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='" . $row["logo"] . "'/><br/>" ;
+								}
+							print "</td>" ;
+						print "</tr>" ;
+						print "<tr>" ;
+							print "<td style='padding-top: 15px; vertical-align: top'>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . _('Difficulty') . "</span><br/>" ;
+								print "<i>" . $row["difficulty"] . "<i>" ;
+							print "</td>" ;
+							print "<td style='padding-top: 15px; vertical-align: top'>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . _('Prerequisites') . "</span><br/>" ;
+								$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
+								if ($prerequisitesActive!=FALSE) {
+									$prerequisites=explode(",", $prerequisitesActive) ;
+									$units=getUnitsArray($connection2) ;
+									foreach ($prerequisites AS $prerequisite) {
+										print "<i>" . $units[$prerequisite][0] . "</i><br/>" ;
+									}
+								}
+								else {
+										print "<i>" . _('None') . "<br/></i>" ;
+								}
+							print "</td>" ;
+						print "</tr>" ;
+						print "<tr>" ;
+							print "<td style='vertical-align: top'>" ;
 								print "<span style='font-size: 115%; font-weight: bold'>" . _('Departments') . "</span><br/>" ;
 								$learningAreas=getLearningAreas($connection2, $guid) ;
 								if ($learningAreas=="") {
@@ -154,20 +208,20 @@ else {
 								else {
 									for ($i=0; $i<count($learningAreas); $i=$i+2) {
 										if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
-											print _($learningAreas[($i+1)]) . "<br/>" ;
+											print "<i>" . _($learningAreas[($i+1)]) . "</i><br/>" ;
 										}
 									}
 								}
 							print "</td>" ;
-							print "<td style='width: 34%; vertical-align: top'>" ;
+							print "<td style='vertical-align: top'>" ;
 								print "<span style='font-size: 115%; font-weight: bold'>" . _('Authors') . "</span><br/>" ;
 								$authors=getAuthorsArray($connection2, $freeLearningUnitID) ;
 								foreach ($authors AS $author) {
 									if ($author[3]=="") {
-										print $author[1] . "<br/>" ;
+										print "<i>" . $author[1] . "</i><br/>" ;
 									}
 									else {
-										print "<a target='_blank' href='" . $author[3] . "'>" . $author[1] . "</a><br/>" ;
+										print "<i><a target='_blank' href='" . $author[3] . "'>" . $author[1] . "</a></i><br/>" ;
 									}
 								}
 							print "</td>" ;
@@ -216,18 +270,42 @@ else {
 					print "<div id='tabs' style='margin: 20px 0'>" ;
 						//Tab links
 						print "<ul>" ;
+							print "<li><a href='#tabs0'>" . _('Unit Overview') . "</a></li>" ;
 							if ($enrolment) {
-								print "<li><a href='#tabs0'>" . _('Enrolment') . "</a></li>" ;
+								print "<li><a href='#tabs1'>" . _('Enrolment') . "</a></li>" ;
 							}
-							print "<li><a href='#tabs1'>" . _('Unit Overview') . "</a></li>" ;
 							print "<li><a href='#tabs2'>" . _('Content') . "</a></li>" ;
 							print "<li><a href='#tabs3'>" . _('Resources') . "</a></li>" ;
 							print "<li><a href='#tabs4'>" . _('Outcomes') . "</a></li>" ;
 						print "</ul>" ;
 				
 						//Tabs
+						print "<div id='tabs0'>" ;
+							print "<h3>" ;
+								print _("Blurb") ;
+							print "</h3>" ;
+							print "<p>" ;
+								print $row["blurb"] ;
+							print "</p>" ;
+							if ($row["license"]!="") {
+								print "<h4>" ;
+									print _("License") ;
+								print "</h4>" ;
+								print "<p>" ;
+									print _("This work is shared under the following license:") . " " . $row["license"] ;
+								print "</p>" ;
+							}
+							if ($row["outline"]!="") {
+								print "<h3>" ;
+									print "Outline" ;
+								print "</h3>" ;
+								print "<p>" ;
+									print $row["outline"] ;
+								print "</p>" ;
+							}
+						print "</div>" ;
 						if ($enrolment) {
-							print "<div id='tabs0'>" ;
+							print "<div id='tabs1'>" ;
 								if (isset($_GET["updateReturn"])) { $updateReturn=$_GET["updateReturn"] ; } else { $updateReturn="" ; }
 								$updateReturnMessage="" ;
 								$class="error" ;
@@ -831,30 +909,6 @@ else {
 								}	
 							print "</div>" ;
 						}
-						print "<div id='tabs1'>" ;
-							print "<h3>" ;
-								print _("Blurb") ;
-							print "</h3>" ;
-							print "<p>" ;
-								print $row["blurb"] ;
-							print "</p>" ;
-							if ($row["license"]!="") {
-								print "<h4>" ;
-									print _("License") ;
-								print "</h4>" ;
-								print "<p>" ;
-									print _("This work is shared under the following license:") . " " . $row["license"] ;
-								print "</p>" ;
-							}
-							if ($row["outline"]!="") {
-								print "<h3>" ;
-									print "Outline" ;
-								print "</h3>" ;
-								print "<p>" ;
-									print $row["outline"] ;
-								print "</p>" ;
-							}
-						print "</div>" ;
 						print "<div id='tabs2'>" ;
 							try {
 								$dataBlocks=array("freeLearningUnitID"=>$freeLearningUnitID); 
@@ -1056,7 +1110,7 @@ else {
 										print "<tr class=$rowNum>" ;
 											print "<td>" ;
 												print "<b>" . $rowBlocks["scope"] . "</b><br/>" ;
-												if ($rowBlocks["scope"]=="Learning Area" AND $rowBlocks["gibbonDepartmentID"]!="") {
+												if ($rowBlocks["scope"]=="Learning Area" AND @$rowBlocks["gibbonDepartmentID"]!="") {
 													try {
 														$dataLearningArea=array("gibbonDepartmentID"=>$rowBlocks["gibbonDepartmentID"]); 
 														$sqlLearningArea="SELECT * FROM gibbonDepartment WHERE gibbonDepartmentID=:gibbonDepartmentID" ;

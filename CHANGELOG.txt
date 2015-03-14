@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v1.3.00
+-------
+Added Map view, currently just a link to an external mind map, hopefully to be soon replaced by a dynamic mind map generated in the module
+Moved enrolment to be the second tab in unit details.
+Added time, difficulty, prerequisites and logo to Overview tab in browse units details. 
+Added filters to Manage Units
+
 v1.2.01
 -------
 Made units exported by SQL more useful by making author and images absolute rather than relative

@@ -79,7 +79,7 @@ else {
 		print "<h3>" ;
 			print _("Filter") ;
 		print "</h3>" ;
-		print "<form method='get' action='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Behaviour/behaviour_manage.php'>" ;
+		print "<form method='get' action='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php'>" ;
 			print "<table class='noIntBorder' cellspacing='0' style='width: 100%'>" ;
 				?>
 				<tr>
@@ -153,6 +153,10 @@ else {
 		print "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>" ;
 			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=list'>" . _('List') . " <img style='margin-bottom: -5px' title='" . _('List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
 			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=grid'>" . _('Grid') . " <img style='margin-bottom: -5px' title='" . _('Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
+			$mapLink=getSettingByScope($connection2, "Free Learning", "mapLink") ;
+			if ($mapLink!="") {
+				print "<a href='$mapLink' target='_blank'>" . _('Map') . " <img style='margin-bottom: -5px' title='" . _('Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
+			}
 		print "</div>" ;
 		
 		//Set pagination variable
@@ -348,7 +352,6 @@ else {
 									}
 								}
 							print "</td>" ;
-						
 							print "<td>" ;
 								$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
 								if ($prerequisitesActive!=FALSE) {

@@ -37,9 +37,22 @@ else {
 		print "</div>" ;
 	}
 	else {
+		$gibbonDepartmentID="" ;
+		if (isset($_GET["gibbonDepartmentID"])) {
+			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
+		}
+		$difficulty="" ;
+		if (isset($_GET["difficulty"])) {
+			$difficulty=$_GET["difficulty"] ;
+		}
+		$name="" ;
+		if (isset($_GET["name"])) {
+			$name=$_GET["name"] ;
+		}
+		
 		//Proceed!
 		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_manage.php'>" . _('Manage Units') . "</a> > </div><div class='trailEnd'>" . _('Add Unit') . "</div>" ;
+		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Manage Units') . "</a> > </div><div class='trailEnd'>" . _('Add Unit') . "</div>" ;
 		print "</div>" ;
 		
 		if (isset($_GET["addReturn"])) { $addReturn=$_GET["addReturn"] ; } else { $addReturn="" ; }
@@ -72,10 +85,15 @@ else {
 				print $addReturnMessage;
 			print "</div>" ;
 		} 
-			
+		
+		if ($gibbonDepartmentID!="" OR $difficulty!="" OR $name!="") {
+			print "<div class='linkTop'>" ;
+				print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>" . _('Back to Search Results') . "</a>" ;
+			print "</div>" ;
+		}
 		
 		?>
-		<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_addProcess.php?address=" . $_GET["q"] ?>"  enctype="multipart/form-data">
+		<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_manage_addProcess.php?address=" . $_GET["q"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name" ?>"  enctype="multipart/form-data">
 			<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 				<tr class='break'>
 					<td colspan=2> 

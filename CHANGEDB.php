@@ -112,4 +112,11 @@ UPDATE freeLearningUnitAuthor SET preferredName=(SELECT preferredName FROM gibbo
 UPDATE freeLearningUnitAuthor SET website=(SELECT website FROM gibbonPerson WHERE gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID) ;end
 " ;
 
+//v1.3.00
+$count++ ;
+$sql[$count][0]="1.3.00" ;
+$sql[$count][1]="
+INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mapLink', 'Map Link', 'A URL pointing to a map of the available units.', '');end
+" ;
+
 ?>

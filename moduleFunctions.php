@@ -83,12 +83,18 @@ function prerquisitesMet($connection2, $gibbonPersonID, $prerequisites) {
 	return $return ;
 }
 
-function getBlocksArray($connection2) {
+//Option second argument get's blocks only for selected units.
+function getBlocksArray($connection2, $freeLearningUnitID=NULL) {
 	$return=FALSE ;
-	
 	try {
-		$data=array(); 
-		$sql="SELECT * FROM freeLearningUnitBlock ORDER BY freeLearningUnitID" ;
+		if (is_null($freeLearningUnitID)) {
+			$data=array(); 
+			$sql="SELECT * FROM freeLearningUnitBlock ORDER BY freeLearningUnitID" ;
+		}
+		else {
+			$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
+			$sql="SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY freeLearningUnitID" ;
+		}
 		$result=$connection2->prepare($sql);
 		$result->execute($data);
 	}
