@@ -38,7 +38,7 @@ else {
 	else {
 		//Get action with highest precendence
 		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "'>" . _('Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "'>" . _('Unit Details') . "</a> > </div><div class='trailEnd'>" . _('Add Multiple') . "</div>" ;
+		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "'>" . _('Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "&tab=1'>" . _('Unit Details') . "</a> > </div><div class='trailEnd'>" . _('Add Multiple') . "</div>" ;
 		print "</div>" ;
 
 		$freeLearningUnitID="" ;

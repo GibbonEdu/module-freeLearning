@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v1.4.00
+-------
+Added ability to delete student enrolment for staff who can edit a given unit
+Added unit history by student report, with a hook into student profile
+
 v1.3.00
 -------
 Added Map view, currently just a link to an external mind map, hopefully to be soon replaced by a dynamic mind map generated in the module

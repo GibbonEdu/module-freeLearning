@@ -17,8 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * Sets version information
- */
-$moduleVersion="1.4.00" ;
+@session_start() ;
+
+//Module includes
+include "./modules/Free Learning/moduleFunctions.php" ;
+
+if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_unitHistory_byStudent.php")==FALSE) {
+	//Acess denied
+	print "<div class='error'>" ;
+		print "You do not have access to this action." ;
+	print "</div>" ;
+}
+else {
+	print getStudentHistory($connection2, $guid, $gibbonPersonID) ;	}
 ?>

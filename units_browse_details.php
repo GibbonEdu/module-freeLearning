@@ -70,6 +70,19 @@ else {
 			}
 		print "</div>" ;
 		
+		if (isset($_GET["deleteReturn"])) { $deleteReturn=$_GET["deleteReturn"] ; } else { $deleteReturn="" ; }
+		$deleteReturnMessage="" ;
+		$class="error" ;
+		if (!($deleteReturn=="")) {
+			if ($deleteReturn=="success0") {
+				$deleteReturnMessage=_("Your request was completed successfully.") ;		
+				$class="success" ;
+			}
+			print "<div class='$class'>" ;
+				print $deleteReturnMessage;
+			print "</div>" ;
+		} 
+		
 		if ($freeLearningUnitID=="") {
 			print "<div class='error'>" ;
 				print _("You have not specified one or more required parameters.") ;
@@ -228,10 +241,15 @@ else {
 						print "</tr>" ;
 					print "</table>" ;
 				
+					$defaultTab=0 ;
+					if (isset($_GET["tab"])) {
+						$defaultTab=$_GET["tab"] ;
+					}
 					?>
 					<script type='text/javascript'>
 						$(function() {
 							$( "#tabs" ).tabs({
+								active: <?php print $defaultTab ?>, 
 								ajaxOptions: {
 									error: function( xhr, status, index, anchor ) {
 										$( anchor.hash ).html(
@@ -255,12 +273,20 @@ else {
 						else if ($roleCategory=="Staff") {
 							$enrolment=TRUE ;
 							$enrolmentType="staffView" ;
-							//Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
-							$learningAreas=getLearningAreas($connection2, $guid, TRUE) ;
-							if ($learningAreas!="") {
-								for ($i=0; $i<count($learningAreas); $i=$i+2) {
-									if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
-										$enrolmentType="staffEdit" ;
+							
+							//Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
+							$manageAll=isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php", "Manage Units_all") ;
+							if ($manageAll==TRUE) {
+								$enrolmentType="staffEdit" ;
+							}
+							else {
+								//Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
+								$learningAreas=getLearningAreas($connection2, $guid, TRUE) ;
+								if ($learningAreas!="") {
+									for ($i=0; $i<count($learningAreas); $i=$i+2) {
+										if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
+											$enrolmentType="staffEdit" ;
+										}
 									}
 								}
 							}
@@ -342,9 +368,13 @@ else {
 									print "<p>" ;
 										print _("Below you can view the students currently enroled in this unit, including both those who are working on it, and those who are awaiting approval.") ;
 									print "</p>" ;
-									print "<div class='linkTop'>" ;
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID'>" . _('Add Multiple') . "<img style='margin: 0 0 -4px 5px' title='" . _('Add Multiple') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new_multi.png'/></a>" ;
-									print "</div>" ;
+									
+									if ($enrolmentType=="staffEdit") {
+										print "<div class='linkTop'>" ;
+											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID'>" . _('Add Multiple') . "<img style='margin: 0 0 -4px 5px' title='" . _('Add Multiple') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new_multi.png'/></a>" ;
+										print "</div>" ;
+									}
+									
 									//List students whose status is Current or Complete - Pending
 									try {
 										$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
@@ -401,30 +431,33 @@ else {
 														<?php
 														if ($rowClass["evidenceLocation"]!="") {
 															if ($rowClass["evidenceType"]=="Link") {
-																print "<a target='_blank' href='" . $rowClass["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																print "<a target='_blank' href='" . $rowClass["evidenceLocation"] . "'>" . _('View') . "</>" ;
 															}
 															else {
-																print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowClass["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowClass["evidenceLocation"] . "'>" . _('View') . "</>" ;
 															}
 														}
 														?>
 													</td>	
 													<td>
 														<?php 
-														if ($rowClass["status"]=="Complete - Pending") {
-															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
-														}
-														if ($rowClass["commentStudent"]!="") {
-															print "<script type='text/javascript'>" ;	
-																print "$(document).ready(function(){" ;
-																	print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").hide();" ;
-																	print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeIn(1000);" ;
-																	print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").click(function(){" ;
-																	print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeToggle(1000);" ;
+														if ($enrolmentType=="staffEdit") {
+															if ($rowClass["status"]=="Complete - Pending") {
+																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
+															}
+															if ($rowClass["commentStudent"]!="") {
+																print "<script type='text/javascript'>" ;	
+																	print "$(document).ready(function(){" ;
+																		print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").hide();" ;
+																		print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeIn(1000);" ;
+																		print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").click(function(){" ;
+																		print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeToggle(1000);" ;
+																		print "});" ;
 																	print "});" ;
-																print "});" ;
-															print "</script>" ;
-															print "<a title='" . _('Show Comment') . "' class='show_hide-" . $rowClass["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
+																print "</script>" ;
+																print "<a title='" . _('Show Comment') . "' class='show_hide-" . $rowClass["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
+															}
+															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;						
 														}
 														?>
 													</td>											
@@ -618,10 +651,10 @@ else {
 															<div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
 																<?php
 																if ($rowEnrol["evidenceType"]=="Link") {
-																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
 																}
 																else {
-																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
 																}
 																?>
 															</div>
@@ -669,10 +702,10 @@ else {
 															<div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
 																<?php
 																if ($rowEnrol["evidenceType"]=="Link") {
-																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
 																}
 																else {
-																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('Click Here') . "</>" ;
+																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
 																}
 																?>
 															</div>

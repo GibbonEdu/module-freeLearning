@@ -37,18 +37,19 @@ catch(PDOException $e) {
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]["timezone"]);
 
-$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["address"]) . "/units_browse_details.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&sidebar=true&tab=1" ;
+$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details_delete.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&sidebar=true&tab=1" ;
+$URLDelete=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&sidebar=true&tab=1" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details_approval.php")==FALSE) {
 	//Fail 0
-	$URL.="&updateReturn=fail0" ;
+	$URL.="&deleteReturn=fail0" ;
 	header("Location: {$URL}");
 }
 else {
 	$highestAction=getHighestGroupedAction($guid, "/modules/Free Learning/units_browse_details_approval.php", $connection2) ;
 	if ($highestAction==FALSE) {
 		//Fail 0
-		$URL.="&updateReturn=fail0" ;
+		$URL.="&deleteReturn=fail0" ;
 		header("Location: {$URL}");
 	}
 	else {
@@ -57,26 +58,26 @@ else {
 	
 		if ($freeLearningUnitID=="" OR $freeLearningUnitStudentID=="") {
 			//Fail 3
-			$URL.="&updateReturn=fail3" ;
+			$URL.="&deleteReturn=fail3" ;
 			header("Location: {$URL}");
 		}
 		else {
 			try {
 				$data=array("freeLearningUnitID"=>$freeLearningUnitID, "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-				$sql="SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID AND status='Complete - Pending'" ; 
+				$sql="SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID" ; 
 				$result=$connection2->prepare($sql);
 				$result->execute($data);
 			}
 			catch(PDOException $e) { 
 				//Fail 2
-				$URL.="&updateReturn=fail2" ;
+				$URL.="&deleteReturn=fail2" ;
 				header("Location: {$URL}");
 				break ;
 			}
 			
 			if ($result->rowCount()!=1) {
 				//Fail 2
-				$URL.="&updateReturn=fail2" ;
+				$URL.="&deleteReturn=fail2" ;
 				header("Location: {$URL}");
 				break ;
 			}
@@ -104,45 +105,27 @@ else {
 				
 				if ($proceed==FALSE) {
 					//Fail 0
-					$URL.="&updateReturn=fail0" ;
+					$URL.="&deleteReturn=fail0" ;
 					header("Location: {$URL}");
 				}
 				else {
-					//Get Inputs
-					$status='Complete - Approved' ;
-					$commentApproval=$_POST["commentApproval"] ;
-					$gibbonPersonIDStudent=$row["gibbonPersonIDStudent"] ;
-					
-					//Validation
-					if ($commentApproval=="") {
-						//Fail 3
-						$URL.="&updateReturn=fail3" ;
-						header("Location: {$URL}");
+					//Write to database
+					try {
+						$data=array("freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+						$sql="DELETE FROM freeLearningUnitStudent WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+						$result=$connection2->prepare($sql);
+						$result->execute($data);
 					}
-					else {
-						//Write to database
-						try {
-							$data=array("status"=>$status, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-							$sql="UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
-							$result=$connection2->prepare($sql);
-							$result->execute($data);
-						}
-						catch(PDOException $e) { 
-							//Fail 2
-							$URL.="&updateReturn=fail2" ;
-							header("Location: {$URL}");
-							exit ;
-						}
-					
-						//Attempt to notify the student
-						$text=_("A teacher has approved your request for unit completion.") ;
-						$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true" ;
-						setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
-					
-						//Success 0
-						$URL.="&updateReturn=success0" ;
+					catch(PDOException $e) { 
+						//Fail 2
+						$URL.="&deleteReturn=fail2" ;
 						header("Location: {$URL}");
+						exit ;
 					}
+					
+					//Success 0
+					$URLDelete.="&deleteReturn=success0" ;
+					header("Location: {$URLDelete}");
 				}
 			}
 		}

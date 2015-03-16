@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="1.3.00" ;
+$version="1.4.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -206,6 +206,23 @@ $actionRows[5]["categoryPermissionStudent"]="Y" ;
 $actionRows[5]["categoryPermissionParent"]="N" ;
 $actionRows[5]["categoryPermissionOther"]="N" ;
 
+$actionRows[6]["name"]="Unit History By Student" ;
+$actionRows[6]["precedence"]="0";
+$actionRows[6]["category"]="Reports" ;
+$actionRows[6]["description"]="Allows a user to see all units undertaken by a student." ;
+$actionRows[6]["URLList"]="report_unitHistory_byStudent.php" ;
+$actionRows[6]["entryURL"]="report_unitHistory_byStudent.php" ;
+$actionRows[6]["entrySidebar"]="Y" ;
+$actionRows[6]["defaultPermissionAdmin"]="Y" ;
+$actionRows[6]["defaultPermissionTeacher"]="Y" ;
+$actionRows[6]["defaultPermissionStudent"]="N" ;
+$actionRows[6]["defaultPermissionParent"]="N" ;
+$actionRows[6]["defaultPermissionSupport"]="N" ;
+$actionRows[6]["categoryPermissionStaff"]="Y" ;
+$actionRows[6]["categoryPermissionStudent"]="Y" ;
+$actionRows[6]["categoryPermissionParent"]="N" ;
+$actionRows[6]["categoryPermissionOther"]="N" ;
+
 $array=array() ;
 $array["toggleSettingName"]="publicUnits" ;
 $array["toggleSettingScope"]="Free Learning" ;
@@ -213,4 +230,11 @@ $array["toggleSettingValue"]="Y" ;
 $array["title"]="Free Learning With Us" ;
 $array["text"]="Free Learning is a way to promote student independence and engagement, by encouraging students to find their own path through a set of content. As a member of the public, we invite you to <a href=\'./index.php?q=/modules/Free Learning/units_browse.php\'>browse a range of our units</a>." ;
 $hooks[0]="INSERT INTO `gibbonHook` (`gibbonHookID`, `name`, `type`, `options`, gibbonModuleID) VALUES (NULL, 'Free Learning', 'Public Home Page ', '" . serialize($array) . "', (SELECT gibbonModuleID FROM gibbonModule WHERE name='$name'));" ;
+
+$array=array() ;
+$array["sourceModuleName"]="Free Learning" ;
+$array["sourceModuleAction"]="Unit History By Student" ;
+$array["sourceModuleInclude"]="hook_studentProfile_unitHistory.php" ;
+$hooks[1]="INSERT INTO `gibbonHook` (`gibbonHookID`, `name`, `type`, `options`, gibbonModuleID) VALUES (NULL, 'Free Learning Unit History', 'Student Profile', '" . serialize($array) . "', (SELECT gibbonModuleID FROM gibbonModule WHERE name='$name'));" ;
+print_r($hooks[1]) ;
 ?>

@@ -17,6 +17,127 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+function getStudentHistory($connection2, $guid, $gibbonPersonID) {
+	$output=FALSE; 
+	
+	try {
+		$data=array("gibbonPersonID"=>$gibbonPersonID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+		$sql="SELECT gibbonPerson.gibbonPersonID, surname, preferredName, name FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonStudentEnrolment.gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName" ;
+		$result=$connection2->prepare($sql);
+		$result->execute($data);
+	}
+	catch(PDOException $e) { $output.="<div class='error'>" . $e->getMessage() . "</div>" ;  }
+
+	if ($result->rowCount()!=1) {
+		$output.="<div class='error'>" ;
+			$output.=_("The specified record does not exist.") ;
+		$output.="</div>" ;
+	}
+	else {
+		try {
+			$data=array("gibbonPersonID"=>$gibbonPersonID); 
+			$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY year, status, unit" ; 
+			$result=$connection2->prepare($sql);
+			$result->execute($data);
+		}
+		catch(PDOException $e) { 
+			$output.="<div class='error'>" . $e->getMessage() . "</div>" ; 
+		}
+
+		if ($result->rowCount()<1) {
+			$output.="<div class='error'>" ;
+			$output.=_("There are no records to display.") ;
+			$output.="</div>" ;
+		}
+		else {
+			$output.="<table cellspacing='0' style='width: 100%'>" ;
+				$output.="<tr class='head'>" ;
+					$output.="<th>" ;
+						$output.=_("School Year") ;
+					$output.="</th>" ;
+					$output.="<th>" ;
+						$output.=_("Unit") ;
+					$output.="</th>" ;
+					$output.="<th>" ;
+						$output.=_("Class") ;
+					$output.="</th>" ;
+					$output.="<th>" ;
+						$output.=_("Status") ;
+					$output.="</th>" ;
+					$output.="<th>" ;
+						$output.=_("Evidence") ;
+					$output.="</th>" ;
+					$output.="<th style='width: 70px!important'>" ;
+						$output.=_("Actions") ;
+					$output.="</th>" ;
+				$output.="</tr>" ;
+	
+				$count=0;
+				$rowNum="odd" ;
+				while ($row=$result->fetch()) {
+					if ($count%2==0) {
+						$rowNum="even" ;
+					}
+					else {
+						$rowNum="odd" ;
+					}
+		
+					$count++ ;
+		
+					//COLOR ROW BY STATUS!
+					$output.="<tr class=$rowNum>" ;
+						$output.="<td>" ;
+							$output.=$row["year"] ;
+						$output.="</td>" ;
+						$output.="<td>" ;
+							$output.="<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $row["freeLearningUnitID"] . "'>" . $row["unit"] . "</a>" ;
+						$output.="</td>" ;
+						$output.="<td>" ;
+							$output.=$row["course"] . "." . $row["class"] ;
+						$output.="</td>" ;
+						$output.="<td>" ;
+							$output.=$row["status"] ;
+						$output.="</td>" ;
+						$output.="<td>" ;
+							if ($row["evidenceLocation"]!="") {
+								if ($row["evidenceType"]=="Link") {
+									$output.="<a target='_blank' href='" . $row["evidenceLocation"] . "'>" . _('View') . "</>" ;
+								}
+								else {
+									$output.="<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["evidenceLocation"] . "'>" . _('View') . "</>" ;
+								}
+							}
+						$output.="</td>" ;
+						$output.="<td>" ;
+							if ($row["commentStudent"]!="") {
+								$output.="<script type='text/javascript'>" ;	
+									$output.="$(document).ready(function(){" ;
+										$output.="\$(\".comment-" . $row["freeLearningUnitStudentID"] . "\").hide();" ;
+										$output.="\$(\".show_hide-" . $row["freeLearningUnitStudentID"] . "\").fadeIn(1000);" ;
+										$output.="\$(\".show_hide-" . $row["freeLearningUnitStudentID"] . "\").click(function(){" ;
+										$output.="\$(\".comment-" . $row["freeLearningUnitStudentID"] . "\").fadeToggle(1000);" ;
+										$output.="});" ;
+									$output.="});" ;
+								$output.="</script>" ;
+								$output.="<a title='" . _('Show Comment') . "' class='show_hide-" . $row["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
+							}
+						$output.="</td>" ;
+					$output.="</tr>" ;
+					if ($row["commentStudent"]!="") {
+						$output.="<tr class='comment-" . $row["freeLearningUnitStudentID"] . "' id='comment-" . $row["freeLearningUnitStudentID"] . "'>" ;
+							$output.="<td colspan=6>" ;
+								$output.=$row["commentStudent"] ;
+							$output.="</td>" ;
+						$output.="</tr>" ;
+					}
+				}
+			$output.="</table>" ;		
+		}
+	}
+	
+	return $output ;
+}
+
 function prerequisitesRemoveInactive($connection2, $prerequisites) {
 	$return=FALSE ;
 	

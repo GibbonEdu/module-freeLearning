@@ -35,7 +35,7 @@ catch(PDOException $e) {
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]["timezone"]);
 
-$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] ;
+$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "&tab=1" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details.php")==FALSE) {
 	//Fail 0
@@ -105,30 +105,55 @@ else {
 					header("Location: {$URL}");
 				}
 				else {
-					$partialFail=FALSE ;
-		
-					foreach ($gibbonPersonIDMulti AS $gibbonPersonID) {
-						//Write to database
-						try {
-							$data=array("gibbonPersonID"=>$gibbonPersonID, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>"Individual", "status"=>$status); 
-							$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonID, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, status=:status" ;
-							$result=$connection2->prepare($sql);
-							$result->execute($data);
-						}
-						catch(PDOException $e) { 
-							$partialFail=TRUE ;	
+					$proceed=FALSE ;
+					//Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
+					$manageAll=isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php", "Manage Units_all") ;
+					if ($manageAll==TRUE) {
+						$proceed=TRUE ;
+					}
+					else {
+						//Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
+						$learningAreas=getLearningAreas($connection2, $guid, TRUE) ;
+						if ($learningAreas!="") {
+							for ($i=0; $i<count($learningAreas); $i=$i+2) {
+								if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
+									$proceed=TRUE ;
+								}
+							}
 						}
 					}
-		
-					if ($partialFail==TRUE) {
-						//Fail 5
-						$URL.="&addReturn=fail5" ;
+				
+					if ($proceed==FALSE) {
+						//Fail 0
+						$URL.="&updateReturn=fail0" ;
 						header("Location: {$URL}");
 					}
 					else {
-						//Success 0
-						$URL.="&addReturn=success0" ;
-						header("Location: {$URL}");
+						$partialFail=FALSE ;
+		
+						foreach ($gibbonPersonIDMulti AS $gibbonPersonID) {
+							//Write to database
+							try {
+								$data=array("gibbonPersonID"=>$gibbonPersonID, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>"Individual", "status"=>$status); 
+								$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonID, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, status=:status" ;
+								$result=$connection2->prepare($sql);
+								$result->execute($data);
+							}
+							catch(PDOException $e) { 
+								$partialFail=TRUE ;	
+							}
+						}
+		
+						if ($partialFail==TRUE) {
+							//Fail 5
+							$URL.="&addReturn=fail5" ;
+							header("Location: {$URL}");
+						}
+						else {
+							//Success 0
+							$URL.="&addReturn=success0" ;
+							header("Location: {$URL}");
+						}
 					}
 				}
 			}
