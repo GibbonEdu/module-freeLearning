@@ -67,7 +67,7 @@ else {
 			else {
 				try {
 					$data=array("freeLearningUnitID"=>$freeLearningUnitID, "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-					$sql="SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID AND status='Current'" ; 
+					$sql="SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID AND (status='Current' OR status='Evidence Not Approved')" ; 
 					$result=$connection2->prepare($sql);
 					$result->execute($data);
 				}
@@ -87,6 +87,7 @@ else {
 				else {
 					//Proceed!
 					$row=$result->fetch() ;
+					$name=$row["name"] ;
 					
 					//Get Inputs
 					$status='Complete - Pending' ;
@@ -189,8 +190,8 @@ else {
 							}
 							catch(PDOException $e) { }
 							
-							$text=_("A student has requested approval for unit complete evidence.") ;
-							$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true" ;
+							$text=sprintf(_('A student has requested unit completion approval and feedback (%1$s).'), $name) ;
+							$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
 							while ($row=$result->fetch()) {
 								setNotification($connection2, $guid, $row["gibbonPersonID"], $text, "Free Learning", $actionLink) ;
 							}

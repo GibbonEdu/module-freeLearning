@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="1.4.00" ;
+$version="1.4.01" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -88,7 +88,7 @@ $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
   `gibbonCourseClassID` INT(8) UNSIGNED ZEROFILL NOT NULL,
   `grouping` ENUM('Individual','Pairs','Threes','Fours','Fives') NOT NULL,
   `collaborationKey` VARCHAR(20) NULL DEFAULT NULL,
-  `status` enum('Current','Complete - Pending','Complete - Approved','Exempt') NOT NULL DEFAULT 'Current',
+  `status` enum('Current','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') NOT NULL DEFAULT 'Current',
   `timestampJoined` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `timestampCompletePending` timestamp NULL DEFAULT NULL,
   `timestampCompleteApproved` timestamp NULL DEFAULT NULL,
@@ -236,5 +236,4 @@ $array["sourceModuleName"]="Free Learning" ;
 $array["sourceModuleAction"]="Unit History By Student" ;
 $array["sourceModuleInclude"]="hook_studentProfile_unitHistory.php" ;
 $hooks[1]="INSERT INTO `gibbonHook` (`gibbonHookID`, `name`, `type`, `options`, gibbonModuleID) VALUES (NULL, 'Free Learning Unit History', 'Student Profile', '" . serialize($array) . "', (SELECT gibbonModuleID FROM gibbonModule WHERE name='$name'));" ;
-print_r($hooks[1]) ;
 ?>

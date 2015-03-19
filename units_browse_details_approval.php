@@ -156,7 +156,10 @@ else {
 									<span style="font-size: 90%"><i><?php print _('This value cannot be changed.') ?></i></span>
 								</td>
 								<td class="right">
-									<input readonly style='width: 300px' type='text' value='Complete - Approved' />
+									<select style="width: 302px" name="status">
+										<option value='Complete - Approved'>Complete - Approved</option>
+										<option value='Evidence Not Approved'>Evidence Not Approved</option>
+									</select>
 								</td>
 							</tr>
 							<tr>

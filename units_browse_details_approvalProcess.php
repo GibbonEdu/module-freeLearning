@@ -83,6 +83,7 @@ else {
 			else {
 				//Proceed!
 				$row=$result->fetch() ;
+				$name=$row["name"] ;
 				
 				$proceed=FALSE ;
 				//Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
@@ -109,7 +110,7 @@ else {
 				}
 				else {
 					//Get Inputs
-					$status='Complete - Approved' ;
+					$status=$_POST["status"] ;
 					$commentApproval=$_POST["commentApproval"] ;
 					$gibbonPersonIDStudent=$row["gibbonPersonIDStudent"] ;
 					
@@ -120,28 +121,59 @@ else {
 						header("Location: {$URL}");
 					}
 					else {
-						//Write to database
-						try {
-							$data=array("status"=>$status, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-							$sql="UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
-							$result=$connection2->prepare($sql);
-							$result->execute($data);
-						}
-						catch(PDOException $e) { 
-							//Fail 2
-							$URL.="&updateReturn=fail2" ;
+						if ($status=="Complete - Approved") { //APPROVED!
+							//Write to database
+							try {
+								$data=array("status"=>$status, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+								$sql="UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+								$result=$connection2->prepare($sql);
+								$result->execute($data);
+							}
+							catch(PDOException $e) { 
+								//Fail 2
+								$URL.="&updateReturn=fail2" ;
+								header("Location: {$URL}");
+								exit ;
+							}
+					
+							//Attempt to notify the student
+							$text=sprintf(_('A teacher has approved your request for unit completion (%1$s).'), $name) ;
+							$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
+							setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
+					
+							//Success 0
+							$URL.="&updateReturn=success0" ;
 							header("Location: {$URL}");
-							exit ;
 						}
+						else if ($status=="Evidence Not Approved") { //NOT APPROVED
+							//Write to database
+							try {
+								$data=array("status"=>$status, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+								$sql="UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+								$result=$connection2->prepare($sql);
+								$result->execute($data);
+							}
+							catch(PDOException $e) { 
+								//Fail 2
+								$URL.="&updateReturn=fail2" ;
+								header("Location: {$URL}");
+								exit ;
+							}
 					
-						//Attempt to notify the student
-						$text=_("A teacher has approved your request for unit completion.") ;
-						$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true" ;
-						setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
+							//Attempt to notify the student
+							$text=sprintf(_('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name) ;
+							$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
+							setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
 					
-						//Success 0
-						$URL.="&updateReturn=success0" ;
-						header("Location: {$URL}");
+							//Success 0
+							$URL.="&updateReturn=success0" ;
+							header("Location: {$URL}");
+						}
+						else {
+							//Fail 3
+							$URL.="&updateReturn=fail3" ;
+							header("Location: {$URL}");
+						}
 					}
 				}
 			}

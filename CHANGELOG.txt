@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v1.4.01
+-------
+Fixed bug in manifest.php
+Made notifications more useful
+Improved order of student enrolment rows in teacher view of enrolment
+
+
 v1.4.00
 -------
 Added ability to delete student enrolment for staff who can edit a given unit

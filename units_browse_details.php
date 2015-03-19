@@ -378,7 +378,7 @@ else {
 									//List students whose status is Current or Complete - Pending
 									try {
 										$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-										$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY freeLearningUnitStudent.status DESC, surname, preferredName" ;
+										$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
 										$resultClass=$connection2->prepare($sqlClass);
 										$resultClass->execute($dataClass);
 									}
@@ -497,13 +497,22 @@ else {
 									if ($enrolCheckFail==FALSE) {
 										if ($resultEnrol->rowCount()==1) { //Already enroled, deal with different statuses
 											$rowEnrol=$resultEnrol->fetch() ;
-											if ($rowEnrol["status"]=="Current") { //Currently enroled, allow to set status to complete and submit feedback
+											if ($rowEnrol["status"]=="Current" OR $rowEnrol["status"]=="Evidence Not Approved") { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
 												print "<h4>" ;
 													print _("Currently Enroled") ;
 												print "</h4>" ;
-												print "<p>" ;
-													print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your teacher will be notified, and will approve your unit completion in due course.'), $row["name"]) ;
-												print "</p>" ;
+												if ($rowEnrol["status"]=="Current") {
+													print "<p>" ;
+														print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your teacher will be notified, and will approve your unit completion in due course.'), $row["name"]) ;
+													print "</p>" ;
+												}
+												else if ($rowEnrol["status"]=="Evidence Not Approved") {
+													print "<div class='warning'>" ;
+														print _("Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:") . "<br/><br/>" ;
+														print "<b>" . $rowEnrol["commentApproval"] . "</b>" ;
+													print "</div>" ;
+												}
+												
 												?>
 												<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_completePendingProcess.php?address=" . $_GET["q"] ?>" enctype="multipart/form-data">
 													<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
