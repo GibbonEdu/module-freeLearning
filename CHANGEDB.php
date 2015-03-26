@@ -136,4 +136,9 @@ $sql[$count][1]="
 ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Current';end
 " ;
 
+//v1.4.02
+$count++ ;
+$sql[$count][0]="1.4.02" ;
+$sql[$count][1]="" ;
+
 ?>

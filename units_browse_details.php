@@ -445,7 +445,7 @@ else {
 															if ($rowClass["status"]=="Complete - Pending") {
 																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
 															}
-															if ($rowClass["commentStudent"]!="") {
+															if ($rowClass["commentStudent"]!="" OR $rowClass["commentApproval"]!="") {
 																print "<script type='text/javascript'>" ;	
 																	print "$(document).ready(function(){" ;
 																		print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").hide();" ;
@@ -463,10 +463,20 @@ else {
 													</td>											
 												</tr>
 												<?php
-												if ($rowClass["commentStudent"]!="") {
+												if ($rowClass["commentStudent"]!="" OR $rowClass["commentApproval"]!="") {
 													print "<tr class='comment-" . $rowClass["freeLearningUnitStudentID"] . "' id='comment-" . $rowClass["freeLearningUnitStudentID"] . "'>" ;
 														print "<td colspan=4>" ;
-															print $rowClass["commentStudent"] ;
+															if ($rowClass["commentStudent"]!="") {
+																print "<b>" . _("Student Comment") . "</b><br/>" ;
+																print $rowClass["commentStudent"] . "<br/>" ;
+															}
+															if ($rowClass["commentApproval"]!="") {
+																if ($rowClass["commentStudent"]!="") {
+																	print "<br/>" ;
+																}
+																print "<b>" . _("Teacher Comment") . "</b><br/>" ;
+																print $rowClass["commentApproval"] . "<br/>" ;
+															}
 														print "</td>" ;
 													print "</tr>" ;
 												}
