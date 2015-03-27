@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.4.03
+-------
+Fixed broken show/hide control on enrolment feedback information for teachers
+
 v1.4.02
 -------
 Added teacher comment to drop down comment view, when teacher viewing enrolment for a unit

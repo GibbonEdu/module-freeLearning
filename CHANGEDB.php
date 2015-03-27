@@ -141,4 +141,8 @@ $count++ ;
 $sql[$count][0]="1.4.02" ;
 $sql[$count][1]="" ;
 
+//v1.4.03
+$count++ ;
+$sql[$count][0]="1.4.03" ;
+$sql[$count][1]="" ;
 ?>

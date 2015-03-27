@@ -445,19 +445,19 @@ else {
 															if ($rowClass["status"]=="Complete - Pending") {
 																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
 															}
-															if ($rowClass["commentStudent"]!="" OR $rowClass["commentApproval"]!="") {
-																print "<script type='text/javascript'>" ;	
-																	print "$(document).ready(function(){" ;
-																		print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").hide();" ;
-																		print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeIn(1000);" ;
-																		print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").click(function(){" ;
-																		print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeToggle(1000);" ;
-																		print "});" ;
-																	print "});" ;
-																print "</script>" ;
-																print "<a title='" . _('Show Comment') . "' class='show_hide-" . $rowClass["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
-															}
 															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;						
+														}
+														if ($rowClass["commentStudent"]!="" OR $rowClass["commentApproval"]!="") {
+															print "<script type='text/javascript'>" ;	
+																print "$(document).ready(function(){" ;
+																	print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").hide();" ;
+																	print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeIn(1000);" ;
+																	print "\$(\".show_hide-" . $rowClass["freeLearningUnitStudentID"] . "\").click(function(){" ;
+																	print "\$(\".comment-" . $rowClass["freeLearningUnitStudentID"] . "\").fadeToggle(1000);" ;
+																	print "});" ;
+																print "});" ;
+															print "</script>" ;
+															print "<a title='" . _('Show Comment') . "' class='show_hide-" . $rowClass["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
 														}
 														?>
 													</td>											
