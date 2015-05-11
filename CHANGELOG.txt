@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v1.5.00
+-------
+Added in parent view of children's unit history
+Added in hook to Parental Dashboard
+
 v1.4.03
 -------
 Fixed broken show/hide control on enrolment feedback information for teachers

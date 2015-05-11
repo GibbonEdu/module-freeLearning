@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function getStudentHistory($connection2, $guid, $gibbonPersonID) {
+function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary=FALSE) {
 	$output=FALSE; 
 	
 	try {
@@ -36,7 +36,12 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID) {
 	else {
 		try {
 			$data=array("gibbonPersonID"=>$gibbonPersonID); 
-			$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY year, status, unit" ; 
+			if ($summary==TRUE) {
+				$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Evidence Not Approved') ORDER BY timestampJoined DESC, year DESC, status, unit LIMIT 0, 3" ; 
+			}
+			else {
+				$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY year DESC, status, unit" ; 
+			}
 			$result=$connection2->prepare($sql);
 			$result->execute($data);
 		}
@@ -123,10 +128,20 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID) {
 							}
 						$output.="</td>" ;
 					$output.="</tr>" ;
-					if ($row["commentStudent"]!="") {
+					if ($row["commentStudent"]!="" OR $row["commentApproval"]!="") {
 						$output.="<tr class='comment-" . $row["freeLearningUnitStudentID"] . "' id='comment-" . $row["freeLearningUnitStudentID"] . "'>" ;
 							$output.="<td colspan=6>" ;
-								$output.=$row["commentStudent"] ;
+								if ($row["commentStudent"]!="") {
+									$output.="<b>" . _("Student Comment") . "</b><br/>" ;
+									$output.=nl2br($row["commentStudent"]) . "<br/>" ;
+								}
+								if ($row["commentApproval"]!="") {
+									if ($row["commentStudent"]!="") {
+										$output.="<br/>" ;
+									}
+									$output.="<b>" . _("Teacher Comment") . "</b><br/>" ;
+									$output.=nl2br($row["commentApproval"]) . "<br/>" ;
+								}
 							$output.="</td>" ;
 						$output.="</tr>" ;
 					}

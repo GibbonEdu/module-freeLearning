@@ -468,14 +468,14 @@ else {
 														print "<td colspan=4>" ;
 															if ($rowClass["commentStudent"]!="") {
 																print "<b>" . _("Student Comment") . "</b><br/>" ;
-																print $rowClass["commentStudent"] . "<br/>" ;
+																print nl2br($rowClass["commentStudent"]) . "<br/>" ;
 															}
 															if ($rowClass["commentApproval"]!="") {
 																if ($rowClass["commentStudent"]!="") {
 																	print "<br/>" ;
 																}
 																print "<b>" . _("Teacher Comment") . "</b><br/>" ;
-																print $rowClass["commentApproval"] . "<br/>" ;
+																print nl2br($rowClass["commentApproval"]) . "<br/>" ;
 															}
 														print "</td>" ;
 													print "</tr>" ;
