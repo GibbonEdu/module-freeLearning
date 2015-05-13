@@ -156,4 +156,14 @@ INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`
 INSERT INTO `gibbonHook` (`gibbonHookID`, `name`, `type`, `options`, gibbonModuleID) VALUES (NULL, 'Free Learning', 'Parental Dashboard', 'a:3:{s:16:\"sourceModuleName\";s:13:\"Free Learning\";s:18:\"sourceModuleAction\";s:34:\"Unit History By Student_myChildren\";s:19:\"sourceModuleInclude\";s:38:\"hook_parentalDashboard_unitHistory.php\";}', (SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning'));end
 UPDATE gibbonHook SET `options`='a:3:{s:16:\"sourceModuleName\";s:13:\"Free Learning\";s:18:\"sourceModuleAction\";s:27:\"Unit History By Student_all\";s:19:\"sourceModuleInclude\";s:35:\"hook_studentProfile_unitHistory.php\";}' WHERE name='Free Learning Unit History' AND type='Student Profile' AND gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE gibbonModule.name='Free Learning');end
 " ;
+
+//v2.0.00
+$count++ ;
+$sql[$count][0]="2.0.00" ;
+$sql[$count][1]="
+UPDATE gibbonHook SET name='Free Learning' WHERE name='Free Learning Unit History' AND gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning') ;end
+INSERT INTO `gibbonAction` (`gibbonActionID`, `gibbonModuleID`, `name`, `precedence`, `category`, `description`, `URLList`, `entryURL`, `entrySidebar`, `defaultPermissionAdmin`, `defaultPermissionTeacher`, `defaultPermissionStudent`, `defaultPermissionParent`, `defaultPermissionSupport`, `categoryPermissionStaff`, `categoryPermissionStudent`, `categoryPermissionParent`, `categoryPermissionOther`) VALUES (NULL, (SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning'), 'Outcomes By Student', 0, 'Reports', 'Allows a user to see all outcomes met by a given student.', 'report_outcomes_byStudent.php','report_outcomes_byStudent.php', 'Y', 'Y', 'N', 'N', 'N', 'N', 'Y', 'N', 'N', 'N');end
+INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`) VALUES (NULL , '1', (SELECT gibbonActionID FROM gibbonAction JOIN gibbonModule ON (gibbonAction.gibbonModuleID=gibbonModule.gibbonModuleID) WHERE gibbonModule.name='Free Learning' AND gibbonAction.name='Outcomes By Student'));end
+" ;
+
 ?>

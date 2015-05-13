@@ -163,21 +163,10 @@ else {
 								</td>
 							</tr>
 							<tr>
-								<td> 
+								<td colspan=2> 
 									<b><?php print _('Comment') ?> *</b><br/>
 									<span style="font-size: 90%"><i><?php print _('Leave a comment on the student\'s progress.') ?></i></span>
-								</td>
-								<td class="right">
-									<script type='text/javascript'>
-										$(document).ready(function(){
-											$('#commentApproval').autosize();    
-										});
-									</script>
-									<textarea name="commentApproval" id="commentApproval" rows=8 style="width: 300px"></textarea>
-									<script type="text/javascript">
-										var commentApproval=new LiveValidation('commentApproval');
-										commentApproval.add(Validate.Presence);
-									</script>
+									<?php print getEditor($guid,  TRUE, "commentApproval", "", 15, TRUE, TRUE ) ?>
 								</td>
 							</tr>
 							<tr>

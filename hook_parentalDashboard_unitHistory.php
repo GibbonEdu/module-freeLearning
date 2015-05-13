@@ -41,7 +41,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_unitH
 }
 else {
 	$returnInt.="<p>" ;
-		$returnInt.=_('The table below shows recent results for Free Learning units studied by your child:') ;
+		$returnInt.=_('The table below shows recent results and enrolment for Free Learning units studied by your child:') ;
 	$returnInt.="</p>" ;
 	$returnInt.=getStudentHistory($connection2, $guid, $gibbonPersonID, TRUE) ;	
 }

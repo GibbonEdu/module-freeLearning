@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v2.0.00
+-------
+Shortened Student Profile hook text
+Allow teacher comments to include rich text, file uploads, etc/
+Added report to allow tracking of unit outcomes, and suggest of next units
+
 v1.5.00
 -------
 Added in parent view of children's unit history
