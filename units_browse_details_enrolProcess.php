@@ -52,6 +52,8 @@ else {
 		header("Location: {$URL}");
 	}
 	else {
+		$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
+
 		$freeLearningUnitID=$_POST["freeLearningUnitID"] ;
 		
 		if ($freeLearningUnitID=="") {
@@ -66,10 +68,16 @@ else {
 					$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID" ; 
 				}
 				else if ($highestAction=="Browse Units_prerequisites") {
-					$data["freeLearningUnitID"]=$freeLearningUnitID; 
-					$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
-					$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
-					$sql="SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
+					if ($schoolType=="Physical") {
+						$data["freeLearningUnitID"]=$freeLearningUnitID; 
+						$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+						$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
+						$sql="SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
+					}
+					else {
+						$data["freeLearningUnitID"]=$freeLearningUnitID; 
+						$sql="SELECT freeLearningUnit.* FROM freeLearningUnit WHERE active='Y' AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
+					}
 				}
 				$result=$connection2->prepare($sql);
 				$result->execute($data);
@@ -114,86 +122,85 @@ else {
 					break ;
 				}
 				else {
-					//Work out if we student enrolment is allowed
-					$enrolment=FALSE ;
-					$roleCategory=getRoleCategory($_SESSION[$guid]["gibbonRoleIDCurrent"], $connection2) ;
-					if ($roleCategory!="Student") {
-						//Fail 2
-						$URL.="&updateReturn=fail2" ;
-						header("Location: {$URL}");
-						break ;
+					if ($schoolType=="Online") {
+						//Write to database
+						try {
+							$data=array("gibbonPersonIDStudent"=>$_SESSION[$guid]["gibbonPersonID"], "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID); 
+							$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=NULL, grouping='Individual', collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=NULL, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+							$result=$connection2->prepare($sql);
+							$result->execute($data);
+						}
+						catch(PDOException $e) { 
+							//Fail 2
+							$URL.="&updateReturn=fail2" ;
+							header("Location: {$URL}");
+							break ;
+						}
+						
+						//Success 0
+						$URL=$URL . "&updateReturn=success0" ;
+						header("Location: {$URL}") ;
 					}
 					else {
-						//Proceed!
-						//Validate Inputs
-						$gibbonCourseClassID=$_POST["gibbonCourseClassID"] ;
-						$grouping=$_POST["grouping"] ;
-						$collaborators=NULL ;
-						if (isset($_POST["collaborators"])) {
-							$collaborators=$_POST["collaborators"] ;
-						} 
-						if ($gibbonCourseClassID=="" OR $grouping=="") {
-							//Fail 3
-							$URL.="&updateReturn=fail3" ;
+						//Work out if we student enrolment is allowed
+						$enrolment=FALSE ;
+						$roleCategory=getRoleCategory($_SESSION[$guid]["gibbonRoleIDCurrent"], $connection2) ;
+						if ($roleCategory!="Student") {
+							//Fail 2
+							$URL.="&updateReturn=fail2" ;
 							header("Location: {$URL}");
+							break ;
 						}
 						else {
-							//If there are collaborators, generate a unique collaboration key
-							$collaborationKey=NULL ;
-							$unique=FALSE ;
-							if (is_array($collaborators)) {
-								$spinCount=0 ;
-								while ($spinCount<100 AND $unique!=TRUE) {
-									$collaborationKey=randomPassword(20) ;
-									$checkFail=FALSE ;
-									try {
-										$data=array("collaborationKey"=>$collaborationKey); 
-										$sql="SELECT * FROM freeLearningUnitStudent WHERE collaborationKey=:collaborationKey" ;
-										$result=$connection2->prepare($sql);
-										$result->execute($data);
-									}
-									catch(PDOException $e) { $checkFail=TRUE ; }
-									if ($checkFail==FALSE) {
-										if ($result->rowCount()==0) {
-											$unique=TRUE ;
-										}
-									}
-									$spinCount++ ;
-								}
-								
-								if ($unique==FALSE ) {
-									//Fail 2
-									$URL.="&updateReturn=fail2" ;
-									header("Location: {$URL}");
-									exit() ;
-								}
-							}
-						
-							//Check enrolment
-							try {
-								$data=array("freeLearningUnitID"=>$freeLearningUnitID, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"]); 
-								$sql="SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID" ;
-								$result=$connection2->prepare($sql);
-								$result->execute($data);
-							}
-							catch(PDOException $e) { 
-								//Fail 2
-								$URL.="&updateReturn=fail2" ;
+							//Proceed!
+							//Validate Inputs
+							$gibbonCourseClassID=$_POST["gibbonCourseClassID"] ;
+							$grouping=$_POST["grouping"] ;
+							$collaborators=NULL ;
+							if (isset($_POST["collaborators"])) {
+								$collaborators=$_POST["collaborators"] ;
+							} 
+							if ($gibbonCourseClassID=="" OR $grouping=="") {
+								//Fail 3
+								$URL.="&updateReturn=fail3" ;
 								header("Location: {$URL}");
-								break ;
-							}
-							
-							if ($result->rowCount()>0) {
-								//Fail 2
-								$URL.="&updateReturn=fail2" ;
-								header("Location: {$URL}");
-								break ;
 							}
 							else {
-								//Write to database
+								//If there are collaborators, generate a unique collaboration key
+								$collaborationKey=NULL ;
+								$unique=FALSE ;
+								if (is_array($collaborators)) {
+									$spinCount=0 ;
+									while ($spinCount<100 AND $unique!=TRUE) {
+										$collaborationKey=randomPassword(20) ;
+										$checkFail=FALSE ;
+										try {
+											$data=array("collaborationKey"=>$collaborationKey); 
+											$sql="SELECT * FROM freeLearningUnitStudent WHERE collaborationKey=:collaborationKey" ;
+											$result=$connection2->prepare($sql);
+											$result->execute($data);
+										}
+										catch(PDOException $e) { $checkFail=TRUE ; }
+										if ($checkFail==FALSE) {
+											if ($result->rowCount()==0) {
+												$unique=TRUE ;
+											}
+										}
+										$spinCount++ ;
+									}
+								
+									if ($unique==FALSE ) {
+										//Fail 2
+										$URL.="&updateReturn=fail2" ;
+										header("Location: {$URL}");
+										exit() ;
+									}
+								}
+						
+								//Check enrolment
 								try {
-									$data=array("gibbonPersonIDStudent"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-									$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+									$data=array("freeLearningUnitID"=>$freeLearningUnitID, "gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"]); 
+									$sql="SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID" ;
 									$result=$connection2->prepare($sql);
 									$result->execute($data);
 								}
@@ -203,50 +210,72 @@ else {
 									header("Location: {$URL}");
 									break ;
 								}
-								
-								
-								//DEAL WITH COLLABORATORS!
-								$partialFail=FALSE ;
-								if (is_array($collaborators)) {
-									foreach ($collaborators AS $collaborator) {
-										//Check enrolment
-										try {
-											$data=array("freeLearningUnitID"=>$freeLearningUnitID, "gibbonPersonID"=>$collaborator); 
-											$sql="SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID" ;
-											$result=$connection2->prepare($sql);
-											$result->execute($data);
-										}
-										catch(PDOException $e) { 
-											$partialFail=TRUE ;
-										}
 							
-										if ($result->rowCount()>0) {
-											$partialFail=TRUE ;
-										}
-										else {
-											//Write to database
+								if ($result->rowCount()>0) {
+									//Fail 2
+									$URL.="&updateReturn=fail2" ;
+									header("Location: {$URL}");
+									break ;
+								}
+								else {
+									//Write to database
+									try {
+										$data=array("gibbonPersonIDStudent"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+										$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+										$result=$connection2->prepare($sql);
+										$result->execute($data);
+									}
+									catch(PDOException $e) { 
+										//Fail 2
+										$URL.="&updateReturn=fail2" ;
+										header("Location: {$URL}");
+										break ;
+									}
+								
+								
+									//DEAL WITH COLLABORATORS!
+									$partialFail=FALSE ;
+									if (is_array($collaborators)) {
+										foreach ($collaborators AS $collaborator) {
+											//Check enrolment
 											try {
-												$data=array("gibbonPersonIDStudent"=>$collaborator, "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-												$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+												$data=array("freeLearningUnitID"=>$freeLearningUnitID, "gibbonPersonID"=>$collaborator); 
+												$sql="SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID" ;
 												$result=$connection2->prepare($sql);
 												$result->execute($data);
 											}
 											catch(PDOException $e) { 
 												$partialFail=TRUE ;
 											}
+							
+											if ($result->rowCount()>0) {
+												$partialFail=TRUE ;
+											}
+											else {
+												//Write to database
+												try {
+													$data=array("gibbonPersonIDStudent"=>$collaborator, "gibbonCourseClassID"=>$gibbonCourseClassID, "grouping"=>$grouping, "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID, "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+													$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+													$result=$connection2->prepare($sql);
+													$result->execute($data);
+												}
+												catch(PDOException $e) { 
+													$partialFail=TRUE ;
+												}
+											}
 										}
 									}
-								}
 								
-								if ($partialFail==TRUE) {
-									//Fail 5
-									$URL.="&updateReturn=fail5" ;
-									header("Location: {$URL}");
-								}
-								else {
-									//Success 0
-									$URL=$URL . "&updateReturn=success0" ;
-									header("Location: {$URL}") ;
+									if ($partialFail==TRUE) {
+										//Fail 5
+										$URL.="&updateReturn=fail5" ;
+										header("Location: {$URL}");
+									}
+									else {
+										//Success 0
+										$URL=$URL . "&updateReturn=success0" ;
+										header("Location: {$URL}") ;
+									}
 								}
 							}
 						}

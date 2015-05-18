@@ -51,6 +51,8 @@ else {
 		header("Location: {$URL}");
 	}
 	else {
+		$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
+
 		if (empty($_POST)) {
 			$URL.="&updateReturn=fail5" ;
 			header("Location: {$URL}");
@@ -81,37 +83,41 @@ else {
 			}
 			$active=$_POST["active"] ;
 			$gibbonYearGroupIDMinimum=NULL ;
-			if ($_POST["gibbonYearGroupIDMinimum"]!="") {
-				$gibbonYearGroupIDMinimum=$_POST["gibbonYearGroupIDMinimum"] ;
+			if ($schoolType=="Physical") {
+				if ($_POST["gibbonYearGroupIDMinimum"]!="") {
+					$gibbonYearGroupIDMinimum=$_POST["gibbonYearGroupIDMinimum"] ;
+				}
 			}
 			$grouping="" ;
-			if (isset($_POST["Individual"])) {
-				if ($_POST["Individual"]=="on") {
-					$grouping.="Individual," ;
+			if ($schoolType=="Physical") {
+				if (isset($_POST["Individual"])) {
+					if ($_POST["Individual"]=="on") {
+						$grouping.="Individual," ;
+					}
 				}
-			}
-			if (isset($_POST["Pairs"])) {
-				if ($_POST["Pairs"]=="on") {
-					$grouping.="Pairs," ;
+				if (isset($_POST["Pairs"])) {
+					if ($_POST["Pairs"]=="on") {
+						$grouping.="Pairs," ;
+					}
 				}
-			}
-			if (isset($_POST["Threes"])) {
-				if ($_POST["Threes"]=="on") {
-					$grouping.="Threes," ;
+				if (isset($_POST["Threes"])) {
+					if ($_POST["Threes"]=="on") {
+						$grouping.="Threes," ;
+					}
 				}
-			}
-			if (isset($_POST["Fours"])) {
-				if ($_POST["Fours"]=="on") {
-					$grouping.="Fours," ;
+				if (isset($_POST["Fours"])) {
+					if ($_POST["Fours"]=="on") {
+						$grouping.="Fours," ;
+					}
 				}
-			}
-			if (isset($_POST["Fives"])) {
-				if ($_POST["Fives"]=="on") {
-					$grouping.="Fives," ;
+				if (isset($_POST["Fives"])) {
+					if ($_POST["Fives"]=="on") {
+						$grouping.="Fives," ;
+					}
 				}
-			}
-			if (substr($grouping, -1)==",") {
-				$grouping=substr($grouping, 0, -1) ;
+				if (substr($grouping, -1)==",") {
+					$grouping=substr($grouping, 0, -1) ;
+				}
 			}
 			$freeLearningUnitIDPrerequisiteList=NULL ;
 			if (isset($_POST["prerequisites"])) {

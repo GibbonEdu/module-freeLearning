@@ -23,6 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 
 $publicUnits=getSettingByScope($connection2, "Free Learning", "publicUnits" ) ;
+$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
 if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
 	//Acess denied
 	print "<div class='error'>" ;
@@ -205,10 +206,16 @@ else {
 					$sql="SELECT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
 				}
 				else if ($highestAction=="Browse Units_prerequisites") {
-					$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
-					$data["gibbonPersonID2"]=$_SESSION[$guid]["gibbonPersonID"] ;
-					$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
-					$sql="SELECT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name" ; 
+					if ($schoolType=="Physical") {
+						$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+						$data["gibbonPersonID2"]=$_SESSION[$guid]["gibbonPersonID"] ;
+						$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
+						$sql="SELECT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name" ; 
+					}
+					else {
+						$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+						$sql="SELECT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name" ; 
+					}
 				}
 			}
 			$result=$connection2->prepare($sql);
@@ -252,9 +259,11 @@ else {
 							print _("Length") . "</br>" ;
 							print "<span style='font-size: 85%; font-style: italic'>" . _('Minutes') . "</span>" ;
 						print "</th>" ;
-						print "<th>" ;
-							print _("Grouping") . "</br>" ;
-						print "</th>" ;
+						if ($schoolType=="Physical") {
+							print "<th>" ;
+								print _("Grouping") . "</br>" ;
+							print "</th>" ;
+						}
 						print "<th>" ;
 							print _("Prerequisites") . "</br>" ;
 						print "</th>" ;
@@ -344,14 +353,17 @@ else {
 								else {
 									print $timing ;
 								}
-							print "</td>" ;print "<td>" ;
-								if ($row["grouping"]!="") {
-									$groupings=explode(",", $row["grouping"]) ;
-									foreach ($groupings AS $grouping) {
-										print ucwords($grouping) . "<br/>" ;
-									}
-								}
 							print "</td>" ;
+							if ($schoolType=="Physical") {
+								print "<td>" ;
+									if ($row["grouping"]!="") {
+										$groupings=explode(",", $row["grouping"]) ;
+										foreach ($groupings AS $grouping) {
+											print ucwords($grouping) . "<br/>" ;
+										}
+									}
+								print "</td>" ;
+							}
 							print "<td>" ;
 								$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
 								if ($prerequisitesActive!=FALSE) {

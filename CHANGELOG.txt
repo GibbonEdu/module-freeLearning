@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.1.00
+-------
+Added ability to deal with online schools (e.g. fewer structures)
+
 v2.0.00
 -------
 Shortened Student Profile hook text

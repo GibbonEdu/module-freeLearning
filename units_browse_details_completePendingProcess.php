@@ -56,6 +56,8 @@ else {
 			header("Location: {$URL}");
 		}
 		else {
+			$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
+
 			$freeLearningUnitID=$_POST["freeLearningUnitID"] ;
 			$freeLearningUnitStudentID=$_POST["freeLearningUnitStudentID"] ;
 		
@@ -167,33 +169,50 @@ else {
 							header("Location: {$URL}");
 						}
 						else {
-							//Write to database
-							try {
-								$data=array("status"=>$status, "commentStudent"=>$commentStudent, "evidenceType"=>$type, "evidenceLocation"=>$location, "timestampCompletePending"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-								$sql="UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
-								$result=$connection2->prepare($sql);
-								$result->execute($data);
+							if ($schoolType=="Online") {
+								//Write to database
+								try {
+									$data=array("commentStudent"=>$commentStudent, "evidenceType"=>$type, "evidenceLocation"=>$location, "timestampCompletePending"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+									$sql="UPDATE freeLearningUnitStudent SET status='Complete - Approved', commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+									$result=$connection2->prepare($sql);
+									$result->execute($data);
+								}
+								catch(PDOException $e) { 
+									//Fail 2
+									$URL.="&updateReturn=fail2" ;
+									header("Location: {$URL}");
+									exit ;
+								}
 							}
-							catch(PDOException $e) { 
-								//Fail 2
-								$URL.="&updateReturn=fail2" ;
-								header("Location: {$URL}");
-								exit ;
-							}
+							else {
+								//Write to database
+								try {
+									$data=array("status"=>$status, "commentStudent"=>$commentStudent, "evidenceType"=>$type, "evidenceLocation"=>$location, "timestampCompletePending"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+									$sql="UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+									$result=$connection2->prepare($sql);
+									$result->execute($data);
+								}
+								catch(PDOException $e) { 
+									//Fail 2
+									$URL.="&updateReturn=fail2" ;
+									header("Location: {$URL}");
+									exit ;
+								}
 							
-							//Attempt to notify teacher(s) of class
-							try {
-								$data=array("gibbonCourseClassID"=>$gibbonCourseClassID); 
-								$sql="SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND role='Teacher'" ;
-								$result=$connection2->prepare($sql);
-								$result->execute($data);
-							}
-							catch(PDOException $e) { }
+								//Attempt to notify teacher(s) of class
+								try {
+									$data=array("gibbonCourseClassID"=>$gibbonCourseClassID); 
+									$sql="SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND role='Teacher'" ;
+									$result=$connection2->prepare($sql);
+									$result->execute($data);
+								}
+								catch(PDOException $e) { }
 							
-							$text=sprintf(_('A student has requested unit completion approval and feedback (%1$s).'), $name) ;
-							$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
-							while ($row=$result->fetch()) {
-								setNotification($connection2, $guid, $row["gibbonPersonID"], $text, "Free Learning", $actionLink) ;
+								$text=sprintf(_('A student has requested unit completion approval and feedback (%1$s).'), $name) ;
+								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
+								while ($row=$result->fetch()) {
+									setNotification($connection2, $guid, $row["gibbonPersonID"], $text, "Free Learning", $actionLink) ;
+								}
 							}
 							
 							//Success 0

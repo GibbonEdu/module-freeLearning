@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="2.0.00" ;
+$version="2.1.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -84,8 +84,8 @@ $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
 `freeLearningUnitStudentID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `gibbonPersonIDStudent` int(10) unsigned zerofill DEFAULT NULL,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
-  `gibbonSchoolYearID` INT(3) UNSIGNED ZEROFILL NOT NULL,
-  `gibbonCourseClassID` INT(8) UNSIGNED ZEROFILL NOT NULL,
+  `gibbonSchoolYearID` INT(3) UNSIGNED ZEROFILL NULL DEFAULT NULL,
+  `gibbonCourseClassID` INT(8) UNSIGNED ZEROFILL NULL DEFAULT NULL,
   `grouping` ENUM('Individual','Pairs','Threes','Fours','Fives') NOT NULL,
   `collaborationKey` VARCHAR(20) NULL DEFAULT NULL,
   `status` enum('Current','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') NOT NULL DEFAULT 'Current',
@@ -105,6 +105,7 @@ $moduleTables[5]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope`
 $moduleTables[6]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'publicUnits', 'Public Units', 'Should selected units be made available to members of the public, via the home page?', 'N');";
 $moduleTables[7]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
 $moduleTables[8]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mapLink', 'Map Link', 'A URL pointing to a map of the available units.', '');";
+$moduleTables[9]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'schoolType', 'School Type', 'Determines how enrolment should function', 'Physical');";
 
 //Action rows
 $actionRows[0]["name"]="Manage Units_all" ;

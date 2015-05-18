@@ -23,6 +23,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 
 $publicUnits=getSettingByScope($connection2, "Free Learning", "publicUnits" ) ;
+$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
+
 if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
 	//Acess denied
 	print "<div class='error'>" ;
@@ -100,10 +102,16 @@ else {
 						$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID" ; 
 					}
 					else if ($highestAction=="Browse Units_prerequisites") {
-						$data["freeLearningUnitID"]=$freeLearningUnitID; 
-						$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
-						$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
-						$sql="SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
+						if ($schoolType=="Physical") {
+							$data["freeLearningUnitID"]=$freeLearningUnitID; 
+							$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
+							$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
+							$sql="SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
+						}
+						else {
+							$data["freeLearningUnitID"]=$freeLearningUnitID; 
+							$sql="SELECT freeLearningUnit.* FROM freeLearningUnit WHERE active='Y' AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
+						}
 					}
 				}
 				$result=$connection2->prepare($sql);
@@ -112,7 +120,7 @@ else {
 			catch(PDOException $e) { 
 				print "<div class='error'>" . $e->getMessage() . "</div>" ; 
 			}
-	
+			
 			if ($result->rowCount()!=1) {
 				print "<div class='error'>" ;
 					print _("The selected record does not exist, or you do not have access to it.") ;
@@ -377,8 +385,14 @@ else {
 									
 									//List students whose status is Current or Complete - Pending
 									try {
-										$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-										$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
+										if ($schoolType=="Physical") {
+											$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+											$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
+										}
+										else {
+											$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"]); 
+											$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
+										}
 										$resultClass=$connection2->prepare($sqlClass);
 										$resultClass->execute($dataClass);
 									}
@@ -487,9 +501,11 @@ else {
 									}
 								}
 								if ($enrolmentType=="student") { //STUDENT ENROLMENT
-									print "<p>" ;
-										print _("You can be enroled in one unit for each of your units at any one time. Use the information to manage your enrolment for this unit.") ;
-									print "</p>" ;
+									if ($schoolType=="Physical") {
+										print "<p>" ;
+											print _("You can be enroled in one unit for each of your classes at any one time. Use the information to manage your enrolment for this unit.") ;
+										print "</p>" ;
+									}
 									
 									//Check enrolment status
 									$enrolCheckFail=FALSE ;
@@ -511,16 +527,25 @@ else {
 												print "<h4>" ;
 													print _("Currently Enroled") ;
 												print "</h4>" ;
-												if ($rowEnrol["status"]=="Current") {
-													print "<p>" ;
-														print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your teacher will be notified, and will approve your unit completion in due course.'), $row["name"]) ;
-													print "</p>" ;
+												if ($schoolType=="Physical") {
+													if ($rowEnrol["status"]=="Current") {
+														print "<p>" ;
+															print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your teacher will be notified, and will approve your unit completion in due course.'), $row["name"]) ;
+														print "</p>" ;
+													}
+													else if ($rowEnrol["status"]=="Evidence Not Approved") {
+														print "<div class='warning'>" ;
+															print _("Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:") . "<br/><br/>" ;
+															print "<b>" . $rowEnrol["commentApproval"] . "</b>" ;
+														print "</div>" ;
+													}
 												}
-												else if ($rowEnrol["status"]=="Evidence Not Approved") {
-													print "<div class='warning'>" ;
-														print _("Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:") . "<br/><br/>" ;
-														print "<b>" . $rowEnrol["commentApproval"] . "</b>" ;
-													print "</div>" ;
+												else {
+													if ($rowEnrol["status"]=="Current") {
+														print "<p>" ;
+															print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.'), $row["name"]) ;
+														print "</p>" ;
+													}
 												}
 												
 												?>
@@ -689,12 +714,22 @@ else {
 												print "</p>" ;
 											}	
 											else if ($rowEnrol["status"]=="Complete - Approved") { //Complete, show status and feedback from teacher.
-												print "<h4>" ;
-													print _("Complete - Approved") ;
-												print "</h4>" ;
-												print "<p>" ;
-													print _('Congralutation! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') ;
-												print "</p>" ;
+												if ($schoolType=="Physical") {
+													print "<h4>" ;
+														print _("Complete - Approved") ;
+													print "</h4>" ;
+													print "<p>" ;
+														print _('Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') ;
+													print "</p>" ;
+												}
+												else {
+													print "<h4>" ;
+														print _("Complete") ;
+													print "</h4>" ;
+													print "<p>" ;
+														print _('Congralutations! You have submitted your evidence, shown below, and so the unit is complete. Feel free to move on to another unit.') ;
+													print "</p>" ;
+												}
 												?>
 												<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 													<tr>
@@ -732,12 +767,14 @@ else {
 													</tr>
 												</table>
 												<?php	
-												print "<h4>" ;
-													print _("Teacher Comment") ;
-												print "</h4>" ;
-												print "<p>" ;
-													print $rowEnrol["commentApproval"] ;
-												print "</p>" ;
+												if ($schoolType=="Physical") {
+													print "<h4>" ;
+														print _("Teacher Comment") ;
+													print "</h4>" ;
+													print "<p>" ;
+														print $rowEnrol["commentApproval"] ;
+													print "</p>" ;
+												}
 												
 												print "<h4>" ;
 													print _("Student Comment") ;
@@ -762,190 +799,194 @@ else {
 											?>
 											<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolProcess.php?address=" . $_GET["q"] ?>">
 												<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
-													<tr>
-														<td> 
-															<b><?php print _('Class') ?> *</b><br/>
-															<span style="font-size: 90%"><i><?php print _('Which class are you enroling for?') ?></i></span>
-														</td>
-														<td class="right">
-															<?php
-															try {
-																$dataClasses=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID"=> $_SESSION[$guid]["gibbonPersonID"]); 
-																$sqlClasses="SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse, gibbonCourseClass, gibbonCourseClassPerson WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID AND gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND NOT role LIKE '% - Left%' ORDER BY course, class" ;
-																$resultClasses=$connection2->prepare($sqlClasses);
-																$resultClasses->execute($dataClasses);
-															}
-															catch(PDOException $e) { }
-															?>
-															<select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
-																<option value="Please select..."><?php print _('Please select...') ?></option>
-																<?php
-																while ($rowClasses=$resultClasses->fetch()) {
-																	print "<option value='" . $rowClasses["gibbonCourseClassID"] . "'>" . $rowClasses["course"] . "." . $rowClasses["class"] . "</option>" ;
-																}
-																?>
-															</select>
-															<script type="text/javascript">
-																var gibbonCourseClassID=new LiveValidation('gibbonCourseClassID');
-																gibbonCourseClassID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
-															 </script>
-														</td>
-													</tr>
-													<tr>
-														<td style='width: 275px'> 
-															<b><?php print _('Grouping') ?> *</b><br/>
-															<span style="font-size: 90%"><i><?php print _('How do you want to study this unit?') ?></i></span>
-														</td>
-														<td class="right">
-															<select name="grouping" id="grouping" style="width: 302px">
-																<option value="Please select..."><?php print _('Please select...') ?></option>
-																<?php
-																$group=FALSE ;
-																$extraSlots=0 ;
-																if (strpos($row["grouping"], "Individual")!==FALSE) {
-																	print "<option value=\"Individual\">Individual</option>" ;
-																}
-																if (strpos($row["grouping"], "Pairs")!==FALSE) {
-																	print "<option value=\"Pairs\">Pair</option>" ;
-																	$group=TRUE ;
-																	$extraSlots=1 ;
-																}
-																if (strpos($row["grouping"], "Threes")!==FALSE) {
-																	print "<option value=\"Threes\">Three</option>" ;
-																	$group=TRUE ;
-																	$extraSlots=2 ;
-																}
-																if (strpos($row["grouping"], "Fours")!==FALSE) {
-																	print "<option value=\"Fours\">Four</option>" ;
-																	$group=TRUE ;
-																	$extraSlots=3 ;
-																}
-																if (strpos($row["grouping"], "Fives")!==FALSE) {
-																	print "<option value=\"Fives\">Five</option>" ;
-																	$group=TRUE ;
-																	$extraSlots=4 ;
-																}
-																?>
-															</select>
-															<script type="text/javascript">
-																var grouping=new LiveValidation('grouping');
-																grouping.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
-															 </script>
-														</td>
-													</tr>
 													<?php
-														if ($group) {
-															//Get array of students
-															$students=array() ;
-															$studentCount=0 ;
-															try {
-																$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID"=> $_SESSION[$guid]["gibbonPersonID"]); 
-																$sqlSelect="SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID ORDER BY surname, preferredName" ;
-																$resultSelect=$connection2->prepare($sqlSelect);
-																$resultSelect->execute($dataSelect);
-															}
-															catch(PDOException $e) { }
-															while ($rowSelect=$resultSelect->fetch()) {
-																$students[$studentCount]="<option value='" . $rowSelect["gibbonPersonID"] . "'>" . formatName("", htmlPrep($rowSelect["preferredName"]), htmlPrep($rowSelect["surname"]), "Student", true) . " (" . $rowSelect["rollGroup"] . ")</option>" ;
-																$studentCount++ ;
-															}		
-															
-															//Controls for lists
-															?>
-															<script type='text/javascript'>
-																$(document).ready(function(){
-																	$('tr.collaborator').css('display','none');
+													if ($schoolType=="Physical") {
+														?>
+														<tr>
+															<td> 
+																<b><?php print _('Class') ?> *</b><br/>
+																<span style="font-size: 90%"><i><?php print _('Which class are you enroling for?') ?></i></span>
+															</td>
+															<td class="right">
+																<?php
+																try {
+																	$dataClasses=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID"=> $_SESSION[$guid]["gibbonPersonID"]); 
+																	$sqlClasses="SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse, gibbonCourseClass, gibbonCourseClassPerson WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID AND gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND NOT role LIKE '% - Left%' ORDER BY course, class" ;
+																	$resultClasses=$connection2->prepare($sqlClasses);
+																	$resultClasses->execute($dataClasses);
+																}
+																catch(PDOException $e) { }
+																?>
+																<select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
+																	<option value="Please select..."><?php print _('Please select...') ?></option>
 																	<?php
-																	for ($i=1; $i<=$extraSlots; $i++) {
-																		print "collaborator" . $i . ".disable();" ;
+																	while ($rowClasses=$resultClasses->fetch()) {
+																		print "<option value='" . $rowClasses["gibbonCourseClassID"] . "'>" . $rowClasses["course"] . "." . $rowClasses["class"] . "</option>" ;
 																	}
 																	?>
-																	$('#grouping').change(function(){
-																		if ($('select#grouping option:selected').val()=='Individual') {
-																			$('#trCollaborator1').css('display','none');
-																			collaborator1.disable() ;
-																			$('#trCollaborator2').css('display','none');
-																			collaborator2.disable() ;
-																			$('#trCollaborator3').css('display','none');
-																			collaborator3.disable() ;
-																			$('#trCollaborator4').css('display','none');
-																			collaborator4.disable() ;
-																		} 
-																		else if ($('select#grouping option:selected').val()=='Pairs') {
-																			$('#trCollaborator1').css('display','table-row');
-																			collaborator1.enable() ;
-																			$('#trCollaborator2').css('display','none');
-																			collaborator2.disable() ;
-																			$('#trCollaborator3').css('display','none');
-																			collaborator3.disable() ;
-																			$('#trCollaborator4').css('display','none');
-																			collaborator4.disable() ;
-																		} 
-																		else if ($('select#grouping option:selected').val()=='Threes') {
-																			$('#trCollaborator1').css('display','table-row');
-																			collaborator1.enable() ;
-																			$('#trCollaborator2').css('display','table-row');
-																			collaborator2.enable() ;
-																			$('#trCollaborator3').css('display','none');
-																			collaborator3.disable() ;
-																			$('#trCollaborator4').css('display','none');
-																			collaborator4.disable() ;
-																		} 
-																		else if ($('select#grouping option:selected').val()=='Fours') {
-																			$('#trCollaborator1').css('display','table-row');
-																			collaborator1.enable() ;
-																			$('#trCollaborator2').css('display','table-row');
-																			collaborator2.enable() ;
-																			$('#trCollaborator3').css('display','table-row');
-																			collaborator3.enable() ;
-																			$('#trCollaborator4').css('display','none');
-																			collaborator4.disable() ;
-																		} 
-																		else if ($('select#grouping option:selected').val()=='Fives') {
-																			$('#trCollaborator1').css('display','table-row');
-																			collaborator1.enable() ;
-																			$('#trCollaborator2').css('display','table-row');
-																			collaborator2.enable() ;
-																			$('#trCollaborator3').css('display','table-row');
-																			collaborator3.enable() ;
-																			$('#trCollaborator4').css('display','table-row');
-																			collaborator4.enable() ;
-																		} 
-																	});
-																});
-															</script>	
+																</select>
+																<script type="text/javascript">
+																	var gibbonCourseClassID=new LiveValidation('gibbonCourseClassID');
+																	gibbonCourseClassID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
+																 </script>
+															</td>
+														</tr>
+														<tr>
+															<td style='width: 275px'> 
+																<b><?php print _('Grouping') ?> *</b><br/>
+																<span style="font-size: 90%"><i><?php print _('How do you want to study this unit?') ?></i></span>
+															</td>
+															<td class="right">
+																<select name="grouping" id="grouping" style="width: 302px">
+																	<option value="Please select..."><?php print _('Please select...') ?></option>
+																	<?php
+																	$group=FALSE ;
+																	$extraSlots=0 ;
+																	if (strpos($row["grouping"], "Individual")!==FALSE) {
+																		print "<option value=\"Individual\">Individual</option>" ;
+																	}
+																	if (strpos($row["grouping"], "Pairs")!==FALSE) {
+																		print "<option value=\"Pairs\">Pair</option>" ;
+																		$group=TRUE ;
+																		$extraSlots=1 ;
+																	}
+																	if (strpos($row["grouping"], "Threes")!==FALSE) {
+																		print "<option value=\"Threes\">Three</option>" ;
+																		$group=TRUE ;
+																		$extraSlots=2 ;
+																	}
+																	if (strpos($row["grouping"], "Fours")!==FALSE) {
+																		print "<option value=\"Fours\">Four</option>" ;
+																		$group=TRUE ;
+																		$extraSlots=3 ;
+																	}
+																	if (strpos($row["grouping"], "Fives")!==FALSE) {
+																		print "<option value=\"Fives\">Five</option>" ;
+																		$group=TRUE ;
+																		$extraSlots=4 ;
+																	}
+																	?>
+																</select>
+																<script type="text/javascript">
+																	var grouping=new LiveValidation('grouping');
+																	grouping.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
+																 </script>
+															</td>
+														</tr>
+														<?php
+															if ($group) {
+																//Get array of students
+																$students=array() ;
+																$studentCount=0 ;
+																try {
+																	$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID"=> $_SESSION[$guid]["gibbonPersonID"]); 
+																	$sqlSelect="SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID ORDER BY surname, preferredName" ;
+																	$resultSelect=$connection2->prepare($sqlSelect);
+																	$resultSelect->execute($dataSelect);
+																}
+																catch(PDOException $e) { }
+																while ($rowSelect=$resultSelect->fetch()) {
+																	$students[$studentCount]="<option value='" . $rowSelect["gibbonPersonID"] . "'>" . formatName("", htmlPrep($rowSelect["preferredName"]), htmlPrep($rowSelect["surname"]), "Student", true) . " (" . $rowSelect["rollGroup"] . ")</option>" ;
+																	$studentCount++ ;
+																}		
 															
-															<?php
-															//Output select lists
-															for ($i=1; $i<=$extraSlots; $i++) {
+																//Controls for lists
 																?>
-																<tr class='collaborator' id='<?php print "trCollaborator$i" ?>'>
-																	<td style='width: 275px'> 
-																		<b><?php print sprintf(_('Collaborator %1$s'), $i) ?> *</b><br/>
-																	</td>
-																	<td class="right">
-																		<select name="collaborators[]" id="collaborator<?php print $i ?>" style="width: 302px">
-																			<option value="Please select..."><?php print _('Please select...') ?></option>
-																			<?php
-																			foreach ($students AS $student) {
-																				print $student ;
-																			}
-																			?>
-																		</select>
-																		<script type="text/javascript">
-																			var collaborator<?php print $i ?>=new LiveValidation('collaborator<?php print $i ?>');
-																			collaborator<?php print $i ?>.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
-																		 </script>
-																	</td>
-																</tr>
+																<script type='text/javascript'>
+																	$(document).ready(function(){
+																		$('tr.collaborator').css('display','none');
+																		<?php
+																		for ($i=1; $i<=$extraSlots; $i++) {
+																			print "collaborator" . $i . ".disable();" ;
+																		}
+																		?>
+																		$('#grouping').change(function(){
+																			if ($('select#grouping option:selected').val()=='Individual') {
+																				$('#trCollaborator1').css('display','none');
+																				collaborator1.disable() ;
+																				$('#trCollaborator2').css('display','none');
+																				collaborator2.disable() ;
+																				$('#trCollaborator3').css('display','none');
+																				collaborator3.disable() ;
+																				$('#trCollaborator4').css('display','none');
+																				collaborator4.disable() ;
+																			} 
+																			else if ($('select#grouping option:selected').val()=='Pairs') {
+																				$('#trCollaborator1').css('display','table-row');
+																				collaborator1.enable() ;
+																				$('#trCollaborator2').css('display','none');
+																				collaborator2.disable() ;
+																				$('#trCollaborator3').css('display','none');
+																				collaborator3.disable() ;
+																				$('#trCollaborator4').css('display','none');
+																				collaborator4.disable() ;
+																			} 
+																			else if ($('select#grouping option:selected').val()=='Threes') {
+																				$('#trCollaborator1').css('display','table-row');
+																				collaborator1.enable() ;
+																				$('#trCollaborator2').css('display','table-row');
+																				collaborator2.enable() ;
+																				$('#trCollaborator3').css('display','none');
+																				collaborator3.disable() ;
+																				$('#trCollaborator4').css('display','none');
+																				collaborator4.disable() ;
+																			} 
+																			else if ($('select#grouping option:selected').val()=='Fours') {
+																				$('#trCollaborator1').css('display','table-row');
+																				collaborator1.enable() ;
+																				$('#trCollaborator2').css('display','table-row');
+																				collaborator2.enable() ;
+																				$('#trCollaborator3').css('display','table-row');
+																				collaborator3.enable() ;
+																				$('#trCollaborator4').css('display','none');
+																				collaborator4.disable() ;
+																			} 
+																			else if ($('select#grouping option:selected').val()=='Fives') {
+																				$('#trCollaborator1').css('display','table-row');
+																				collaborator1.enable() ;
+																				$('#trCollaborator2').css('display','table-row');
+																				collaborator2.enable() ;
+																				$('#trCollaborator3').css('display','table-row');
+																				collaborator3.enable() ;
+																				$('#trCollaborator4').css('display','table-row');
+																				collaborator4.enable() ;
+																			} 
+																		});
+																	});
+																</script>	
+															
 																<?php
+																//Output select lists
+																for ($i=1; $i<=$extraSlots; $i++) {
+																	?>
+																	<tr class='collaborator' id='<?php print "trCollaborator$i" ?>'>
+																		<td style='width: 275px'> 
+																			<b><?php print sprintf(_('Collaborator %1$s'), $i) ?> *</b><br/>
+																		</td>
+																		<td class="right">
+																			<select name="collaborators[]" id="collaborator<?php print $i ?>" style="width: 302px">
+																				<option value="Please select..."><?php print _('Please select...') ?></option>
+																				<?php
+																				foreach ($students AS $student) {
+																					print $student ;
+																				}
+																				?>
+																			</select>
+																			<script type="text/javascript">
+																				var collaborator<?php print $i ?>=new LiveValidation('collaborator<?php print $i ?>');
+																				collaborator<?php print $i ?>.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
+																			 </script>
+																		</td>
+																	</tr>
+																	<?php
+																}
 															}
 														}
 													?>
 													<tr>
 														<td class="right" colspan=2>
 															<input type="hidden" name="freeLearningUnitID" value="<?php print $freeLearningUnitID ?>">
-															<input type="submit" id="submit" value="Submit">
+															<input type="submit" id="submit" value="Enrol Now">
 														</td>
 													</tr>
 													<tr>

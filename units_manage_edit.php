@@ -37,6 +37,8 @@ else {
 		print "</div>" ;
 	}
 	else {
+		$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
+
 		$freeLearningUnitID=$_GET["freeLearningUnitID"]; 
 		$gibbonDepartmentID="" ;
 		if (isset($_GET["gibbonDepartmentID"])) {
@@ -336,68 +338,74 @@ else {
 							</select>
 						</td>
 					</tr>
-					<tr>
-						<td style='width: 275px'> 
-							<b><?php print _('Minimum Year Group') ?></b><br/>
-							<span style="font-size: 90%"><i><?php print _('Lowest age group allowed to view unit.') . "<br/>" . _('Public sharing disabled if set.') ?></i></span>
-						</td>
-						<td class="right">
-							<select name="gibbonYearGroupIDMinimum" id="gibbonYearGroupIDMinimum" style="width: 302px">
-								<?php
-								print "<option value=''></option>" ;
-								try {
-									$dataSelect=array(); 
-									$sqlSelect="SELECT gibbonYearGroupID, name FROM gibbonYearGroup ORDER BY sequenceNumber" ;
-									$resultSelect=$connection2->prepare($sqlSelect);
-									$resultSelect->execute($dataSelect);
-								}
-								catch(PDOException $e) { }
-								while ($rowSelect=$resultSelect->fetch()) {
-									$selected="" ;
-									if ($rowSelect["gibbonYearGroupID"]==$row["gibbonYearGroupIDMinimum"]) {
-										$selected="selected" ;
+					<?php
+					if ($schoolType=="Physical") {
+						?>
+						<tr>
+							<td style='width: 275px'> 
+								<b><?php print _('Minimum Year Group') ?></b><br/>
+								<span style="font-size: 90%"><i><?php print _('Lowest age group allowed to view unit.') . "<br/>" . _('Public sharing disabled if set.') ?></i></span>
+							</td>
+							<td class="right">
+								<select name="gibbonYearGroupIDMinimum" id="gibbonYearGroupIDMinimum" style="width: 302px">
+									<?php
+									print "<option value=''></option>" ;
+									try {
+										$dataSelect=array(); 
+										$sqlSelect="SELECT gibbonYearGroupID, name FROM gibbonYearGroup ORDER BY sequenceNumber" ;
+										$resultSelect=$connection2->prepare($sqlSelect);
+										$resultSelect->execute($dataSelect);
 									}
-									print "<option $selected value='" . $rowSelect["gibbonYearGroupID"] . "'>" . htmlPrep(_($rowSelect["name"])) . "</option>" ;
+									catch(PDOException $e) { }
+									while ($rowSelect=$resultSelect->fetch()) {
+										$selected="" ;
+										if ($rowSelect["gibbonYearGroupID"]==$row["gibbonYearGroupIDMinimum"]) {
+											$selected="selected" ;
+										}
+										print "<option $selected value='" . $rowSelect["gibbonYearGroupID"] . "'>" . htmlPrep(_($rowSelect["name"])) . "</option>" ;
+									}
+									?>				
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td style='width: 275px'> 
+								<b><?php print _('Grouping') ?></b><br/>
+								<span style="font-size: 90%"><i><?php print _('How should students work during this unit?') ?></i></span>
+							</td>
+							<td class="right">
+								<?php
+								$checked="" ;
+								if (strpos($row["grouping"], "Individual")!==FALSE) {
+									$checked="checked" ;
 								}
-								?>				
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td style='width: 275px'> 
-							<b><?php print _('Grouping') ?></b><br/>
-							<span style="font-size: 90%"><i><?php print _('How should students work during this unit?') ?></i></span>
-						</td>
-						<td class="right">
-							<?php
-							$checked="" ;
-							if (strpos($row["grouping"], "Individual")!==FALSE) {
-								$checked="checked" ;
-							}
-							print _("Individual") . "<input $checked type='checkbox' name='Individual'><br/>" ;
-							$checked="" ;
-							if (strpos($row["grouping"], "Pairs")!==FALSE) {
-								$checked="checked" ;
-							}
-							print _("Pairs") . "<input $checked type='checkbox' name='Pairs'><br/>" ;
-							$checked="" ;
-							if (strpos($row["grouping"], "Threes")!==FALSE) {
-								$checked="checked" ;
-							}
-							print _("Threes") . "<input $checked type='checkbox' name='Threes'><br/>" ;
-							$checked="" ;
-							if (strpos($row["grouping"], "Fours")!==FALSE) {
-								$checked="checked" ;
-							}
-							print _("Fours") . "<input $checked type='checkbox' name='Fours'><br/>" ;
-							$checked="" ;
-							if (strpos($row["grouping"], "Fives")!==FALSE) {
-								$checked="checked" ;
-							}
-							print _("Fives") . "<input $checked type='checkbox' name='Fives'><br/>" ;
-							?> 
-						</td>
-				</tr>
+								print _("Individual") . "<input $checked type='checkbox' name='Individual'><br/>" ;
+								$checked="" ;
+								if (strpos($row["grouping"], "Pairs")!==FALSE) {
+									$checked="checked" ;
+								}
+								print _("Pairs") . "<input $checked type='checkbox' name='Pairs'><br/>" ;
+								$checked="" ;
+								if (strpos($row["grouping"], "Threes")!==FALSE) {
+									$checked="checked" ;
+								}
+								print _("Threes") . "<input $checked type='checkbox' name='Threes'><br/>" ;
+								$checked="" ;
+								if (strpos($row["grouping"], "Fours")!==FALSE) {
+									$checked="checked" ;
+								}
+								print _("Fours") . "<input $checked type='checkbox' name='Fours'><br/>" ;
+								$checked="" ;
+								if (strpos($row["grouping"], "Fives")!==FALSE) {
+									$checked="checked" ;
+								}
+								print _("Fives") . "<input $checked type='checkbox' name='Fives'><br/>" ;
+								?> 
+							</td>
+						</tr>
+						<?php
+					}
+					?>
 					
 					<tr class='break'>
 						<td colspan=2> 
