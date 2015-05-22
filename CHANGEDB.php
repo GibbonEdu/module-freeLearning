@@ -175,4 +175,10 @@ ALTER TABLE `freeLearningUnitStudent` CHANGE `gibbonSchoolYearID` `gibbonSchoolY
 ALTER TABLE `freeLearningUnitStudent` CHANGE `gibbonCourseClassID` `gibbonCourseClassID` INT( 8 ) UNSIGNED ZEROFILL NULL DEFAULT NULL ;
 " ;
 
+//v2.1.01
+$count++ ;
+$sql[$count][0]="2.1.01" ;
+$sql[$count][1]="
+" ;
+
 ?>
