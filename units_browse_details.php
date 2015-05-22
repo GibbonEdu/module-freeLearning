@@ -190,7 +190,7 @@ else {
 									print "<i>" . $timing . "</i>" ;
 								}
 							print "</td>" ;
-							print "<td style='width: 135%!important; vertical-align: top; text-align: right' rowspan=3>" ;
+							print "<td style='width: 135%!important; vertical-align: top; text-align: right' rowspan=4>" ;
 								if ($row["logo"]==NULL) {
 									print "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_125.jpg'/><br/>" ;
 								}
@@ -247,6 +247,22 @@ else {
 								}
 							print "</td>" ;
 						print "</tr>" ;
+						if ($schoolType=="Physical") {
+							print "<tr>" ;
+								print "<td style='vertical-align: top'>" ;
+									print "<span style='font-size: 115%; font-weight: bold'>" . _('Groupings') . "</span><br/>" ;
+									if ($row["grouping"]!="") {
+										$groupings=explode(",", $row["grouping"]) ;
+										foreach ($groupings AS $grouping) {
+											print ucwords($grouping) . "<br/>" ;
+										}
+									}
+								print "</td>" ;
+								print "<td style='vertical-align: top'>" ;
+								
+								print "</td>" ;
+							print "</tr>" ;
+						}
 					print "</table>" ;
 				
 					$defaultTab=0 ;
