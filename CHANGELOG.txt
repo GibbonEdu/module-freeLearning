@@ -2,6 +2,10 @@ CHANGELOG
 =========
 v2.1.01
 -------
+Added "Evidence Not Approved" status to Current Unit by Class report
+
+v2.1.01
+-------
 Added groupings to unit view
 
 v2.1.00

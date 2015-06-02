@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="2.1.01" ;
+$version="2.1.02" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 

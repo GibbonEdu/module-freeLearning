@@ -109,7 +109,7 @@ else {
 		
 			try {
 				$data=array("gibbonCourseClassID"=>$gibbonCourseClassID); 
-				$sql="SELECT gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnit.freeLearningUnitID, freeLearningUnit.name, timestampJoined, collaborationKey FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role='Student') LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending')) LEFT JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID ORDER BY collaborationKey, surname, preferredName" ;
+				$sql="SELECT gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnit.freeLearningUnitID, freeLearningUnit.name, timestampJoined, collaborationKey, freeLearningUnitStudent.status FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role='Student') LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending' OR freeLearningUnitStudent.status='Evidence Not Approved')) LEFT JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID ORDER BY collaborationKey, surname, preferredName" ;
 				$result=$connection2->prepare($sql);
 				$result->execute($data);
 			}
@@ -134,6 +134,7 @@ else {
 					print "</th>" ;
 					print "<th>" ;
 						print _("Unit") ;
+						print "<span style='font-size: 85%; font-style: italic'>" . _("Status") . "</span>" ;
 					print "</th>" ;
 					print "<th>" ;
 						print _("Date Started") ;
@@ -175,6 +176,7 @@ else {
 						print "</td>" ;
 						print "<td>" ;
 							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=&difficulty=&name='>" . $row["name"] . "</a>" ;
+							print "<br/><span style='font-size: 85%; font-style: italic'>" . $row["status"] . "</span>" ;
 						print "</td>" ;
 						print "<td>" ;
 							if ($row["timestampJoined"]!="") {
