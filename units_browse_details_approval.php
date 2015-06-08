@@ -153,20 +153,47 @@ else {
 							<tr>
 								<td> 
 									<b><?php print _('Status') ?> *</b><br/>
-									<span style="font-size: 90%"><i><?php print _('This value cannot be changed.') ?></i></span>
 								</td>
 								<td class="right">
 									<select style="width: 302px" name="status">
-										<option value='Complete - Approved'>Complete - Approved</option>
-										<option value='Evidence Not Approved'>Evidence Not Approved</option>
+										<option <?php if ($row["status"]=="Complete - Approved") { print "selected" ; } ?> value='Complete - Approved'>Complete - Approved</option>
+										<option <?php if ($row["status"]=="Evidence Not Approved") { print "selected" ; } ?> value='Evidence Not Approved'>Evidence Not Approved</option>
 									</select>
 								</td>
 							</tr>
 							<tr>
+								<td> 
+									<b><?php print _('Submission') ?> *</b><br/>
+								</td>
+								<td class="right">
+									<?php
+									if ($row["evidenceLocation"]!="") {
+										if ($row["evidenceType"]=="Link") {
+											print "<a target='_blank' href='" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</>" ;
+										}
+										else {
+											print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</>" ;
+										}
+									}
+									?>
+								</td>
+							</tr>
+							<tr>
 								<td colspan=2> 
-									<b><?php print _('Comment') ?> *</b><br/>
+									<b><?php print _('Student Comment') ?> *</b><br/>
+									<p>
+										<?php
+											print $row["commentStudent"] ;
+										?>
+									</p>
+								</td>
+							</tr>
+							
+							<tr>
+								<td colspan=2> 
+									<b><?php print _('Teacher Comment') ?> *</b><br/>
 									<span style="font-size: 90%"><i><?php print _('Leave a comment on the student\'s progress.') ?></i></span>
-									<?php print getEditor($guid,  TRUE, "commentApproval", "", 15, TRUE, TRUE ) ?>
+									<?php print getEditor($guid,  TRUE, "commentApproval", $row["commentApproval"], 15, TRUE, TRUE ) ?>
 								</td>
 							</tr>
 							<tr>

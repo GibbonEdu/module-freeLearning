@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v2.2.00
+-------
+Show student comment and evidence when approving. 
+When a student has to re-submit, show their original comment in the comment box, so they don't need to rewrite it.
+In enrolment list, show class group
+Sort option in class/unit report, in order to see students enroled double. 
+Allow edit to change Approved/Not Approved around in case of mistake.
+
 v2.1.01
 -------
 Added "Evidence Not Approved" status to Current Unit by Class report

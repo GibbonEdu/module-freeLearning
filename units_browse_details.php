@@ -403,11 +403,11 @@ else {
 									try {
 										if ($schoolType=="Physical") {
 											$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-											$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
+											$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "') AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
 										}
 										else {
 											$dataClass=array("freeLearningUnitID"=>$row["freeLearningUnitID"]); 
-											$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
+											$sqlClass="SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "') ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName" ;
 										}
 										$resultClass=$connection2->prepare($sqlClass);
 										$resultClass->execute($dataClass);
@@ -429,6 +429,15 @@ else {
 												<th> 
 													<?php print _('Student') ?><br/>
 												</th>
+												<?php
+												if ($schoolType=="Physical") {
+													?>
+													<th> 
+														<?php print _('Class') ?><br/>
+													</th>
+													<?php
+												}
+												?>
 												<th> 
 													<?php print _('Status') ?><br/>
 												</th>
@@ -454,6 +463,18 @@ else {
 													<td> 
 														<?php print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true) . "</a>" ?><br/>
 													</td>
+													<?php
+													if ($schoolType=="Physical") {
+														print "<td>" ;
+															if ($rowClass["course"]!="" AND $rowClass["class"]!="") {
+																print $rowClass["course"] . "." . $rowClass["class"] ;
+															}
+															else {
+																print "<i>" . _('NA') . "</i>" ;
+															}
+														print "</td>" ;
+													}
+													?>
 													<td> 
 														<?php print $rowClass["status"] ?><br/>
 													</td>	
@@ -472,7 +493,7 @@ else {
 													<td>
 														<?php 
 														if ($enrolmentType=="staffEdit") {
-															if ($rowClass["status"]=="Complete - Pending") {
+															if ($rowClass["status"]=="Complete - Pending" OR $rowClass["status"]=="Complete - Approved" OR $rowClass["status"]=="Evidence Not Approved") {
 																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
 															}
 															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;						
@@ -579,7 +600,14 @@ else {
 														<tr>
 															<td> 
 																<b><?php print _('Comment') ?> *</b><br/>
-																<span style="font-size: 90%"><i><?php print _('Leave a brief reflective comment on this unit<br/>and what you learned.') ?></i></span>
+																<span style="font-size: 90%"><i>
+																	<?php 
+																	print _('Leave a brief reflective comment on this unit<br/>and what you learned.') ;
+																	if ($rowEnrol["status"]=="Evidence Not Approved") {
+																		print "<br/><br/>" . _("Your previous comment is shown here, for you to edit.") ;
+																	}
+																	?>
+																</i></span>
 															</td>
 															<td class="right">
 																<script type='text/javascript'>
@@ -587,7 +615,11 @@ else {
 																		$('#commentStudent').autosize();    
 																	});
 																</script>
-																<textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"></textarea>
+																<textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"><?php
+																if ($rowEnrol["status"]=="Evidence Not Approved") {
+																	print $rowEnrol["commentStudent"] ;
+																}
+																?></textarea>
 																<script type="text/javascript">
 																	var commentStudent=new LiveValidation('commentStudent');
 																	commentStudent.add(Validate.Presence);
