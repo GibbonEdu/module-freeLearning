@@ -516,7 +516,7 @@ else {
 												<?php
 												if ($rowClass["commentStudent"]!="" OR $rowClass["commentApproval"]!="") {
 													print "<tr class='comment-" . $rowClass["freeLearningUnitStudentID"] . "' id='comment-" . $rowClass["freeLearningUnitStudentID"] . "'>" ;
-														print "<td colspan=4>" ;
+														print "<td colspan=5>" ;
 															if ($rowClass["commentStudent"]!="") {
 																print "<b>" . _("Student Comment") . "</b><br/>" ;
 																print nl2br($rowClass["commentStudent"]) . "<br/>" ;

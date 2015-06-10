@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.2.01
+-------
+Fixed minor table colspan issue
+
 v2.2.00
 -------
 Show student comment and evidence when approving. 
