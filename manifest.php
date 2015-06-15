@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="2.2.01" ;
+$version="2.3.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -97,6 +97,7 @@ $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
   `evidenceLocation` text NOT NULL,
   `commentStudent` text NOT NULL,
   `commentApproval` text NOT NULL,
+  `examplarWork` enum('N','Y') NOT NULL DEFAULT 'N',
   PRIMARY KEY (`freeLearningUnitStudentID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
 
@@ -257,6 +258,23 @@ $actionRows[8]["categoryPermissionStaff"]="Y" ;
 $actionRows[8]["categoryPermissionStudent"]="N" ;
 $actionRows[8]["categoryPermissionParent"]="Y" ;
 $actionRows[8]["categoryPermissionOther"]="N" ;
+
+$actionRows[9]["name"]="My Unit History" ;
+$actionRows[9]["precedence"]="0";
+$actionRows[9]["category"]="Learning" ;
+$actionRows[9]["description"]="Allows a student to see all the units they have studied and are studying." ;
+$actionRows[9]["URLList"]="report_unitHistory_my.php" ;
+$actionRows[9]["entryURL"]="report_unitHistory_my.php" ;
+$actionRows[9]["entrySidebar"]="Y" ;
+$actionRows[9]["defaultPermissionAdmin"]="N" ;
+$actionRows[9]["defaultPermissionTeacher"]="N" ;
+$actionRows[9]["defaultPermissionStudent"]="Y" ;
+$actionRows[9]["defaultPermissionParent"]="N" ;
+$actionRows[9]["defaultPermissionSupport"]="N" ;
+$actionRows[9]["categoryPermissionStaff"]="N" ;
+$actionRows[9]["categoryPermissionStudent"]="Y" ;
+$actionRows[9]["categoryPermissionParent"]="N" ;
+$actionRows[9]["categoryPermissionOther"]="N" ;
 
 $array=array() ;
 $array["toggleSettingName"]="publicUnits" ;

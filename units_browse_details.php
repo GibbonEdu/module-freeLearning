@@ -97,7 +97,7 @@ else {
 						$sql="SELECT * FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC" ; 
 				}
 				else {
-					if ($highestAction=="Browse Units_all") {
+					if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
 						$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
 						$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID" ; 
 					}
@@ -135,7 +135,7 @@ else {
 				}
 				
 				$proceed=FALSE ;
-				if ($highestAction=="Browse Units_all") {
+				if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
 					$proceed=TRUE ;
 				}
 				else if ($highestAction=="Browse Units_prerequisites") {
@@ -327,6 +327,7 @@ else {
 							print "<li><a href='#tabs2'>" . _('Content') . "</a></li>" ;
 							print "<li><a href='#tabs3'>" . _('Resources') . "</a></li>" ;
 							print "<li><a href='#tabs4'>" . _('Outcomes') . "</a></li>" ;
+							print "<li><a href='#tabs5'>" . _('Exemplar Work') . "</a></li>" ;
 						print "</ul>" ;
 				
 						//Tabs
@@ -1306,6 +1307,65 @@ else {
 								print "</table>" ;
 							}
 						
+						print "</div>" ;
+						print "<div id='tabs5'>" ;
+							//Spit out outcomes
+							try {
+								$dataWork=array("freeLearningUnitID"=>$freeLearningUnitID);  
+								$sqlWork="SELECT freeLearningUnitStudent.*, surname, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND examplarWork='Y' ORDER BY timestampCompleteApproved DESC" ;
+								$resultWork=$connection2->prepare($sqlWork);
+								$resultWork->execute($dataWork);
+							}
+							catch(PDOException $e) { 
+								print "<div class='error'>" . $e->getMessage() . "</div>" ; 
+							}
+							if ($resultWork->rowCount()<1) {
+								print "<div class='error'>" ;
+									print _("There are no records to display.") ;
+								print "</div>" ;
+							}
+							else {
+								while ($rowWork=$resultWork->fetch()) {
+									print "<h3>" ;
+										print formatName("", $rowWork["preferredName"], $rowWork["surname"], "Student", false) . " . <span style='font-size: 75%'>" . _("Approved") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) . "</span>" ;
+									print "</h3>" ;
+									print "<p>" ;
+										if ($rowWork["commentStudent"]!="") {
+											print "<b><u>" . _("Student Comment") . "</u></b><br/><br/>" ;
+											print nl2br($rowWork["commentStudent"]) . "<br/>" ;
+										}
+										if ($rowWork["commentApproval"]!="") {
+											if ($rowWork["commentStudent"]!="") {
+												print "<br/>" ;
+											}
+											print "<b><u>" . _("Teacher Comment") . "</u></b>" ;
+											print $rowWork["commentApproval"] . "<br/>" ;
+										}
+									print "</p>" ;
+									//DISPLAY WORK.
+									$extension=strrchr($rowWork["evidenceLocation"], ".") ;
+									if (strcasecmp($extension, ".gif")==0 OR strcasecmp($extension, ".jpg")==0 OR strcasecmp($extension, ".jpeg")==0 OR strcasecmp($extension, ".png")==0) { //Its an image
+										print "<p style='text-align: center'>" ;
+											if ($rowWork["evidenceType"]=="File") { //It's a file
+												print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'><img style='max-width: 550px' src='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'/></a>" ;
+											}
+											else { //It's a link
+												print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'><img style='max-width: 550px' src='" . $rowWork["evidenceLocation"] . "'/></a>" ;
+											}
+										print "</p>" ;
+									}
+									else { //Not an image
+										print "<p>" ;
+											if ($rowWork["evidenceType"]=="File") { //It's a file
+												print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'>" . _('View Work') . "</a>" ;
+											}
+											else { //It's a link
+												print "<a target='_blank' href='" . $rowWork["evidenceLocation"] . "'>" . _('View Work') . "</a>" ;
+											}
+										print "</p>" ;
+									}
+								}
+							}
 						print "</div>" ;
 					print "</div>" ;			
 				}

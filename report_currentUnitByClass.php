@@ -167,8 +167,8 @@ else {
 			
 				$count=0;
 				$rowNum="odd" ;
-				$collaborationKeyLast=NULL ;
 				$group=0 ;	
+				$collaborationKeys=array() ;
 				while ($row=$result->fetch()) {
 					if ($count%2==0) {
 						$rowNum="even" ;
@@ -188,11 +188,11 @@ else {
 						print "</td>" ;
 						print "<td>" ;
 							if ($row["collaborationKey"]!="") {
-								if ($row["collaborationKey"]!=$collaborationKeyLast) {
+								if (isset($collaborationKeys[$row["collaborationKey"]])==FALSE) {
 									$group++ ;
+									$collaborationKeys[$row["collaborationKey"]]=$group ;
 								}
-								print $group ;
-								$collaborationKeyLast=$row["collaborationKey"] ;
+								print $collaborationKeys[$row["collaborationKey"]] ;
 							}
 						print "</td>" ;
 						print "<td>" ;

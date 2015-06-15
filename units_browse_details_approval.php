@@ -163,16 +163,38 @@ else {
 							</tr>
 							<tr>
 								<td> 
+									<b><?php print _("Exmplar Work") ; ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php print _("Work and comments will be made viewable to other users.") ; ?></i></span>
+								</td>
+								<td class="right">
+									<select name="examplarWork" id="examplarWork" style="width: 302px">
+										<?php
+										print "<option " ;
+										if ($row["examplarWork"]=="N") {
+											print " selected " ;
+										}
+										print "value='N'>" . ynExpander('N') . "</option>" ;
+										print "<option " ;
+										if ($row["examplarWork"]=="Y") {
+											print " selected " ;
+										}
+										print "value='Y'>" . ynExpander('Y') . "</option>" ;
+										?>				
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td> 
 									<b><?php print _('Submission') ?> *</b><br/>
 								</td>
 								<td class="right">
 									<?php
 									if ($row["evidenceLocation"]!="") {
 										if ($row["evidenceType"]=="Link") {
-											print "<a target='_blank' href='" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</>" ;
+											print "<a target='_blank' href='" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</a>" ;
 										}
 										else {
-											print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</>" ;
+											print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</a>" ;
 										}
 									}
 									?>

@@ -264,7 +264,10 @@ else {
 								print _("Grouping") . "</br>" ;
 							print "</th>" ;
 						}
-						print "<th>" ;
+						print "<th style='min-width: 150px'>" ;
+							if ($schoolType=="Online") {
+								print _("Recommended") . "<br/>" ;
+							}
 							print _("Prerequisites") . "</br>" ;
 						print "</th>" ;
 						print "<th style='min-width: 70px'>" ;
@@ -365,7 +368,23 @@ else {
 								print "</td>" ;
 							}
 							print "<td>" ;
-								$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
+								$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;						
+								if ($highestAction=="Browse Units_prerequisites") {
+									if ($prerequisitesActive!=FALSE) {
+										$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
+										if ($prerquisitesMet) {
+											print "<span style='font-weight: bold; color: #00cc00'>" . _("OK!") . "<br/></span>" ;
+										}
+										else {
+											if ($schoolType=="Online") {
+												print "<span style='font-weight: bold; color: #D65602'>" . _("Consider Studying") . "<br/></span>" ;
+											}
+											else {
+												print "<span style='font-weight: bold; color: #cc0000'>" . _("Not Met") . "<br/></span>" ;
+											}
+										}
+									}
+								}
 								if ($prerequisitesActive!=FALSE) {
 									$prerequisites=explode(",", $prerequisitesActive) ;
 									$units=getUnitsArray($connection2) ;
@@ -376,20 +395,9 @@ else {
 								else {
 										print "<i>" . _('None') . "<br/></i>" ;
 								}
-								if ($highestAction=="Browse Units_prerequisites") {
-									if ($prerequisitesActive!=FALSE) {
-										$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
-										if ($prerquisitesMet) {
-											print "<span style='font-weight: bold; color: #00cc00'>" . _("OK!") . "</span>" ;
-										}
-										else {
-											print "<span style='font-weight: bold; color: #cc0000'>" . _("Not Met") . "</span>" ;
-										}
-									}
-								}
 							print "</td>" ;
 							print "<td>" ;
-								if ($highestAction=="Browse Units_all") {
+								if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
 									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 								}
 								else if ($highestAction=="Browse Units_prerequisites") {

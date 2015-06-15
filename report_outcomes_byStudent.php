@@ -33,7 +33,9 @@ else {
 	print "<div class='trail'>" ;
 	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Outcomes By Student') . "</div>" ;
 	print "</div>" ;
-
+	
+	$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
+	
 	print "<h2>" ;
 	print _("Choose Student") ;
 	print "</h2>" ;
@@ -51,41 +53,70 @@ else {
 					<b><?php print _('Student') ?> *</b><br/>
 				</td>
 				<td class="right">
-					<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
-						<option></option>
-						<optgroup label='--<?php print _('Students by Roll Group') ?>--'>
-							<?php
-							try {
-								$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-								$sqlSelect="SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='FULL' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName" ;
-								$resultSelect=$connection2->prepare($sqlSelect);
-								$resultSelect->execute($dataSelect);
-							}
-							catch(PDOException $e) { }
-							while ($rowSelect=$resultSelect->fetch()) {
-								$selected="" ;
-								if ($rowSelect["gibbonPersonID"]==$gibbonPersonID) {
-									$selected="selected" ;
-								}
-								print "<option $selected value='" . $rowSelect["gibbonPersonID"] . "'>" . htmlPrep($rowSelect["name"]) . " - " . formatName("", htmlPrep($rowSelect["preferredName"]), htmlPrep($rowSelect["surname"]), "Student", true) . "</option>" ;
-							}
+					<?php
+						if ($schoolType=="Physical") {
 							?>
-						</optgroup>
-						<optgroup label='--<?php print _('Students by Name') ?>--'>
+							<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
+								<option></option>
+								<optgroup label='--<?php print _('Students by Roll Group') ?>--'>
+									<?php
+									try {
+										$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+										$sqlSelect="SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName" ;
+										$resultSelect=$connection2->prepare($sqlSelect);
+										$resultSelect->execute($dataSelect);
+									}
+									catch(PDOException $e) { }
+									while ($rowSelect=$resultSelect->fetch()) {
+										$selected="" ;
+										if ($rowSelect["gibbonPersonID"]==$gibbonPersonID) {
+											$selected="selected" ;
+										}
+										print "<option $selected value='" . $rowSelect["gibbonPersonID"] . "'>" . htmlPrep($rowSelect["name"]) . " - " . formatName("", htmlPrep($rowSelect["preferredName"]), htmlPrep($rowSelect["surname"]), "Student", true) . "</option>" ;
+									}
+									?>
+								</optgroup>
+								<optgroup label='--<?php print _('Students by Name') ?>--'>
+									<?php
+									try {
+										$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+										$sqlSelect="SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName" ;
+										$resultSelect=$connection2->prepare($sqlSelect);
+										$resultSelect->execute($dataSelect);
+									}
+									catch(PDOException $e) { }
+									while ($rowSelect=$resultSelect->fetch()) {
+										print "<option value='" . $rowSelect["gibbonPersonID"] . "'>" . formatName("", htmlPrep($rowSelect["preferredName"]), htmlPrep($rowSelect["surname"]), "Student", true) . " (" . htmlPrep($rowSelect["name"]) . ")</option>" ;
+									}
+									?>
+								</optgroup>
+							</select>
 							<?php
-							try {
-								$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
-								$sqlSelect="SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='FULL' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName" ;
-								$resultSelect=$connection2->prepare($sqlSelect);
-								$resultSelect->execute($dataSelect);
-							}
-							catch(PDOException $e) { }
-							while ($rowSelect=$resultSelect->fetch()) {
-								print "<option value='" . $rowSelect["gibbonPersonID"] . "'>" . formatName("", htmlPrep($rowSelect["preferredName"]), htmlPrep($rowSelect["surname"]), "Student", true) . " (" . htmlPrep($rowSelect["name"]) . ")</option>" ;
-							}
+						}
+						else {
 							?>
-						</optgroup>
-					</select>
+							<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
+								<option></option>
+								<?php
+									try {
+										$dataSelect=array(); 
+										$sqlSelect="SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname, username FROM gibbonPerson LEFT JOIN gibbonRole ON (gibbonRole.gibbonRoleID LIKE concat( '%', gibbonPerson.gibbonRoleIDAll, '%' ) AND category='Student') WHERE status='Full' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL  OR dateEnd>='" . date("Y-m-d") . "') ORDER BY surname, preferredName" ;
+										$resultSelect=$connection2->prepare($sqlSelect);
+										$resultSelect->execute($dataSelect);
+									}
+									catch(PDOException $e) { }
+									while ($rowSelect=$resultSelect->fetch()) {
+										$selected="" ;
+										if ($rowSelect["gibbonPersonID"]==$gibbonPersonID) {
+											$selected="selected" ;
+										}
+										print "<option $selected value='" . $rowSelect["gibbonPersonID"] . "'>" . formatName("", htmlPrep($rowSelect["preferredName"]), htmlPrep($rowSelect["surname"]), "Student", true) . " (" . $rowSelect["username"] . ")</option>" ;
+									}
+									?>
+							</select>
+							<?php
+						}
+						?>
 				</td>
 			</tr>
 			<tr>
@@ -105,28 +136,34 @@ else {
 		print "</h2>" ;
 	
 		//Check the years groups the student has been enroled into
-		try {
-			$data=array("gibbonPersonID"=>$gibbonPersonID); 
-			$sql="SELECT gibbonRollGroup.name AS rollGroup, gibbonSchoolYear.name AS schoolYear, gibbonStudentEnrolment.gibbonYearGroupID FROM gibbonStudentEnrolment JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) JOIN gibbonSchoolYear ON (gibbonStudentEnrolment.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) WHERE gibbonPersonID=:gibbonPersonID ORDER BY gibbonStudentEnrolment.gibbonSchoolYearID" ;
-			$result=$connection2->prepare($sql);
-			$result->execute($data);
-		}
-		catch(PDOException $e) { }
-
-		if ($result->rowCount()<1) {
-			print "<div class='error'>" ;
-				print _("Your request failed due to a database error.") ;
-			print "</div>" ;
-		}
-		else {
-			//Make list of year groups for where
-			$gibbonYearGroupIDWhere="(" ;
-			while ($row=$result->fetch()) {
-				$gibbonYearGroupIDWhere.="gibbonYearGroupIDList LIKE '%" . $row["gibbonYearGroupID"] . "%' OR " ;
+		$proceed=TRUE ;
+		$gibbonYearGroupIDWhere='' ;
+		if ($schoolType=="Physical") {
+			try {
+				$data=array("gibbonPersonID"=>$gibbonPersonID); 
+				$sql="SELECT gibbonRollGroup.name AS rollGroup, gibbonSchoolYear.name AS schoolYear, gibbonStudentEnrolment.gibbonYearGroupID FROM gibbonStudentEnrolment JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) JOIN gibbonSchoolYear ON (gibbonStudentEnrolment.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) WHERE gibbonPersonID=:gibbonPersonID ORDER BY gibbonStudentEnrolment.gibbonSchoolYearID" ;
+				$result=$connection2->prepare($sql);
+				$result->execute($data);
 			}
-			$gibbonYearGroupIDWhere=substr($gibbonYearGroupIDWhere, 0, -4) . ")" ;
+			catch(PDOException $e) { }
+
+			if ($result->rowCount()<1) {
+				print "<div class='error'>" ;
+					print _("Your request failed due to a database error.") ;
+				print "</div>" ;
+				$proceed=FALSE ; 
+			}
+			else {
+				//Make list of year groups for where
+				$gibbonYearGroupIDWhere="(" ;
+				while ($row=$result->fetch()) {
+					$gibbonYearGroupIDWhere.="gibbonYearGroupIDList LIKE '%" . $row["gibbonYearGroupID"] . "%' OR " ;
+				}
+				$gibbonYearGroupIDWhere=substr($gibbonYearGroupIDWhere, 0, -4) . ")" ;
+			}
+		}
 			
-			
+		if ($proceed==TRUE) {	
 			//Create array of each outcome the student has met in Free Learning
 			try {
 				$dataFreeLearning=array("gibbonPersonIDStudent"=>$gibbonPersonID); 
@@ -162,7 +199,12 @@ else {
 			$output.="</h4>" ;
 			try {
 				$dataOutcomes=array("gibbonPersonID"=>$gibbonPersonID); 
-				$sqlOutcomes="SELECT gibbonOutcome.*, gibbonDepartment.name AS department FROM gibbonOutcome LEFT JOIN gibbonDepartment ON (gibbonOutcome.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $gibbonYearGroupIDWhere AND active='Y' ORDER BY field(Scope,'School','Learning Area'), category, name" ;
+				if ($schoolType=="Online") {
+					$sqlOutcomes="SELECT gibbonOutcome.*, gibbonDepartment.name AS department FROM gibbonOutcome LEFT JOIN gibbonDepartment ON (gibbonOutcome.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE active='Y' ORDER BY field(Scope,'School','Learning Area'), category, name" ;
+				}
+				else {
+					$sqlOutcomes="SELECT gibbonOutcome.*, gibbonDepartment.name AS department FROM gibbonOutcome LEFT JOIN gibbonDepartment ON (gibbonOutcome.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $gibbonYearGroupIDWhere AND active='Y' ORDER BY field(Scope,'School','Learning Area'), category, name" ;
+				}
 				$resultOutcomes=$connection2->prepare($sqlOutcomes);
 				$resultOutcomes->execute($dataOutcomes);
 			}

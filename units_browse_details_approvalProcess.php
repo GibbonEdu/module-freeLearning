@@ -85,6 +85,7 @@ else {
 				//Proceed!
 				$row=$result->fetch() ;
 				$name=$row["name"] ;
+				$statusOriginal=$row["status"] ;
 				
 				$proceed=FALSE ;
 				//Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
@@ -114,9 +115,10 @@ else {
 					$status=$_POST["status"] ;
 					$commentApproval=$_POST["commentApproval"] ;
 					$gibbonPersonIDStudent=$row["gibbonPersonIDStudent"] ;
+					$examplarWork=$_POST["examplarWork"] ;
 					
 					//Validation
-					if ($commentApproval=="") {
+					if ($commentApproval=="" OR $examplarWork=="") {
 						//Fail 3
 						$URL.="&updateReturn=fail3" ;
 						header("Location: {$URL}");
@@ -125,8 +127,8 @@ else {
 						if ($status=="Complete - Approved") { //APPROVED!
 							//Write to database
 							try {
-								$data=array("status"=>$status, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-								$sql="UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+								$data=array("status"=>$status, "examplarWork"=>$examplarWork, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+								$sql="UPDATE freeLearningUnitStudent SET examplarWork=:examplarWork, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
 								$result=$connection2->prepare($sql);
 								$result->execute($data);
 							}
@@ -138,10 +140,12 @@ else {
 							}
 					
 							//Attempt to notify the student
-							$text=sprintf(_('A teacher has approved your request for unit completion (%1$s).'), $name) ;
-							$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
-							setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
-					
+							if ($statusOriginal!=$status) { //Only if status has changed.
+								$text=sprintf(_('A teacher has approved your request for unit completion (%1$s).'), $name) ;
+								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
+								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
+							}
+							
 							//Success 0
 							$URL.="&updateReturn=success0" ;
 							header("Location: {$URL}");
@@ -149,8 +153,8 @@ else {
 						else if ($status=="Evidence Not Approved") { //NOT APPROVED
 							//Write to database
 							try {
-								$data=array("status"=>$status, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-								$sql="UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+								$data=array("status"=>$status, "examplarWork"=>$examplarWork, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+								$sql="UPDATE freeLearningUnitStudent SET examplarWork=:examplarWork, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
 								$result=$connection2->prepare($sql);
 								$result->execute($data);
 							}
@@ -162,10 +166,12 @@ else {
 							}
 					
 							//Attempt to notify the student
-							$text=sprintf(_('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name) ;
-							$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
-							setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
-					
+							if ($statusOriginal!=$status) { //Only if status has changed.
+								$text=sprintf(_('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name) ;
+								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
+								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
+							}
+							
 							//Success 0
 							$URL.="&updateReturn=success0" ;
 							header("Location: {$URL}");

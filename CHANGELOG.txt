@@ -1,5 +1,16 @@
 CHANGELOG
 =========
+v2.3.00
+-------
+Optional prerequisite in online school
+Student view of own history
+Fix student reports in Online mode.
+Exemplar work highlight function (this will be used in future to create a gallery of great work)
+
+v2.2.02
+-------
+Fixed minor bug in groupings in class/unit report
+
 v2.2.01
 -------
 Fixed minor table colspan issue

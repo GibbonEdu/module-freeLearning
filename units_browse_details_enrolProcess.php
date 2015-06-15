@@ -63,7 +63,7 @@ else {
 		}
 		else {
 			try {
-				if ($highestAction=="Browse Units_all") {
+				if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
 					$data=array("freeLearningUnitID"=>$freeLearningUnitID); 
 					$sql="SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID" ; 
 				}
@@ -99,7 +99,7 @@ else {
 				$row=$result->fetch() ;
 				
 				$proceed=FALSE ;
-				if ($highestAction=="Browse Units_all") {
+				if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
 					$proceed=TRUE ;
 				}
 				else if ($highestAction=="Browse Units_prerequisites") {
@@ -125,8 +125,8 @@ else {
 					if ($schoolType=="Online") {
 						//Write to database
 						try {
-							$data=array("gibbonPersonIDStudent"=>$_SESSION[$guid]["gibbonPersonID"], "collaborationKey"=>$collaborationKey, "freeLearningUnitID"=>$freeLearningUnitID); 
-							$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=NULL, grouping='Individual', collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=NULL, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
+							$data=array("gibbonPersonIDStudent"=>$_SESSION[$guid]["gibbonPersonID"], "freeLearningUnitID"=>$freeLearningUnitID); 
+							$sql="INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=NULL, grouping='Individual', collaborationKey='', freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=NULL, status='Current', timestampJoined='" . date("Y-m-d H:i:s") . "'" ;
 							$result=$connection2->prepare($sql);
 							$result->execute($data);
 						}
