@@ -284,7 +284,7 @@ else {
 					$dataRecommend["gibbonPersonID"]=$gibbonPersonID ;
 					$dataRecommend["gibbonPersonID2"]=$gibbonPersonID ;
 					$dataRecommend["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
-					$sqlRecommend="SELECT freeLearningUnitStudent.status, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 
+					$sqlRecommend="SELECT DISTINCT freeLearningUnitStudent.status, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 
 						FROM freeLearningUnit 
 						JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
 						LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) 

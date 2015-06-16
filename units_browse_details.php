@@ -1327,21 +1327,8 @@ else {
 							else {
 								while ($rowWork=$resultWork->fetch()) {
 									print "<h3>" ;
-										print formatName("", $rowWork["preferredName"], $rowWork["surname"], "Student", false) . " . <span style='font-size: 75%'>" . _("Approved") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) . "</span>" ;
+										print formatName("", $rowWork["preferredName"], $rowWork["surname"], "Student", false) . " . <span style='font-size: 75%'>" . _("Shared on") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) . "</span>" ;
 									print "</h3>" ;
-									print "<p>" ;
-										if ($rowWork["commentStudent"]!="") {
-											print "<b><u>" . _("Student Comment") . "</u></b><br/><br/>" ;
-											print nl2br($rowWork["commentStudent"]) . "<br/>" ;
-										}
-										if ($rowWork["commentApproval"]!="") {
-											if ($rowWork["commentStudent"]!="") {
-												print "<br/>" ;
-											}
-											print "<b><u>" . _("Teacher Comment") . "</u></b>" ;
-											print $rowWork["commentApproval"] . "<br/>" ;
-										}
-									print "</p>" ;
 									//DISPLAY WORK.
 									$extension=strrchr($rowWork["evidenceLocation"], ".") ;
 									if (strcasecmp($extension, ".gif")==0 OR strcasecmp($extension, ".jpg")==0 OR strcasecmp($extension, ".jpeg")==0 OR strcasecmp($extension, ".png")==0) { //Its an image
@@ -1357,13 +1344,26 @@ else {
 									else { //Not an image
 										print "<p>" ;
 											if ($rowWork["evidenceType"]=="File") { //It's a file
-												print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'>" . _('View Work') . "</a>" ;
+												print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'>" . _('Click to View Work') . "</a>" ;
 											}
 											else { //It's a link
-												print "<a target='_blank' href='" . $rowWork["evidenceLocation"] . "'>" . _('View Work') . "</a>" ;
+												print "<a target='_blank' href='" . $rowWork["evidenceLocation"] . "'>" . _('Click to View Work') . "</a>" ;
 											}
 										print "</p>" ;
 									}
+									print "<p>" ;
+										if ($rowWork["commentStudent"]!="") {
+											print "<b><u>" . _("Student Comment") . "</u></b><br/><br/>" ;
+											print nl2br($rowWork["commentStudent"]) . "<br/>" ;
+										}
+										if ($rowWork["commentApproval"]!="") {
+											if ($rowWork["commentStudent"]!="") {
+												print "<br/>" ;
+											}
+											print "<b><u>" . _("Teacher Comment") . "</u></b>" ;
+											print $rowWork["commentApproval"] . "<br/>" ;
+										}
+									print "</p>" ;
 								}
 							}
 						print "</div>" ;

@@ -214,4 +214,10 @@ INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`
 ALTER TABLE `freeLearningUnitStudent` ADD `examplarWork` ENUM('N','Y') NOT NULL DEFAULT 'N' AFTER `commentApproval`;end
 " ;
 
+//v2.3.01
+$count++ ;
+$sql[$count][0]="2.3.01" ;
+$sql[$count][1]="
+" ;
+
 ?>
