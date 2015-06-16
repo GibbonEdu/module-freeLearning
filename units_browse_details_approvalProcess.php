@@ -86,6 +86,7 @@ else {
 				$row=$result->fetch() ;
 				$name=$row["name"] ;
 				$statusOriginal=$row["status"] ;
+				$commentApprovalOriginal=$row["commentApproval"] ;
 				
 				$proceed=FALSE ;
 				//Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
@@ -140,7 +141,7 @@ else {
 							}
 					
 							//Attempt to notify the student
-							if ($statusOriginal!=$status) { //Only if status has changed.
+							if ($statusOriginal!=$status OR $commentApprovalOriginal!=$commentApproval) { //Only if status or comment has changed.
 								$text=sprintf(_('A teacher has approved your request for unit completion (%1$s).'), $name) ;
 								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
 								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
@@ -166,7 +167,7 @@ else {
 							}
 					
 							//Attempt to notify the student
-							if ($statusOriginal!=$status) { //Only if status has changed.
+							if ($statusOriginal!=$status OR $commentApprovalOriginal!=$commentApproval) { //Only if status or comment has changed.
 								$text=sprintf(_('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name) ;
 								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
 								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
