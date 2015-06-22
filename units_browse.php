@@ -53,6 +53,12 @@ else {
 			}
 		print "</div>" ;
 		
+		if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
+			print "<div class='linkTop'>" ;
+				print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>View Our Free Learning Showcase</a>" ;
+			print "</div>" ;
+		}
+		
 		$gibbonDepartmentID=NULL ;
 		if (isset($_GET["gibbonDepartmentID"])) {
 			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;

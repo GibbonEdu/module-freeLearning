@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="2.3.02" ;
+$version="2.4.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -97,7 +97,9 @@ $moduleTables[4]="CREATE TABLE `freeLearningUnitStudent` (
   `evidenceLocation` text NOT NULL,
   `commentStudent` text NOT NULL,
   `commentApproval` text NOT NULL,
-  `examplarWork` enum('N','Y') NOT NULL DEFAULT 'N',
+  `exemplarWork` enum('N','Y') NOT NULL DEFAULT 'N',
+  `exemplarWorkThumb` text NOT NULL,
+  `exemplarWorkLicense` varchar(255) NOT NULL,
   PRIMARY KEY (`freeLearningUnitStudentID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
 
@@ -275,6 +277,23 @@ $actionRows[9]["categoryPermissionStaff"]="N" ;
 $actionRows[9]["categoryPermissionStudent"]="Y" ;
 $actionRows[9]["categoryPermissionParent"]="N" ;
 $actionRows[9]["categoryPermissionOther"]="N" ;
+
+$actionRows[10]["name"]="Free Learning Showcase" ;
+$actionRows[10]["precedence"]="0";
+$actionRows[10]["category"]="Learning" ;
+$actionRows[10]["description"]="Allows users to view Exemplar Work from across the system, in one place." ;
+$actionRows[10]["URLList"]="showcase.php" ;
+$actionRows[10]["entryURL"]="showcase.php" ;
+$actionRows[10]["entrySidebar"]="N" ;
+$actionRows[10]["defaultPermissionAdmin"]="Y" ;
+$actionRows[10]["defaultPermissionTeacher"]="Y" ;
+$actionRows[10]["defaultPermissionStudent"]="Y" ;
+$actionRows[10]["defaultPermissionParent"]="Y" ;
+$actionRows[10]["defaultPermissionSupport"]="Y" ;
+$actionRows[10]["categoryPermissionStaff"]="Y" ;
+$actionRows[10]["categoryPermissionStudent"]="Y" ;
+$actionRows[10]["categoryPermissionParent"]="Y" ;
+$actionRows[10]["categoryPermissionOther"]="Y" ;
 
 $array=array() ;
 $array["toggleSettingName"]="publicUnits" ;

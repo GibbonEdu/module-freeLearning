@@ -298,7 +298,6 @@ else {
 							print getMaxUpload() ;
 							$ext="'.png','.jpeg','.jpg','.gif'" ;
 							?>
-							
 							<script type="text/javascript">
 								var file=new LiveValidation('file');
 								file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "<?php print _('Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );

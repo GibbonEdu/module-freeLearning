@@ -1309,10 +1309,10 @@ else {
 						
 						print "</div>" ;
 						print "<div id='tabs5'>" ;
-							//Spit out outcomes
+							//Spit out exemplar work
 							try {
 								$dataWork=array("freeLearningUnitID"=>$freeLearningUnitID);  
-								$sqlWork="SELECT freeLearningUnitStudent.*, surname, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND examplarWork='Y' ORDER BY timestampCompleteApproved DESC" ;
+								$sqlWork="SELECT freeLearningUnitStudent.*, surname, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC" ;
 								$resultWork=$connection2->prepare($sqlWork);
 								$resultWork->execute($dataWork);
 							}

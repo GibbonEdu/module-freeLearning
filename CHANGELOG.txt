@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.4.00
+-------
+Added Showcase to allow exemplar work to be viewed from one place
+
 v2.3.02
 -------
 Notification tweak

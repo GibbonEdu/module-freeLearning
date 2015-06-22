@@ -148,39 +148,130 @@ else {
 						print _('Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.') ;
 					print "</p>" ;
 					?>
-					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_approvalProcess.php?address=" . $_GET["q"] ?>">
+					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_approvalProcess.php?address=" . $_GET["q"] ?>"  enctype="multipart/form-data">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 							<tr>
 								<td> 
 									<b><?php print _('Status') ?> *</b><br/>
 								</td>
 								<td class="right">
-									<select style="width: 302px" name="status">
+									<select style="width: 302px" name="status" id="status">
 										<option <?php if ($row["status"]=="Complete - Approved") { print "selected" ; } ?> value='Complete - Approved'>Complete - Approved</option>
 										<option <?php if ($row["status"]=="Evidence Not Approved") { print "selected" ; } ?> value='Evidence Not Approved'>Evidence Not Approved</option>
 									</select>
 								</td>
 							</tr>
-							<tr>
+							<script type="text/javascript">
+								/* Subbmission type control */
+								$(document).ready(function(){
+									<?php
+									if ($row["status"]=="Evidence Not Approved") {
+										?>
+										$("#exemplarRow").css("display","none");
+										$("#fileRow").css("display","none");
+										$("#linkRow").css("display","none");
+										file.disable() ;
+										<?php
+									}
+									else if ($row["exemplarWork"]=="N") {
+										?>
+										$("#fileRow").css("display","none");
+										$("#linkRow").css("display","none");
+										file.disable() ;
+										<?php
+									}
+									?>
+									
+									$("#status").click(function(){
+										if ($('#status option:selected').val()=="Evidence Not Approved" ) {
+											$("#exemplarRow").css("display","none"); 
+											$("#fileRow").css("display","none"); 
+											$("#linkRow").css("display","none"); 
+											file.disable() ;
+										} else {
+											$("#exemplarRow").slideDown("fast", $("#exemplarRow").css("display","table-row")); 
+											if ($('#exemplarWork option:selected').val()=="Y" ) {
+												$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row")); 
+												$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); 
+												file.enable() ;
+											}
+										}
+									}) ;
+								
+									$("#exemplarWork").click(function(){
+										if ($('#exemplarWork option:selected').val()=="N" ) {
+											$("#fileRow").css("display","none"); 
+											$("#linkRow").css("display","none"); 
+											file.disable() ;
+										} else {
+											$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row")); 
+											$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); 
+											file.enable() ;
+										}
+									 });
+								});
+							</script>
+						
+							<tr id="exemplarRow">
 								<td> 
 									<b><?php print _("Exmplar Work") ; ?> *</b><br/>
 									<span style="font-size: 90%"><i><?php print _("Work and comments will be made viewable to other users.") ; ?></i></span>
 								</td>
 								<td class="right">
-									<select name="examplarWork" id="examplarWork" style="width: 302px">
+									<select name="exemplarWork" id="exemplarWork" style="width: 302px">
 										<?php
 										print "<option " ;
-										if ($row["examplarWork"]=="N") {
+										if ($row["exemplarWork"]=="N") {
 											print " selected " ;
 										}
 										print "value='N'>" . ynExpander('N') . "</option>" ;
 										print "<option " ;
-										if ($row["examplarWork"]=="Y") {
+										if ($row["exemplarWork"]=="Y") {
 											print " selected " ;
 										}
 										print "value='Y'>" . ynExpander('Y') . "</option>" ;
 										?>				
 									</select>
+								</td>
+							</tr>
+							<tr id="fileRow">
+								<td> 
+									<b><?php print _('Exemplar Work Thumbnail Image') ?></b><br/>
+									<span style="font-size: 90%"><i>150x150px jpg/png/gif</i><br/></span>
+								</td>
+								<td class="right">
+									<?php
+									if ($row["exemplarWorkThumb"]!="") {
+										print _("Current attachment:") . " <a href='" . $row["exemplarWorkThumb"] . "'>" . $row["exemplarWorkThumb"] . "</a><br/><br/>" ;
+									}
+									?>
+									<input type="file" name="file" id="file"><br/><br/>
+									<?php
+									print getMaxUpload() ;
+								
+									//Get list of acceptable file extensions
+									try {
+										$dataExt=array(); 
+										$sqlExt="SELECT * FROM gibbonFileExtension" ;
+										$resultExt=$connection2->prepare($sqlExt);
+										$resultExt->execute($dataExt);
+									}
+									catch(PDOException $e) { }
+									$ext="'.png','.jpeg','.jpg','.gif'" ;
+									?>
+									<script type="text/javascript">
+										var file=new LiveValidation('file');
+										file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "<?php print _('Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
+									</script>
+								</td>
+							</tr>
+							<tr id="linkRow">
+								<td> 
+									<b><?php print _('Exemplar Work Thumbnail Image Credit') ?></b><br/>
+									<span style="font-size: 90%"><i><?php print _("Credit and license for image used above.") ; ?></i></span>
+								</td>
+								<td class="right">
+									<input name="exemplarWorkLicense" id="exemplarWorkLicense" maxlength=255 value="<?php print $row["exemplarWorkLicense"] ?>" type="text" style="width: 300px">
 								</td>
 							</tr>
 							<tr>

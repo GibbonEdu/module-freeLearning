@@ -116,20 +116,58 @@ else {
 					$status=$_POST["status"] ;
 					$commentApproval=$_POST["commentApproval"] ;
 					$gibbonPersonIDStudent=$row["gibbonPersonIDStudent"] ;
-					$examplarWork=$_POST["examplarWork"] ;
+					$exemplarWork=$_POST["exemplarWork"] ;
+					$exemplarWorkLicense="" ;
+					$attachment="" ;
+					if ($exemplarWork=="Y") {
+						$exemplarWorkLicense=$_POST["exemplarWorkLicense"] ;
+					}
+					
 					
 					//Validation
-					if ($commentApproval=="" OR $examplarWork=="") {
+					if ($commentApproval=="" OR $exemplarWork=="") {
 						//Fail 3
 						$URL.="&updateReturn=fail3" ;
 						header("Location: {$URL}");
 					}
 					else {
 						if ($status=="Complete - Approved") { //APPROVED!
+							//Move attached file, if there is one
+							if ($exemplarWork=="Y") {
+								$attachment=$row["logo"] ;							
+								$time=time() ;
+								if ($_FILES['file']["tmp_name"]!="") {
+									//Check for folder in uploads based on today's date
+									$path=$_SESSION[$guid]["absolutePath"] ;
+									if (is_dir($path ."/uploads/" . date("Y", $time) . "/" . date("m", $time))==FALSE) {
+										mkdir($path ."/uploads/" . date("Y", $time) . "/" . date("m", $time), 0777, TRUE) ;
+									}
+									$unique=FALSE;
+									$count=0 ;
+									while ($unique==FALSE AND $count<100) {
+										$suffix=randomPassword(16) ;
+										$attachment="uploads/" . date("Y", $time) . "/" . date("m", $time) . "/" . preg_replace("/[^a-zA-Z0-9]/", "", $name) . "_$suffix" . strrchr($_FILES["file"]["name"], ".") ;
+										if (!(file_exists($path . "/" . $attachment))) {
+											$unique=TRUE ;
+										}
+										$count++ ;
+									}
+					
+									if (!(move_uploaded_file($_FILES["file"]["tmp_name"],$path . "/" . $attachment))) {
+										//Fail 5
+										$URL.="&updateReturn=fail5" ;
+										header("Location: {$URL}");
+									}
+									if ($attachment!=NULL) {
+										$attachment=$_SESSION[$guid]["absoluteURL"] . "/" . $attachment ;
+									}
+								}
+							}
+							
 							//Write to database
 							try {
-								$data=array("status"=>$status, "examplarWork"=>$examplarWork, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-								$sql="UPDATE freeLearningUnitStudent SET examplarWork=:examplarWork, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+								$data=array("status"=>$status, "exemplarWork"=>$exemplarWork, "exemplarWorkThumb"=>$attachment, "exemplarWorkLicense"=>$exemplarWorkLicense, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+								$sql="UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
 								$result=$connection2->prepare($sql);
 								$result->execute($data);
 							}
@@ -154,8 +192,8 @@ else {
 						else if ($status=="Evidence Not Approved") { //NOT APPROVED
 							//Write to database
 							try {
-								$data=array("status"=>$status, "examplarWork"=>$examplarWork, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-								$sql="UPDATE freeLearningUnitStudent SET examplarWork=:examplarWork, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
+								$data=array("status"=>$status, "exemplarWork"=>$exemplarWork, "exemplarWorkThumb"=>"", "exemplarWorkLicense"=>"", "commentApproval"=>$commentApproval, "commentApproval"=>$commentApproval, "gibbonPersonIDApproval"=>$_SESSION[$guid]["gibbonPersonID"], "timestampCompleteApproved"=>date("Y-m-d H:i:s"), "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
+								$sql="UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID" ;
 								$result=$connection2->prepare($sql);
 								$result->execute($data);
 							}
