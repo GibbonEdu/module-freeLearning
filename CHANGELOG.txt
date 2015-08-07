@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v2.4.01
+-------
+Added parent dashboard hook link to showcase
+Added student name to approve view
+Fixed student listing for parents in Unit History report
+
 v2.4.00
 -------
 Added Showcase to allow exemplar work to be viewed from one place

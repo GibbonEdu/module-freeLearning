@@ -240,4 +240,9 @@ ALTER TABLE `freeLearningUnitStudent` CHANGE `examplarWork` `exemplarWork` ENUM(
 ALTER TABLE `freeLearningUnitStudent` ADD `exemplarWorkThumb` text NOT NULL AFTER `exemplarWork`, ADD `exemplarWorkLicense` VARCHAR(255) NOT NULL AFTER `exemplarWorkThumb`;end
 " ;
 
+//v2.4.01
+$count++ ;
+$sql[$count][0]="2.4.01" ;
+$sql[$count][1]="
+" ;
 ?>

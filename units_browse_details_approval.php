@@ -71,7 +71,7 @@ else {
 		else {
 			try {
 				$data=array("freeLearningUnitID"=>$freeLearningUnitID, "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-				$sql="SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID" ; 
+				$sql="SELECT freeLearningUnit.*, freeLearningUnitStudent.*, surname, preferredName FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID" ; 
 				$result=$connection2->prepare($sql);
 				$result->execute($data);
 			}
@@ -150,6 +150,15 @@ else {
 					?>
 					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_approvalProcess.php?address=" . $_GET["q"] ?>"  enctype="multipart/form-data">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+							<tr>
+								<td> 
+									<b><?php print _('Student') ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php print _('This value cannot be changed.') ?></i></span>
+								</td>
+								<td class="right">
+									<?php print "<input readonly value='" . formatName("", $row["preferredName"], $row["surname"], "Student", false ) . "' type='text' style='width: 300px'>" ; ?>
+								</td>
+							</tr>
 							<tr>
 								<td> 
 									<b><?php print _('Status') ?> *</b><br/>

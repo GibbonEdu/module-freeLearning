@@ -40,8 +40,11 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_unitH
 	$returnInt.="</div>" ;
 }
 else {
-	$returnInt.="<p>" ;
-		$returnInt.=_('The table below shows recent results and enrolment for Free Learning units studied by your child:') ;
+	$returnInt.="<div class='linkTop'>" ;
+		$returnInt.=sprintf(_('%1$sView Showcase of Student Work%2$s'), "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/showcase.php'>", "</a>") ;
+	$returnInt.="</div>" ;
+	$returnInt.="<p style='margin-top: 20px'>" ;
+		$returnInt.=_('This table shows recent results and enrolment for Free Learning units studied by your child:') ;
 	$returnInt.="</p>" ;
 	$returnInt.=getStudentHistory($connection2, $guid, $gibbonPersonID, TRUE) ;	
 }
