@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.4.02
+-------
+Fixed leaking of Teacher's Notes
+
 v2.4.01
 -------
 Added parent dashboard hook link to showcase

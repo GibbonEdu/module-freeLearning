@@ -1063,6 +1063,7 @@ else {
 							}
 						
 							$resourceContents="" ;
+							$roleCategory=getRoleCategory($_SESSION[$guid]["gibbonRoleIDCurrent"], $connection2) ;
 				
 							if ($resultBlocks->rowCount()<1) {
 								print "<div class='error'>" ;
@@ -1098,9 +1099,13 @@ else {
 										print "<div style='padding: 15px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>" . $rowBlocks["contents"] . "</div>" ;
 										$resourceContents.=$rowBlocks["contents"] ;
 									}
-									if ($rowBlocks["teachersNotes"]!="") {
-										print "<div style='background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>" . _("Teacher's Notes") . ":</b></p> " . $rowBlocks["teachersNotes"] . "</div>" ;
-										$resourceContents.=$rowBlocks["teachersNotes"] ;
+									if (isset($_SESSION[$guid]["username"])) {
+										if ($roleCategory=="Staff") {
+											if ($rowBlocks["teachersNotes"]!="") {
+												print "<div style='background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>" . _("Teacher's Notes") . ":</b></p> " . $rowBlocks["teachersNotes"] . "</div>" ;
+												$resourceContents.=$rowBlocks["teachersNotes"] ;
+											}
+										}
 									}
 								}
 							}
