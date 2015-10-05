@@ -1063,8 +1063,11 @@ else {
 							}
 						
 							$resourceContents="" ;
-							$roleCategory=getRoleCategory($_SESSION[$guid]["gibbonRoleIDCurrent"], $connection2) ;
-				
+							$roleCategory=NULL ;
+							if (isset($_SESSION[$guid]["gibbonRoleIDCurrent"])) {
+								$roleCategory=getRoleCategory($_SESSION[$guid]["gibbonRoleIDCurrent"], $connection2) ;
+							}
+							
 							if ($resultBlocks->rowCount()<1) {
 								print "<div class='error'>" ;
 									print _("There are no records to display.") ;
