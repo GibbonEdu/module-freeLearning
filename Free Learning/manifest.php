@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_manage.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="2.4.04" ;
+$version="2.5.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -294,6 +294,24 @@ $actionRows[10]["categoryPermissionStaff"]="Y" ;
 $actionRows[10]["categoryPermissionStudent"]="Y" ;
 $actionRows[10]["categoryPermissionParent"]="Y" ;
 $actionRows[10]["categoryPermissionOther"]="Y" ;
+
+$actionRows[11]["name"]="Work Pending Approval" ;
+$actionRows[11]["precedence"]="0";
+$actionRows[11]["category"]="Reports" ;
+$actionRows[11]["description"]="Allows a user to see all work for which approval has been requested, and is still pending." ;
+$actionRows[11]["URLList"]="report_workPendingApproval.php" ;
+$actionRows[11]["entryURL"]="report_workPendingApproval.php" ;
+$actionRows[11]["entrySidebar"]="Y" ;
+$actionRows[11]["defaultPermissionAdmin"]="Y" ;
+$actionRows[11]["defaultPermissionTeacher"]="Y" ;
+$actionRows[11]["defaultPermissionStudent"]="N" ;
+$actionRows[11]["defaultPermissionParent"]="N" ;
+$actionRows[11]["defaultPermissionSupport"]="N" ;
+$actionRows[11]["categoryPermissionStaff"]="Y" ;
+$actionRows[11]["categoryPermissionStudent"]="N" ;
+$actionRows[11]["categoryPermissionParent"]="N" ;
+$actionRows[11]["categoryPermissionOther"]="N" ;
+
 
 $array=array() ;
 $array["toggleSettingName"]="publicUnits" ;
