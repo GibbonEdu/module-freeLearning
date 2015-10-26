@@ -169,31 +169,6 @@ else {
 				</td>
 			</tr>
 			<tr>
-				<?php
-				try {
-					$data=array(); 
-					$sql="SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='mapLink'" ;
-					$result=$connection2->prepare($sql);
-					$result->execute($data);
-				}
-				catch(PDOException $e) { 
-					print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-				}
-				$row=$result->fetch() ;
-				?>
-				<td style='width: 275px'> 
-					<b><?php print _($row["nameDisplay"]) ?></b><br/>
-					<span style="font-size: 90%"><i><?php if ($row["description"]!="") { print _($row["description"]) ; } ?></i></span>
-				</td>
-				<td stclass="right">
-					<input name="<?php print $row["name"] ?>" id="<?php print $row["name"] ?>" maxlength=50 value="<?php print htmlPrep($row["value"]) ?>" type="text" style="width: 300px">
-					<script type="text/javascript">
-						var <?php print $row["name"] ?>=new LiveValidation('<?php print $row["name"] ?>');
-						<?php print $row["name"] ?>.add( Validate.Format, { pattern: /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/, failureMessage: "Must start with http:// or https://" } );
-					</script> 
-				</td>
-			</tr>
-			<tr>
 				<td>
 					<span style="font-size: 90%"><i>* <?php print _("denotes a required field") ; ?></i></span>
 				</td>

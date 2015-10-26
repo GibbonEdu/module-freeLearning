@@ -48,8 +48,6 @@ else {
 	$difficultyOptions=$_POST["difficultyOptions"] ; 	
 	$publicUnits=$_POST["publicUnits"] ; 	
 	$unitOutlineTemplate=$_POST["unitOutlineTemplate"] ;
-	$mapLink=$_POST["mapLink"] ;
-	
 	//Validate Inputs
 	if ($difficultyOptions=="" OR $publicUnits=="") {
 		//Fail 3
@@ -94,16 +92,6 @@ else {
 		try {
 			$data=array("unitOutlineTemplate"=>$unitOutlineTemplate); 
 			$sql="UPDATE gibbonSetting SET value=:unitOutlineTemplate WHERE scope='Free Learning' AND name='unitOutlineTemplate'" ;
-			$result=$connection2->prepare($sql);
-			$result->execute($data);
-		}
-		catch(PDOException $e) { 
-			$fail=TRUE ;
-		}
-		
-		try {
-			$data=array("mapLink"=>$mapLink); 
-			$sql="UPDATE gibbonSetting SET value=:mapLink WHERE scope='Free Learning' AND name='mapLink'" ;
 			$result=$connection2->prepare($sql);
 			$result->execute($data);
 		}

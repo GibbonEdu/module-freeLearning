@@ -75,10 +75,9 @@ else {
 		if (isset($_GET["view"])) {
 			$view=$_GET["view"] ;
 		}
-		if ($view!="grid") {
+		if ($view!="grid" AND $view!="map") {
 			$view="list" ;
 		}
-		
 		$learningAreaArray=getLearningAreaArray($connection2) ;
 		$authors=getAuthorsArray($connection2) ;
 		$blocks=getBlocksArray($connection2) ;
@@ -149,6 +148,7 @@ else {
 				print "<tr>" ;
 					print "<td class='right' colspan=2>" ;
 						print "<input type='hidden' name='q' value='" . $_GET["q"] . "'>" ;
+						print "<input type='hidden' name='view' value='$view'>" ;
 						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php'>" . _('Clear Filters') . "</a> " ;
 						print "<input type='submit' value='" . _('Go') . "'>" ;
 					print "</td>" ;
@@ -160,10 +160,8 @@ else {
 		print "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>" ;
 			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=list'>" . _('List') . " <img style='margin-bottom: -5px' title='" . _('List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
 			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=grid'>" . _('Grid') . " <img style='margin-bottom: -5px' title='" . _('Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
+			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=map'>" . _('Map') . " <img style='margin-bottom: -5px' title='" . _('Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
 			$mapLink=getSettingByScope($connection2, "Free Learning", "mapLink") ;
-			if ($mapLink!="") {
-				print "<a href='$mapLink' target='_blank'>" . _('Map') . " <img style='margin-bottom: -5px' title='" . _('Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
-			}
 		print "</div>" ;
 		
 		//Set pagination variable
@@ -425,7 +423,7 @@ else {
 					printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]["pagination"], "bottom", "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name") ;
 				}
 			}
-			else if ($view="grid") {
+			else if ($view=="grid") {
 				print "<table cellspacing='0' style='width: 100%'>" ;
 					$count=0;
 					$columns=4 ;
@@ -497,6 +495,101 @@ else {
 						print "</tr>" ;
 					}
 				print "</table>" ;	
+			}
+			else if ($view=="map") {
+				print "<p>" ;
+					print _("The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.") ;
+				print "</p>" ;
+				?>
+				<script type="text/javascript" src="<?php print $_SESSION[$guid]["absoluteURL"] ?>/lib/vis/dist/vis.js"></script>
+				<link href="<?php print $_SESSION[$guid]["absoluteURL"] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+
+				<style type="text/css">
+					div#map {
+						width: 100%;
+						height: 800px;
+						border: 1px solid #000;
+						background-color: #ddd;
+						margin-bottom: 20px ;
+					}
+				</style>
+				
+				<div id="map"></div>
+
+				<?php
+				//PREP NODE AND EDGE ARRAYS DATA
+				$nodeArray=array() ;
+				$edgeArray=array();
+				$nodeList="" ;
+				$edgeList="" ;
+				$countNodes=0 ;
+				while ($row=$result->fetch()) {
+					if ($row["logo"]!="") {
+						$image=$row["logo"] ;
+					}
+					else {
+						$image=$_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_240_square.jpg" ;
+					}
+					if ($row["freeLearningUnitIDPrerequisiteList"]=="") {
+						$nodeList.="{id: " . $countNodes . ",  shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', color: {border:'red'}, borderWidth: 20}," ;
+					}
+					else {
+						$nodeList.="{id: " . $countNodes . ",  shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', borderWidth: 2}," ;
+					}
+					$nodeArray[$row["freeLearningUnitID"]][0]=$countNodes ;
+					$nodeArray[$row["freeLearningUnitID"]][1]=$row["freeLearningUnitID"] ;
+					$nodeArray[$row["freeLearningUnitID"]][2]=$row["freeLearningUnitIDPrerequisiteList"] ;
+					$countNodes++ ;
+				}
+				if ($nodeList!="") {
+					$nodeList=substr($nodeList, 0, -1) ;
+				}
+				
+				foreach ($nodeArray AS $node) {
+					if (isset($node[2])) {
+						$edgeExplode=explode(',', $node[2]) ;
+						foreach ($edgeExplode AS $edge) {
+							$edgeList.="{from: " . $nodeArray[$node[1]][0] . ", to: " . $nodeArray[$edge][0] . ", arrows:'from'}," ;
+						}
+					}
+				}
+				if ($edgeList!="") {
+					$edgeList=substr($edgeList, 0, -1) ;
+				}
+				
+				?>
+				<script type="text/javascript">
+					//CREATE NODE ARRAY
+					var nodes = new vis.DataSet([<?php print $nodeList ; ?>]);
+
+					//CREATE EDGET ARRAY
+					var edges = new vis.DataSet([<?php print $edgeList ?>]);
+
+					//CREATE NETWORK
+					var container = document.getElementById('map');
+					var data = {
+					nodes: nodes,
+					edges: edges
+					};
+					var options = {
+						nodes: {
+							borderWidth:4,
+							size:30,
+							color: {
+								border: '#222222',
+								background: '#999999'
+							},
+							font:{color:'#333'},
+            				shadow:true
+						},
+						edges: {
+							color: '#333',
+            				shadow:true
+						}
+					};
+					var network = new vis.Network(container, data, options);
+				</script>
+				<?php
 			}
 		}
 	}

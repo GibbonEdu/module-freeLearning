@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.6.00
+-------
+Added rendering of unit graph (no need to use external mind map!)
+
 v2.5.00
 -------
 Added ability to see all Pending work in one place (saves hunting for it if interrupted)
