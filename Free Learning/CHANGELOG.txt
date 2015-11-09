@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.6.03
+-------
+Unit approval now gives student a like
+
 v2.6.02
 -------
 Minor map bug fix

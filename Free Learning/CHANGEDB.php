@@ -291,4 +291,9 @@ UPDATE gibbonModule SET entryURL='units_browse.php' WHERE name='Free Learning';e
 $count++ ;
 $sql[$count][0]="2.6.02" ;
 $sql[$count][1]="" ;
+
+//v2.6.03
+$count++ ;
+$sql[$count][0]="2.6.03" ;
+$sql[$count][1]="" ;
 ?>

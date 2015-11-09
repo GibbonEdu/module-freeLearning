@@ -178,11 +178,13 @@ else {
 								exit ;
 							}
 					
-							//Attempt to notify the student
+							//Attempt to notify the student, and issue like
 							if ($statusOriginal!=$status OR $commentApprovalOriginal!=$commentApproval) { //Only if status or comment has changed.
 								$text=sprintf(_('A teacher has approved your request for unit completion (%1$s).'), $name) ;
 								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
 								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
+							
+								setLike($connection2, "Free Learning", $_SESSION[$guid]["gibbonSchoolYearID"], "freeLearningUnitStudentID", $freeLearningUnitStudentID, $_SESSION[$guid]["gibbonPersonID"], $gibbonPersonIDStudent, "Unit Approval", "") ;
 							}
 							
 							//Success 0
