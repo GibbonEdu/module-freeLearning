@@ -554,7 +554,7 @@ else {
 					if (isset($node[2])) {
 						$edgeExplode=explode(',', $node[2]) ;
 						foreach ($edgeExplode AS $edge) {
-							if ($nodeArray[$node[1]][0]!="" AND $nodeArray[$edge][0]!="") {
+							if ($nodeArray[$edge][0]!="") {
 								$edgeList.="{from: " . $nodeArray[$node[1]][0] . ", to: " . $nodeArray[$edge][0] . ", arrows:'from'}," ;
 							}
 						}

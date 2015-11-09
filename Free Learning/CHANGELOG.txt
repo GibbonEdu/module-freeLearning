@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.6.02
+-------
+Minor map bug fix
+
 v2.6.01
 -------
 Clickable units in map
