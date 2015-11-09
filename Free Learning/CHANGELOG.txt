@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v2.6.01
+-------
+Clickable units in map
+Landing page now browse, not edit
+
 v2.6.00
 -------
 Added rendering of unit graph (no need to use external mind map!)

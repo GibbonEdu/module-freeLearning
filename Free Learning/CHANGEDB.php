@@ -279,4 +279,11 @@ $sql[$count][0]="2.6.00" ;
 $sql[$count][1]="
 DELETE FROM gibbonSetting WHERE name='mapLink' AND scope='Free Learning';end
 " ;
+
+//v2.6.01
+$count++ ;
+$sql[$count][0]="2.6.01" ;
+$sql[$count][1]="
+UPDATE gibbonModule SET entryURL='units_browse.php' WHERE name='Free Learning';end
+" ;
 ?>

@@ -149,7 +149,7 @@ else {
 					print "<td class='right' colspan=2>" ;
 						print "<input type='hidden' name='q' value='" . $_GET["q"] . "'>" ;
 						print "<input type='hidden' name='view' value='$view'>" ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php'>" . _('Clear Filters') . "</a> " ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&view=$view'>" . _('Clear Filters') . "</a> " ;
 						print "<input type='submit' value='" . _('Go') . "'>" ;
 					print "</td>" ;
 				print "</tr>" ;
@@ -158,9 +158,9 @@ else {
 		
 		
 		print "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>" ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=list'>" . _('List') . " <img style='margin-bottom: -5px' title='" . _('List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=grid'>" . _('Grid') . " <img style='margin-bottom: -5px' title='" . _('Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=map'>" . _('Map') . " <img style='margin-bottom: -5px' title='" . _('Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
+			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=list'>" . _('List') . " <img style='margin-bottom: -5px' title='" . _('List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
+			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=grid'>" . _('Grid') . " <img style='margin-bottom: -5px' title='" . _('Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
+			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=map'>" . _('Map') . " <img style='margin-bottom: -5px' title='" . _('Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
 			$mapLink=getSettingByScope($connection2, "Free Learning", "mapLink") ;
 		print "</div>" ;
 		
@@ -402,15 +402,15 @@ else {
 							print "</td>" ;
 							print "<td>" ;
 								if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 								}
 								else if ($highestAction=="Browse Units_prerequisites") {
 									if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 									}
 									else {
 										if ($prerquisitesMet) {
-											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 										}
 									}
 								}
@@ -467,15 +467,15 @@ else {
 								}
 							}
 							if ($highestAction=="Browse Units_all") {
-								print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+								print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 							}
 							else if ($highestAction=="Browse Units_prerequisites") {
 								if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 								}
 								else {
 									if ($prerquisitesMet) {
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 									}
 								}
 							}
@@ -522,6 +522,7 @@ else {
 				$edgeArray=array();
 				$nodeList="" ;
 				$edgeList="" ;
+				$idList="" ;
 				$countNodes=0 ;
 				while ($row=$result->fetch()) {
 					if ($row["logo"]!="") {
@@ -531,25 +532,31 @@ else {
 						$image=$_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_240_square.jpg" ;
 					}
 					if ($row["freeLearningUnitIDPrerequisiteList"]=="") {
-						$nodeList.="{id: " . $countNodes . ",  shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', color: {border:'red'}, borderWidth: 20}," ;
+						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', color: {border:'red'}, borderWidth: 20}," ;
 					}
 					else {
-						$nodeList.="{id: " . $countNodes . ",  shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', borderWidth: 2}," ;
+						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', borderWidth: 2}," ;
 					}
 					$nodeArray[$row["freeLearningUnitID"]][0]=$countNodes ;
 					$nodeArray[$row["freeLearningUnitID"]][1]=$row["freeLearningUnitID"] ;
 					$nodeArray[$row["freeLearningUnitID"]][2]=$row["freeLearningUnitIDPrerequisiteList"] ;
+					$idList.="'" . $row["freeLearningUnitID"] . "'," ;
 					$countNodes++ ;
 				}
 				if ($nodeList!="") {
 					$nodeList=substr($nodeList, 0, -1) ;
+				}
+				if ($idList!="") {
+					$idList=substr($idList, 0, -1) ;
 				}
 				
 				foreach ($nodeArray AS $node) {
 					if (isset($node[2])) {
 						$edgeExplode=explode(',', $node[2]) ;
 						foreach ($edgeExplode AS $edge) {
-							$edgeList.="{from: " . $nodeArray[$node[1]][0] . ", to: " . $nodeArray[$edge][0] . ", arrows:'from'}," ;
+							if ($nodeArray[$node[1]][0]!="" AND $nodeArray[$edge][0]!="") {
+								$edgeList.="{from: " . $nodeArray[$node[1]][0] . ", to: " . $nodeArray[$edge][0] . ", arrows:'from'}," ;
+							}
 						}
 					}
 				}
@@ -565,6 +572,9 @@ else {
 					//CREATE EDGET ARRAY
 					var edges = new vis.DataSet([<?php print $edgeList ?>]);
 
+					//CREATE NODE TO freeLearningUnitID ARRAY
+					var ids = new Array(<?php print $idList ?>);
+					
 					//CREATE NETWORK
 					var container = document.getElementById('map');
 					var data = {
@@ -588,6 +598,12 @@ else {
 						}
 					};
 					var network = new vis.Network(container, data, options);
+					
+					//CLICK LISTENER
+					network.on( 'click', function(properties) {
+						var nodeNo = properties.nodes ;
+						window.location = '<?php print $_SESSION[$guid]["absoluteURL"] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php print $gibbonDepartmentID ?>&difficulty=<?php print $difficulty ?>&name=<?php print $name ?>&view=<?php print $view ?>';
+					});
 				</script>
 				<?php
 			}

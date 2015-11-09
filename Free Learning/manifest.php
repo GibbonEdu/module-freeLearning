@@ -22,10 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //Basica variables
 $name="Free Learning" ;
 $description="Free Learning is a module which enables a student-focused and student-driven pedagogy that goes by the same name as the module (see <a href='http://rossparker.org/free-learning'>http://rossparker.org/free-learning</a> for more)." ;
-$entryURL="units_manage.php" ;
+$entryURL="units_browse.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="2.6.00" ;
+$version="2.6.01" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
