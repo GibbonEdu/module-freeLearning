@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.7.00
+-------
+Added ability for students to like units
+
 v2.6.03
 -------
 Unit approval now gives student a like

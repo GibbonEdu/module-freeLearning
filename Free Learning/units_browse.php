@@ -274,7 +274,12 @@ else {
 							}
 							print _("Prerequisites") . "</br>" ;
 						print "</th>" ;
-						print "<th style='min-width: 70px'>" ;
+						if (isset($_SESSION[$guid]["username"])) { //Likes only if logged in!
+							print "<th style='min-width: 50px'>" ;
+								print _("Like") ;
+							print "</th>" ;
+						}
+						print "<th style='min-width: 50px'>" ;
 							print _("Actions") ;
 						print "</th>" ;
 					print "</tr>" ;
@@ -318,6 +323,7 @@ else {
 								print "</span>" ;
 							print "</td>" ;
 							print "<td>" ;
+								$amAuthor=FALSE ;
 								foreach ($authors AS $author) {
 									if ($author[0]==$row["freeLearningUnitID"]) {
 										if ($author[3]=="") {
@@ -326,13 +332,20 @@ else {
 										else {
 											print "<a target='_blank' href='" . $author[3] . "'>" . $author[1] . "</a><br/>" ;
 										}
+										if (isset($_SESSION[$guid]["username"])) { //Am author chekc only if logged in!
+											if ($author[2]==$_SESSION[$guid]["gibbonPersonID"]) { // Check to see if I am one of the authors
+												$amAuthor=TRUE ;
+											}
+										}
 									}
 								}
 								if ($row["gibbonDepartmentIDList"]!="") {
 									print "<span style='font-size: 85%;'>" ;
 										$departments=explode(",", $row["gibbonDepartmentIDList"]) ;
 										foreach ($departments AS $department) {
-											print $learningAreaArray[$department] . "<br/>" ;
+											if (isset($learningAreaArray[$department])) {
+												print $learningAreaArray[$department] . "<br/>" ;
+											}
 										}
 									print "</span>" ;
 								}
@@ -400,17 +413,56 @@ else {
 										print "<i>" . _('None') . "<br/></i>" ;
 								}
 							print "</td>" ;
+							if (isset($_SESSION[$guid]["username"])) { //Likes only if logged in!
+								print "<td>" ;
+									//DEAL WITH LIKES
+									if ($amAuthor) { //I am one of the authors, so cannot like
+										print countLikesByContextAndRecipient($connection2, "Free Learning", "freeLearningUnitID", $row["freeLearningUnitID"], $_SESSION[$guid]["gibbonPersonID"]) ;
+									}
+									else { //I am not one of the authors, and so can like
+										print "<div id='star" . $row["freeLearningUnitID"] . "'>" ;
+											$likesGiven=countLikesByContextAndGiver($connection2, "Free Learning", "freeLearningUnitID", $row["freeLearningUnitID"], $_SESSION[$guid]["gibbonPersonID"]) ;
+											$comment=addSlashes($row["name"]) ;
+											$authorList="" ;
+											foreach ($authors AS $author) {
+												if ($author[0]==$row["freeLearningUnitID"]) {
+													$authorList.=$author[2] . "," ;
+												}
+											}
+											if ($authorList!="") {
+												$authorList=substr($authorList,0,-1) ;
+											}
+											print "<script type=\"text/javascript\">" ;
+												print "$(document).ready(function(){" ;
+													print "$(\"#starAdd" . $row["freeLearningUnitID"] . "\").click(function(){" ;
+														print "$(\"#star" . $row["freeLearningUnitID"] . "\").load(\"" . $_SESSION[$guid]["absoluteURL"] . "/modules/Free%20Learning/units_browse_starAjax.php\",{\"freeLearningUnitID\": \"" . $row["freeLearningUnitID"] . "\", \"mode\": \"add\", \"comment\": \"" . $comment . "\", \"authorList\": \"" . $authorList . "\"});" ;
+													print "});" ;
+													print "$(\"#starRemove" . $row["freeLearningUnitID"] . "\").click(function(){" ;
+														print "$(\"#star" . $row["freeLearningUnitID"] . "\").load(\"" . $_SESSION[$guid]["absoluteURL"] . "/modules/Free%20Learning/units_browse_starAjax.php\",{\"freeLearningUnitID\": \"" . $row["freeLearningUnitID"] . "\", \"mode\": \"remove\", \"comment\": \"" . $comment . "\", \"authorList\": \"" . $authorList . "\"});" ;
+													print "});" ;
+												print "});" ;
+											print "</script>" ;
+											if ($likesGiven<1) {
+												print "<a id='starAdd" . $row["freeLearningUnitID"] . "' onclick='return false;' href='#'><img src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/like_off.png'></a>" ;
+											}
+											else {
+												print "<a id='starRemove" . $row["freeLearningUnitID"] . "' onclick='return false;' href='#'><img src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/like_on.png'></a>" ;
+											}
+										}
+									print "</div>" ;
+								print "</td>" ;
+							}
 							print "<td>" ;
 								if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 								}
 								else if ($highestAction=="Browse Units_prerequisites") {
 									if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 									}
 									else {
 										if ($prerquisitesMet) {
-											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 										}
 									}
 								}
