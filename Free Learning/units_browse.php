@@ -583,11 +583,18 @@ else {
 					else {
 						$image=$_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_240_square.jpg" ;
 					}
-					if ($row["freeLearningUnitIDPrerequisiteList"]=="") {
-						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', color: {border:'red'}, borderWidth: 20}," ;
+					if (strlen($row["blurb"])>90) {
+						$title=addSlashes(substr($row["blurb"],0,90)) . "..." ;
 					}
 					else {
-						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . $row["name"] . "', borderWidth: 2}," ;
+						$title=addSlashes($row["blurb"]) ;
+					}
+					
+					if ($row["freeLearningUnitIDPrerequisiteList"]=="") {
+						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . addSlashes($row["name"]) . "', title: '" . $title . "', color: {border:'red'}, borderWidth: 20}," ;
+					}
+					else {
+						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . addSlashes($row["name"]) . "', title: '" . $title . "', borderWidth: 2}," ;
 					}
 					$nodeArray[$row["freeLearningUnitID"]][0]=$countNodes ;
 					$nodeArray[$row["freeLearningUnitID"]][1]=$row["freeLearningUnitID"] ;
@@ -647,7 +654,11 @@ else {
 						edges: {
 							color: '#333',
             				shadow:true
-						}
+						},
+					  	interaction:{
+							navigationButtons: true,				
+    						zoomView: false
+						}					  	
 					};
 					var network = new vis.Network(container, data, options);
 					
