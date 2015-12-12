@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v3.0.01
+-------
+Make content tab the default landing tab
+
 v3.0.00
 -------
 Final tweaks...

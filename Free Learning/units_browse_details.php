@@ -269,7 +269,7 @@ else {
 						}
 					print "</table>" ;
 				
-					$defaultTab=0 ;
+					$defaultTab=2 ;
 					if (isset($_GET["tab"])) {
 						$defaultTab=$_GET["tab"] ;
 					}
