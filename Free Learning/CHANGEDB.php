@@ -311,4 +311,9 @@ $sql[$count][1]="" ;
 $count++ ;
 $sql[$count][0]="3.0.01" ;
 $sql[$count][1]="" ;
+
+//v3.0.02
+$count++ ;
+$sql[$count][0]="3.0.02" ;
+$sql[$count][1]="" ;
 ?>
