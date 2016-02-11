@@ -657,7 +657,11 @@ else {
 					  	interaction:{
 							navigationButtons: true,				
     						zoomView: false
-						}					  	
+						},
+						layout: {
+							randomSeed: 0.5,
+							improvedLayout:true
+						}						  	
 					};
 					var network = new vis.Network(container, data, options);
 					
