@@ -72,8 +72,29 @@ else {
 		}
 	
 		while ($rowWork=$resultWork->fetch()) {
+			$students="" ;
+			if ($rowWork["grouping"]=="Individual") { //Created by a single student
+				$students=formatName("", $rowWork["preferredName"], $rowWork["surname"], "Student", false) ;
+			}
+			else { //Created by a group of students
+				try{
+					$dataStudents=array("collaborationKey"=>$rowWork["collaborationKey"]);  
+					$sqlStudents="SELECT surname, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY surname, preferredName" ;
+					$resultStudents=$connection2->prepare($sqlStudents);
+					$resultStudents->execute($dataStudents);
+				}
+				catch(PDOException $e) {  }
+				while ($rowStudents=$resultStudents->fetch()) {
+					$students.=formatName("", $rowStudents["preferredName"], $rowStudents["surname"], "Student", false) . ", " ;
+				} 
+				if ($students!="") {
+					$students=substr($students, 0, -2) ;
+					$students = preg_replace('/,([^,]*)$/', ' & \1', $students);
+				}
+			}
+			
 			print "<h3 style='margin-bottom: 5px'>" ;
-				print $rowWork["name"] . "<span style='font-size: 75%; text-transform: none'> by " . formatName("", $rowWork["preferredName"], $rowWork["surname"], "Student", false) . "</span>" ;
+				print $rowWork["name"] . "<span style='font-size: 75%; text-transform: none'> by " . $students . "</span>" ;
 			print "</h3>" ;
 			print "<p style='font-style: italic; margin-top 0; margin-bottom: 5px; font-size: 10.5px'>" ;
 				 print _("Shared on") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) ;

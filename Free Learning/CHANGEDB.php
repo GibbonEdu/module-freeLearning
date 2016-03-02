@@ -321,4 +321,14 @@ $sql[$count][1]="" ;
 $count++ ;
 $sql[$count][0]="3.0.03" ;
 $sql[$count][1]="" ;
+
+//v3.0.04
+$count++ ;
+$sql[$count][0]="3.0.04" ;
+$sql[$count][1]="" ;
+
+//v3.0.05
+$count++ ;
+$sql[$count][0]="3.0.05" ;
+$sql[$count][1]="" ;
 ?>
