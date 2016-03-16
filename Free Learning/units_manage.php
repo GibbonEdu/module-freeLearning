@@ -253,7 +253,7 @@ else {
 							}
 						print "</td>" ;
 						print "<td>" ;
-							print ynExpander($row["active"]) ;
+							print ynExpander($guid, $row["active"]) ;
 						print "</td>" ;
 						print "<td>" ;
 							if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")) {

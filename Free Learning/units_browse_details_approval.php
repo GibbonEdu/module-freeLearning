@@ -237,12 +237,12 @@ else {
 										if ($row["exemplarWork"]=="N") {
 											print " selected " ;
 										}
-										print "value='N'>" . ynExpander('N') . "</option>" ;
+										print "value='N'>" . ynExpander($guid, 'N') . "</option>" ;
 										print "<option " ;
 										if ($row["exemplarWork"]=="Y") {
 											print " selected " ;
 										}
-										print "value='Y'>" . ynExpander('Y') . "</option>" ;
+										print "value='Y'>" . ynExpander($guid, 'Y') . "</option>" ;
 										?>				
 									</select>
 								</td>

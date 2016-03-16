@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v3.0.06
+-------
+v12 ynExpander compatibility
+
 v3.0.05
 -------
 Improved Showcase and Examplar work to show names of all group members for group submissions
