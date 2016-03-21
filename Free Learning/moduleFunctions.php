@@ -36,7 +36,6 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary=FALSE)
 	}
 	catch(PDOException $e) { $output.="<div class='error'>" . $e->getMessage() . "</div>" ;  }
 	
-	
 	if ($result->rowCount()!=1) {
 		$output.="<div class='error'>" ;
 			$output.=_("The specified record does not exist.") ;
@@ -47,18 +46,18 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary=FALSE)
 			$data=array("gibbonPersonID"=>$gibbonPersonID); 
 			if ($schoolType=="Physical") {
 				if ($summary==TRUE) {
-					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Evidence Not Approved' OR freeLearningUnitStudent.status='Current') ORDER BY timestampJoined DESC, year DESC, status, unit LIMIT 0, 8" ; 
+					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Evidence Not Approved' OR freeLearningUnitStudent.status='Current') ORDER BY timestampJoined DESC, year DESC, status, unit LIMIT 0, 8" ; 
 				}
 				else {
-					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY year DESC, status, unit" ; 
+					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY timestampJoined DESC, year DESC, status, unit" ; 
 				}
 			}
 			else {
 				if ($summary==TRUE) {
-					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, evidenceLocation, evidenceType, commentStudent, commentApproval FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Evidence Not Approved' OR freeLearningUnitStudent.status='Current') ORDER BY timestampJoined DESC, status, unit LIMIT 0, 8" ; 
+					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, evidenceLocation, evidenceType, commentStudent, commentApproval, timestampCompleteApproved, timestampJoined FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Evidence Not Approved' OR freeLearningUnitStudent.status='Current') ORDER BY timestampJoined DESC, status, unit LIMIT 0, 8" ; 
 				}
 				else {
-					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, evidenceLocation, evidenceType, commentStudent, commentApproval FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY status, unit" ; 
+					$sql="SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, evidenceLocation, evidenceType, commentStudent, commentApproval, timestampCompleteApproved, timestampJoined FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY timestampJoined DESC, status, unit" ; 
 				}
 			}
 			$result=$connection2->prepare($sql);
@@ -78,7 +77,8 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary=FALSE)
 				$output.="<tr class='head'>" ;
 					if ($schoolType=="Physical") {
 						$output.="<th>" ;
-							$output.=_("School Year") ;
+							$output.=_("School Year") . "<br/>" ;
+							$output.="<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Date') . "</span>" ;
 						$output.="</th>" ;
 					}
 					$output.="<th>" ;
@@ -116,7 +116,13 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary=FALSE)
 					$output.="<tr class=$rowNum>" ;
 						if ($schoolType=="Physical") {
 							$output.="<td>" ;
-								$output.=$row["year"] ;
+								$output.=$row["year"] . "<br/>" ;
+								if ($row["status"]=="Complete - Approved") {
+									$output.="<span style='font-size: 85%; font-style: italic'>" . dateConvertBack($guid, substr($row["timestampCompleteApproved"],0,10)) . "</span>" ;
+								}
+								else {
+									$output.="<span style='font-size: 85%; font-style: italic'>" . dateConvertBack($guid, substr($row["timestampJoined"],0,10)) . "</span>" ;
+								}
 							$output.="</td>" ;
 						}
 						$output.="<td>" ;

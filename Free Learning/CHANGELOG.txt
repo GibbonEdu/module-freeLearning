@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v3.0.07
+-------
+Added content to Student Dashboard (v12+ only)
+Added date to student unit history listings
+
 v3.0.06
 -------
 v12 ynExpander compatibility
