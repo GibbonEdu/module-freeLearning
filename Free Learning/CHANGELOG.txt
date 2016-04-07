@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v3.0.08
+-------
+Fixed v12 compatibility bug
+
 v3.0.07
 -------
 Added content to Student Dashboard (v12+ only)

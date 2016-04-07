@@ -343,6 +343,10 @@ $sql[$count][0]="3.0.07" ;
 $sql[$count][1]="INSERT INTO `gibbonHook` (`gibbonHookID`, `name`, `type`, `options`, gibbonModuleID) VALUES (NULL, 'Free Learning', 'Student Dashboard', 'a:3:{s:16:\"sourceModuleName\";s:13:\"Free Learning\";s:18:\"sourceModuleAction\";s:15:\"My Unit History\";s:19:\"sourceModuleInclude\";s:37:\"hook_studentDashboard_unitHistory.php\";}', (SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning'));end
 " ;
 
+//v3.0.08
+$count++ ;
+$sql[$count][0]="3.0.08" ;
+$sql[$count][1]="" ;
 
 
 ?>
