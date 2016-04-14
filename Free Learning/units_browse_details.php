@@ -268,27 +268,7 @@ else {
 							print "</tr>" ;
 						}
 					print "</table>" ;
-				
-					$defaultTab=2 ;
-					if (isset($_GET["tab"])) {
-						$defaultTab=$_GET["tab"] ;
-					}
-					?>
-					<script type='text/javascript'>
-						$(function() {
-							$( "#tabs" ).tabs({
-								active: <?php print $defaultTab ?>, 
-								ajaxOptions: {
-									error: function( xhr, status, index, anchor ) {
-										$( anchor.hash ).html(
-											"Couldn't load this tab." );
-									}
-								}
-							});
-						});
-					</script>
-				
-					<?php
+					
 					//Work out if we should show enrolment, and what type of enrolment it should be (e.g. self or class)
 					$enrolment=FALSE ;
 					$enrolmentType=NULL ;
@@ -321,6 +301,29 @@ else {
 						}
 					}
 					
+					$defaultTab=2 ;
+					if (!$enrolment) {
+						$defaultTab=1 ;
+					}
+					if (isset($_GET["tab"])) {
+						$defaultTab=$_GET["tab"] ;
+					}
+					?>
+					<script type='text/javascript'>
+						$(function() {
+							$( "#tabs" ).tabs({
+								active: <?php print $defaultTab ?>, 
+								ajaxOptions: {
+									error: function( xhr, status, index, anchor ) {
+										$( anchor.hash ).html(
+											"Couldn't load this tab." );
+									}
+								}
+							});
+						});
+					</script>
+					
+					<?php
 					print "<div id='tabs' style='margin: 20px 0'>" ;
 						//Tab links
 						print "<ul>" ;

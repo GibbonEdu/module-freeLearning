@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v3.0.09
+-------
+Fixed landing tab page for non-logged in users
+
 v3.0.08
 -------
 Fixed v12 compatibility bug
