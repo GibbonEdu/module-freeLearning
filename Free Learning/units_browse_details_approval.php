@@ -25,7 +25,7 @@ include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details_approval.php")==FALSE) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
@@ -33,7 +33,7 @@ else {
 	$highestAction=getHighestGroupedAction($guid, "/modules/Free Learning/units_browse_details_approval.php", $connection2) ;
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
-		print _("The highest grouped action cannot be determined.") ;
+		print __($guid, "The highest grouped action cannot be determined.") ;
 		print "</div>" ;
 	}
 	else {
@@ -64,12 +64,12 @@ else {
 		}
 		
 		print "<div class='trail'>" ;
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . _('Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1'>" . _('Unit Details') . "</a> > </div><div class='trailEnd'>" . _('Approval') . "</div>" ;
+			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Approval') . "</div>" ;
 		print "</div>" ;
 		
 		if ($freeLearningUnitID=="" OR $freeLearningUnitStudentID=="") {
 			print "<div class='error'>" ;
-				print _("You have not specified one or more required parameters.") ;
+				print __($guid, "You have not specified one or more required parameters.") ;
 			print "</div>" ;
 		}
 		else {
@@ -85,7 +85,7 @@ else {
 	
 			if ($result->rowCount()!=1) {
 				print "<div class='error'>" ;
-					print _("The selected record does not exist, or you do not have access to it.") ;
+					print __($guid, "The selected record does not exist, or you do not have access to it.") ;
 				print "</div>" ;
 			}
 			else {
@@ -104,39 +104,39 @@ else {
 				
 				if ($proceed==FALSE) {
 					print "<div class='error'>" ;
-						print _("The selected record does not exist, or you do not have access to it.") ;
+						print __($guid, "The selected record does not exist, or you do not have access to it.") ;
 					print "</div>" ;
 				}
 				else {
 					//Let's go!
 					if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php")) {
 						print "<div class='linkTop'>" ;
-							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID'>" . _('Edit') . "<img style='margin: 0 0 -4px 3px' title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
+							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID'>" . __($guid, 'Edit') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
 						print "</div>" ;
 					}
 					
 					print "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>" ;
 						print "<tr>" ;
 							print "<td style='width: 33%; vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Unit Name') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Unit Name') . "</span><br/>" ;
 								print $row["name"] ;
 							print "</td>" ;
 							print "<td style='width: 34%; vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Departments') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Departments') . "</span><br/>" ;
 								$learningAreas=getLearningAreas($connection2, $guid) ;
 								if ($learningAreas=="") {
-									print "<i>" . _('No Learning Areas available.') . "</i>" ;
+									print "<i>" . __($guid, 'No Learning Areas available.') . "</i>" ;
 								}
 								else {
 									for ($i=0; $i<count($learningAreas); $i=$i+2) {
 										if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
-											print _($learningAreas[($i+1)]) . "<br/>" ;
+											print __($guid, $learningAreas[($i+1)]) . "<br/>" ;
 										}
 									}
 								}
 							print "</td>" ;
 							print "<td style='width: 34%; vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Authors') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Authors') . "</span><br/>" ;
 								$authors=getAuthorsArray($connection2, $freeLearningUnitID) ;
 								foreach ($authors AS $author) {
 									print $author[1] . "<br/>" ;
@@ -146,18 +146,18 @@ else {
 					print "</table>" ;
 					
 					print "<h4>" ;
-						print _('Unit Complete Approval') ;
+						print __($guid, 'Unit Complete Approval') ;
 					print "</h4>" ;
 					print "<p>" ;
-						print _('Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.') ;
+						print __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.') ;
 					print "</p>" ;
 					?>
 					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_approvalProcess.php?address=" . $_GET["q"] ?>"  enctype="multipart/form-data">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 							<tr>
 								<td> 
-									<b><?php print _('Student') ?> *</b><br/>
-									<span style="font-size: 90%"><i><?php print _('This value cannot be changed.') ?></i></span>
+									<b><?php print __($guid, 'Student') ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php print __($guid, 'This value cannot be changed.') ?></i></span>
 								</td>
 								<td class="right">
 									<?php print "<input readonly value='" . formatName("", $row["preferredName"], $row["surname"], "Student", false ) . "' type='text' style='width: 300px'>" ; ?>
@@ -165,7 +165,7 @@ else {
 							</tr>
 							<tr>
 								<td> 
-									<b><?php print _('Status') ?> *</b><br/>
+									<b><?php print __($guid, 'Status') ?> *</b><br/>
 								</td>
 								<td class="right">
 									<select style="width: 302px" name="status" id="status">
@@ -227,8 +227,8 @@ else {
 						
 							<tr id="exemplarRow">
 								<td> 
-									<b><?php print _("Exmplar Work") ; ?> *</b><br/>
-									<span style="font-size: 90%"><i><?php print _("Work and comments will be made viewable to other users.") ; ?></i></span>
+									<b><?php print __($guid, "Exmplar Work") ; ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php print __($guid, "Work and comments will be made viewable to other users.") ; ?></i></span>
 								</td>
 								<td class="right">
 									<select name="exemplarWork" id="exemplarWork" style="width: 302px">
@@ -249,13 +249,13 @@ else {
 							</tr>
 							<tr id="fileRow">
 								<td> 
-									<b><?php print _('Exemplar Work Thumbnail Image') ?></b><br/>
+									<b><?php print __($guid, 'Exemplar Work Thumbnail Image') ?></b><br/>
 									<span style="font-size: 90%"><i>150x150px jpg/png/gif</i><br/></span>
 								</td>
 								<td class="right">
 									<?php
 									if ($row["exemplarWorkThumb"]!="") {
-										print _("Current attachment:") . " <a href='" . $row["exemplarWorkThumb"] . "'>" . $row["exemplarWorkThumb"] . "</a><br/><br/>" ;
+										print __($guid, "Current attachment:") . " <a href='" . $row["exemplarWorkThumb"] . "'>" . $row["exemplarWorkThumb"] . "</a><br/><br/>" ;
 									}
 									?>
 									<input type="file" name="file" id="file"><br/><br/>
@@ -274,14 +274,14 @@ else {
 									?>
 									<script type="text/javascript">
 										var file=new LiveValidation('file');
-										file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "<?php print _('Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
+										file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "<?php print __($guid, 'Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
 									</script>
 								</td>
 							</tr>
 							<tr id="linkRow">
 								<td> 
-									<b><?php print _('Exemplar Work Thumbnail Image Credit') ?></b><br/>
-									<span style="font-size: 90%"><i><?php print _("Credit and license for image used above.") ; ?></i></span>
+									<b><?php print __($guid, 'Exemplar Work Thumbnail Image Credit') ?></b><br/>
+									<span style="font-size: 90%"><i><?php print __($guid, "Credit and license for image used above.") ; ?></i></span>
 								</td>
 								<td class="right">
 									<input name="exemplarWorkLicense" id="exemplarWorkLicense" maxlength=255 value="<?php print $row["exemplarWorkLicense"] ?>" type="text" style="width: 300px">
@@ -289,16 +289,16 @@ else {
 							</tr>
 							<tr>
 								<td> 
-									<b><?php print _('Submission') ?> *</b><br/>
+									<b><?php print __($guid, 'Submission') ?> *</b><br/>
 								</td>
 								<td class="right">
 									<?php
 									if ($row["evidenceLocation"]!="") {
 										if ($row["evidenceType"]=="Link") {
-											print "<a target='_blank' href='" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</a>" ;
+											print "<a target='_blank' href='" . $row["evidenceLocation"] . "'>" . __($guid, 'View Submission') . "</a>" ;
 										}
 										else {
-											print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["evidenceLocation"] . "'>" . _('View Submission') . "</a>" ;
+											print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["evidenceLocation"] . "'>" . __($guid, 'View Submission') . "</a>" ;
 										}
 									}
 									?>
@@ -306,7 +306,7 @@ else {
 							</tr>
 							<tr>
 								<td colspan=2> 
-									<b><?php print _('Student Comment') ?> *</b><br/>
+									<b><?php print __($guid, 'Student Comment') ?> *</b><br/>
 									<p>
 										<?php
 											print $row["commentStudent"] ;
@@ -317,8 +317,8 @@ else {
 							
 							<tr>
 								<td colspan=2> 
-									<b><?php print _('Teacher Comment') ?> *</b><br/>
-									<span style="font-size: 90%"><i><?php print _('Leave a comment on the student\'s progress.') ?></i></span>
+									<b><?php print __($guid, 'Teacher Comment') ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php print __($guid, 'Leave a comment on the student\'s progress.') ?></i></span>
 									<?php print getEditor($guid,  TRUE, "commentApproval", $row["commentApproval"], 15, TRUE, TRUE ) ?>
 								</td>
 							</tr>
@@ -331,7 +331,7 @@ else {
 							</tr>
 							<tr>
 								<td class="right" colspan=2>
-									<span style="font-size: 90%"><i>* <?php print _("denotes a required field") ; ?></i></span>
+									<span style="font-size: 90%"><i>* <?php print __($guid, "denotes a required field") ; ?></i></span>
 								</td>
 							</tr>
 						</table>

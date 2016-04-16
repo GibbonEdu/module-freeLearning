@@ -71,7 +71,7 @@ else {
 				//Fail 2
 				$URL.="&updateReturn=fail2" ;
 				header("Location: {$URL}");
-				break ;
+				exit() ;
 			}
 			
 			
@@ -79,7 +79,7 @@ else {
 				//Fail 2
 				$URL.="&updateReturn=fail2" ;
 				header("Location: {$URL}");
-				break ;
+				exit() ;
 			}
 			else {
 				//Proceed!
@@ -180,7 +180,7 @@ else {
 					
 							//Attempt to notify the student, and issue like
 							if ($statusOriginal!=$status OR $commentApprovalOriginal!=$commentApproval) { //Only if status or comment has changed.
-								$text=sprintf(_('A teacher has approved your request for unit completion (%1$s).'), $name) ;
+								$text=sprintf(__($guid, 'A teacher has approved your request for unit completion (%1$s).'), $name) ;
 								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
 								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
 							
@@ -208,7 +208,7 @@ else {
 					
 							//Attempt to notify the student
 							if ($statusOriginal!=$status OR $commentApprovalOriginal!=$commentApproval) { //Only if status or comment has changed.
-								$text=sprintf(_('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name) ;
+								$text=sprintf(__($guid, 'A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name) ;
 								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
 								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
 							}

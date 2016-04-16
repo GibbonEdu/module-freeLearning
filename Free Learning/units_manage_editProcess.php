@@ -154,7 +154,7 @@ else {
 					//Fail 2
 					$URL.="&addReturn=fail2" ;
 					header("Location: {$URL}");
-					break ;
+					exit() ;
 				}
 
 				if ($result->rowCount()!=1) {
@@ -208,7 +208,7 @@ else {
 						//Fail 2
 						$URL.="&updateReturn=fail2" ;
 						header("Location: {$URL}");
-						break ;
+						exit() ;
 					}
 					
 					//Write author to database
@@ -244,7 +244,7 @@ else {
 						//Fail2
 						$URL.="&updateReturn=fail2" ;
 						header("Location: {$URL}");
-						break ;
+						exit() ;
 					}
 					//Insert outcomes
 					$count=0 ;

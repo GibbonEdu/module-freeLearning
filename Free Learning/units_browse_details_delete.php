@@ -25,7 +25,7 @@ include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details_approval.php")==FALSE) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
@@ -33,7 +33,7 @@ else {
 	$highestAction=getHighestGroupedAction($guid, "/modules/Free Learning/units_browse_details_approval.php", $connection2) ;
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
-		print _("The highest grouped action cannot be determined.") ;
+		print __($guid, "The highest grouped action cannot be determined.") ;
 		print "</div>" ;
 	}
 	else {
@@ -64,7 +64,7 @@ else {
 		}
 		
 		print "<div class='trail'>" ;
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . _('Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1'>" . _('Unit Details') . "</a> > </div><div class='trailEnd'>" . _('Delete Enrolment') . "</div>" ;
+			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Delete Enrolment') . "</div>" ;
 		print "</div>" ;
 		
 		if (isset($_GET["deleteReturn"])) { $deleteReturn=$_GET["deleteReturn"] ; } else { $deleteReturn="" ; }
@@ -72,16 +72,16 @@ else {
 		$class="error" ;
 		if (!($deleteReturn=="")) {
 			if ($deleteReturn=="fail0") {
-				$deleteReturnMessage=_("Your request failed because you do not have access to this action.") ;	
+				$deleteReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
 			}
 			else if ($deleteReturn=="fail1") {
-				$deleteReturnMessage=_("Your request failed because your inputs were invalid.") ;	
+				$deleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
 			}
 			else if ($deleteReturn=="fail2") {
-				$deleteReturnMessage=_("Your request failed due to a database error.") ;	
+				$deleteReturnMessage=__($guid, "Your request failed due to a database error.") ;	
 			}
 			else if ($deleteReturn=="fail3") {
-				$deleteReturnMessage=_("Your request failed because your inputs were invalid.") ;	
+				$deleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
 			}
 			print "<div class='$class'>" ;
 				print $deleteReturnMessage;
@@ -90,7 +90,7 @@ else {
 		
 		if ($freeLearningUnitID=="" OR $freeLearningUnitStudentID=="") {
 			print "<div class='error'>" ;
-				print _("You have not specified one or more required parameters.") ;
+				print __($guid, "You have not specified one or more required parameters.") ;
 			print "</div>" ;
 		}
 		else {
@@ -106,7 +106,7 @@ else {
 	
 			if ($result->rowCount()!=1) {
 				print "<div class='error'>" ;
-					print _("The selected record does not exist, or you do not have access to it.") ;
+					print __($guid, "The selected record does not exist, or you do not have access to it.") ;
 				print "</div>" ;
 			}
 			else {
@@ -125,7 +125,7 @@ else {
 				
 				if ($proceed==FALSE) {
 					print "<div class='error'>" ;
-						print _("The selected record does not exist, or you do not have access to it.") ;
+						print __($guid, "The selected record does not exist, or you do not have access to it.") ;
 					print "</div>" ;
 				}
 				else {
@@ -135,8 +135,8 @@ else {
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 							<tr>
 								<td> 
-									<b><?php print _('Are you sure you want to delete this record?') ; ?></b><br/>
-									<span style="font-size: 90%; color: #cc0000"><i><?php print _('This operation cannot be undone, and may lead to loss of vital data in your system. PROCEED WITH CAUTION!') ; ?></i></span>
+									<b><?php print __($guid, 'Are you sure you want to delete this record?') ; ?></b><br/>
+									<span style="font-size: 90%; color: #cc0000"><i><?php print __($guid, 'This operation cannot be undone, and may lead to loss of vital data in your system. PROCEED WITH CAUTION!') ; ?></i></span>
 								</td>
 								<td class="right">
 								
@@ -147,7 +147,7 @@ else {
 									<input name="freeLearningUnitStudentID" id="freeLearningUnitStudentID" value="<?php print $freeLearningUnitStudentID ?>" type="hidden">
 									<input name="freeLearningUnitID" id="freeLearningUnitID" value="<?php print $freeLearningUnitID ?>" type="hidden">
 									<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
-									<input type="submit" value="<?php print _('Yes') ; ?>">
+									<input type="submit" value="<?php print __($guid, 'Yes') ; ?>">
 								</td>
 								<td class="right">
 								

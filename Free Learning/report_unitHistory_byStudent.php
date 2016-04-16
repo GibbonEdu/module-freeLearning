@@ -25,7 +25,7 @@ include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_unitHistory_byStudent.php")==FALSE) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
@@ -33,19 +33,19 @@ else {
 	$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
-		print _("The highest grouped action cannot be determined.") ;
+		print __($guid, "The highest grouped action cannot be determined.") ;
 		print "</div>" ;
 	}
 	else {
 		//Proceed!
 		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Unit History By Student') . "</div>" ;
+		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Unit History By Student') . "</div>" ;
 		print "</div>" ;
 	
 		$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
 		
 		print "<h2>" ;
-		print _("Choose Student") ;
+		print __($guid, "Choose Student") ;
 		print "</h2>" ;
 	
 		$gibbonPersonID=NULL ;
@@ -58,7 +58,7 @@ else {
 			<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 				<tr>
 					<td style='width: 275px'> 
-						<b><?php print _('Student') ?> *</b><br/>
+						<b><?php print __($guid, 'Student') ?> *</b><br/>
 					</td>
 					<td class="right">
 						<?php
@@ -90,7 +90,7 @@ else {
 								?>
 								<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
 									<option></option>
-									<optgroup label='--<?php print _('Students by Roll Group') ?>--'>
+									<optgroup label='--<?php print __($guid, 'Students by Roll Group') ?>--'>
 										<?php
 										try {
 											$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
@@ -108,7 +108,7 @@ else {
 										}
 										?>
 									</optgroup>
-									<optgroup label='--<?php print _('Students by Name') ?>--'>
+									<optgroup label='--<?php print __($guid, 'Students by Name') ?>--'>
 										<?php
 										try {
 											$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
@@ -155,7 +155,7 @@ else {
 				<tr>
 					<td colspan=2 class="right">
 						<input type="hidden" name="q" value="/modules/<?php print $_SESSION[$guid]["module"] ?>/report_unitHistory_byStudent.php">
-						<input type="submit" value="<?php print _("Submit") ; ?>">
+						<input type="submit" value="<?php print __($guid, "Submit") ; ?>">
 					</td>
 				</tr>
 			</table>
@@ -165,7 +165,7 @@ else {
 		if ($gibbonPersonID!="") {
 			$output="" ;
 			print "<h2>" ;
-			print _("Report Data") ;
+			print __($guid, "Report Data") ;
 			print "</h2>" ;
 		
 			//Check access for parents
@@ -180,7 +180,7 @@ else {
 
 				if ($resultChild->rowCount()!=1) {
 					print "<div class='error'>" ;
-						print _("An error occurred.") ;
+						print __($guid, "An error occurred.") ;
 					print "</div>" ;
 				}
 				else {

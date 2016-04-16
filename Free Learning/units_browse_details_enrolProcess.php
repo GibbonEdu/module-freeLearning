@@ -86,14 +86,14 @@ else {
 				//Fail 2
 				$URL.="&updateReturn=fail2" ;
 				header("Location: {$URL}");
-				break ;
+				exit() ;
 			}
 	
 			if ($result->rowCount()!=1) {
 				//Fail 2
 				$URL.="&updateReturn=fail2" ;
 				header("Location: {$URL}");
-				break ;
+				exit() ;
 			}
 			else {
 				$row=$result->fetch() ;
@@ -119,7 +119,7 @@ else {
 					//Fail 2
 					$URL.="&updateReturn=fail2" ;
 					header("Location: {$URL}");
-					break ;
+					exit() ;
 				}
 				else {
 					if ($schoolType=="Online") {
@@ -134,7 +134,7 @@ else {
 							//Fail 2
 							$URL.="&updateReturn=fail2" ;
 							header("Location: {$URL}");
-							break ;
+							exit() ;
 						}
 						
 						//Success 0
@@ -149,7 +149,7 @@ else {
 							//Fail 2
 							$URL.="&updateReturn=fail2" ;
 							header("Location: {$URL}");
-							break ;
+							exit() ;
 						}
 						else {
 							//Proceed!
@@ -208,14 +208,14 @@ else {
 									//Fail 2
 									$URL.="&updateReturn=fail2" ;
 									header("Location: {$URL}");
-									break ;
+									exit() ;
 								}
 							
 								if ($result->rowCount()>0) {
 									//Fail 2
 									$URL.="&updateReturn=fail2" ;
 									header("Location: {$URL}");
-									break ;
+									exit() ;
 								}
 								else {
 									//Write to database
@@ -229,7 +229,7 @@ else {
 										//Fail 2
 										$URL.="&updateReturn=fail2" ;
 										header("Location: {$URL}");
-										break ;
+										exit() ;
 									}
 								
 								

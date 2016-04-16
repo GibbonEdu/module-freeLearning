@@ -51,7 +51,7 @@ if (isset($_POST["comment"])) {
 }
 	
 if ($freeLearningUnitID=="" OR count($authors)<1 OR ($mode!="add" AND $mode!="remove")) {
-	print _("Error") ;
+	print __($guid, "Error") ;
 }
 else {
 	$script="<script type=\"text/javascript\">

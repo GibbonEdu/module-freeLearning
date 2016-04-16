@@ -25,17 +25,17 @@ include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workPendingApproval.php")==FALSE) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
 	//Proceed!
 	print "<div class='trail'>" ;
-	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Work Pending Approval') . "</div>" ;
+	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Work Pending Approval') . "</div>" ;
 	print "</div>" ;
 	
 	print "<p>" ;
-		print _('This report shows all work that is complete, but pending approval, in all of your classes.') ;
+		print __($guid, 'This report shows all work that is complete, but pending approval, in all of your classes.') ;
 	print "<p>" ;
 	
 	//List students whose status is Current or Complete - Pending
@@ -52,7 +52,7 @@ else {
 	$rowNum="odd" ;
 	if ($resultClass->rowCount()<1) {
 		print "<div class='error'>" ;
-			print _("There are no records to display.") ;
+			print __($guid, "There are no records to display.") ;
 		print "</div>" ;
 	}
 	else {
@@ -60,16 +60,16 @@ else {
 		<table cellspacing='0' style="width: 100%">	
 			<tr class='head'>
 				<th> 
-					<?php print _('Class') ?><br/>
+					<?php print __($guid, 'Class') ?><br/>
 				</th>
 				<th> 
-					<?php print _('Unit') ?><br/>
+					<?php print __($guid, 'Unit') ?><br/>
 				</th>
 				<th> 
-					<?php print _('Student') ?><br/>
+					<?php print __($guid, 'Student') ?><br/>
 				</th>
 				<th> 
-					<?php print _('Status') ?><br/>
+					<?php print __($guid, 'Status') ?><br/>
 				</th>
 			</tr>
 			<?php
@@ -90,7 +90,7 @@ else {
 							print $rowClass["course"] . "." . $rowClass["class"] ;
 						}
 						else {
-							print "<i>" . _('NA') . "</i>" ;
+							print "<i>" . __($guid, 'NA') . "</i>" ;
 						}
 					print "</td>" ;
 					?>

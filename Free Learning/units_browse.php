@@ -27,7 +27,7 @@ $schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
 if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
@@ -40,16 +40,16 @@ else {
 	}
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
-		print _("The highest grouped action cannot be determined.") ;
+		print __($guid, "The highest grouped action cannot be determined.") ;
 		print "</div>" ;
 	}
 	else {
 		print "<div class='trail'>" ;
 			if ($publicUnits=="Y") {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > </div><div class='trailEnd'>" . _('Browse Units') . "</div>" ;
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > </div><div class='trailEnd'>" . __($guid, 'Browse Units') . "</div>" ;
 			}
 			else {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Browse Units') . "</div>" ;
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Browse Units') . "</div>" ;
 			}
 		print "</div>" ;
 		
@@ -83,14 +83,14 @@ else {
 		$blocks=getBlocksArray($connection2) ;
 		
 		print "<h3>" ;
-			print _("Filter") ;
+			print __($guid, "Filter") ;
 		print "</h3>" ;
 		print "<form method='get' action='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php'>" ;
 			print "<table class='noIntBorder' cellspacing='0' style='width: 100%'>" ;
 				?>
 				<tr>
 					<td> 
-						<b><?php print _('Learning Area') ?></b><br/>
+						<b><?php print __($guid, 'Learning Area') ?></b><br/>
 						<span style="font-size: 90%"><i></i></span>
 					</td>
 					<td class="right">
@@ -100,10 +100,10 @@ else {
 							$learningAreas=getLearningAreas($connection2, $guid) ;
 							for ($i=0; $i<count($learningAreas); $i=$i+2) {
 								if ($gibbonDepartmentID==$learningAreas[$i]) {
-									print "<option selected value='" . $learningAreas[$i] . "'>" . _($learningAreas[($i+1)]) . "</option>" ;
+									print "<option selected value='" . $learningAreas[$i] . "'>" . __($guid, $learningAreas[($i+1)]) . "</option>" ;
 								}
 								else {
-									print "<option value='" . $learningAreas[$i] . "'>" . _($learningAreas[($i+1)]) . "</option>" ;
+									print "<option value='" . $learningAreas[$i] . "'>" . __($guid, $learningAreas[($i+1)]) . "</option>" ;
 								}
 							}
 							?>			
@@ -112,7 +112,7 @@ else {
 				</tr>
 				<tr>
 					<td> 
-						<b><?php print _('Difficulty') ?></b><br/>
+						<b><?php print __($guid, 'Difficulty') ?></b><br/>
 						<span style="font-size: 90%"><i></i></span>
 					</td>
 					<td class="right">
@@ -134,7 +134,7 @@ else {
 				</tr>
 				<tr>
 					<td> 
-						<b><?php print _('Name') ?></b><br/>
+						<b><?php print __($guid, 'Name') ?></b><br/>
 						<span style="font-size: 90%"><i></i></span>
 					</td>
 					<td class="right">
@@ -149,8 +149,8 @@ else {
 					print "<td class='right' colspan=2>" ;
 						print "<input type='hidden' name='q' value='" . $_GET["q"] . "'>" ;
 						print "<input type='hidden' name='view' value='$view'>" ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&view=$view'>" . _('Clear Filters') . "</a> " ;
-						print "<input type='submit' value='" . _('Go') . "'>" ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&view=$view'>" . __($guid, 'Clear Filters') . "</a> " ;
+						print "<input type='submit' value='" . __($guid, 'Go') . "'>" ;
 					print "</td>" ;
 				print "</tr>" ;
 			print "</table>" ;
@@ -158,9 +158,9 @@ else {
 		
 		
 		print "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>" ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=list'>" . _('List') . " <img style='margin-bottom: -5px' title='" . _('List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=grid'>" . _('Grid') . " <img style='margin-bottom: -5px' title='" . _('Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=map'>" . _('Map') . " <img style='margin-bottom: -5px' title='" . _('Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
+			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=list'>" . __($guid, 'List') . " <img style='margin-bottom: -5px' title='" . __($guid, 'List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
+			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=grid'>" . __($guid, 'Grid') . " <img style='margin-bottom: -5px' title='" . __($guid, 'Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
+			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&view=map'>" . __($guid, 'Map') . " <img style='margin-bottom: -5px' title='" . __($guid, 'Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
 		print "</div>" ;
 		
 		//Set pagination variable
@@ -230,12 +230,12 @@ else {
 		$sqlPage=$sql . " LIMIT " . $_SESSION[$guid]["pagination"] . " OFFSET " . (($page-1)*$_SESSION[$guid]["pagination"]) ;
 		
 		print "<h3>" ;
-			print _("Units") . " <span style='font-size: 65%; font-style: italics'> x" . $result->rowCount() . "</span>" ;
+			print __($guid, "Units") . " <span style='font-size: 65%; font-style: italics'> x" . $result->rowCount() . "</span>" ;
 		print "</h3>" ;
 		
 		if ($result->rowCount()<1) {
 			print "<div class='error'>" ;
-			print _("There are no records to display.") ;
+			print __($guid, "There are no records to display.") ;
 			print "</div>" ;
 		}
 		else {
@@ -247,39 +247,39 @@ else {
 				print "<table cellspacing='0' style='width: 100%'>" ;
 					print "<tr class='head'>" ;
 						print "<th style='width: 150px!important; text-align: center'>" ;
-							print _("Name") . "</br>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . _('Status') . "</span>" ;
+							print __($guid, "Name") . "</br>" ;
+							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Status') . "</span>" ;
 						print "</th>" ;
 						print "<th style='width: 100px!important'>" ;
-							print _("Authors") . "<br/>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . _('Learning Areas') . "</span>" ;
+							print __($guid, "Authors") . "<br/>" ;
+							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Learning Areas') . "</span>" ;
 						print "</th>" ;
 						print "<th style='max-width: 325px!important'>" ;
-							print _("Difficulty") . "</br>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . _('Blurb') . "</span>" ;
+							print __($guid, "Difficulty") . "</br>" ;
+							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Blurb') . "</span>" ;
 						print "</th>" ;
 						print "<th>" ;
-							print _("Length") . "</br>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . _('Minutes') . "</span>" ;
+							print __($guid, "Length") . "</br>" ;
+							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Minutes') . "</span>" ;
 						print "</th>" ;
 						if ($schoolType=="Physical") {
 							print "<th>" ;
-								print _("Grouping") . "</br>" ;
+								print __($guid, "Grouping") . "</br>" ;
 							print "</th>" ;
 						}
 						print "<th style='min-width: 150px'>" ;
 							if ($schoolType=="Online") {
-								print _("Recommended") . "<br/>" ;
+								print __($guid, "Recommended") . "<br/>" ;
 							}
-							print _("Prerequisites") . "</br>" ;
+							print __($guid, "Prerequisites") . "</br>" ;
 						print "</th>" ;
 						if (isset($_SESSION[$guid]["username"])) { //Likes only if logged in!
 							print "<th style='min-width: 50px'>" ;
-								print _("Like") ;
+								print __($guid, "Like") ;
 							print "</th>" ;
 						}
 						print "<th style='min-width: 50px'>" ;
-							print _("Actions") ;
+							print __($guid, "Actions") ;
 						print "</th>" ;
 					print "</tr>" ;
 				
@@ -367,7 +367,7 @@ else {
 									}
 								}
 								if (is_null($timing)) {
-									print "<i>" . _('NA') . "</i>" ;
+									print "<i>" . __($guid, 'NA') . "</i>" ;
 								}
 								else {
 									print $timing ;
@@ -389,14 +389,14 @@ else {
 									if ($prerequisitesActive!=FALSE) {
 										$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
 										if ($prerquisitesMet) {
-											print "<span style='font-weight: bold; color: #00cc00'>" . _("OK!") . "<br/></span>" ;
+											print "<span style='font-weight: bold; color: #00cc00'>" . __($guid, "OK!") . "<br/></span>" ;
 										}
 										else {
 											if ($schoolType=="Online") {
-												print "<span style='font-weight: bold; color: #D65602'>" . _("Consider Studying") . "<br/></span>" ;
+												print "<span style='font-weight: bold; color: #D65602'>" . __($guid, "Consider Studying") . "<br/></span>" ;
 											}
 											else {
-												print "<span style='font-weight: bold; color: #cc0000'>" . _("Not Met") . "<br/></span>" ;
+												print "<span style='font-weight: bold; color: #cc0000'>" . __($guid, "Not Met") . "<br/></span>" ;
 											}
 										}
 									}
@@ -409,7 +409,7 @@ else {
 									}
 								}
 								else {
-										print "<i>" . _('None') . "<br/></i>" ;
+										print "<i>" . __($guid, 'None') . "<br/></i>" ;
 								}
 							print "</td>" ;
 							if (isset($_SESSION[$guid]["username"])) { //Likes only if logged in!
@@ -453,15 +453,15 @@ else {
 							}
 							print "<td>" ;
 								if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 								}
 								else if ($highestAction=="Browse Units_prerequisites") {
 									if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 									}
 									else {
 										if ($prerquisitesMet) {
-											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img style='padding-left: 5px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 										}
 									}
 								}
@@ -518,15 +518,15 @@ else {
 								}
 							}
 							if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
-								print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+								print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 							}
 							else if ($highestAction=="Browse Units_prerequisites") {
 								if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 								}
 								else {
 									if ($prerquisitesMet) {
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 									}
 								}
 							}
@@ -549,7 +549,7 @@ else {
 			}
 			else if ($view=="map") {
 				print "<p>" ;
-					print _("The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.") ;
+					print __($guid, "The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.") ;
 				print "</p>" ;
 				?>
 				<script type="text/javascript" src="<?php print $_SESSION[$guid]["absoluteURL"] ?>/lib/vis/dist/vis.js"></script>

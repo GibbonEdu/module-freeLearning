@@ -77,14 +77,14 @@ else {
 					//Fail 2
 					$URL.="&updateReturn=fail2" ;
 					header("Location: {$URL}");
-					break ;
+					exit() ;
 				}
 	
 				if ($result->rowCount()!=1) {
 					//Fail 2
 					$URL.="&updateReturn=fail2" ;
 					header("Location: {$URL}");
-					break ;
+					exit() ;
 				}
 				else {
 					//Proceed!
@@ -208,7 +208,7 @@ else {
 								}
 								catch(PDOException $e) { }
 							
-								$text=sprintf(_('A student has requested unit completion approval and feedback (%1$s).'), $name) ;
+								$text=sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).'), $name) ;
 								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
 								while ($row=$result->fetch()) {
 									setNotification($connection2, $guid, $row["gibbonPersonID"], $text, "Free Learning", $actionLink) ;

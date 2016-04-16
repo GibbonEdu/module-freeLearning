@@ -30,16 +30,16 @@ $canEdit=isActionAccessible($guid, $connection2, "/modules/Free Learning/units_b
 if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/showcase.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
 	print "<div class='trail'>" ;
 		if ($publicUnits=="Y") {
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > </div><div class='trailEnd'>" . _('Free Learning Showcase') . "</div>" ;
+			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > </div><div class='trailEnd'>" . __($guid, 'Free Learning Showcase') . "</div>" ;
 		}
 		else {
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Free Learning Showcase') . "</div>" ;
+			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Free Learning Showcase') . "</div>" ;
 		}
 	print "</div>" ;
 	
@@ -63,7 +63,7 @@ else {
 		
 	if ($resultWork->rowCount()<1) {
 		print "<div class='error'>" ;
-			print _("There are no records to display.") ;
+			print __($guid, "There are no records to display.") ;
 		print "</div>" ;
 	}
 	else {
@@ -97,11 +97,11 @@ else {
 				print $rowWork["name"] . "<span style='font-size: 75%; text-transform: none'> by " . $students . "</span>" ;
 			print "</h3>" ;
 			print "<p style='font-style: italic; margin-top 0; margin-bottom: 5px; font-size: 10.5px'>" ;
-				 print _("Shared on") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) ;
+				 print __($guid, "Shared on") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) ;
 			print "</p>" ;
 			if ($canEdit) {
 				print "<div class='linkTop'>" ;
-					print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=" . $rowWork["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $rowWork["freeLearningUnitStudentID"] . "&sidebar=true'>" . _('Edit') . "<img style='margin: 0 0 -4px 3px' title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
+					print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=" . $rowWork["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $rowWork["freeLearningUnitStudentID"] . "&sidebar=true'>" . __($guid, 'Edit') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
 				print "</div>" ;
 			}
 			print "<table style='width: 100%'>" ;
@@ -121,22 +121,22 @@ else {
 						//DISPLAY WORK.
 						print "<p>" ;
 							if ($rowWork["evidenceType"]=="File") { //It's a file
-								print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'>" . _('Click to View Work') . "</a>" ;
+								print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'>" . __($guid, 'Click to View Work') . "</a>" ;
 							}
 							else { //It's a link
-								print "<a target='_blank' href='" . $rowWork["evidenceLocation"] . "'>" . _('Click to View Work') . "</a>" ;
+								print "<a target='_blank' href='" . $rowWork["evidenceLocation"] . "'>" . __($guid, 'Click to View Work') . "</a>" ;
 							}
 						print "</p>" ;
 						print "<p>" ;
 							if ($rowWork["commentStudent"]!="") {
-								print "<b><u>" . _("Student Comment") . "</u></b><br/><br/>" ;
+								print "<b><u>" . __($guid, "Student Comment") . "</u></b><br/><br/>" ;
 								print nl2br($rowWork["commentStudent"]) . "<br/>" ;
 							}
 							if ($rowWork["commentApproval"]!="") {
 								if ($rowWork["commentStudent"]!="") {
 									print "<br/>" ;
 								}
-								print "<b><u>" . _("Teacher Comment") . "</u></b>" ;
+								print "<b><u>" . __($guid, "Teacher Comment") . "</u></b>" ;
 								print $rowWork["commentApproval"] . "<br/>" ;
 							}
 						print "</p>" ;

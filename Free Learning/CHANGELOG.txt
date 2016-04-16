@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v3.0.10
+-------
+Gibbon Core v12 & PHP 7 Compatibility 
+
 v3.0.09
 -------
 Fixed landing tab page for non-logged in users

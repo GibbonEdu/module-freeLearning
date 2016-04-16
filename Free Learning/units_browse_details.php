@@ -28,7 +28,7 @@ $schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
 if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
@@ -41,7 +41,7 @@ else {
 	}
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
-		print _("The highest grouped action cannot be determined.") ;
+		print __($guid, "The highest grouped action cannot be determined.") ;
 		print "</div>" ;
 	}
 	else {
@@ -69,10 +69,10 @@ else {
 		
 		print "<div class='trail'>" ;
 		if ($publicUnits=="Y") {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . _('Browse Units') . "</a> > </div><div class='trailEnd'>" . _('Unit Details') . "</div>" ;
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Unit Details') . "</div>" ;
 			}
 			else {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . _('Browse Units') . "</a> > </div><div class='trailEnd'>" . _('Unit Details') . "</div>" ;
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Unit Details') . "</div>" ;
 			}
 		print "</div>" ;
 		
@@ -81,7 +81,7 @@ else {
 		$class="error" ;
 		if (!($deleteReturn=="")) {
 			if ($deleteReturn=="success0") {
-				$deleteReturnMessage=_("Your request was completed successfully.") ;		
+				$deleteReturnMessage=__($guid, "Your request was completed successfully.") ;		
 				$class="success" ;
 			}
 			print "<div class='$class'>" ;
@@ -91,7 +91,7 @@ else {
 		
 		if ($freeLearningUnitID=="") {
 			print "<div class='error'>" ;
-				print _("You have not specified one or more required parameters.") ;
+				print __($guid, "You have not specified one or more required parameters.") ;
 			print "</div>" ;
 		}
 		else {
@@ -127,14 +127,14 @@ else {
 			
 			if ($result->rowCount()!=1) {
 				print "<div class='error'>" ;
-					print _("The selected record does not exist, or you do not have access to it.") ;
+					print __($guid, "The selected record does not exist, or you do not have access to it.") ;
 				print "</div>" ;
 			}
 			else {
 				$row=$result->fetch() ;
 				if ($gibbonDepartmentID!="" OR $difficulty!="" OR $name!="") {
 					print "<div class='linkTop'>" ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . _('Back to Search Results') . "</a>" ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Back to Search Results') . "</a>" ;
 					print "</div>" ;
 				}
 				
@@ -157,25 +157,25 @@ else {
 				
 				if ($proceed==FALSE) {
 					print "<div class='error'>" ;
-						print _("The selected record does not exist, or you do not have access to it.") ;
+						print __($guid, "The selected record does not exist, or you do not have access to it.") ;
 					print "</div>" ;
 				}
 				else {
 					//Let's go!
 					if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php")) {
 						print "<div class='linkTop'>" ;
-							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID'>" . _('Edit') . "<img style='margin: 0 0 -4px 3px' title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
+							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID'>" . __($guid, 'Edit') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
 						print "</div>" ;
 					}
 					
 					print "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>" ;
 						print "<tr>" ;
 							print "<td style='width: 50%; vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Unit Name') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Unit Name') . "</span><br/>" ;
 								print "<i>" . $row["name"] . "</i>" ;
 							print "</td>" ;
 							print "<td style='width: 50%; vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Time') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Time') . "</span><br/>" ;
 								$timing=NULL ;
 								$blocks=getBlocksArray($connection2, $freeLearningUnitID) ;
 								if ($blocks!=FALSE) {
@@ -188,7 +188,7 @@ else {
 									}
 								}
 								if (is_null($timing)) {
-									print "<i>" . _('NA') . "</i>" ;
+									print "<i>" . __($guid, 'NA') . "</i>" ;
 								}
 								else {
 									print "<i>" . $timing . "</i>" ;
@@ -205,11 +205,11 @@ else {
 						print "</tr>" ;
 						print "<tr>" ;
 							print "<td style='padding-top: 15px; vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Difficulty') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Difficulty') . "</span><br/>" ;
 								print "<i>" . $row["difficulty"] . "<i>" ;
 							print "</td>" ;
 							print "<td style='padding-top: 15px; vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Prerequisites') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Prerequisites') . "</span><br/>" ;
 								$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
 								if ($prerequisitesActive!=FALSE) {
 									$prerequisites=explode(",", $prerequisitesActive) ;
@@ -219,27 +219,27 @@ else {
 									}
 								}
 								else {
-										print "<i>" . _('None') . "<br/></i>" ;
+										print "<i>" . __($guid, 'None') . "<br/></i>" ;
 								}
 							print "</td>" ;
 						print "</tr>" ;
 						print "<tr>" ;
 							print "<td style='vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Departments') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Departments') . "</span><br/>" ;
 								$learningAreas=getLearningAreas($connection2, $guid) ;
 								if ($learningAreas=="") {
-									print "<i>" . _('No Learning Areas available.') . "</i>" ;
+									print "<i>" . __($guid, 'No Learning Areas available.') . "</i>" ;
 								}
 								else {
 									for ($i=0; $i<count($learningAreas); $i=$i+2) {
 										if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
-											print "<i>" . _($learningAreas[($i+1)]) . "</i><br/>" ;
+											print "<i>" . __($guid, $learningAreas[($i+1)]) . "</i><br/>" ;
 										}
 									}
 								}
 							print "</td>" ;
 							print "<td style='vertical-align: top'>" ;
-								print "<span style='font-size: 115%; font-weight: bold'>" . _('Authors') . "</span><br/>" ;
+								print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Authors') . "</span><br/>" ;
 								$authors=getAuthorsArray($connection2, $freeLearningUnitID) ;
 								foreach ($authors AS $author) {
 									if ($author[3]=="") {
@@ -254,7 +254,7 @@ else {
 						if ($schoolType=="Physical") {
 							print "<tr>" ;
 								print "<td style='vertical-align: top'>" ;
-									print "<span style='font-size: 115%; font-weight: bold'>" . _('Groupings') . "</span><br/>" ;
+									print "<span style='font-size: 115%; font-weight: bold'>" . __($guid, 'Groupings') . "</span><br/>" ;
 									if ($row["grouping"]!="") {
 										$groupings=explode(",", $row["grouping"]) ;
 										foreach ($groupings AS $grouping) {
@@ -327,30 +327,30 @@ else {
 					print "<div id='tabs' style='margin: 20px 0'>" ;
 						//Tab links
 						print "<ul>" ;
-							print "<li><a href='#tabs0'>" . _('Unit Overview') . "</a></li>" ;
+							print "<li><a href='#tabs0'>" . __($guid, 'Unit Overview') . "</a></li>" ;
 							if ($enrolment) {
-								print "<li><a href='#tabs1'>" . _('Enrolment') . "</a></li>" ;
+								print "<li><a href='#tabs1'>" . __($guid, 'Enrolment') . "</a></li>" ;
 							}
-							print "<li><a href='#tabs2'>" . _('Content') . "</a></li>" ;
-							print "<li><a href='#tabs3'>" . _('Resources') . "</a></li>" ;
-							print "<li><a href='#tabs4'>" . _('Outcomes') . "</a></li>" ;
-							print "<li><a href='#tabs5'>" . _('Exemplar Work') . "</a></li>" ;
+							print "<li><a href='#tabs2'>" . __($guid, 'Content') . "</a></li>" ;
+							print "<li><a href='#tabs3'>" . __($guid, 'Resources') . "</a></li>" ;
+							print "<li><a href='#tabs4'>" . __($guid, 'Outcomes') . "</a></li>" ;
+							print "<li><a href='#tabs5'>" . __($guid, 'Exemplar Work') . "</a></li>" ;
 						print "</ul>" ;
 				
 						//Tabs
 						print "<div id='tabs0'>" ;
 							print "<h3>" ;
-								print _("Blurb") ;
+								print __($guid, "Blurb") ;
 							print "</h3>" ;
 							print "<p>" ;
 								print $row["blurb"] ;
 							print "</p>" ;
 							if ($row["license"]!="") {
 								print "<h4>" ;
-									print _("License") ;
+									print __($guid, "License") ;
 								print "</h4>" ;
 								print "<p>" ;
-									print _("This work is shared under the following license:") . " " . $row["license"] ;
+									print __($guid, "This work is shared under the following license:") . " " . $row["license"] ;
 								print "</p>" ;
 							}
 							if ($row["outline"]!="") {
@@ -369,22 +369,22 @@ else {
 								$class="error" ;
 								if (!($updateReturn=="")) {
 									if ($updateReturn=="fail0") {
-										$updateReturnMessage=_("Your request failed because you do not have access to this action.") ;	
+										$updateReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
 									}
 									else if ($updateReturn=="fail2") {
-										$updateReturnMessage=_("Your request failed due to a database error.") ;	
+										$updateReturnMessage=__($guid, "Your request failed due to a database error.") ;	
 									}
 									else if ($updateReturn=="fail3") {
-										$updateReturnMessage=_("Your request failed because your inputs were invalid.") ;	
+										$updateReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
 									}
 									else if ($updateReturn=="fail5") {
-										$updateReturnMessage=_("Your request was successful, but some data was not properly saved.") ;	
+										$updateReturnMessage=__($guid, "Your request was successful, but some data was not properly saved.") ;	
 									}
 									else if ($updateReturn=="fail6") {
-										$updateReturnMessage=_("Your request failed due to an attachment error.") ;	
+										$updateReturnMessage=__($guid, "Your request failed due to an attachment error.") ;	
 									}
 									else if ($updateReturn=="success0") {
-										$updateReturnMessage=_("Your request was completed successfully.") ;	
+										$updateReturnMessage=__($guid, "Your request was completed successfully.") ;	
 										$class="success" ;
 									}
 									print "<div class='$class'>" ;
@@ -393,17 +393,17 @@ else {
 								} 
 								
 								print "<h3>" ;
-									print _("Enrolment") ;
+									print __($guid, "Enrolment") ;
 								print "</h3>" ;
 									
 								if ($enrolmentType=="staffView" OR $enrolmentType=="staffEdit") { //STAFF ENROLMENT
 									print "<p>" ;
-										print _("Below you can view the students currently enroled in this unit, including both those who are working on it, and those who are awaiting approval.") ;
+										print __($guid, "Below you can view the students currently enroled in this unit, including both those who are working on it, and those who are awaiting approval.") ;
 									print "</p>" ;
 									
 									if ($enrolmentType=="staffEdit") {
 										print "<div class='linkTop'>" ;
-											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID'>" . _('Add Multiple') . "<img style='margin: 0 0 -4px 5px' title='" . _('Add Multiple') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new_multi.png'/></a>" ;
+											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID'>" . __($guid, 'Add Multiple') . "<img style='margin: 0 0 -4px 5px' title='" . __($guid, 'Add Multiple') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new_multi.png'/></a>" ;
 										print "</div>" ;
 									}
 									
@@ -427,7 +427,7 @@ else {
 									$rowNum="odd" ;
 									if ($resultClass->rowCount()<1) {
 										print "<div class='error'>" ;
-											print _("There are no records to display.") ;
+											print __($guid, "There are no records to display.") ;
 										print "</div>" ;
 									}
 									else {
@@ -435,25 +435,25 @@ else {
 										<table cellspacing='0' style="width: 100%">	
 											<tr class='head'>
 												<th> 
-													<?php print _('Student') ?><br/>
+													<?php print __($guid, 'Student') ?><br/>
 												</th>
 												<?php
 												if ($schoolType=="Physical") {
 													?>
 													<th> 
-														<?php print _('Class') ?><br/>
+														<?php print __($guid, 'Class') ?><br/>
 													</th>
 													<?php
 												}
 												?>
 												<th> 
-													<?php print _('Status') ?><br/>
+													<?php print __($guid, 'Status') ?><br/>
 												</th>
 												<th> 
-													<?php print _('View') ?><br/>
+													<?php print __($guid, 'View') ?><br/>
 												</th>
 												<th>
-													<?php print _('Action') ?><br/>
+													<?php print __($guid, 'Action') ?><br/>
 												</th>
 											</tr>
 											<?php
@@ -478,7 +478,7 @@ else {
 																print $rowClass["course"] . "." . $rowClass["class"] ;
 															}
 															else {
-																print "<i>" . _('NA') . "</i>" ;
+																print "<i>" . __($guid, 'NA') . "</i>" ;
 															}
 														print "</td>" ;
 													}
@@ -490,10 +490,10 @@ else {
 														<?php
 														if ($rowClass["evidenceLocation"]!="") {
 															if ($rowClass["evidenceType"]=="Link") {
-																print "<a target='_blank' href='" . $rowClass["evidenceLocation"] . "'>" . _('View') . "</>" ;
+																print "<a target='_blank' href='" . $rowClass["evidenceLocation"] . "'>" . __($guid, 'View') . "</>" ;
 															}
 															else {
-																print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowClass["evidenceLocation"] . "'>" . _('View') . "</>" ;
+																print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowClass["evidenceLocation"] . "'>" . __($guid, 'View') . "</>" ;
 															}
 														}
 														?>
@@ -502,9 +502,9 @@ else {
 														<?php 
 														if ($enrolmentType=="staffEdit") {
 															if ($rowClass["status"]=="Complete - Pending" OR $rowClass["status"]=="Complete - Approved" OR $rowClass["status"]=="Evidence Not Approved") {
-																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
+																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
 															}
-															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . _('Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;						
+															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;						
 														}
 														if ($rowClass["commentStudent"]!="" OR $rowClass["commentApproval"]!="") {
 															print "<script type='text/javascript'>" ;	
@@ -516,7 +516,7 @@ else {
 																	print "});" ;
 																print "});" ;
 															print "</script>" ;
-															print "<a title='" . _('Show Comment') . "' class='show_hide-" . $rowClass["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
+															print "<a title='" . __($guid, 'Show Comment') . "' class='show_hide-" . $rowClass["freeLearningUnitStudentID"] . "' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . __($guid, 'Show Comment') . "' onclick='return false;' /></a>" ;
 														}
 														?>
 													</td>											
@@ -526,14 +526,14 @@ else {
 													print "<tr class='comment-" . $rowClass["freeLearningUnitStudentID"] . "' id='comment-" . $rowClass["freeLearningUnitStudentID"] . "'>" ;
 														print "<td colspan=5>" ;
 															if ($rowClass["commentStudent"]!="") {
-																print "<b>" . _("Student Comment") . "</b><br/>" ;
+																print "<b>" . __($guid, "Student Comment") . "</b><br/>" ;
 																print nl2br($rowClass["commentStudent"]) . "<br/>" ;
 															}
 															if ($rowClass["commentApproval"]!="") {
 																if ($rowClass["commentStudent"]!="") {
 																	print "<br/>" ;
 																}
-																print "<b>" . _("Teacher Comment") . "</b><br/>" ;
+																print "<b>" . __($guid, "Teacher Comment") . "</b><br/>" ;
 																print nl2br($rowClass["commentApproval"]) . "<br/>" ;
 															}
 														print "</td>" ;
@@ -548,7 +548,7 @@ else {
 								if ($enrolmentType=="student") { //STUDENT ENROLMENT
 									if ($schoolType=="Physical") {
 										print "<p>" ;
-											print _("You can be enroled in one unit for each of your classes at any one time. Use the information to manage your enrolment for this unit.") ;
+											print __($guid, "You can be enroled in one unit for each of your classes at any one time. Use the information to manage your enrolment for this unit.") ;
 										print "</p>" ;
 									}
 									
@@ -570,17 +570,17 @@ else {
 											$rowEnrol=$resultEnrol->fetch() ;
 											if ($rowEnrol["status"]=="Current" OR $rowEnrol["status"]=="Evidence Not Approved") { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
 												print "<h4>" ;
-													print _("Currently Enroled") ;
+													print __($guid, "Currently Enroled") ;
 												print "</h4>" ;
 												if ($schoolType=="Physical") {
 													if ($rowEnrol["status"]=="Current") {
 														print "<p>" ;
-															print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your teacher will be notified, and will approve your unit completion in due course.'), $row["name"]) ;
+															print sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your teacher will be notified, and will approve your unit completion in due course.'), $row["name"]) ;
 														print "</p>" ;
 													}
 													else if ($rowEnrol["status"]=="Evidence Not Approved") {
 														print "<div class='warning'>" ;
-															print _("Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:") . "<br/><br/>" ;
+															print __($guid, "Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:") . "<br/><br/>" ;
 															print "<b>" . $rowEnrol["commentApproval"] . "</b>" ;
 														print "</div>" ;
 													}
@@ -588,7 +588,7 @@ else {
 												else {
 													if ($rowEnrol["status"]=="Current") {
 														print "<p>" ;
-															print sprintf(_('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.'), $row["name"]) ;
+															print sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.'), $row["name"]) ;
 														print "</p>" ;
 													}
 												}
@@ -598,8 +598,8 @@ else {
 													<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 														<tr>
 															<td> 
-																<b><?php print _('Status') ?> *</b><br/>
-																<span style="font-size: 90%"><i><?php print _('This value cannot be changed.') ?></i></span>
+																<b><?php print __($guid, 'Status') ?> *</b><br/>
+																<span style="font-size: 90%"><i><?php print __($guid, 'This value cannot be changed.') ?></i></span>
 															</td>
 															<td class="right">
 																<input readonly style='width: 300px' type='text' value='Complete - Pending' />
@@ -607,12 +607,12 @@ else {
 														</tr>
 														<tr>
 															<td> 
-																<b><?php print _('Comment') ?> *</b><br/>
+																<b><?php print __($guid, 'Comment') ?> *</b><br/>
 																<span style="font-size: 90%"><i>
 																	<?php 
-																	print _('Leave a brief reflective comment on this unit<br/>and what you learned.') ;
+																	print __($guid, 'Leave a brief reflective comment on this unit<br/>and what you learned.') ;
 																	if ($rowEnrol["status"]=="Evidence Not Approved") {
-																		print "<br/><br/>" . _("Your previous comment is shown here, for you to edit.") ;
+																		print "<br/><br/>" . __($guid, "Your previous comment is shown here, for you to edit.") ;
 																	}
 																	?>
 																</i></span>
@@ -636,7 +636,7 @@ else {
 														</tr>
 														<tr>
 															<td> 
-																<b><?php print _('Type') ?> *</b><br/>
+																<b><?php print __($guid, 'Type') ?> *</b><br/>
 															</td>
 															<td class="right">
 																<input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
@@ -663,7 +663,7 @@ else {
 													
 														<tr id="fileRow">
 															<td> 
-																<b><?php print _('Submit File') ?> *</b><br/>
+																<b><?php print __($guid, 'Submit File') ?> *</b><br/>
 															</td>
 															<td class="right">
 																<input type="file" name="file" id="file"><br/><br/>
@@ -692,7 +692,7 @@ else {
 														</tr>
 														<tr id="linkRow">
 															<td> 
-																<b><?php print _('Submit Link') ?> *</b><br/>
+																<b><?php print __($guid, 'Submit Link') ?> *</b><br/>
 															</td>
 															<td class="right">
 																<input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
@@ -711,7 +711,7 @@ else {
 														</tr>
 														<tr>
 															<td class="right" colspan=2>
-																<span style="font-size: 90%"><i>* <?php print _("denotes a required field") ; ?></i></span>
+																<span style="font-size: 90%"><i>* <?php print __($guid, "denotes a required field") ; ?></i></span>
 															</td>
 														</tr>
 													</table>
@@ -720,16 +720,16 @@ else {
 											}	
 											else if ($rowEnrol["status"]=="Complete - Pending") { //Waiting for teacher feedback
 												print "<h4>" ;
-													print _("Complete - Pending Approval") ;
+													print __($guid, "Complete - Pending Approval") ;
 												print "</h4>" ;
 												print "<p>" ;
-													print _('Your evidence, shown below, has been submitted to your teacher(s) for approval. This screen will show a teacher comment, once approval has been given.') ;
+													print __($guid, 'Your evidence, shown below, has been submitted to your teacher(s) for approval. This screen will show a teacher comment, once approval has been given.') ;
 												print "</p>" ;
 												?>
 												<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 													<tr>
 														<td> 
-															<b><?php print _('Status') ?></b><br/>
+															<b><?php print __($guid, 'Status') ?></b><br/>
 														</td>
 														<td class="right">
 															<input readonly style='width: 300px' type='text' value='Complete - Pending' />
@@ -737,7 +737,7 @@ else {
 													</tr>
 													<tr>
 														<td> 
-															<b><?php print _('Evidence Type') ?></b><br/>
+															<b><?php print __($guid, 'Evidence Type') ?></b><br/>
 														</td>
 														<td class="right">
 															<input readonly style='width: 300px' type='text' value='<?php print $rowEnrol["evidenceType"] ?>' />
@@ -745,16 +745,16 @@ else {
 													</tr>
 													<tr>
 														<td> 
-															<b><?php print _('Evidence') ?></b><br/>
+															<b><?php print __($guid, 'Evidence') ?></b><br/>
 														</td>
 														<td class="right">
 															<div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
 																<?php
 																if ($rowEnrol["evidenceType"]=="Link") {
-																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
+																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . __($guid, 'View') . "</>" ;
 																}
 																else {
-																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
+																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . __($guid, 'View') . "</>" ;
 																}
 																?>
 															</div>
@@ -763,7 +763,7 @@ else {
 												</table>
 												<?php	
 												print "<h4>" ;
-													print _("Student Comment") ;
+													print __($guid, "Student Comment") ;
 												print "</h4>" ;
 												print "<p>" ;
 													print $rowEnrol["commentStudent"] ;
@@ -772,25 +772,25 @@ else {
 											else if ($rowEnrol["status"]=="Complete - Approved") { //Complete, show status and feedback from teacher.
 												if ($schoolType=="Physical") {
 													print "<h4>" ;
-														print _("Complete - Approved") ;
+														print __($guid, "Complete - Approved") ;
 													print "</h4>" ;
 													print "<p>" ;
-														print _('Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') ;
+														print __($guid, 'Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') ;
 													print "</p>" ;
 												}
 												else {
 													print "<h4>" ;
-														print _("Complete") ;
+														print __($guid, "Complete") ;
 													print "</h4>" ;
 													print "<p>" ;
-														print _('Congralutations! You have submitted your evidence, shown below, and so the unit is complete. Feel free to move on to another unit.') ;
+														print __($guid, 'Congralutations! You have submitted your evidence, shown below, and so the unit is complete. Feel free to move on to another unit.') ;
 													print "</p>" ;
 												}
 												?>
 												<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 													<tr>
 														<td> 
-															<b><?php print _('Status') ?></b><br/>
+															<b><?php print __($guid, 'Status') ?></b><br/>
 														</td>
 														<td class="right">
 															<input readonly style='width: 300px' type='text' value='Complete - Approved' />
@@ -798,7 +798,7 @@ else {
 													</tr>
 													<tr>
 														<td> 
-															<b><?php print _('Evidence Type') ?></b><br/>
+															<b><?php print __($guid, 'Evidence Type') ?></b><br/>
 														</td>
 														<td class="right">
 															<input readonly style='width: 300px' type='text' value='<?php print $rowEnrol["evidenceType"] ?>' />
@@ -806,16 +806,16 @@ else {
 													</tr>
 													<tr>
 														<td> 
-															<b><?php print _('Evidence') ?></b><br/>
+															<b><?php print __($guid, 'Evidence') ?></b><br/>
 														</td>
 														<td class="right">
 															<div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
 																<?php
 																if ($rowEnrol["evidenceType"]=="Link") {
-																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
+																	print "<a target='_blank' href='" . $rowEnrol["evidenceLocation"] . "'>" . __($guid, 'View') . "</>" ;
 																}
 																else {
-																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . _('View') . "</>" ;
+																	print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowEnrol["evidenceLocation"] . "'>" . __($guid, 'View') . "</>" ;
 																}
 																?>
 															</div>
@@ -825,7 +825,7 @@ else {
 												<?php	
 												if ($schoolType=="Physical") {
 													print "<h4>" ;
-														print _("Teacher Comment") ;
+														print __($guid, "Teacher Comment") ;
 													print "</h4>" ;
 													print "<p>" ;
 														print $rowEnrol["commentApproval"] ;
@@ -833,7 +833,7 @@ else {
 												}
 												
 												print "<h4>" ;
-													print _("Student Comment") ;
+													print __($guid, "Student Comment") ;
 												print "</h4>" ;
 												print "<p>" ;
 													print $rowEnrol["commentStudent"] ;
@@ -841,16 +841,16 @@ else {
 											}	
 											else if ($rowEnrol["status"]=="Exempt") { //Exempt, let student know
 												print "<h4>" ;
-													print _("Exempt") ;
+													print __($guid, "Exempt") ;
 												print "</h4>" ;
 												print "<p>" ;
-													print _('You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.') ;
+													print __($guid, 'You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.') ;
 												print "</p>" ;
 											}
 										}
 										else { //Not enroled, give a chance to enrol
 											print "<h4>" ;
-												print _("Enrol Now") ;
+												print __($guid, "Enrol Now") ;
 											print "</h4>" ;
 											?>
 											<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolProcess.php?address=" . $_GET["q"] ?>">
@@ -860,8 +860,8 @@ else {
 														?>
 														<tr>
 															<td> 
-																<b><?php print _('Class') ?> *</b><br/>
-																<span style="font-size: 90%"><i><?php print _('Which class are you enroling for?') ?></i></span>
+																<b><?php print __($guid, 'Class') ?> *</b><br/>
+																<span style="font-size: 90%"><i><?php print __($guid, 'Which class are you enroling for?') ?></i></span>
 															</td>
 															<td class="right">
 																<?php
@@ -874,7 +874,7 @@ else {
 																catch(PDOException $e) { }
 																?>
 																<select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
-																	<option value="Please select..."><?php print _('Please select...') ?></option>
+																	<option value="Please select..."><?php print __($guid, 'Please select...') ?></option>
 																	<?php
 																	while ($rowClasses=$resultClasses->fetch()) {
 																		print "<option value='" . $rowClasses["gibbonCourseClassID"] . "'>" . $rowClasses["course"] . "." . $rowClasses["class"] . "</option>" ;
@@ -883,18 +883,18 @@ else {
 																</select>
 																<script type="text/javascript">
 																	var gibbonCourseClassID=new LiveValidation('gibbonCourseClassID');
-																	gibbonCourseClassID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
+																	gibbonCourseClassID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print __($guid, 'Select something!') ?>"});
 																 </script>
 															</td>
 														</tr>
 														<tr>
 															<td style='width: 275px'> 
-																<b><?php print _('Grouping') ?> *</b><br/>
-																<span style="font-size: 90%"><i><?php print _('How do you want to study this unit?') ?></i></span>
+																<b><?php print __($guid, 'Grouping') ?> *</b><br/>
+																<span style="font-size: 90%"><i><?php print __($guid, 'How do you want to study this unit?') ?></i></span>
 															</td>
 															<td class="right">
 																<select name="grouping" id="grouping" style="width: 302px">
-																	<option value="Please select..."><?php print _('Please select...') ?></option>
+																	<option value="Please select..."><?php print __($guid, 'Please select...') ?></option>
 																	<?php
 																	$group=FALSE ;
 																	$extraSlots=0 ;
@@ -925,7 +925,7 @@ else {
 																</select>
 																<script type="text/javascript">
 																	var grouping=new LiveValidation('grouping');
-																	grouping.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
+																	grouping.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print __($guid, 'Select something!') ?>"});
 																 </script>
 															</td>
 														</tr>
@@ -1017,11 +1017,11 @@ else {
 																	?>
 																	<tr class='collaborator' id='<?php print "trCollaborator$i" ?>'>
 																		<td style='width: 275px'> 
-																			<b><?php print sprintf(_('Collaborator %1$s'), $i) ?> *</b><br/>
+																			<b><?php print sprintf(__($guid, 'Collaborator %1$s'), $i) ?> *</b><br/>
 																		</td>
 																		<td class="right">
 																			<select name="collaborators[]" id="collaborator<?php print $i ?>" style="width: 302px">
-																				<option value="Please select..."><?php print _('Please select...') ?></option>
+																				<option value="Please select..."><?php print __($guid, 'Please select...') ?></option>
 																				<?php
 																				foreach ($students AS $student) {
 																					print $student ;
@@ -1030,7 +1030,7 @@ else {
 																			</select>
 																			<script type="text/javascript">
 																				var collaborator<?php print $i ?>=new LiveValidation('collaborator<?php print $i ?>');
-																				collaborator<?php print $i ?>.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
+																				collaborator<?php print $i ?>.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print __($guid, 'Select something!') ?>"});
 																			 </script>
 																		</td>
 																	</tr>
@@ -1047,7 +1047,7 @@ else {
 													</tr>
 													<tr>
 														<td class="right" colspan=2>
-															<span style="font-size: 90%"><i>* <?php print _("denotes a required field") ; ?></i></span>
+															<span style="font-size: 90%"><i>* <?php print __($guid, "denotes a required field") ; ?></i></span>
 														</td>
 													</tr>
 												</table>
@@ -1077,7 +1077,7 @@ else {
 							
 							if ($resultBlocks->rowCount()<1) {
 								print "<div class='error'>" ;
-									print _("There are no records to display.") ;
+									print __($guid, "There are no records to display.") ;
 								print "</div>" ;
 							}
 							else {
@@ -1112,7 +1112,7 @@ else {
 									if (isset($_SESSION[$guid]["username"])) {
 										if ($roleCategory=="Staff") {
 											if ($rowBlocks["teachersNotes"]!="") {
-												print "<div style='background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>" . _("Teacher's Notes") . ":</b></p> " . $rowBlocks["teachersNotes"] . "</div>" ;
+												print "<div style='background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>" . __($guid, "Teacher's Notes") . ":</b></p> " . $rowBlocks["teachersNotes"] . "</div>" ;
 												$resourceContents.=$rowBlocks["teachersNotes"] ;
 											}
 										}
@@ -1213,7 +1213,7 @@ else {
 							//No resources!
 							if ($noReosurces) {
 								print "<div class='error'>" ;
-									print _("There are no records to display.") ;
+									print __($guid, "There are no records to display.") ;
 								print "</div>" ;
 							}
 						print "</div>" ;
@@ -1230,26 +1230,26 @@ else {
 							}
 							if ($resultBlocks->rowCount()<1) {
 								print "<div class='error'>" ;
-									print _("There are no records to display.") ;
+									print __($guid, "There are no records to display.") ;
 								print "</div>" ;
 							}
 							else {
 								print "<table cellspacing='0' style='width: 100%'>" ;
 									print "<tr class='head'>" ;
 										print "<th>" ;
-											print _("Scope") ;
+											print __($guid, "Scope") ;
 										print "</th>" ;
 										print "<th>" ;
-											print _("Category") ;
+											print __($guid, "Category") ;
 										print "</th>" ;
 										print "<th>" ;
-											print _("Name") ;
+											print __($guid, "Name") ;
 										print "</th>" ;
 										print "<th>" ;
-											print _("Year Groups") ;
+											print __($guid, "Year Groups") ;
 										print "</th>" ;
 										print "<th>" ;
-											print _("Actions") ;
+											print __($guid, "Actions") ;
 										print "</th>" ;
 									print "</tr>" ;
 					
@@ -1304,7 +1304,7 @@ else {
 													print "});" ;
 												print "</script>" ;
 												if ($rowBlocks["content"]!="") {
-													print "<a title='" . _('View Description') . "' class='show_hide-$count' onclick='false' href='#'><img style='padding-left: 0px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . _('Show Comment') . "' onclick='return false;' /></a>" ;
+													print "<a title='" . __($guid, 'View Description') . "' class='show_hide-$count' onclick='false' href='#'><img style='padding-left: 0px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' alt='" . __($guid, 'Show Comment') . "' onclick='return false;' /></a>" ;
 												}
 											print "</td>" ;
 										print "</tr>" ;
@@ -1336,7 +1336,7 @@ else {
 							}
 							if ($resultWork->rowCount()<1) {
 								print "<div class='error'>" ;
-									print _("There are no records to display.") ;
+									print __($guid, "There are no records to display.") ;
 								print "</div>" ;
 							}
 							else {
@@ -1364,7 +1364,7 @@ else {
 									
 									
 									print "<h3>" ;
-										print $students . " . <span style='font-size: 75%'>" . _("Shared on") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) . "</span>" ;
+										print $students . " . <span style='font-size: 75%'>" . __($guid, "Shared on") . " " . dateConvertBack($guid, $rowWork["timestampCompleteApproved"]) . "</span>" ;
 									print "</h3>" ;
 									//DISPLAY WORK.
 									$extension=strrchr($rowWork["evidenceLocation"], ".") ;
@@ -1381,23 +1381,23 @@ else {
 									else { //Not an image
 										print "<p>" ;
 											if ($rowWork["evidenceType"]=="File") { //It's a file
-												print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'>" . _('Click to View Work') . "</a>" ;
+												print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $rowWork["evidenceLocation"] . "'>" . __($guid, 'Click to View Work') . "</a>" ;
 											}
 											else { //It's a link
-												print "<a target='_blank' href='" . $rowWork["evidenceLocation"] . "'>" . _('Click to View Work') . "</a>" ;
+												print "<a target='_blank' href='" . $rowWork["evidenceLocation"] . "'>" . __($guid, 'Click to View Work') . "</a>" ;
 											}
 										print "</p>" ;
 									}
 									print "<p>" ;
 										if ($rowWork["commentStudent"]!="") {
-											print "<b><u>" . _("Student Comment") . "</u></b><br/><br/>" ;
+											print "<b><u>" . __($guid, "Student Comment") . "</u></b><br/><br/>" ;
 											print nl2br($rowWork["commentStudent"]) . "<br/>" ;
 										}
 										if ($rowWork["commentApproval"]!="") {
 											if ($rowWork["commentStudent"]!="") {
 												print "<br/>" ;
 											}
-											print "<b><u>" . _("Teacher Comment") . "</u></b>" ;
+											print "<b><u>" . __($guid, "Teacher Comment") . "</u></b>" ;
 											print $rowWork["commentApproval"] . "<br/>" ;
 										}
 									print "</p>" ;

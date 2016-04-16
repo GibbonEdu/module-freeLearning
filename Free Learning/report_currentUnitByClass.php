@@ -25,17 +25,17 @@ include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_currentUnitByClass.php")==FALSE) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
 	//Proceed!
 	print "<div class='trail'>" ;
-	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Current Unit By Class') . "</div>" ;
+	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Current Unit By Class') . "</div>" ;
 	print "</div>" ;
 	
 	print "<h2>" ;
-	print _("Choose Class") ;
+	print __($guid, "Choose Class") ;
 	print "</h2>" ;
 	
 	$gibbonCourseClassID=NULL ;
@@ -53,7 +53,7 @@ else {
 		<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 			<tr>
 				<td style='width: 275px'> 
-					<b><?php print _('Class') ?> *</b><br/>
+					<b><?php print __($guid, 'Class') ?> *</b><br/>
 				</td>
 				<td class="right">
 					<select style="width: 302px" name="gibbonCourseClassID">
@@ -80,7 +80,7 @@ else {
 			</tr>
 			<tr>
 				<td>
-					<b><?php print _('Sort By') ?></b><br/>
+					<b><?php print __($guid, 'Sort By') ?></b><br/>
 				</td>
 				<td class="right">
 					<select name="sort" style="width: 300px">
@@ -92,7 +92,7 @@ else {
 			<tr>
 				<td colspan=2 class="right">
 					<input type="hidden" name="q" value="/modules/<?php print $_SESSION[$guid]["module"] ?>/report_currentUnitByClass.php">
-					<input type="submit" value="<?php print _("Submit") ; ?>">
+					<input type="submit" value="<?php print __($guid, "Submit") ; ?>">
 				</td>
 			</tr>
 		</table>
@@ -101,7 +101,7 @@ else {
 	
 	if ($gibbonCourseClassID!="") {
 		print "<h2>" ;
-		print _("Report Data") ;
+		print __($guid, "Report Data") ;
 		print "</h2>" ;
 		
 		try {
@@ -116,12 +116,12 @@ else {
 		
 		if ($result->rowCount()!=1) {
 			print "<div class='error'>" ;
-				print _("There are no records to display.") ;
+				print __($guid, "There are no records to display.") ;
 			print "</div>" ;
 		}
 		else {
 			$row=$result->fetch() ;
-			print "<p style='margin-bottom: 0px'><b>" . _('Class') . "</b>: " . $row["course"] . "." . $row["class"] . "</p>" ;
+			print "<p style='margin-bottom: 0px'><b>" . __($guid, 'Class') . "</b>: " . $row["course"] . "." . $row["class"] . "</p>" ;
 		
 			try {
 				$data=array("gibbonCourseClassID"=>$gibbonCourseClassID); 
@@ -139,29 +139,29 @@ else {
 			}
 		
 			print "<div class='linkTop'>" ;
-			print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/report.php?q=/modules/" . $_SESSION[$guid]["module"] . "/report_students_byRollGroup_print.php&gibbonCourseClassID=$gibbonCourseClassID'>" .  _('Print') . "<img style='margin-left: 5px' title='" . _('Print') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/print.png'/></a>" ;
+			print "<a target='_blank' href='" . $_SESSION[$guid]["absoluteURL"] . "/report.php?q=/modules/" . $_SESSION[$guid]["module"] . "/report_students_byRollGroup_print.php&gibbonCourseClassID=$gibbonCourseClassID'>" .  __($guid, 'Print') . "<img style='margin-left: 5px' title='" . __($guid, 'Print') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/print.png'/></a>" ;
 			print "</div>" ;
 	
 			print "<table class='mini' cellspacing='0' style='width: 100%'>" ;
 				print "<tr class='head'>" ;
 					print "<th>" ;
-						print _("Number") ;
+						print __($guid, "Number") ;
 					print "</th>" ;
 					print "<th>" ;
-						print _("Student") ;
+						print __($guid, "Student") ;
 					print "</th>" ;
 					print "<th>" ;
-						print _("Group") ;
+						print __($guid, "Group") ;
 					print "</th>" ;
 					print "<th>" ;
-						print _("Unit") ;
-						print "<span style='font-size: 85%; font-style: italic'>" . _("Status") . "</span>" ;
+						print __($guid, "Unit") ;
+						print "<span style='font-size: 85%; font-style: italic'>" . __($guid, "Status") . "</span>" ;
 					print "</th>" ;
 					print "<th>" ;
-						print _("Date Started") ;
+						print __($guid, "Date Started") ;
 					print "</th>" ;
 					print "<th>" ;
-						print _("Days Since Started") ;
+						print __($guid, "Days Since Started") ;
 					print "</th>" ;
 				print "</tr>" ;
 			
@@ -215,7 +215,7 @@ else {
 				if ($count==0) {
 					print "<tr class=$rowNum>" ;
 						print "<td colspan=3>" ;
-							print _("There are no records to display.") ;
+							print __($guid, "There are no records to display.") ;
 						print "</td>" ;
 					print "</tr>" ;
 				}

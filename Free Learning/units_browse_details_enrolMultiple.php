@@ -25,20 +25,20 @@ include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details.php")==FALSE) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
 	$highestAction=getHighestGroupedAction($guid, "/modules/Free Learning/units_browse_details.php", $connection2) ;
 	if ($highestAction==FALSE) {
 		print "<div class='error'>" ;
-		print _("The highest grouped action cannot be determined.") ;
+		print __($guid, "The highest grouped action cannot be determined.") ;
 		print "</div>" ;
 	}
 	else {
 		//Get action with highest precendence
 		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "'>" . _('Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "&tab=1'>" . _('Unit Details') . "</a> > </div><div class='trailEnd'>" . _('Add Multiple') . "</div>" ;
+		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Add Multiple') . "</div>" ;
 		print "</div>" ;
 
 		$freeLearningUnitID="" ;
@@ -48,7 +48,7 @@ else {
 
 		if ($freeLearningUnitID=="") {
 			print "<div class='error'>" ;
-				print _("You have not specified one or more required parameters.") ;
+				print __($guid, "You have not specified one or more required parameters.") ;
 			print "</div>" ;
 		}
 		else {
@@ -72,7 +72,7 @@ else {
 
 			if ($result->rowCount()!=1) {
 				print "<div class='error'>" ;
-					print _("The selected record does not exist, or you do not have access to it.") ;
+					print __($guid, "The selected record does not exist, or you do not have access to it.") ;
 				print "</div>" ;
 			}
 			else {
@@ -83,22 +83,22 @@ else {
 				$class="error" ;
 				if (!($addReturn=="")) {
 					if ($addReturn=="fail0") {
-						$addReturnMessage=_("Your request failed because you do not have access to this action.") ;	
+						$addReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
 					}
 					else if ($addReturn=="fail2") {
-						$addReturnMessage=_("Your request failed due to a database error.") ;	
+						$addReturnMessage=__($guid, "Your request failed due to a database error.") ;	
 					}
 					else if ($addReturn=="fail3") {
-						$addReturnMessage=_("Your request failed because your inputs were invalid.") ;	
+						$addReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
 					}
 					else if ($addReturn=="fail4") {
-						$addReturnMessage=_("Your request failed because your inputs were invalid.") ;	
+						$addReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
 					}
 					else if ($addReturn=="fail5") {
-						$addReturnMessage=_("Your request was successful, but some data was not properly saved.") ;	
+						$addReturnMessage=__($guid, "Your request was successful, but some data was not properly saved.") ;	
 					}
 					else if ($addReturn=="success0") {
-						$addReturnMessage=_("Your request was completed successfully. You can now add another record if you wish.") ;	
+						$addReturnMessage=__($guid, "Your request was completed successfully. You can now add another record if you wish.") ;	
 						$class="success" ;
 					}
 					print "<div class='$class'>" ;
@@ -111,8 +111,8 @@ else {
 					<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 						<tr>
 							<td> 
-								<b><?php print _('Unit') ?> *</b><br/>
-								<span style="font-size: 90%"><i><?php print _('This value cannot be changed.') ?></i></span>
+								<b><?php print __($guid, 'Unit') ?> *</b><br/>
+								<span style="font-size: 90%"><i><?php print __($guid, 'This value cannot be changed.') ?></i></span>
 							</td>
 							<td class="right">
 								<input readonly style='width: 300px' type='text' value='<?php print $row["name"] ?>' />
@@ -121,7 +121,7 @@ else {
 						
 						<tr>
 							<td style='width: 275px'> 
-								<b><?php print _('Class') ?></b><br/>
+								<b><?php print __($guid, 'Class') ?></b><br/>
 							</td>
 							<td class="right">
 								<?php
@@ -151,8 +151,8 @@ else {
 						</tr>
 						<tr>
 							<td style='width: 275px'> 
-								<b><?php print _('Students In Class') ?> *</b><br/>
-								<span style="font-size: 90%"><i><?php print _('Use Control, Command and/or Shift to select multiple.') ?> </span>
+								<b><?php print __($guid, 'Students In Class') ?> *</b><br/>
+								<span style="font-size: 90%"><i><?php print __($guid, 'Use Control, Command and/or Shift to select multiple.') ?> </span>
 							</td>
 							<td class="right">
 								<select multiple name="gibbonPersonIDMulti[]" id="gibbonPersonIDMulti" style="width: 302px; height:150px">
@@ -176,22 +176,22 @@ else {
 						</script>
 						<tr>
 							<td> 
-								<b><?php print _('Status') ?> *</b><br/>
+								<b><?php print __($guid, 'Status') ?> *</b><br/>
 								<span style="font-size: 90%"><i></i></span>
 							</td>
 							<td class="right">
 								<select name="status" id="status" style="width: 302px">
-									<option value="Exempt"><?php print _('Exempt') ?></option>
+									<option value="Exempt"><?php print __($guid, 'Exempt') ?></option>
 								</select>
 							</td>
 						</tr>
 						<tr>
 							<td>
-								<span style="font-size: 90%"><i>* <?php print _("denotes a required field") ; ?></i></span>
+								<span style="font-size: 90%"><i>* <?php print __($guid, "denotes a required field") ; ?></i></span>
 							</td>
 							<td class="right">
 								<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
-								<input type="submit" value="<?php print _('Next') ?>">
+								<input type="submit" value="<?php print __($guid, 'Next') ?>">
 							</td>
 						</tr>
 					</table>

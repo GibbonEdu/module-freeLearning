@@ -25,19 +25,19 @@ include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_outcomes_byStudent.php")==FALSE) {
 	//Acess denied
 	print "<div class='error'>" ;
-		print _("You do not have access to this action.") ;
+		print __($guid, "You do not have access to this action.") ;
 	print "</div>" ;
 }
 else {
 	//Proceed!
 	print "<div class='trail'>" ;
-	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . _(getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . _('Outcomes By Student') . "</div>" ;
+	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Outcomes By Student') . "</div>" ;
 	print "</div>" ;
 	
 	$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
 	
 	print "<h2>" ;
-	print _("Choose Student") ;
+	print __($guid, "Choose Student") ;
 	print "</h2>" ;
 
 	$gibbonPersonID=NULL ;
@@ -50,7 +50,7 @@ else {
 		<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 			<tr>
 				<td style='width: 275px'> 
-					<b><?php print _('Student') ?> *</b><br/>
+					<b><?php print __($guid, 'Student') ?> *</b><br/>
 				</td>
 				<td class="right">
 					<?php
@@ -58,7 +58,7 @@ else {
 							?>
 							<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
 								<option></option>
-								<optgroup label='--<?php print _('Students by Roll Group') ?>--'>
+								<optgroup label='--<?php print __($guid, 'Students by Roll Group') ?>--'>
 									<?php
 									try {
 										$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
@@ -76,7 +76,7 @@ else {
 									}
 									?>
 								</optgroup>
-								<optgroup label='--<?php print _('Students by Name') ?>--'>
+								<optgroup label='--<?php print __($guid, 'Students by Name') ?>--'>
 									<?php
 									try {
 										$dataSelect=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
@@ -122,7 +122,7 @@ else {
 			<tr>
 				<td colspan=2 class="right">
 					<input type="hidden" name="q" value="/modules/<?php print $_SESSION[$guid]["module"] ?>/report_outcomes_byStudent.php">
-					<input type="submit" value="<?php print _("Submit") ; ?>">
+					<input type="submit" value="<?php print __($guid, "Submit") ; ?>">
 				</td>
 			</tr>
 		</table>
@@ -132,7 +132,7 @@ else {
 	if ($gibbonPersonID!="") {
 		$output="" ;
 		print "<h2>" ;
-		print _("Report Data") ;
+		print __($guid, "Report Data") ;
 		print "</h2>" ;
 	
 		//Check the years groups the student has been enroled into
@@ -149,7 +149,7 @@ else {
 
 			if ($result->rowCount()<1) {
 				print "<div class='error'>" ;
-					print _("Your request failed due to a database error.") ;
+					print __($guid, "Your request failed due to a database error.") ;
 				print "</div>" ;
 				$proceed=FALSE ; 
 			}
@@ -195,7 +195,7 @@ else {
 			//Get all school and department outcomes for the students' years in school and store in variable
 			$output='' ;
 			$output.="<h4>" ;
-			$output.=_("Outcome Completion") ;
+			$output.=__($guid, "Outcome Completion") ;
 			$output.="</h4>" ;
 			try {
 				$dataOutcomes=array("gibbonPersonID"=>$gibbonPersonID); 
@@ -212,21 +212,21 @@ else {
 			
 			if ($resultOutcomes->rowCount()<1) {
 				$output.="<div class='error'>" ;
-				$output.=_("There are no records to display.") ;
+				$output.=__($guid, "There are no records to display.") ;
 				$output.="</div>" ;
 			}
 			else {
 				$output.="<table cellspacing='0' style='width: 100%'>" ;
 					$output.="<tr class='head'>" ;
 						$output.="<th>" ;
-							$output.=_("Scope") . "<br/>" ;
-							$output.="<span style='font-size: 85%; font-style: italic'>" . _("Category") . "</span>" ;
+							$output.=__($guid, "Scope") . "<br/>" ;
+							$output.="<span style='font-size: 85%; font-style: italic'>" . __($guid, "Category") . "</span>" ;
 						$output.="</th>" ;
 						$output.="<th>" ;
-							$output.=_("Name") ;
+							$output.=__($guid, "Name") ;
 						$output.="</th>" ;
 						$output.="<th>" ;
-							$output.=_("Status") ;
+							$output.=__($guid, "Status") ;
 						$output.="</th>" ;
 					$output.="</tr>" ;
 				
@@ -257,12 +257,12 @@ else {
 							$output.="</td>" ;
 							$output.="<td>" ;
 								if (isset($outcomesMet[$rowOutcomes["gibbonOutcomeID"]][0])==FALSE) {
-									$output.="<img title='" . _('Outcome not met') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/iconCross.png'/> " ;
+									$output.="<img title='" . __($guid, 'Outcome not met') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/iconCross.png'/> " ;
 									$outcomesNotMet[$outcomesNotMetCount]=$rowOutcomes["gibbonOutcomeID"] ;
 									$outcomesNotMetCount++ ;
 								}
 								else {
-									$output.="<img title='" . _('Outcome met in units:') . " " . htmlPrep($outcomesMet[$rowOutcomes["gibbonOutcomeID"]][1]) . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/iconTick.png'/> x" . $outcomesMet[$rowOutcomes["gibbonOutcomeID"]][0] ;
+									$output.="<img title='" . __($guid, 'Outcome met in units:') . " " . htmlPrep($outcomesMet[$rowOutcomes["gibbonOutcomeID"]][1]) . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/iconTick.png'/> x" . $outcomesMet[$rowOutcomes["gibbonOutcomeID"]][0] ;
 								}
 							$output.="</td>" ;
 						$output.="</tr>" ;
@@ -304,36 +304,36 @@ else {
 					$blocks=getBlocksArray($connection2) ;
 		
 					print "<h4>" ;
-					print _("Recommended Units") ;
+					print __($guid, "Recommended Units") ;
 					print "</h4>" ;
 					print "<p>" ;
-					print _("The units below (up to a total of 3) are chosen at random from a list of units that have outcomes this student has not met, but can do based on year group.") ;
+					print __($guid, "The units below (up to a total of 3) are chosen at random from a list of units that have outcomes this student has not met, but can do based on year group.") ;
 					print "</p>" ;
 					
 					print "<table cellspacing='0' style='width: 100%'>" ;
 						print "<tr class='head'>" ;
 							print "<th style='width: 150px!important; text-align: center'>" ;
-								print _("Name") . "</br>" ;
+								print __($guid, "Name") . "</br>" ;
 							print "</th>" ;
 							print "<th style='width: 100px!important'>" ;
-								print _("Authors") . "<br/>" ;
-								print "<span style='font-size: 85%; font-style: italic'>" . _('Learning Areas') . "</span>" ;
+								print __($guid, "Authors") . "<br/>" ;
+								print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Learning Areas') . "</span>" ;
 							print "</th>" ;
 							print "<th style='max-width: 325px!important'>" ;
-								print _("Difficulty") . "</br>" ;
+								print __($guid, "Difficulty") . "</br>" ;
 							print "</th>" ;
 							print "<th>" ;
-								print _("Length") . "</br>" ;
-								print "<span style='font-size: 85%; font-style: italic'>" . _('Minutes') . "</span>" ;
+								print __($guid, "Length") . "</br>" ;
+								print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Minutes') . "</span>" ;
 							print "</th>" ;
 							print "<th>" ;
-								print _("Grouping") . "</br>" ;
+								print __($guid, "Grouping") . "</br>" ;
 							print "</th>" ;
 							print "<th>" ;
-								print _("Prerequisites") . "</br>" ;
+								print __($guid, "Prerequisites") . "</br>" ;
 							print "</th>" ;
 							print "<th style='min-width: 70px'>" ;
-								print _("Actions") ;
+								print __($guid, "Actions") ;
 							print "</th>" ;
 						print "</tr>" ;
 				
@@ -394,7 +394,7 @@ else {
 										}
 									}
 									if (is_null($timing)) {
-										print "<i>" . _('NA') . "</i>" ;
+										print "<i>" . __($guid, 'NA') . "</i>" ;
 									}
 									else {
 										print $timing ;
@@ -417,20 +417,20 @@ else {
 									}
 								}
 								else {
-										print "<i>" . _('None') . "<br/></i>" ;
+										print "<i>" . __($guid, 'None') . "<br/></i>" ;
 								}
 								if ($prerequisitesActive!=FALSE) {
 									$prerquisitesMet=prerquisitesMet($connection2, $gibbonPersonID, $prerequisitesActive) ;
 									if ($prerquisitesMet) {
-										print "<span style='font-weight: bold; color: #00cc00'>" . _("OK!") . "</span>" ;
+										print "<span style='font-weight: bold; color: #00cc00'>" . __($guid, "OK!") . "</span>" ;
 									}
 									else {
-										print "<span style='font-weight: bold; color: #cc0000'>" . _("Not Met") . "</span>" ;
+										print "<span style='font-weight: bold; color: #cc0000'>" . __($guid, "Not Met") . "</span>" ;
 									}
 								}
 								print "</td>" ;
 								print "<td>" ;
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $rowRecommend["freeLearningUnitID"] . "&gibbonDepartmentID=&difficulty=&name='><img title='" . _('View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
+									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $rowRecommend["freeLearningUnitID"] . "&gibbonDepartmentID=&difficulty=&name='><img title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
 								print "</td>" ;
 							print "</tr>" ;
 						}
