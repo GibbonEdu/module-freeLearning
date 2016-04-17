@@ -78,7 +78,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary=FALSE)
 					if ($schoolType=="Physical") {
 						$output.="<th>" ;
 							$output.=__($guid, "School Year") . "<br/>" ;
-							$output.="<span style='font-size: 85%; font-style: italic'>" . ___($guid, $guid, 'Date') . "</span>" ;
+							$output.="<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Date') . "</span>" ;
 						$output.="</th>" ;
 					}
 					$output.="<th>" ;

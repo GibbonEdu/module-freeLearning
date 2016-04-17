@@ -358,5 +358,10 @@ $count++ ;
 $sql[$count][0]="3.0.10" ;
 $sql[$count][1]="" ;
 
+//v3.0.11
+$count++ ;
+$sql[$count][0]="3.0.11" ;
+$sql[$count][1]="" ;
+
 
 ?>
