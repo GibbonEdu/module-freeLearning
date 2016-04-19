@@ -620,7 +620,7 @@ else {
 															<td class="right">
 																<script type='text/javascript'>
 																	$(document).ready(function(){
-																		$('#commentStudent').autosize();    
+																		autosize($('textarea')); 
 																	});
 																</script>
 																<textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"><?php
