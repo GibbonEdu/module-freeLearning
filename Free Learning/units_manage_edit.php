@@ -40,6 +40,14 @@ else {
 		$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
 
 		$freeLearningUnitID=$_GET["freeLearningUnitID"]; 
+		$canManage=FALSE ;
+		if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php") AND getHighestGroupedAction($guid, "/modules/Free Learning/units_browse.php", $connection2)=="Browse Units_all") {
+			$canManage=TRUE ;
+		}
+		$showInactive="N" ;
+		if ($canManage AND isset($_GET["showInactive"])) {
+			$showInactive=$_GET["showInactive"] ;
+		}
 		$gibbonDepartmentID="" ;
 		if (isset($_GET["gibbonDepartmentID"])) {
 			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
@@ -51,6 +59,10 @@ else {
 		$name="" ;
 		if (isset($_GET["name"])) {
 			$name=$_GET["name"] ;
+		}
+		$view="" ;
+		if (isset($_GET["view"])) {
+			$view=$_GET["view"] ;
 		}
 		
 		//Proceed!
@@ -136,7 +148,7 @@ else {
 			
 			if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details.php")) {
 				print "<div class='linkTop'>" ;
-					print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID'>" . __($guid, 'View') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a>" ;
+					print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'View') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a>" ;
 				print "</div>" ;
 			}
 			
@@ -211,7 +223,8 @@ else {
 						</td>
 						<td class="right">
 							<?php 
-							if ($highestAction=="Manage Units_all") {
+							$learningAreaRestriction=getSettingByScope($connection2, "Free Learning", "learningAreaRestriction") ;
+							if ($highestAction=="Manage Units_all" OR $learningAreaRestriction=="N") {
 								$learningAreas=getLearningAreas($connection2, $guid) ;
 							}
 							else if ($highestAction=="Manage Units_learningAreas") {
@@ -295,7 +308,7 @@ else {
 							?>
 							<input type="file" name="file" id="file"><br/><br/>
 							<?php
-							print getMaxUpload() ;
+							print getMaxUpload($guid) ;
 							$ext="'.png','.jpeg','.jpg','.gif'" ;
 							?>
 							<script type="text/javascript">

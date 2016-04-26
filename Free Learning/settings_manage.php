@@ -114,10 +114,40 @@ else {
 						<?php
 						$selected="" ;
 						if ($row["value"]=="Y" ) { $selected="selected" ; }
-						print "<option $selected value='Y'>Y</option>" ;
+						print "<option $selected value='Y'>" . ynExpander($guid, 'Y') . "</option>" ;
 						$selected="" ;
 						if ($row["value"]=="N" ) { $selected="selected" ; }
-						print "<option $selected value='N'>N</option>" ;
+						print "<option $selected value='N'>" . ynExpander($guid, 'N') . "</option>" ;
+						?>			
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<?php
+				try {
+					$data=array(); 
+					$sql="SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='learningAreaRestriction'" ;
+					$result=$connection2->prepare($sql);
+					$result->execute($data);
+				}
+				catch(PDOException $e) { 
+					print "<div class='error'>" . $e->getMessage() . "</div>" ; 
+				}
+				$row=$result->fetch() ;
+				?>
+				<td> 
+					<b><?php print __($guid, $row["nameDisplay"]) ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row["description"]!="") { print __($guid, $row["description"]) ; } ?></i></span>
+				</td>
+				<td class="right">
+					<select name="<?php print $row["name"] ?>" id="<?php print $row["name"] ?>" style="width: 302px">
+						<?php
+						$selected="" ;
+						if ($row["value"]=="Y" ) { $selected="selected" ; }
+						print "<option $selected value='Y'>" . ynExpander($guid, 'Y') . "</option>" ;
+						$selected="" ;
+						if ($row["value"]=="N" ) { $selected="selected" ; }
+						print "<option $selected value='N'>" . ynExpander($guid, 'N') . "</option>" ;
 						?>			
 					</select>
 				</td>

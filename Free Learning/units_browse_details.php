@@ -50,6 +50,14 @@ else {
 		if (isset($_GET["freeLearningUnitID"])) {
 			$freeLearningUnitID=$_GET["freeLearningUnitID"] ;
 		}
+		$canManage=FALSE ;
+		if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php") AND $highestAction=="Browse Units_all") {
+			$canManage=TRUE ;
+		}
+		$showInactive="N" ;
+		if ($canManage AND isset($_GET["showInactive"])) {
+			$showInactive=$_GET["showInactive"] ;
+		}
 		$gibbonDepartmentID="" ;
 		if (isset($_GET["gibbonDepartmentID"])) {
 			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
@@ -69,10 +77,10 @@ else {
 		
 		print "<div class='trail'>" ;
 		if ($publicUnits=="Y") {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Unit Details') . "</div>" ;
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'Browse Units') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Unit Details') . "</div>" ;
 			}
 			else {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Unit Details') . "</div>" ;
+				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'Browse Units') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Unit Details') . "</div>" ;
 			}
 		print "</div>" ;
 		
@@ -134,7 +142,7 @@ else {
 				$row=$result->fetch() ;
 				if ($gibbonDepartmentID!="" OR $difficulty!="" OR $name!="") {
 					print "<div class='linkTop'>" ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Back to Search Results') . "</a>" ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'Back to Search Results') . "</a>" ;
 					print "</div>" ;
 				}
 				
@@ -164,7 +172,7 @@ else {
 					//Let's go!
 					if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php")) {
 						print "<div class='linkTop'>" ;
-							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID'>" . __($guid, 'Edit') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
+							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'Edit') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
 						print "</div>" ;
 					}
 					
@@ -403,7 +411,7 @@ else {
 									
 									if ($enrolmentType=="staffEdit") {
 										print "<div class='linkTop'>" ;
-											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID'>" . __($guid, 'Add Multiple') . "<img style='margin: 0 0 -4px 5px' title='" . __($guid, 'Add Multiple') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new_multi.png'/></a>" ;
+											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive'>" . __($guid, 'Add Multiple') . "<img style='margin: 0 0 -4px 5px' title='" . __($guid, 'Add Multiple') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new_multi.png'/></a>" ;
 										print "</div>" ;
 									}
 									
@@ -502,9 +510,9 @@ else {
 														<?php 
 														if ($enrolmentType=="staffEdit") {
 															if ($rowClass["status"]=="Complete - Pending" OR $rowClass["status"]=="Complete - Approved" OR $rowClass["status"]=="Evidence Not Approved") {
-																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
+																print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;						
 															}
-															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'><img title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;						
+															print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID=" . $rowClass["freeLearningUnitStudentID"] . "&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;						
 														}
 														if ($rowClass["commentStudent"]!="" OR $rowClass["commentApproval"]!="") {
 															print "<script type='text/javascript'>" ;	

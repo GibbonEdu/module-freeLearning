@@ -25,7 +25,7 @@ $description="Free Learning is a module which enables a student-focused and stud
 $entryURL="units_browse.php" ;
 $type="Additional" ;
 $category="Learn" ;
-$version="3.0.12" ;
+$version="3.1.00" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org/free-learning" ;
 
@@ -109,6 +109,7 @@ $moduleTables[6]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope`
 $moduleTables[7]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
 $moduleTables[8]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mapLink', 'Map Link', 'A URL pointing to a map of the available units.', '');";
 $moduleTables[9]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'schoolType', 'School Type', 'Determines how enrolment should function', 'Physical');";
+$moduleTables[10]="INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'learningAreaRestriction', 'Learning Area Restriction', 'Should unit creation be limited to own Learning Areas?', 'Y');" ;
 
 //Action rows
 $actionRows[0]["name"]="Manage Units_all" ;

@@ -368,5 +368,12 @@ $count++ ;
 $sql[$count][0]="3.0.12" ;
 $sql[$count][1]="" ;
 
+//v3.1.00
+$count++ ;
+$sql[$count][0]="3.1.00" ;
+$sql[$count][1]="
+INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'learningAreaRestriction', 'Learning Area Restriction', 'Should unit creation be limited to own Learning Areas?', 'Y');end
+
+" ;
 
 ?>

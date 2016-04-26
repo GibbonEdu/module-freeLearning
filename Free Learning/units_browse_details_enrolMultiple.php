@@ -36,15 +36,40 @@ else {
 		print "</div>" ;
 	}
 	else {
-		//Get action with highest precendence
-		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Add Multiple') . "</div>" ;
-		print "</div>" ;
-
+		//Get params
 		$freeLearningUnitID="" ;
 		if (isset($_GET["freeLearningUnitID"])) {
 			$freeLearningUnitID=$_GET["freeLearningUnitID"] ;
 		}
+		$canManage=FALSE ;
+		if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php") AND $highestAction=="Browse Units_all") {
+			$canManage=TRUE ;
+		}
+		$showInactive="N" ;
+		if ($canManage AND isset($_GET["showInactive"])) {
+			$showInactive=$_GET["showInactive"] ;
+		}
+		$gibbonDepartmentID="" ;
+		if (isset($_GET["gibbonDepartmentID"])) {
+			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
+		}
+		$difficulty="" ;
+		if (isset($_GET["difficulty"])) {
+			$difficulty=$_GET["difficulty"] ;
+		}
+		$name="" ;
+		if (isset($_GET["name"])) {
+			$name=$_GET["name"] ;
+		}
+		$view="" ;
+		if (isset($_GET["view"])) {
+			$view=$_GET["view"] ;
+		}
+		
+		//Get action with highest precendence
+		print "<div class='trail'>" ;
+		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Add Multiple') . "</div>" ;
+		print "</div>" ;
 
 		if ($freeLearningUnitID=="") {
 			print "<div class='error'>" ;
@@ -107,7 +132,7 @@ else {
 				} 
 				?>
 
-				<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID=" . $_GET["freeLearningUnitID"] ?>">
+				<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID=" . $_GET["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive" ?>">
 					<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 						<tr>
 							<td> 

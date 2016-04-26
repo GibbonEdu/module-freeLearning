@@ -37,7 +37,7 @@ catch(PDOException $e) {
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]["timezone"]);
 
-$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["address"]) . "/units_browse_details.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&sidebar=true&tab=1" ;
+$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["address"]) . "/units_browse_details.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&gibbonDepartmentID=" . $_GET["gibbonDepartmentID"] . "&difficulty=" . $_GET["difficulty"] . "&name=" . $_GET["name"] . "&showInactive=" . $_GET["showInactive"] . "&sidebar=true&tab=1" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details_approval.php")==FALSE) {
 	//Fail 0
@@ -181,7 +181,7 @@ else {
 							//Attempt to notify the student, and issue like
 							if ($statusOriginal!=$status OR $commentApprovalOriginal!=$commentApproval) { //Only if status or comment has changed.
 								$text=sprintf(__($guid, 'A teacher has approved your request for unit completion (%1$s).'), $name) ;
-								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
+								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1" ;
 								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
 							
 								setLike($connection2, "Free Learning", $_SESSION[$guid]["gibbonSchoolYearID"], "freeLearningUnitStudentID", $freeLearningUnitStudentID, $_SESSION[$guid]["gibbonPersonID"], $gibbonPersonIDStudent, "Unit Approval", "") ;
@@ -209,7 +209,7 @@ else {
 							//Attempt to notify the student
 							if ($statusOriginal!=$status OR $commentApprovalOriginal!=$commentApproval) { //Only if status or comment has changed.
 								$text=sprintf(__($guid, 'A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name) ;
-								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1" ;
+								$actionLink="/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1" ;
 								setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, "Free Learning", $actionLink) ;
 							}
 							

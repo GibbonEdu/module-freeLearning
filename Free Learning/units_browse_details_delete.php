@@ -46,6 +46,14 @@ else {
 		if (isset($_GET["freeLearningUnitID"])) {
 			$freeLearningUnitID=$_GET["freeLearningUnitID"] ;
 		}
+		$canManage=FALSE ;
+		if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php") AND $highestAction=="Browse Units_all") {
+			$canManage=TRUE ;
+		}
+		$showInactive="N" ;
+		if ($canManage AND isset($_GET["showInactive"])) {
+			$showInactive=$_GET["showInactive"] ;
+		}
 		$gibbonDepartmentID="" ;
 		if (isset($_GET["gibbonDepartmentID"])) {
 			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
@@ -64,7 +72,7 @@ else {
 		}
 		
 		print "<div class='trail'>" ;
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Delete Enrolment') . "</div>" ;
+			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Delete Enrolment') . "</div>" ;
 		print "</div>" ;
 		
 		if (isset($_GET["deleteReturn"])) { $deleteReturn=$_GET["deleteReturn"] ; } else { $deleteReturn="" ; }
@@ -131,7 +139,7 @@ else {
 				else {
 					//Let's go!
 					?>
-					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view" ?>">
+					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view" ?>">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 							<tr>
 								<td> 

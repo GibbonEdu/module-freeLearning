@@ -37,8 +37,8 @@ catch(PDOException $e) {
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]["timezone"]);
 
-$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details_delete.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&sidebar=true&tab=1" ;
-$URLDelete=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&sidebar=true&tab=1" ;
+$URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details_delete.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&gibbonDepartmentID=" . $_GET["gibbonDepartmentID"] . "&difficulty=" . $_GET["difficulty"] . "&name=" . $_GET["name"] . "&showInactive=" . $_GET["showInactive"] . "&sidebar=true&tab=1" ;
+$URLDelete=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_POST["address"]) . "/units_browse_details.php&freeLearningUnitID=" . $_POST["freeLearningUnitID"] . "&freeLearningUnitStudentID=" . $_POST["freeLearningUnitStudentID"] . "&gibbonDepartmentID=" . $_GET["gibbonDepartmentID"] . "&difficulty=" . $_GET["difficulty"] . "&name=" . $_GET["name"] . "&showInactive=" . $_GET["showInactive"] . "&sidebar=true&tab=1" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details_approval.php")==FALSE) {
 	//Fail 0

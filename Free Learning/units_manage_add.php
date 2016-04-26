@@ -161,7 +161,8 @@ else {
 					</td>
 					<td class="right">
 						<?php 
-						if ($highestAction=="Manage Units_all") {
+						$learningAreaRestriction=getSettingByScope($connection2, "Free Learning", "learningAreaRestriction") ;
+						if ($highestAction=="Manage Units_all" OR $learningAreaRestriction=="N") {
 							$learningAreas=getLearningAreas($connection2, $guid) ;
 						}
 						else if ($highestAction=="Manage Units_learningAreas") {
@@ -233,7 +234,7 @@ else {
 					<td class="right">
 						<input type="file" name="file" id="file"><br/><br/>
 						<?php
-						print getMaxUpload() ;
+						print getMaxUpload($guid) ;
 						$ext="'.png','.jpeg','.jpg','.gif'" ;
 						?>
 						<script type="text/javascript">

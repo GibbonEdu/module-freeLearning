@@ -48,8 +48,10 @@ else {
 	$difficultyOptions=$_POST["difficultyOptions"] ; 	
 	$publicUnits=$_POST["publicUnits"] ; 	
 	$unitOutlineTemplate=$_POST["unitOutlineTemplate"] ;
+	$learningAreaRestriction=$_POST["learningAreaRestriction"] ;
+	
 	//Validate Inputs
-	if ($difficultyOptions=="" OR $publicUnits=="") {
+	if ($difficultyOptions=="" OR $publicUnits=="" OR $learningAreaRestriction=="") {
 		//Fail 3
 		$URL.="&updateReturn=fail3" ;
 		header("Location: {$URL}");
@@ -88,10 +90,19 @@ else {
 			$fail=TRUE ;
 		}
 		
-		
 		try {
 			$data=array("unitOutlineTemplate"=>$unitOutlineTemplate); 
 			$sql="UPDATE gibbonSetting SET value=:unitOutlineTemplate WHERE scope='Free Learning' AND name='unitOutlineTemplate'" ;
+			$result=$connection2->prepare($sql);
+			$result->execute($data);
+		}
+		catch(PDOException $e) { 
+			$fail=TRUE ;
+		}
+		
+		try {
+			$data=array("learningAreaRestriction"=>$learningAreaRestriction); 
+			$sql="UPDATE gibbonSetting SET value=:learningAreaRestriction WHERE scope='Free Learning' AND name='learningAreaRestriction'" ;
 			$result=$connection2->prepare($sql);
 			$result->execute($data);
 		}

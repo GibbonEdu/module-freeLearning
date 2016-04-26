@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v3.1.00
+-------
+Added setting to relax Learning Area restrictions
+Added filter for teachers to see active='N' in Browse Units
+
 v3.0.12
 -------
 Student work submission bug fix

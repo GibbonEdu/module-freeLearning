@@ -46,6 +46,14 @@ else {
 		if (isset($_GET["freeLearningUnitID"])) {
 			$freeLearningUnitID=$_GET["freeLearningUnitID"] ;
 		}
+		$canManage=FALSE ;
+		if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php") AND $highestAction=="Browse Units_all") {
+			$canManage=TRUE ;
+		}
+		$showInactive="N" ;
+		if ($canManage AND isset($_GET["showInactive"])) {
+			$showInactive=$_GET["showInactive"] ;
+		}
 		$gibbonDepartmentID="" ;
 		if (isset($_GET["gibbonDepartmentID"])) {
 			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
@@ -64,7 +72,7 @@ else {
 		}
 		
 		print "<div class='trail'>" ;
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Approval') . "</div>" ;
+			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Approval') . "</div>" ;
 		print "</div>" ;
 		
 		if ($freeLearningUnitID=="" OR $freeLearningUnitStudentID=="") {
@@ -111,7 +119,7 @@ else {
 					//Let's go!
 					if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php")) {
 						print "<div class='linkTop'>" ;
-							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID'>" . __($guid, 'Edit') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
+							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive'>" . __($guid, 'Edit') . "<img style='margin: 0 0 -4px 3px' title='" . __($guid, 'Edit') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a>" ;
 						print "</div>" ;
 					}
 					
@@ -152,7 +160,7 @@ else {
 						print __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.') ;
 					print "</p>" ;
 					?>
-					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_approvalProcess.php?address=" . $_GET["q"] ?>"  enctype="multipart/form-data">
+					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_approvalProcess.php?address=" . $_GET["q"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive" ?>"  enctype="multipart/form-data">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 							<tr>
 								<td> 
@@ -260,7 +268,7 @@ else {
 									?>
 									<input type="file" name="file" id="file"><br/><br/>
 									<?php
-									print getMaxUpload() ;
+									print getMaxUpload($guid) ;
 								
 									//Get list of acceptable file extensions
 									try {
