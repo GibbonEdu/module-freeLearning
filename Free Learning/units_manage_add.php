@@ -260,13 +260,17 @@ else {
 							<?php
 							try {
 								$dataSelect=array(); 
-								$sqlSelect="SELECT * FROM freeLearningUnit WHERE active='Y' ORDER BY name" ;
+								$sqlSelect="SELECT * FROM freeLearningUnit ORDER BY name" ;
 								$resultSelect=$connection2->prepare($sqlSelect);
 								$resultSelect->execute($dataSelect);
 							}
 							catch(PDOException $e) { }
 							while ($rowSelect=$resultSelect->fetch()) {
-								print "<option value='" . $rowSelect["freeLearningUnitID"] . "'>" . $rowSelect["name"] . " ( " . $rowSelect["difficulty"] . ")</option>" ;
+								print "<option value='" . $rowSelect["freeLearningUnitID"] . "'>" . $rowSelect["name"] . " (" . $rowSelect["difficulty"] . ")" ;
+								if ($rowSelect["active"]=="N") {
+									print " - " . __($guid, "Inactive") ;
+								}
+								print "</option>" ;
 							}
 							?>
 							</optgroup>

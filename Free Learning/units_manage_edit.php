@@ -333,7 +333,7 @@ else {
 								<?php
 								try {
 									$dataSelect=array("freeLearningUnitID"=>$freeLearningUnitID); 
-									$sqlSelect="SELECT * FROM freeLearningUnit WHERE active='Y' AND NOT freeLearningUnitID=:freeLearningUnitID ORDER BY name" ;
+									$sqlSelect="SELECT * FROM freeLearningUnit WHERE NOT freeLearningUnitID=:freeLearningUnitID ORDER BY name" ;
 									$resultSelect=$connection2->prepare($sqlSelect);
 									$resultSelect->execute($dataSelect);
 								}
@@ -343,7 +343,11 @@ else {
 									if (is_numeric(strpos($row["freeLearningUnitIDPrerequisiteList"],str_pad($rowSelect['freeLearningUnitID'], 10, "0", STR_PAD_LEFT)))) {
 										$selected="selected" ;
 									}
-									print "<option $selected value='" . $rowSelect["freeLearningUnitID"] . "'>" . $rowSelect["name"] . " ( " . $rowSelect["difficulty"] . ")</option>" ;
+									print "<option $selected value='" . $rowSelect["freeLearningUnitID"] . "'>" . $rowSelect["name"] . " (" . $rowSelect["difficulty"] . ")" ;
+									if ($rowSelect["active"]=="N") {
+										print " - " . __($guid, "Inactive") ;
+									}
+									print "</option>" ;
 								}
 								?>
 								</optgroup>

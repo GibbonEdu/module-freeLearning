@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v3.1.01
+-------
+Show inactive units in prerequisites
+
 v3.1.00
 -------
 Added setting to relax Learning Area restrictions
