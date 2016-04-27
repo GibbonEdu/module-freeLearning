@@ -550,7 +550,7 @@ function makeBlock($guid, $connection2, $i, $mode="masterAdd", $title="", $type=
 //Make the display for a block, according to the input provided, where $i is a unique number appended to the block's field ids.
 function makeBlockOutcome($guid,  $i, $type="", $gibbonOutcomeID="", $title="", $category="", $contents="", $id="", $outerBlock=TRUE, $allowOutcomeEditing="Y") {	
 	if ($outerBlock) {
-		print "<div id='" . $type . "blockOuter$i'>" ;
+		print "<div id='" . $type . "blockOuter$i' class='blockOuter'>" ;
 	}
 	?>
 		<script>
