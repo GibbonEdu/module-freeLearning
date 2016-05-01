@@ -17,37 +17,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@session_start() ;
+@session_start();
 
-$returnInt=NULL ;
+$returnInt = null;
 
 //Only include module include if it is not already included (which it may be been on the index page)
-$included=FALSE ;
-$includes=get_included_files() ;
-foreach ($includes AS $include) {
-	if ($include==$_SESSION[$guid]["absolutePath"] . "/modules/Free Learning/moduleFunctions.php") {
-		$included=TRUE ;
-	}
+$included = false;
+$includes = get_included_files();
+foreach ($includes as $include) {
+    if ($include == $_SESSION[$guid]['absolutePath'].'/modules/Free Learning/moduleFunctions.php') {
+        $included = true;
+    }
 }
-if ($included==FALSE) {
-	include "./modules/Free Learning/moduleFunctions.php" ;
-}
-
-if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_unitHistory_my.php")==FALSE) {
-	//Acess denied
-	$returnInt.="<div class='error'>" ;
-		$returnInt.="You do not have access to this action." ;
-	$returnInt.="</div>" ;
-}
-else {
-	$returnInt.="<div class='linkTop'>" ;
-		$returnInt.=sprintf(__($guid, '%1$sView Showcase of Student Work%2$s'), "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/showcase.php'>", "</a>") ;
-	$returnInt.="</div>" ;
-	$returnInt.="<p style='margin-top: 20px'>" ;
-		$returnInt.=__($guid, 'This table shows your recent results and enrolment for Free Learning:') ;
-	$returnInt.="</p>" ;
-	$returnInt.=getStudentHistory($connection2, $guid, $gibbonPersonID, TRUE) ;	
+if ($included == false) {
+    include './modules/Free Learning/moduleFunctions.php';
 }
 
-return $returnInt ;
-?>
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_my.php') == false) {
+    //Acess denied
+    $returnInt .= "<div class='error'>";
+    $returnInt .= 'You do not have access to this action.';
+    $returnInt .= '</div>';
+} else {
+    $returnInt .= "<div class='linkTop'>";
+    $returnInt .= sprintf(__($guid, '%1$sView Showcase of Student Work%2$s'), "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
+    $returnInt .= '</div>';
+    $returnInt .= "<p style='margin-top: 20px'>";
+    $returnInt .= __($guid, 'This table shows your recent results and enrolment for Free Learning:');
+    $returnInt .= '</p>';
+    $returnInt .= getStudentHistory($connection2, $guid, $gibbonPersonID, true);
+}
+
+return $returnInt;

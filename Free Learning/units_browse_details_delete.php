@@ -17,156 +17,137 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-@session_start() ;
+@session_start();
 
 //Module includes
-include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
+include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
-if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse_details_approval.php")==FALSE) {
-	//Acess denied
-	print "<div class='error'>" ;
-		print __($guid, "You do not have access to this action.") ;
-	print "</div>" ;
-}
-else {
-	//Get action with highest precendence
-	$highestAction=getHighestGroupedAction($guid, "/modules/Free Learning/units_browse_details_approval.php", $connection2) ;
-	if ($highestAction==FALSE) {
-		print "<div class='error'>" ;
-		print __($guid, "The highest grouped action cannot be determined.") ;
-		print "</div>" ;
-	}
-	else {
-		//Get params
-		$freeLearningUnitStudentID="" ;
-		if (isset($_GET["freeLearningUnitStudentID"])) {
-			$freeLearningUnitStudentID=$_GET["freeLearningUnitStudentID"] ;
-		}
-		$freeLearningUnitID="" ;
-		if (isset($_GET["freeLearningUnitID"])) {
-			$freeLearningUnitID=$_GET["freeLearningUnitID"] ;
-		}
-		$canManage=FALSE ;
-		if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php") AND $highestAction=="Browse Units_all") {
-			$canManage=TRUE ;
-		}
-		$showInactive="N" ;
-		if ($canManage AND isset($_GET["showInactive"])) {
-			$showInactive=$_GET["showInactive"] ;
-		}
-		$gibbonDepartmentID="" ;
-		if (isset($_GET["gibbonDepartmentID"])) {
-			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
-		}
-		$difficulty="" ;
-		if (isset($_GET["difficulty"])) {
-			$difficulty=$_GET["difficulty"] ;
-		}
-		$name="" ;
-		if (isset($_GET["name"])) {
-			$name=$_GET["name"] ;
-		}
-		$view="" ;
-		if (isset($_GET["view"])) {
-			$view=$_GET["view"] ;
-		}
-		
-		print "<div class='trail'>" ;
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>" . __($guid, 'Browse Units') . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1'>" . __($guid, 'Unit Details') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Delete Enrolment') . "</div>" ;
-		print "</div>" ;
-		
-		if (isset($_GET["deleteReturn"])) { $deleteReturn=$_GET["deleteReturn"] ; } else { $deleteReturn="" ; }
-		$deleteReturnMessage="" ;
-		$class="error" ;
-		if (!($deleteReturn=="")) {
-			if ($deleteReturn=="fail0") {
-				$deleteReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
-			}
-			else if ($deleteReturn=="fail1") {
-				$deleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-			}
-			else if ($deleteReturn=="fail2") {
-				$deleteReturnMessage=__($guid, "Your request failed due to a database error.") ;	
-			}
-			else if ($deleteReturn=="fail3") {
-				$deleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-			}
-			print "<div class='$class'>" ;
-				print $deleteReturnMessage;
-			print "</div>" ;
-		} 
-		
-		if ($freeLearningUnitID=="" OR $freeLearningUnitStudentID=="") {
-			print "<div class='error'>" ;
-				print __($guid, "You have not specified one or more required parameters.") ;
-			print "</div>" ;
-		}
-		else {
-			try {
-				$data=array("freeLearningUnitID"=>$freeLearningUnitID, "freeLearningUnitStudentID"=>$freeLearningUnitStudentID); 
-				$sql="SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID" ; 
-				$result=$connection2->prepare($sql);
-				$result->execute($data);
-			}
-			catch(PDOException $e) { 
-				print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-			}
-	
-			if ($result->rowCount()!=1) {
-				print "<div class='error'>" ;
-					print __($guid, "The selected record does not exist, or you do not have access to it.") ;
-				print "</div>" ;
-			}
-			else {
-				$row=$result->fetch() ;
-				
-				$proceed=FALSE ;
-				//Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
-				$learningAreas=getLearningAreas($connection2, $guid, TRUE) ;
-				if ($learningAreas!="") {
-					for ($i=0; $i<count($learningAreas); $i=$i+2) {
-						if (is_numeric(strpos($row["gibbonDepartmentIDList"], $learningAreas[$i]))) {
-							$proceed=TRUE ;
-						}
-					}
-				}
-				
-				if ($proceed==FALSE) {
-					print "<div class='error'>" ;
-						print __($guid, "The selected record does not exist, or you do not have access to it.") ;
-					print "</div>" ;
-				}
-				else {
-					//Let's go!
-					?>
-					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view" ?>">
-						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
+    //Acess denied
+    echo "<div class='error'>";
+    echo __($guid, 'You do not have access to this action.');
+    echo '</div>';
+} else {
+    //Get action with highest precendence
+    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
+    if ($highestAction == false) {
+        echo "<div class='error'>";
+        echo __($guid, 'The highest grouped action cannot be determined.');
+        echo '</div>';
+    } else {
+        //Get params
+        $freeLearningUnitStudentID = '';
+        if (isset($_GET['freeLearningUnitStudentID'])) {
+            $freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'];
+        }
+        $freeLearningUnitID = '';
+        if (isset($_GET['freeLearningUnitID'])) {
+            $freeLearningUnitID = $_GET['freeLearningUnitID'];
+        }
+        $canManage = false;
+        if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
+            $canManage = true;
+        }
+        $showInactive = 'N';
+        if ($canManage and isset($_GET['showInactive'])) {
+            $showInactive = $_GET['showInactive'];
+        }
+        $gibbonDepartmentID = '';
+        if (isset($_GET['gibbonDepartmentID'])) {
+            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
+        }
+        $difficulty = '';
+        if (isset($_GET['difficulty'])) {
+            $difficulty = $_GET['difficulty'];
+        }
+        $name = '';
+        if (isset($_GET['name'])) {
+            $name = $_GET['name'];
+        }
+        $view = '';
+        if (isset($_GET['view'])) {
+            $view = $_GET['view'];
+        }
+
+        echo "<div class='trail'>";
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Delete Enrolment').'</div>';
+        echo '</div>';
+
+        if (isset($_GET['return'])) {
+            returnProcess($guid, $_GET['return'], null, null);
+        }
+
+        if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
+            echo "<div class='error'>";
+            echo __($guid, 'You have not specified one or more required parameters.');
+            echo '</div>';
+        } else {
+            try {
+                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                $sql = 'SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID';
+                $result = $connection2->prepare($sql);
+                $result->execute($data);
+            } catch (PDOException $e) {
+                echo "<div class='error'>".$e->getMessage().'</div>';
+            }
+
+            if ($result->rowCount() != 1) {
+                echo "<div class='error'>";
+                echo __($guid, 'The selected record does not exist, or you do not have access to it.');
+                echo '</div>';
+            } else {
+                $row = $result->fetch();
+
+                $proceed = false;
+                //Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
+                $learningAreas = getLearningAreas($connection2, $guid, true);
+                if ($learningAreas != '') {
+                    for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+                        if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
+                            $proceed = true;
+                        }
+                    }
+                }
+
+                if ($proceed == false) {
+                    echo "<div class='error'>";
+                    echo __($guid, 'The selected record does not exist, or you do not have access to it.');
+                    echo '</div>';
+                } else {
+                    //Let's go!
+                    ?>
+					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module']."/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view" ?>">
+						<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 							<tr>
-								<td> 
-									<b><?php print __($guid, 'Are you sure you want to delete this record?') ; ?></b><br/>
-									<span style="font-size: 90%; color: #cc0000"><i><?php print __($guid, 'This operation cannot be undone, and may lead to loss of vital data in your system. PROCEED WITH CAUTION!') ; ?></i></span>
+								<td>
+									<b><?php echo __($guid, 'Are you sure you want to delete this record?');
+                    ?></b><br/>
+									<span style="font-size: 90%; color: #cc0000"><i><?php echo __($guid, 'This operation cannot be undone, and may lead to loss of vital data in your system. PROCEED WITH CAUTION!');
+                    ?></i></span>
 								</td>
 								<td class="right">
-								
+
 								</td>
 							</tr>
 							<tr>
-								<td> 
-									<input name="freeLearningUnitStudentID" id="freeLearningUnitStudentID" value="<?php print $freeLearningUnitStudentID ?>" type="hidden">
-									<input name="freeLearningUnitID" id="freeLearningUnitID" value="<?php print $freeLearningUnitID ?>" type="hidden">
-									<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
-									<input type="submit" value="<?php print __($guid, 'Yes') ; ?>">
+								<td>
+									<input name="freeLearningUnitStudentID" id="freeLearningUnitStudentID" value="<?php echo $freeLearningUnitStudentID ?>" type="hidden">
+									<input name="freeLearningUnitID" id="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>" type="hidden">
+									<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
+									<input type="submit" value="<?php echo __($guid, 'Yes');
+                    ?>">
 								</td>
 								<td class="right">
-								
+
 								</td>
 							</tr>
 						</table>
 					</form>
 					<?php
-				}
-			}
-		}
-	} 
-}		
+
+                }
+            }
+        }
+    }
+}
 ?>

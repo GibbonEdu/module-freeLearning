@@ -17,68 +17,63 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-include "../../functions.php" ;
-include "../../config.php" ;
+include '../../functions.php';
+include '../../config.php';
 
-include "./moduleFunctions.php" ;
+include './moduleFunctions.php';
 
 //New PDO DB connection
 try {
-  	$connection2=new PDO("mysql:host=$databaseServer;dbname=$databaseName;charset=utf8", $databaseUsername, $databasePassword);
-	$connection2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$connection2->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-}
-catch(PDOException $e) {
-  echo $e->getMessage();
+    $connection2 = new PDO("mysql:host=$databaseServer;dbname=$databaseName;charset=utf8", $databaseUsername, $databasePassword);
+    $connection2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $connection2->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo $e->getMessage();
 }
 
-@session_start() ;
+@session_start();
 
 //Set timezone from session variable
-date_default_timezone_set($_SESSION[$guid]["timezone"]);
+date_default_timezone_set($_SESSION[$guid]['timezone']);
 
+$freeLearningUnitID = $_POST['freeLearningUnitID'];
+$authorList = $_POST['authorList'];
+$authors = array();
+if ($authorList != '') {
+    $authors = explode(',', $authorList);
+}
+$mode = $_POST['mode']; //can be "add" or "remove"
+$comment = '';
+if (isset($_POST['comment'])) {
+    $comment = $_POST['comment'];
+}
 
-$freeLearningUnitID=$_POST["freeLearningUnitID"] ;
-$authorList=$_POST["authorList"] ; 
-$authors=array() ;
-if ($authorList!="") {
-	$authors=explode(",", $authorList) ;
-}
-$mode=$_POST["mode"] ; //can be "add" or "remove"
-$comment="" ;
-if (isset($_POST["comment"])) {
-	$comment=$_POST["comment"] ;
-}
-	
-if ($freeLearningUnitID=="" OR count($authors)<1 OR ($mode!="add" AND $mode!="remove")) {
-	print __($guid, "Error") ;
-}
-else {
-	$script="<script type=\"text/javascript\">
+if ($freeLearningUnitID == '' or count($authors) < 1 or ($mode != 'add' and $mode != 'remove')) {
+    echo __($guid, 'Error');
+} else {
+    $script = '<script type="text/javascript">
 		$(document).ready(function(){
-			$(\"#starAdd" . $freeLearningUnitID . "\").click(function(){
-				$(\"#star" . $freeLearningUnitID . "\").load(\"" . $_SESSION[$guid]["absoluteURL"] . "/modules/Free%20Learning/units_browse_starAjax.php\",{\"freeLearningUnitID\": \"" . $freeLearningUnitID . "\", \"mode\": \"add\", \"comment\": \"" . $comment . "\", \"authorList\": \"" . $authorList . "\"});
+			$("#starAdd'.$freeLearningUnitID.'").click(function(){
+				$("#star'.$freeLearningUnitID.'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$freeLearningUnitID.'", "mode": "add", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});
 			});
-			$(\"#starRemove" . $freeLearningUnitID . "\").click(function(){
-				$(\"#star" . $freeLearningUnitID . "\").load(\"" . $_SESSION[$guid]["absoluteURL"] . "/modules/Free%20Learning/units_browse_starAjax.php\",{\"freeLearningUnitID\": \"" . $freeLearningUnitID . "\", \"mode\": \"remove\", \"comment\": \"" . $comment . "\", \"authorList\": \"" . $authorList . "\"});
+			$("#starRemove'.$freeLearningUnitID.'").click(function(){
+				$("#star'.$freeLearningUnitID.'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$freeLearningUnitID.'", "mode": "remove", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});
 			});
 		});
-	</script>" ;
-	$on=$script."<a id='starRemove" . $freeLearningUnitID . "' onclick='return false;' href='#'><img src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/like_on.png'></a>" ; 
-	$off=$script."<a id='starAdd" . $freeLearningUnitID . "' onclick='return false;' href='#'><img src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/like_off.png'></a>" ; 
-	
-	//Act based on the mode
-	if ($mode=="add") { //ADD
-		foreach ($authors AS $author) {
-			$return=setLike($connection2, "Free Learning", $_SESSION[$guid]["gibbonSchoolYearID"], "freeLearningUnitID", $freeLearningUnitID, $_SESSION[$guid]["gibbonPersonID"], $author, "Free Learning - Unit Feedback", $comment) ;
-		}
-		print $on ;
-	}
-	else if ($mode=="remove"){ //REMOVE
-		foreach ($authors AS $author) {
-			$return=deleteLike($connection2, "Free Learning", "freeLearningUnitID", $freeLearningUnitID, $_SESSION[$guid]["gibbonPersonID"], $author, "Free Learning - Unit Feedback") ;
-		}
-		print $off ;
-	}
+	</script>';
+    $on = $script."<a id='starRemove".$freeLearningUnitID."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_on.png'></a>";
+    $off = $script."<a id='starAdd".$freeLearningUnitID."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_off.png'></a>";
+
+    //Act based on the mode
+    if ($mode == 'add') { //ADD
+        foreach ($authors as $author) {
+            $return = setLike($connection2, 'Free Learning', $_SESSION[$guid]['gibbonSchoolYearID'], 'freeLearningUnitID', $freeLearningUnitID, $_SESSION[$guid]['gibbonPersonID'], $author, 'Free Learning - Unit Feedback', $comment);
+        }
+        echo $on;
+    } elseif ($mode == 'remove') { //REMOVE
+        foreach ($authors as $author) {
+            $return = deleteLike($connection2, 'Free Learning', 'freeLearningUnitID', $freeLearningUnitID, $_SESSION[$guid]['gibbonPersonID'], $author, 'Free Learning - Unit Feedback');
+        }
+        echo $off;
+    }
 }
-?>

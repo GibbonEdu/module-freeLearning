@@ -17,581 +17,555 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-@session_start() ;
+@session_start();
 
 //Module includes
-include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
+include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
-$publicUnits=getSettingByScope($connection2, "Free Learning", "publicUnits" ) ;
-$schoolType=getSettingByScope($connection2, "Free Learning", "schoolType" ) ;
-if (!(isActionAccessible($guid, $connection2, "/modules/Free Learning/units_browse.php")==TRUE OR ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE))) {
-	//Acess denied
-	print "<div class='error'>" ;
-		print __($guid, "You do not have access to this action.") ;
-	print "</div>" ;
-}
-else {
-	//Get action with highest precendence
-	if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
-		$highestAction="Browse Units_all" ;
-	}
-	else {
-		$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
-	}
-	if ($highestAction==FALSE) {
-		print "<div class='error'>" ;
-		print __($guid, "The highest grouped action cannot be determined.") ;
-		print "</div>" ;
-	}
-	else {
-		print "<div class='trail'>" ;
-			if ($publicUnits=="Y") {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > </div><div class='trailEnd'>" . __($guid, 'Browse Units') . "</div>" ;
-			}
-			else {
-				print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Browse Units') . "</div>" ;
-			}
-		print "</div>" ;
-		
-		if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
-			print "<div class='linkTop'>" ;
-				print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>View Our Free Learning Showcase</a>" ;
-			print "</div>" ;
-		}
-		
-		$canManage=FALSE ;
-		if (isActionAccessible($guid, $connection2, "/modules/Free Learning/units_manage.php") AND $highestAction=="Browse Units_all") {
-			$canManage=TRUE ;
-		}
-		$showInactive="N" ;
-		if ($canManage AND isset($_GET["showInactive"])) {
-			$showInactive=$_GET["showInactive"] ;
-		}
-		
-		$gibbonDepartmentID=NULL ;
-		if (isset($_GET["gibbonDepartmentID"])) {
-			$gibbonDepartmentID=$_GET["gibbonDepartmentID"] ;
-		}	
-		$difficulty=NULL ;
-		if (isset($_GET["difficulty"])) {
-			$difficulty=$_GET["difficulty"] ;
-		}	
-		$name=NULL ;
-		if (isset($_GET["name"])) {
-			$name=$_GET["name"] ;
-		}
-		$view=NULL ;
-		if (isset($_GET["view"])) {
-			$view=$_GET["view"] ;
-		}
-		
-		if ($view!="grid" AND $view!="map") {
-			$view="list" ;
-		}
-		$learningAreaArray=getLearningAreaArray($connection2) ;
-		$authors=getAuthorsArray($connection2) ;
-		$blocks=getBlocksArray($connection2) ;
-		
-		print "<h3>" ;
-			print __($guid, "Filter") ;
-		print "</h3>" ;
-		print "<form method='get' action='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php'>" ;
-			print "<table class='noIntBorder' cellspacing='0' style='width: 100%'>" ;
-				?>
+$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false))) {
+    //Acess denied
+    echo "<div class='error'>";
+    echo __($guid, 'You do not have access to this action.');
+    echo '</div>';
+} else {
+    //Get action with highest precendence
+    if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+        $highestAction = 'Browse Units_all';
+    } else {
+        $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
+    }
+    if ($highestAction == false) {
+        echo "<div class='error'>";
+        echo __($guid, 'The highest grouped action cannot be determined.');
+        echo '</div>';
+    } else {
+        echo "<div class='trail'>";
+        if ($publicUnits == 'Y') {
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units').'</div>';
+        } else {
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units').'</div>';
+        }
+        echo '</div>';
+
+        if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+            echo "<div class='linkTop'>";
+            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>View Our Free Learning Showcase</a>";
+            echo '</div>';
+        }
+
+        $canManage = false;
+        if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
+            $canManage = true;
+        }
+        $showInactive = 'N';
+        if ($canManage and isset($_GET['showInactive'])) {
+            $showInactive = $_GET['showInactive'];
+        }
+
+        $gibbonDepartmentID = null;
+        if (isset($_GET['gibbonDepartmentID'])) {
+            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
+        }
+        $difficulty = null;
+        if (isset($_GET['difficulty'])) {
+            $difficulty = $_GET['difficulty'];
+        }
+        $name = null;
+        if (isset($_GET['name'])) {
+            $name = $_GET['name'];
+        }
+        $view = null;
+        if (isset($_GET['view'])) {
+            $view = $_GET['view'];
+        }
+
+        if ($view != 'grid' and $view != 'map') {
+            $view = 'list';
+        }
+        $learningAreaArray = getLearningAreaArray($connection2);
+        $authors = getAuthorsArray($connection2);
+        $blocks = getBlocksArray($connection2);
+
+        echo '<h3>';
+        echo __($guid, 'Filter');
+        echo '</h3>';
+        echo "<form method='get' action='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php'>";
+        echo "<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
+        ?>
 				<tr>
 					<td> 
-						<b><?php print __($guid, 'Learning Area') ?></b><br/>
+						<b><?php echo __($guid, 'Learning Area') ?></b><br/>
 						<span style="font-size: 90%"><i></i></span>
 					</td>
 					<td class="right">
 						<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
 							<option value=""></option>
 							<?php
-							$learningAreas=getLearningAreas($connection2, $guid) ;
-							for ($i=0; $i<count($learningAreas); $i=$i+2) {
-								if ($gibbonDepartmentID==$learningAreas[$i]) {
-									print "<option selected value='" . $learningAreas[$i] . "'>" . __($guid, $learningAreas[($i+1)]) . "</option>" ;
-								}
-								else {
-									print "<option value='" . $learningAreas[$i] . "'>" . __($guid, $learningAreas[($i+1)]) . "</option>" ;
-								}
-							}
-							?>			
+                            $learningAreas = getLearningAreas($connection2, $guid);
+        for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+            if ($gibbonDepartmentID == $learningAreas[$i]) {
+                echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+            } else {
+                echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+            }
+        }
+        ?>			
 						</select>
 					</td>
 				</tr>
 				<tr>
 					<td> 
-						<b><?php print __($guid, 'Difficulty') ?></b><br/>
+						<b><?php echo __($guid, 'Difficulty') ?></b><br/>
 						<span style="font-size: 90%"><i></i></span>
 					</td>
 					<td class="right">
 						<?php
-						$difficulties=getSettingByScope($connection2, "Free Learning", "difficultyOptions") ;
-						print "<select name='difficulty' id='difficulty' style='width: 302px'>" ;
-							print "<option value=''></option>" ;
-							$difficultiesList=explode(",", $difficulties) ;
-							foreach ($difficultiesList AS $difficultyOption) {
-								$selected="" ;
-								if ($difficulty==$difficultyOption) {
-									$selected="selected" ;
-								}
-								print "<option $selected value='" . $difficultyOption . "'>" . $difficultyOption . "</option>" ;
-							}
-						print "</select>" ;
-						?>
+                        $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+        echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
+        echo "<option value=''></option>";
+        $difficultiesList = explode(',', $difficulties);
+        foreach ($difficultiesList as $difficultyOption) {
+            $selected = '';
+            if ($difficulty == $difficultyOption) {
+                $selected = 'selected';
+            }
+            echo "<option $selected value='".$difficultyOption."'>".$difficultyOption.'</option>';
+        }
+        echo '</select>';
+        ?>
 					</td>
 				</tr>
 				<tr>
 					<td> 
-						<b><?php print __($guid, 'Name') ?></b><br/>
+						<b><?php echo __($guid, 'Name') ?></b><br/>
 						<span style="font-size: 90%"><i></i></span>
 					</td>
 					<td class="right">
 						<?php
-						print "<input name='name' value='" . $name . "' type='text' style='width: 300px'/>" ; 
-						?>
+                        echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
+        ?>
 					</td>
 				</tr>
 				<?php
-				if ($canManage) {
-					?>
+                if ($canManage) {
+                    ?>
 					<tr>
 						<td> 
-							<b><?php print __($guid, 'Show Inactive Units?') ?></b><br/>
+							<b><?php echo __($guid, 'Show Inactive Units?') ?></b><br/>
 							<span style="font-size: 90%"><i></i></span>
 						</td>
 						<td class="right">
 							<select name="showInactive" id="showInactive" style="width: 302px">
 								<?php
-								$selected="" ;
-								if ($showInactive=="N" ) { $selected="selected" ; }
-								print "<option $selected value='N'>" . ynExpander($guid, 'N') . "</option>" ;
-								$selected="" ;
-								if ($showInactive=="Y" ) { $selected="selected" ; }
-								print "<option $selected value='Y'>" . ynExpander($guid, 'Y') . "</option>" ;
-								?>			
+                                $selected = '';
+                    if ($showInactive == 'N') {
+                        $selected = 'selected';
+                    }
+                    echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+                    $selected = '';
+                    if ($showInactive == 'Y') {
+                        $selected = 'selected';
+                    }
+                    echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+                    ?>			
 							</select>
 						</td>
 					</tr>
 					<?php
-				}
-				
-				print "<tr>" ;
-					print "<td class='right' colspan=2>" ;
-						print "<input type='hidden' name='q' value='" . $_GET["q"] . "'>" ;
-						print "<input type='hidden' name='view' value='$view'>" ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse.php&view=$view'>" . __($guid, 'Clear Filters') . "</a> " ;
-						print "<input type='submit' value='" . __($guid, 'Go') . "'>" ;
-					print "</td>" ;
-				print "</tr>" ;
-			print "</table>" ;
-		print "</form>" ;
-		
-		
-		print "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>" ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=list'>" . __($guid, 'List') . " <img style='margin-bottom: -5px' title='" . __($guid, 'List') . "' src='./modules/Free Learning/img/iconList.png'/></a> " ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=grid'>" . __($guid, 'Grid') . " <img style='margin-bottom: -5px' title='" . __($guid, 'Grid') . "' src='./modules/Free Learning/img/iconGrid.png'/></a> " ;
-			print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=map'>" . __($guid, 'Map') . " <img style='margin-bottom: -5px' title='" . __($guid, 'Map') . "' src='./modules/Free Learning/img/iconMap.png'/></a> " ;
-		print "</div>" ;
-		
-		//Set pagination variable
-		$page=1 ; if (isset($_GET["page"])) { $page=$_GET["page"] ; }
-		if ((!is_numeric($page)) OR $page<1) {
-			$page=1 ;
-		}
-		
-		//Search with filters applied
-		try {
-			$data=array() ;
-			$sqlWhere="AND " ;
-			if ($gibbonDepartmentID!="") {
-				$data["gibbonDepartmentID"]=$gibbonDepartmentID ;
-				$sqlWhere.="gibbonDepartmentIDList LIKE concat('%', :gibbonDepartmentID, '%') AND " ; 
-			}
-			if ($difficulty!="") {
-				$data["difficulty"]=$difficulty ;
-				$sqlWhere.="difficulty=:difficulty AND " ; 
-			}
-			if ($name!="") {
-				$data["name"]=$name ;
-				$sqlWhere.="freeLearningUnit.name LIKE concat('%', :name, '%') AND " ; 
-			}
-			if ($sqlWhere=="AND ") {
-				$sqlWhere="" ;
-			}
-			else {
-				$sqlWhere=substr($sqlWhere,0,-5) ;
-			}
-			$difficultyOrder="" ;
-			if ($difficulties!=FALSE) {
-				$difficultyOrder="FIELD(difficulty" ;
-				$difficulties=explode(",", $difficulties) ;
-				foreach ($difficulties AS $difficultyOption) {
-					$difficultyOrder.=",'" . $difficultyOption . "'" ;
-				}
-				$difficultyOrder.="), " ;
-			}
-			if ($publicUnits=="Y" AND isset($_SESSION[$guid]["username"])==FALSE) {
-				$sql="SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
-			}
-			else {
-				if ($highestAction=="Browse Units_all") {
-					$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
-					if ($showInactive=="Y") {
-						$sql="SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
-					}
-					else {
-						$sql="SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC" ; 
-					}
-					
-				}
-				else if ($highestAction=="Browse Units_prerequisites") {
-					if ($schoolType=="Physical") {
-						$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
-						$data["gibbonPersonID2"]=$_SESSION[$guid]["gibbonPersonID"] ;
-						$data["gibbonSchoolYearID"]=$_SESSION[$guid]["gibbonSchoolYearID"] ;
-						$sql="SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name" ; 
-					}
-					else {
-						$data["gibbonPersonID"]=$_SESSION[$guid]["gibbonPersonID"] ;
-						$sql="SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name" ; 
-					}
-				}
-			}
-			$result=$connection2->prepare($sql);
-			$result->execute($data);
-		}
-		catch(PDOException $e) { 
-			print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-		}
-		$sqlPage=$sql . " LIMIT " . $_SESSION[$guid]["pagination"] . " OFFSET " . (($page-1)*$_SESSION[$guid]["pagination"]) ;
-		
-		print "<h3>" ;
-			print __($guid, "Units") . " <span style='font-size: 65%; font-style: italics'> x" . $result->rowCount() . "</span>" ;
-		print "</h3>" ;
-		
-		if ($result->rowCount()<1) {
-			print "<div class='error'>" ;
-			print __($guid, "There are no records to display.") ;
-			print "</div>" ;
-		}
-		else {
-			if ($view=="list") {
-				if ($result->rowCount()>$_SESSION[$guid]["pagination"]) {
-					printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]["pagination"], "top", "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive") ;
-				}
-		
-				print "<table cellspacing='0' style='width: 100%'>" ;
-					print "<tr class='head'>" ;
-						print "<th style='width: 150px!important; text-align: center'>" ;
-							print __($guid, "Name") . "</br>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Status') . "</span>" ;
-						print "</th>" ;
-						print "<th style='width: 100px!important'>" ;
-							print __($guid, "Authors") . "<br/>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Learning Areas') . "</span>" ;
-						print "</th>" ;
-						print "<th style='max-width: 325px!important'>" ;
-							print __($guid, "Difficulty") . "</br>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Blurb') . "</span>" ;
-						print "</th>" ;
-						print "<th>" ;
-							print __($guid, "Length") . "</br>" ;
-							print "<span style='font-size: 85%; font-style: italic'>" . __($guid, 'Minutes') . "</span>" ;
-						print "</th>" ;
-						if ($schoolType=="Physical") {
-							print "<th>" ;
-								print __($guid, "Grouping") . "</br>" ;
-							print "</th>" ;
-						}
-						print "<th style='min-width: 150px'>" ;
-							if ($schoolType=="Online") {
-								print __($guid, "Recommended") . "<br/>" ;
-							}
-							print __($guid, "Prerequisites") . "</br>" ;
-						print "</th>" ;
-						if (isset($_SESSION[$guid]["username"])) { //Likes only if logged in!
-							print "<th style='min-width: 50px'>" ;
-								print __($guid, "Like") ;
-							print "</th>" ;
-						}
-						print "<th style='min-width: 50px'>" ;
-							print __($guid, "Actions") ;
-						print "</th>" ;
-					print "</tr>" ;
-				
-					$count=0;
-					$rowNum="odd" ;
-					try {
-						$resultPage=$connection2->prepare($sqlPage);
-						$resultPage->execute($data);
-					}
-					catch(PDOException $e) { 
-						print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-					}		
-					while ($row=$resultPage->fetch()) {
-						if ($count%2==0) {
-							$rowNum="even" ;
-						}
-						else {
-							$rowNum="odd" ;
-						}
-						if ($row["status"]=="Complete - Approved" OR $row["status"]=="Exempt") {
-							$rowNum="current" ;
-						}
-						else if ($row["status"]=="Current" OR $row["status"]=="Complete - Pending") {
-							$rowNum="warning" ;
-						}
-						$count++ ;
-					
-						//COLOR ROW BY STATUS!
-						print "<tr class=$rowNum>" ;
-							print "<td style='text-align: center; font-size: 125%'>" ;
-								print "<div style='font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>" . $row["name"] . "</div><br/>" ;
-								if ($row["logo"]==NULL) {
-									print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_125.jpg'/><br/>" ;
-								}
-								else {
-									print "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $row["logo"] . "'/><br/>" ;
-								}
-								print "<span style='font-size: 85%;'>" ;
-									print $row["status"] ;
-								print "</span>" ;
-							print "</td>" ;
-							print "<td>" ;
-								$amAuthor=FALSE ;
-								foreach ($authors AS $author) {
-									if ($author[0]==$row["freeLearningUnitID"]) {
-										if ($author[3]=="") {
-											print $author[1] . "<br/>" ;
-										}
-										else {
-											print "<a target='_blank' href='" . $author[3] . "'>" . $author[1] . "</a><br/>" ;
-										}
-										if (isset($_SESSION[$guid]["username"])) { //Am author chekc only if logged in!
-											if ($author[2]==$_SESSION[$guid]["gibbonPersonID"]) { // Check to see if I am one of the authors
-												$amAuthor=TRUE ;
-											}
-										}
-									}
-								}
-								if ($row["gibbonDepartmentIDList"]!="") {
-									print "<span style='font-size: 85%;'>" ;
-										$departments=explode(",", $row["gibbonDepartmentIDList"]) ;
-										foreach ($departments AS $department) {
-											if (isset($learningAreaArray[$department])) {
-												print $learningAreaArray[$department] . "<br/>" ;
-											}
-										}
-									print "</span>" ;
-								}
-							print "</td>" ;
-							print "<td>" ;
-								print "<b>" . $row["difficulty"] . "</b><br/>" ;
-								print "<div style='font-size: 100%; text-align: justify'>" ;
-									print $row["blurb"] ;
-								print "</div>" ;
-							print "</td>" ;
-							print "<td>" ;
-								$timing=NULL ;
-								if ($blocks!=FALSE) {
-									foreach ($blocks AS $block) {
-										if ($block[0]==$row["freeLearningUnitID"]) {
-											if (is_numeric($block[2])) {
-												$timing+=$block[2] ;
-											}
-										}
-									}
-								}
-								if (is_null($timing)) {
-									print "<i>" . __($guid, 'NA') . "</i>" ;
-								}
-								else {
-									print $timing ;
-								}
-							print "</td>" ;
-							if ($schoolType=="Physical") {
-								print "<td>" ;
-									if ($row["grouping"]!="") {
-										$groupings=explode(",", $row["grouping"]) ;
-										foreach ($groupings AS $grouping) {
-											print ucwords($grouping) . "<br/>" ;
-										}
-									}
-								print "</td>" ;
-							}
-							print "<td>" ;
-								$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;						
-								if ($highestAction=="Browse Units_prerequisites") {
-									if ($prerequisitesActive!=FALSE) {
-										$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
-										if ($prerquisitesMet) {
-											print "<span style='font-weight: bold; color: #00cc00'>" . __($guid, "OK!") . "<br/></span>" ;
-										}
-										else {
-											if ($schoolType=="Online") {
-												print "<span style='font-weight: bold; color: #D65602'>" . __($guid, "Consider Studying") . "<br/></span>" ;
-											}
-											else {
-												print "<span style='font-weight: bold; color: #cc0000'>" . __($guid, "Not Met") . "<br/></span>" ;
-											}
-										}
-									}
-								}
-								if ($prerequisitesActive!=FALSE) {
-									$prerequisites=explode(",", $prerequisitesActive) ;
-									$units=getUnitsArray($connection2) ;
-									foreach ($prerequisites AS $prerequisite) {
-										print $units[$prerequisite][0] . "<br/>" ;
-									}
-								}
-								else {
-										print "<i>" . __($guid, 'None') . "<br/></i>" ;
-								}
-							print "</td>" ;
-							if (isset($_SESSION[$guid]["username"])) { //Likes only if logged in!
-								print "<td>" ;
-									//DEAL WITH LIKES
-									if ($amAuthor) { //I am one of the authors, so cannot like
-										print countLikesByContextAndRecipient($connection2, "Free Learning", "freeLearningUnitID", $row["freeLearningUnitID"], $_SESSION[$guid]["gibbonPersonID"]) ;
-									}
-									else { //I am not one of the authors, and so can like
-										print "<div id='star" . $row["freeLearningUnitID"] . "'>" ;
-											$likesGiven=countLikesByContextAndGiver($connection2, "Free Learning", "freeLearningUnitID", $row["freeLearningUnitID"], $_SESSION[$guid]["gibbonPersonID"]) ;
-											$comment=addSlashes($row["name"]) ;
-											$authorList="" ;
-											foreach ($authors AS $author) {
-												if ($author[0]==$row["freeLearningUnitID"]) {
-													$authorList.=$author[2] . "," ;
-												}
-											}
-											if ($authorList!="") {
-												$authorList=substr($authorList,0,-1) ;
-											}
-											print "<script type=\"text/javascript\">" ;
-												print "$(document).ready(function(){" ;
-													print "$(\"#starAdd" . $row["freeLearningUnitID"] . "\").click(function(){" ;
-														print "$(\"#star" . $row["freeLearningUnitID"] . "\").load(\"" . $_SESSION[$guid]["absoluteURL"] . "/modules/Free%20Learning/units_browse_starAjax.php\",{\"freeLearningUnitID\": \"" . $row["freeLearningUnitID"] . "\", \"mode\": \"add\", \"comment\": \"" . $comment . "\", \"authorList\": \"" . $authorList . "\"});" ;
-													print "});" ;
-													print "$(\"#starRemove" . $row["freeLearningUnitID"] . "\").click(function(){" ;
-														print "$(\"#star" . $row["freeLearningUnitID"] . "\").load(\"" . $_SESSION[$guid]["absoluteURL"] . "/modules/Free%20Learning/units_browse_starAjax.php\",{\"freeLearningUnitID\": \"" . $row["freeLearningUnitID"] . "\", \"mode\": \"remove\", \"comment\": \"" . $comment . "\", \"authorList\": \"" . $authorList . "\"});" ;
-													print "});" ;
-												print "});" ;
-											print "</script>" ;
-											if ($likesGiven<1) {
-												print "<a id='starAdd" . $row["freeLearningUnitID"] . "' onclick='return false;' href='#'><img src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/like_off.png'></a>" ;
-											}
-											else {
-												print "<a id='starRemove" . $row["freeLearningUnitID"] . "' onclick='return false;' href='#'><img src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/like_on.png'></a>" ;
-											}
-										}
-									print "</div>" ;
-								print "</td>" ;
-							}
-							print "<td>" ;
-								if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
-								}
-								else if ($highestAction=="Browse Units_prerequisites") {
-									if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
-									}
-									else {
-										if ($prerquisitesMet) {
-											print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
-										}
-									}
-								}
-							print "</td>" ;
-						print "</tr>" ;
-					}
-				print "</table>" ;
-			
-				if ($result->rowCount()>$_SESSION[$guid]["pagination"]) {
-					printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]["pagination"], "bottom", "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive") ;
-				}
-			}
-			else if ($view=="grid") {
-				print "<table cellspacing='0' style='width: 100%'>" ;
-					$count=0;
-					$columns=4 ;
-					
-					$rowNum="odd" ;
-					while ($row=$result->fetch()) {
-						//Row header if needed
-						if ($count%$columns==0) {
-							print "<tr class='odd'>" ;
-						}
-						
-						//Cell style
-						$cellClass="" ;
-						if ($row["status"]=="Complete - Approved" OR $row["status"]=="Exempt") {
-							$cellClass="current" ;
-						}
-						else if ($row["status"]=="Current" OR $row["status"]=="Complete - Pending") {
-							$cellClass="warning" ;
-						}
-						print "<td class='$cellClass' style='vertical-align: top ; text-align: center; font-size: 125%; width: " . (100/$columns) . "%'>" ;
-							print "<div style='height: 40px; font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>" . $row["name"] . "</div><br/>" ;
-							$title="Difficulty: " . $row["difficulty"] . "." ;
-							$title.=" " . $row["blurb"] ;
-							if ($row["logo"]==NULL) {
-								print "<img title='" . htmlPrep($title) . "' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_125.jpg'/><br/>" ;
-							}
-							else {
-								print "<img title='" . htmlPrep($title) . "' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='" . $row["logo"] . "'/><br/>" ;
-							}
-							
-							//Actions
-							$prerequisitesActive=prerequisitesRemoveInactive($connection2, $row["freeLearningUnitIDPrerequisiteList"]) ;
-							if ($prerequisitesActive!=FALSE) {
-								$prerequisites=explode(",", $prerequisitesActive) ;
-								$units=getUnitsArray($connection2) ;
 
-							}
-							if ($highestAction=="Browse Units_prerequisites") {
-								if ($prerequisitesActive!=FALSE) {
-									$prerquisitesMet=prerquisitesMet($connection2, $_SESSION[$guid]["gibbonPersonID"], $prerequisitesActive) ;
-								}
-							}
-							if ($highestAction=="Browse Units_all" OR $schoolType=="Online") {
-								print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
-							}
-							else if ($highestAction=="Browse Units_prerequisites") {
-								if ($row["freeLearningUnitIDPrerequisiteList"]==NULL OR $row["freeLearningUnitIDPrerequisiteList"]=="") {
-									print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
-								}
-								else {
-									if ($prerquisitesMet) {
-										print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . $_SESSION[$guid]["module"] . "/units_browse_details.php&sidebar=true&freeLearningUnitID=" . $row["freeLearningUnitID"] . "&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='" . __($guid, 'View') . "' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/plus.png'/></a> " ;
-									}
-								}
-							}
-						print "</td>" ;
-						
-						if ($count%$columns==($columns-1)) {
-							print "</tr>" ;
-						}
-						$count++ ;
-					}
-		
-					for ($i=0;$i<$columns-($count%$columns);$i++) {
-						print "<td></td>" ;
-					}
-	
-					if ($count%$columns!=0) {
-						print "</tr>" ;
-					}
-				print "</table>" ;	
-			}
-			else if ($view=="map") {
-				print "<p>" ;
-					print __($guid, "The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.") ;
-				print "</p>" ;
-				?>
-				<script type="text/javascript" src="<?php print $_SESSION[$guid]["absoluteURL"] ?>/lib/vis/dist/vis.js"></script>
-				<link href="<?php print $_SESSION[$guid]["absoluteURL"] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+                }
+
+        echo '<tr>';
+        echo "<td class='right' colspan=2>";
+        echo "<input type='hidden' name='q' value='".$_GET['q']."'>";
+        echo "<input type='hidden' name='view' value='$view'>";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php&view=$view'>".__($guid, 'Clear Filters').'</a> ';
+        echo "<input type='submit' value='".__($guid, 'Go')."'>";
+        echo '</td>';
+        echo '</tr>';
+        echo '</table>';
+        echo '</form>';
+
+        echo "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=list'>".__($guid, 'List')." <img style='margin-bottom: -5px' title='".__($guid, 'List')."' src='./modules/Free Learning/img/iconList.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=grid'>".__($guid, 'Grid')." <img style='margin-bottom: -5px' title='".__($guid, 'Grid')."' src='./modules/Free Learning/img/iconGrid.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=map'>".__($guid, 'Map')." <img style='margin-bottom: -5px' title='".__($guid, 'Map')."' src='./modules/Free Learning/img/iconMap.png'/></a> ";
+        echo '</div>';
+
+        //Set pagination variable
+        $page = 1;
+        if (isset($_GET['page'])) {
+            $page = $_GET['page'];
+        }
+        if ((!is_numeric($page)) or $page < 1) {
+            $page = 1;
+        }
+
+        //Search with filters applied
+        try {
+            $data = array();
+            $sqlWhere = 'AND ';
+            if ($gibbonDepartmentID != '') {
+                $data['gibbonDepartmentID'] = $gibbonDepartmentID;
+                $sqlWhere .= "gibbonDepartmentIDList LIKE concat('%', :gibbonDepartmentID, '%') AND ";
+            }
+            if ($difficulty != '') {
+                $data['difficulty'] = $difficulty;
+                $sqlWhere .= 'difficulty=:difficulty AND ';
+            }
+            if ($name != '') {
+                $data['name'] = $name;
+                $sqlWhere .= "freeLearningUnit.name LIKE concat('%', :name, '%') AND ";
+            }
+            if ($sqlWhere == 'AND ') {
+                $sqlWhere = '';
+            } else {
+                $sqlWhere = substr($sqlWhere, 0, -5);
+            }
+            $difficultyOrder = '';
+            if ($difficulties != false) {
+                $difficultyOrder = 'FIELD(difficulty';
+                $difficulties = explode(',', $difficulties);
+                foreach ($difficulties as $difficultyOption) {
+                    $difficultyOrder .= ",'".$difficultyOption."'";
+                }
+                $difficultyOrder .= '), ';
+            }
+            if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+                $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
+            } else {
+                if ($highestAction == 'Browse Units_all') {
+                    $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                    if ($showInactive == 'Y') {
+                        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name DESC";
+                    } else {
+                        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
+                    }
+                } elseif ($highestAction == 'Browse Units_prerequisites') {
+                    if ($schoolType == 'Physical') {
+                        $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                        $data['gibbonPersonID2'] = $_SESSION[$guid]['gibbonPersonID'];
+                        $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
+                        $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name";
+                    } else {
+                        $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                        $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name";
+                    }
+                }
+            }
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            echo "<div class='error'>".$e->getMessage().'</div>';
+        }
+        $sqlPage = $sql.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($page - 1) * $_SESSION[$guid]['pagination']);
+
+        echo '<h3>';
+        echo __($guid, 'Units')." <span style='font-size: 65%; font-style: italics'> x".$result->rowCount().'</span>';
+        echo '</h3>';
+
+        if ($result->rowCount() < 1) {
+            echo "<div class='error'>";
+            echo __($guid, 'There are no records to display.');
+            echo '</div>';
+        } else {
+            if ($view == 'list') {
+                if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
+                    printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top', "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive");
+                }
+
+                echo "<table cellspacing='0' style='width: 100%'>";
+                echo "<tr class='head'>";
+                echo "<th style='width: 150px!important; text-align: center'>";
+                echo __($guid, 'Name').'</br>';
+                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Status').'</span>';
+                echo '</th>';
+                echo "<th style='width: 100px!important'>";
+                echo __($guid, 'Authors').'<br/>';
+                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Learning Areas').'</span>';
+                echo '</th>';
+                echo "<th style='max-width: 325px!important'>";
+                echo __($guid, 'Difficulty').'</br>';
+                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Blurb').'</span>';
+                echo '</th>';
+                echo '<th>';
+                echo __($guid, 'Length').'</br>';
+                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes').'</span>';
+                echo '</th>';
+                if ($schoolType == 'Physical') {
+                    echo '<th>';
+                    echo __($guid, 'Grouping').'</br>';
+                    echo '</th>';
+                }
+                echo "<th style='min-width: 150px'>";
+                if ($schoolType == 'Online') {
+                    echo __($guid, 'Recommended').'<br/>';
+                }
+                echo __($guid, 'Prerequisites').'</br>';
+                echo '</th>';
+                if (isset($_SESSION[$guid]['username'])) { //Likes only if logged in!
+                            echo "<th style='min-width: 50px'>";
+                    echo __($guid, 'Like');
+                    echo '</th>';
+                }
+                echo "<th style='min-width: 50px'>";
+                echo __($guid, 'Actions');
+                echo '</th>';
+                echo '</tr>';
+
+                $count = 0;
+                $rowNum = 'odd';
+                try {
+                    $resultPage = $connection2->prepare($sqlPage);
+                    $resultPage->execute($data);
+                } catch (PDOException $e) {
+                    echo "<div class='error'>".$e->getMessage().'</div>';
+                }
+                while ($row = $resultPage->fetch()) {
+                    if ($count % 2 == 0) {
+                        $rowNum = 'even';
+                    } else {
+                        $rowNum = 'odd';
+                    }
+                    if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
+                        $rowNum = 'current';
+                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Complete - Pending') {
+                        $rowNum = 'warning';
+                    }
+                    ++$count;
+
+                        //COLOR ROW BY STATUS!
+                        echo "<tr class=$rowNum>";
+                    echo "<td style='text-align: center; font-size: 125%'>";
+                    echo "<div style='font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>".$row['name'].'</div><br/>';
+                    if ($row['logo'] == null) {
+                        echo "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_125.jpg'/><br/>";
+                    } else {
+                        echo "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$row['logo']."'/><br/>";
+                    }
+                    echo "<span style='font-size: 85%;'>";
+                    echo $row['status'];
+                    echo '</span>';
+                    echo '</td>';
+                    echo '<td>';
+                    $amAuthor = false;
+                    foreach ($authors as $author) {
+                        if ($author[0] == $row['freeLearningUnitID']) {
+                            if ($author[3] == '') {
+                                echo $author[1].'<br/>';
+                            } else {
+                                echo "<a target='_blank' href='".$author[3]."'>".$author[1].'</a><br/>';
+                            }
+                            if (isset($_SESSION[$guid]['username'])) { //Am author chekc only if logged in!
+                                            if ($author[2] == $_SESSION[$guid]['gibbonPersonID']) { // Check to see if I am one of the authors
+                                                $amAuthor = true;
+                                            }
+                            }
+                        }
+                    }
+                    if ($row['gibbonDepartmentIDList'] != '') {
+                        echo "<span style='font-size: 85%;'>";
+                        $departments = explode(',', $row['gibbonDepartmentIDList']);
+                        foreach ($departments as $department) {
+                            if (isset($learningAreaArray[$department])) {
+                                echo $learningAreaArray[$department].'<br/>';
+                            }
+                        }
+                        echo '</span>';
+                    }
+                    echo '</td>';
+                    echo '<td>';
+                    echo '<b>'.$row['difficulty'].'</b><br/>';
+                    echo "<div style='font-size: 100%; text-align: justify'>";
+                    echo $row['blurb'];
+                    echo '</div>';
+                    echo '</td>';
+                    echo '<td>';
+                    $timing = null;
+                    if ($blocks != false) {
+                        foreach ($blocks as $block) {
+                            if ($block[0] == $row['freeLearningUnitID']) {
+                                if (is_numeric($block[2])) {
+                                    $timing += $block[2];
+                                }
+                            }
+                        }
+                    }
+                    if (is_null($timing)) {
+                        echo '<i>'.__($guid, 'NA').'</i>';
+                    } else {
+                        echo $timing;
+                    }
+                    echo '</td>';
+                    if ($schoolType == 'Physical') {
+                        echo '<td>';
+                        if ($row['grouping'] != '') {
+                            $groupings = explode(',', $row['grouping']);
+                            foreach ($groupings as $grouping) {
+                                echo ucwords($grouping).'<br/>';
+                            }
+                        }
+                        echo '</td>';
+                    }
+                    echo '<td>';
+                    $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
+                    if ($highestAction == 'Browse Units_prerequisites') {
+                        if ($prerequisitesActive != false) {
+                            $prerquisitesMet = prerquisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
+                            if ($prerquisitesMet) {
+                                echo "<span style='font-weight: bold; color: #00cc00'>".__($guid, 'OK!').'<br/></span>';
+                            } else {
+                                if ($schoolType == 'Online') {
+                                    echo "<span style='font-weight: bold; color: #D65602'>".__($guid, 'Consider Studying').'<br/></span>';
+                                } else {
+                                    echo "<span style='font-weight: bold; color: #cc0000'>".__($guid, 'Not Met').'<br/></span>';
+                                }
+                            }
+                        }
+                    }
+                    if ($prerequisitesActive != false) {
+                        $prerequisites = explode(',', $prerequisitesActive);
+                        $units = getUnitsArray($connection2);
+                        foreach ($prerequisites as $prerequisite) {
+                            echo $units[$prerequisite][0].'<br/>';
+                        }
+                    } else {
+                        echo '<i>'.__($guid, 'None').'<br/></i>';
+                    }
+                    echo '</td>';
+                    if (isset($_SESSION[$guid]['username'])) { //Likes only if logged in!
+                                echo '<td>';
+                                    //DEAL WITH LIKES
+                                    if ($amAuthor) { //I am one of the authors, so cannot like
+                                        echo countLikesByContextAndRecipient($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
+                                    } else { //I am not one of the authors, and so can like
+                                        echo "<div id='star".$row['freeLearningUnitID']."'>";
+                                        $likesGiven = countLikesByContextAndGiver($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
+                                        $comment = addSlashes($row['name']);
+                                        $authorList = '';
+                                        foreach ($authors as $author) {
+                                            if ($author[0] == $row['freeLearningUnitID']) {
+                                                $authorList .= $author[2].',';
+                                            }
+                                        }
+                                        if ($authorList != '') {
+                                            $authorList = substr($authorList, 0, -1);
+                                        }
+                                        echo '<script type="text/javascript">';
+                                        echo '$(document).ready(function(){';
+                                        echo '$("#starAdd'.$row['freeLearningUnitID'].'").click(function(){';
+                                        echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "add", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
+                                        echo '});';
+                                        echo '$("#starRemove'.$row['freeLearningUnitID'].'").click(function(){';
+                                        echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "remove", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
+                                        echo '});';
+                                        echo '});';
+                                        echo '</script>';
+                                        if ($likesGiven < 1) {
+                                            echo "<a id='starAdd".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_off.png'></a>";
+                                        } else {
+                                            echo "<a id='starRemove".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_on.png'></a>";
+                                        }
+                                    }
+                        echo '</div>';
+                        echo '</td>';
+                    }
+                    echo '<td>';
+                    if ($highestAction == 'Browse Units_all' or $schoolType == 'Online') {
+                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                    } elseif ($highestAction == 'Browse Units_prerequisites') {
+                        if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                        } else {
+                            if ($prerquisitesMet) {
+                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                            }
+                        }
+                    }
+                    echo '</td>';
+                    echo '</tr>';
+                }
+                echo '</table>';
+
+                if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
+                    printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'bottom', "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive");
+                }
+            } elseif ($view == 'grid') {
+                echo "<table cellspacing='0' style='width: 100%'>";
+                $count = 0;
+                $columns = 4;
+
+                $rowNum = 'odd';
+                while ($row = $result->fetch()) {
+                    //Row header if needed
+                        if ($count % $columns == 0) {
+                            echo "<tr class='odd'>";
+                        }
+
+                        //Cell style
+                        $cellClass = '';
+                    if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
+                        $cellClass = 'current';
+                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Complete - Pending') {
+                        $cellClass = 'warning';
+                    }
+                    echo "<td class='$cellClass' style='vertical-align: top ; text-align: center; font-size: 125%; width: ".(100 / $columns)."%'>";
+                    echo "<div style='height: 40px; font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>".$row['name'].'</div><br/>';
+                    $title = 'Difficulty: '.$row['difficulty'].'.';
+                    $title .= ' '.$row['blurb'];
+                    if ($row['logo'] == null) {
+                        echo "<img title='".htmlPrep($title)."' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_125.jpg'/><br/>";
+                    } else {
+                        echo "<img title='".htmlPrep($title)."' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$row['logo']."'/><br/>";
+                    }
+
+                            //Actions
+                            $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
+                    if ($prerequisitesActive != false) {
+                        $prerequisites = explode(',', $prerequisitesActive);
+                        $units = getUnitsArray($connection2);
+                    }
+                    if ($highestAction == 'Browse Units_prerequisites') {
+                        if ($prerequisitesActive != false) {
+                            $prerquisitesMet = prerquisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
+                        }
+                    }
+                    if ($highestAction == 'Browse Units_all' or $schoolType == 'Online') {
+                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                    } elseif ($highestAction == 'Browse Units_prerequisites') {
+                        if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                        } else {
+                            if ($prerquisitesMet) {
+                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                            }
+                        }
+                    }
+                    echo '</td>';
+
+                    if ($count % $columns == ($columns - 1)) {
+                        echo '</tr>';
+                    }
+                    ++$count;
+                }
+
+                for ($i = 0;$i < $columns - ($count % $columns);++$i) {
+                    echo '<td></td>';
+                }
+
+                if ($count % $columns != 0) {
+                    echo '</tr>';
+                }
+                echo '</table>';
+            } elseif ($view == 'map') {
+                echo '<p>';
+                echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.');
+                echo '</p>';
+                ?>
+				<script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
+				<link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 
 				<style type="text/css">
 					div#map {
@@ -606,72 +580,70 @@ else {
 				<div id="map"></div>
 
 				<?php
-				//PREP NODE AND EDGE ARRAYS DATA
-				$nodeArray=array() ;
-				$edgeArray=array();
-				$nodeList="" ;
-				$edgeList="" ;
-				$idList="" ;
-				$countNodes=0 ;
-				while ($row=$result->fetch()) {
-					if ($row["logo"]!="") {
-						$image=$row["logo"] ;
-					}
-					else {
-						$image=$_SESSION[$guid]["absoluteURL"] . "/themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/anonymous_240_square.jpg" ;
-					}
-					if (strlen($row["blurb"])>90) {
-						$title=addSlashes(substr($row["blurb"],0,90)) . "..." ;
-					}
-					else {
-						$title=addSlashes($row["blurb"]) ;
-					}
-					
-					if ($row["freeLearningUnitIDPrerequisiteList"]=="") {
-						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . addSlashes($row["name"]) . "', title: '" . $title . "', color: {border:'red'}, borderWidth: 20}," ;
-					}
-					else {
-						$nodeList.="{id: " . $countNodes . ", shape: 'circularImage', image: '$image', label: '" . addSlashes($row["name"]) . "', title: '" . $title . "', borderWidth: 2}," ;
-					}
-					$nodeArray[$row["freeLearningUnitID"]][0]=$countNodes ;
-					$nodeArray[$row["freeLearningUnitID"]][1]=$row["freeLearningUnitID"] ;
-					$nodeArray[$row["freeLearningUnitID"]][2]=$row["freeLearningUnitIDPrerequisiteList"] ;
-					$idList.="'" . $row["freeLearningUnitID"] . "'," ;
-					$countNodes++ ;
-				}
-				if ($nodeList!="") {
-					$nodeList=substr($nodeList, 0, -1) ;
-				}
-				if ($idList!="") {
-					$idList=substr($idList, 0, -1) ;
-				}
-				
-				foreach ($nodeArray AS $node) {
-					if (isset($node[2])) {
-						$edgeExplode=explode(',', $node[2]) ;
-						foreach ($edgeExplode AS $edge) {
-							if (isset($nodeArray[$edge][0])) {
-								if ($nodeArray[$edge][0]!="") {
-									$edgeList.="{from: " . $nodeArray[$node[1]][0] . ", to: " . $nodeArray[$edge][0] . ", arrows:'from'}," ;
-								}
-							}
-						}
-					}
-				}
-				if ($edgeList!="") {
-					$edgeList=substr($edgeList, 0, -1) ;
-				}
-				
-				?>
+                //PREP NODE AND EDGE ARRAYS DATA
+                $nodeArray = array();
+                $edgeArray = array();
+                $nodeList = '';
+                $edgeList = '';
+                $idList = '';
+                $countNodes = 0;
+                while ($row = $result->fetch()) {
+                    if ($row['logo'] != '') {
+                        $image = $row['logo'];
+                    } else {
+                        $image = $_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName'].'/img/anonymous_240_square.jpg';
+                    }
+                    if (strlen($row['blurb']) > 90) {
+                        $title = addSlashes(substr($row['blurb'], 0, 90)).'...';
+                    } else {
+                        $title = addSlashes($row['blurb']);
+                    }
+
+                    if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'red'}, borderWidth: 20},";
+                    } else {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', borderWidth: 2},";
+                    }
+                    $nodeArray[$row['freeLearningUnitID']][0] = $countNodes;
+                    $nodeArray[$row['freeLearningUnitID']][1] = $row['freeLearningUnitID'];
+                    $nodeArray[$row['freeLearningUnitID']][2] = $row['freeLearningUnitIDPrerequisiteList'];
+                    $idList .= "'".$row['freeLearningUnitID']."',";
+                    ++$countNodes;
+                }
+                if ($nodeList != '') {
+                    $nodeList = substr($nodeList, 0, -1);
+                }
+                if ($idList != '') {
+                    $idList = substr($idList, 0, -1);
+                }
+
+                foreach ($nodeArray as $node) {
+                    if (isset($node[2])) {
+                        $edgeExplode = explode(',', $node[2]);
+                        foreach ($edgeExplode as $edge) {
+                            if (isset($nodeArray[$edge][0])) {
+                                if ($nodeArray[$edge][0] != '') {
+                                    $edgeList .= '{from: '.$nodeArray[$node[1]][0].', to: '.$nodeArray[$edge][0].", arrows:'from'},";
+                                }
+                            }
+                        }
+                    }
+                }
+                if ($edgeList != '') {
+                    $edgeList = substr($edgeList, 0, -1);
+                }
+
+                ?>
 				<script type="text/javascript">
 					//CREATE NODE ARRAY
-					var nodes = new vis.DataSet([<?php print $nodeList ; ?>]);
+					var nodes = new vis.DataSet([<?php echo $nodeList;
+                ?>]);
 
 					//CREATE EDGET ARRAY
-					var edges = new vis.DataSet([<?php print $edgeList ?>]);
+					var edges = new vis.DataSet([<?php echo $edgeList ?>]);
 
 					//CREATE NODE TO freeLearningUnitID ARRAY
-					var ids = new Array(<?php print $idList ?>);
+					var ids = new Array(<?php echo $idList ?>);
 					
 					//CREATE NETWORK
 					var container = document.getElementById('map');
@@ -708,12 +680,13 @@ else {
 					//CLICK LISTENER
 					network.on( 'click', function(properties) {
 						var nodeNo = properties.nodes ;
-						window.location = '<?php print $_SESSION[$guid]["absoluteURL"] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php print $gibbonDepartmentID ?>&difficulty=<?php print $difficulty ?>&name=<?php print $name ?>&view=<?php print $view ?>';
+						window.location = '<?php echo $_SESSION[$guid]['absoluteURL'] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
 					});
 				</script>
 				<?php
-			}
-		}
-	}
-}	
+
+            }
+        }
+    }
+}
 ?>
