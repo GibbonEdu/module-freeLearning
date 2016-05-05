@@ -30,8 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -93,9 +92,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 				</tr>
 				<?php
                 $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-        if ($difficulties != false) {
-            $difficulties = explode(',', $difficulties);
-            ?>
+				if ($difficulties != false) {
+					$difficulties = explode(',', $difficulties);
+					?>
 					<tr>
 						<td>
 							<b><?php echo __($guid, 'Difficulty') ?> *</b><br/>
@@ -111,7 +110,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 								<?php
 
                                 }
-            ?>
+            					?>
 							</select>
 							<script type="text/javascript">
 								var difficulty=new LiveValidation('difficulty');
@@ -121,8 +120,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</tr>
 					<?php
 
-        }
-        ?>
+				}
+				?>
 				<tr>
 					<td colspan=2>
 						<b><?php echo __($guid, 'Blurb') ?> *</b>
@@ -140,28 +139,27 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					<td class="right">
 						<?php
                         $learningAreaRestriction = getSettingByScope($connection2, 'Free Learning', 'learningAreaRestriction');
-        if ($highestAction == 'Manage Units_all' or $learningAreaRestriction == 'N') {
-            $learningAreas = getLearningAreas($connection2, $guid);
-        } elseif ($highestAction == 'Manage Units_learningAreas') {
-            $learningAreas = getLearningAreas($connection2, $guid, true);
-        }
-        if ($learningAreas == '') {
-            echo '<i>'.__($guid, 'No Learning Areas available.').'</i>';
-        } else {
-            for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                echo __($guid, $learningAreas[($i + 1)])." <input type='checkbox' name='gibbonDepartmentIDCheck".($i) / 2 ."'><br/>";
-                echo "<input type='hidden' name='gibbonDepartmentID".($i) / 2 ."' value='".$learningAreas[$i]."'>";
-            }
-        }
-        ?>
+						if ($highestAction == 'Manage Units_all' or $learningAreaRestriction == 'N') {
+							$learningAreas = getLearningAreas($connection2, $guid);
+						} elseif ($highestAction == 'Manage Units_learningAreas') {
+							$learningAreas = getLearningAreas($connection2, $guid, true);
+						}
+						if ($learningAreas == '') {
+							echo '<i>'.__($guid, 'No Learning Areas available.').'</i>';
+						} else {
+							for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+								echo __($guid, $learningAreas[($i + 1)])." <input type='checkbox' name='gibbonDepartmentIDCheck".($i) / 2 ."'><br/>";
+								echo "<input type='hidden' name='gibbonDepartmentID".($i) / 2 ."' value='".$learningAreas[$i]."'>";
+							}
+						}
+						?>
 						<input type="hidden" name="count" value="<?php echo(count($learningAreas)) / 2 ?>">
 					</td>
 				</tr>
 				<tr>
 					<td>
 						<b><?php echo __($guid, 'License') ?></b><br/>
-						<span style="font-size: 90%"><i><?php echo __($guid, 'Under what conditions can this work be reused?');
-        ?></i></span>
+						<span style="font-size: 90%"><i><?php echo __($guid, 'Under what conditions can this work be reused?'); ?></i></span>
 					</td>
 					<td class="right">
 						<select name="license" id="license" style="width: 302px">
@@ -176,13 +174,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 				</tr>
 				<?php
                 $makeUnitsPublic = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
-        if ($makeUnitsPublic == 'Y') {
-            ?>
+				if ($makeUnitsPublic == 'Y') {
+					?>
 					<tr>
 						<td>
 							<b><?php echo __($guid, 'Shared Publically') ?> * </b><br/>
-							<span style="font-size: 90%"><i><?php echo __($guid, 'Share this unit via the public listing of units? Useful for building MOOCS.');
-            ?></i></span>
+							<span style="font-size: 90%"><i><?php echo __($guid, 'Share this unit via the public listing of units? Useful for building MOOCS.'); ?></i></span>
 						</td>
 						<td class="right">
 							<input type="radio" name="sharedPublic" value="Y" /> <?php echo __($guid, 'Yes') ?>
@@ -190,9 +187,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 						</td>
 					</tr>
 					<?php
-
-        }
-        ?>
+				}
+				?>
 				<tr>
 					<td>
 						<b><?php echo __($guid, 'Active') ?> *</b><br/>
@@ -214,12 +210,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 						<input type="file" name="file" id="file"><br/><br/>
 						<?php
                         echo getMaxUpload($guid);
-        $ext = "'.png','.jpeg','.jpg','.gif'";
-        ?>
+						$ext = "'.png','.jpeg','.jpg','.gif'";
+						?>
 						<script type="text/javascript">
 							var file=new LiveValidation('file');
-							file.add( Validate.Inclusion, { within: [<?php echo $ext;
-        ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
+							file.add( Validate.Inclusion, { within: [<?php echo $ext; ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
 						</script>
 					</td>
 				</tr>
@@ -245,14 +240,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                 $resultSelect->execute($dataSelect);
                             } catch (PDOException $e) {
                             }
-        while ($rowSelect = $resultSelect->fetch()) {
-            echo "<option value='".$rowSelect['freeLearningUnitID']."'>".$rowSelect['name'].' ('.$rowSelect['difficulty'].')';
-            if ($rowSelect['active'] == 'N') {
-                echo ' - '.__($guid, 'Inactive');
-            }
-            echo '</option>';
-        }
-        ?>
+							while ($rowSelect = $resultSelect->fetch()) {
+								echo "<option value='".$rowSelect['freeLearningUnitID']."'>".$rowSelect['name'].' ('.$rowSelect['difficulty'].')';
+								if ($rowSelect['active'] == 'N') {
+									echo ' - '.__($guid, 'Inactive');
+								}
+								echo '</option>';
+							}
+							?>
 							</optgroup>
 						</select>
 					</td>
@@ -301,7 +296,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					<?php
 
                 }
-        ?>
+        		?>
 
 				<tr class='break'>
 					<td colspan=2>
@@ -361,7 +356,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             for ($i = 1; $i <= 5; ++$i) {
                                 makeBlock($guid, $connection2, $i);
                             }
-        ?>
+       		 				?>
 						</div>
 
 						<div style='width: 100%; padding: 0px 0px 0px 0px'>
@@ -404,8 +399,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 				</tr>
 				<tr>
 					<td class="right" colspan=2>
-						<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field');
-        ?></i></span>
+						<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
 					</td>
 				</tr>
 			</table>

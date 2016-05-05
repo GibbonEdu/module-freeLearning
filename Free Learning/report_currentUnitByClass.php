@@ -58,21 +58,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 					<select style="width: 302px" name="gibbonCourseClassID">
 						<?php
                         echo "<option value=''></option>";
-    try {
-        $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-        $sqlSelect = 'SELECT gibbonCourseClassID, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort as class FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY course, class';
-        $resultSelect = $connection2->prepare($sqlSelect);
-        $resultSelect->execute($dataSelect);
-    } catch (PDOException $e) {
-    }
-    while ($rowSelect = $resultSelect->fetch()) {
-        if ($gibbonCourseClassID == $rowSelect['gibbonCourseClassID']) {
-            echo "<option selected value='".$rowSelect['gibbonCourseClassID']."'>".htmlPrep($rowSelect['course']).'.'.htmlPrep($rowSelect['class']).'</option>';
-        } else {
-            echo "<option value='".$rowSelect['gibbonCourseClassID']."'>".htmlPrep($rowSelect['course']).'.'.htmlPrep($rowSelect['class']).'</option>';
-        }
-    }
-    ?>				
+						try {
+							$dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+							$sqlSelect = 'SELECT gibbonCourseClassID, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort as class FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY course, class';
+							$resultSelect = $connection2->prepare($sqlSelect);
+							$resultSelect->execute($dataSelect);
+						} catch (PDOException $e) {
+						}
+						while ($rowSelect = $resultSelect->fetch()) {
+							if ($gibbonCourseClassID == $rowSelect['gibbonCourseClassID']) {
+								echo "<option selected value='".$rowSelect['gibbonCourseClassID']."'>".htmlPrep($rowSelect['course']).'.'.htmlPrep($rowSelect['class']).'</option>';
+							} else {
+								echo "<option value='".$rowSelect['gibbonCourseClassID']."'>".htmlPrep($rowSelect['course']).'.'.htmlPrep($rowSelect['class']).'</option>';
+							}
+						}
+						?>				
 					</select>
 				</td>
 			</tr>
@@ -82,22 +82,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 				</td>
 				<td class="right">
 					<select name="sort" style="width: 300px">
-						<option value="unit" <?php if ($sort == 'unit') {
-    echo 'selected';
-}
-    ?>>Unit</option>
-						<option value="student" <?php if ($sort == 'student') {
-    echo 'selected';
-}
-    ?>>Student</option>
+						<option value="unit" <?php if ($sort == 'unit') { echo 'selected'; } ?>>Unit</option>
+						<option value="student" <?php if ($sort == 'student') { echo 'selected'; } ?>>Student</option>
 					</select>
 				</td>
 			</tr>
 			<tr>
 				<td colspan=2 class="right">
 					<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_currentUnitByClass.php">
-					<input type="submit" value="<?php echo __($guid, 'Submit');
-    ?>">
+					<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
 				</td>
 			</tr>
 		</table>
@@ -178,8 +171,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 }
                 ++$count;
 
-                    //COLOR ROW BY STATUS!
-                    echo "<tr class=$rowNum>";
+				//COLOR ROW BY STATUS!
+				echo "<tr class=$rowNum>";
                 echo '<td>';
                 echo $count;
                 echo '</td>';

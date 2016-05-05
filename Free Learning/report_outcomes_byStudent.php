@@ -116,14 +116,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 							<?php
 
                         }
-    ?>
+   						?>
 				</td>
 			</tr>
 			<tr>
 				<td colspan=2 class="right">
 					<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_outcomes_byStudent.php">
-					<input type="submit" value="<?php echo __($guid, 'Submit');
-    ?>">
+					<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
 				</td>
 			</tr>
 		</table>

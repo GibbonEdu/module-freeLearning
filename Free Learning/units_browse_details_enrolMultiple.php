@@ -29,8 +29,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     echo '</div>';
 } else {
     $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details.php', $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -121,7 +120,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							<td class="right">
 								<?php
                                     $highestAction2 = getHighestGroupedAction($guid, '/modules/Free Learning/units_manage.php', $connection2);
-                ?>
+                                ?>
 								<select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
 									<?php
                                     try {
@@ -136,10 +135,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $resultSelect->execute($dataSelect);
                                     } catch (PDOException $e) {
                                     }
-                while ($rowSelect = $resultSelect->fetch()) {
-                    echo "<option value='".$rowSelect['gibbonCourseClassID']."'>".htmlPrep($rowSelect['course']).'.'.htmlPrep($rowSelect['class']).' - '.$rowSelect['name'].'</option>';
-                }
-                ?>
+									while ($rowSelect = $resultSelect->fetch()) {
+										echo "<option value='".$rowSelect['gibbonCourseClassID']."'>".htmlPrep($rowSelect['course']).'.'.htmlPrep($rowSelect['class']).' - '.$rowSelect['name'].'</option>';
+									}
+									?>
 								</select>
 							</td>
 						</tr>
@@ -158,10 +157,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $resultSelect2->execute($dataSelect2);
                                     } catch (PDOException $e) {
                                     }
-                while ($rowSelect2 = $resultSelect2->fetch()) {
-                    echo "<option class='".$rowSelect2['gibbonCourseClassID']."' value='".$rowSelect2['gibbonPersonID']."'>".htmlPrep($rowSelect2['name']).' - '.formatName('', htmlPrep($rowSelect2['preferredName']), htmlPrep($rowSelect2['surname']), 'Student', true).'</option>';
-                }
-                ?>
+									while ($rowSelect2 = $resultSelect2->fetch()) {
+										echo "<option class='".$rowSelect2['gibbonCourseClassID']."' value='".$rowSelect2['gibbonPersonID']."'>".htmlPrep($rowSelect2['name']).' - '.formatName('', htmlPrep($rowSelect2['preferredName']), htmlPrep($rowSelect2['surname']), 'Student', true).'</option>';
+									}
+									?>
 								</select>
 							</td>
 						</tr>
@@ -181,8 +180,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 						</tr>
 						<tr>
 							<td>
-								<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field');
-                ?></i></span>
+								<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
 							</td>
 							<td class="right">
 								<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">

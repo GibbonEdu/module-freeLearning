@@ -30,8 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -151,8 +150,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     echo '</h4>';
                     echo '<p>';
                     echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.');
-                    echo '</p>';
-                    ?>
+                    echo '</p>'; ?>
 					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_approvalProcess.php?address='.$_GET['q']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive" ?>"  enctype="multipart/form-data">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 							<tr>
@@ -162,7 +160,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								</td>
 								<td class="right">
 									<?php echo "<input readonly value='".formatName('', $row['preferredName'], $row['surname'], 'Student', false)."' type='text' style='width: 300px'>";
-                    ?>
+                    				?>
 								</td>
 							</tr>
 							<tr>
@@ -171,14 +169,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								</td>
 								<td class="right">
 									<select style="width: 302px" name="status" id="status">
-										<option <?php if ($row['status'] == 'Complete - Approved') {
-    echo 'selected';
-}
-                    ?> value='Complete - Approved'>Complete - Approved</option>
-										<option <?php if ($row['status'] == 'Evidence Not Approved') {
-    echo 'selected';
-}
-                    ?> value='Evidence Not Approved'>Evidence Not Approved</option>
+										<option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'>Complete - Approved</option>
+										<option <?php if ($row['status'] == 'Evidence Not Approved') { echo 'selected'; } ?> value='Evidence Not Approved'>Evidence Not Approved</option>
 									</select>
 								</td>
 							</tr>
@@ -202,7 +194,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 										<?php
 
                                     }
-                    ?>
+                    				?>
 									
 									$("#status").click(function(){
 										if ($('#status option:selected').val()=="Evidence Not Approved" ) {
@@ -236,25 +228,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 						
 							<tr id="exemplarRow">
 								<td> 
-									<b><?php echo __($guid, 'Exmplar Work');
-                    ?> *</b><br/>
-									<span style="font-size: 90%"><i><?php echo __($guid, 'Work and comments will be made viewable to other users.');
-                    ?></i></span>
+									<b><?php echo __($guid, 'Exmplar Work'); ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php echo __($guid, 'Work and comments will be made viewable to other users.'); ?></i></span>
 								</td>
 								<td class="right">
 									<select name="exemplarWork" id="exemplarWork" style="width: 302px">
 										<?php
                                         echo '<option ';
-                    if ($row['exemplarWork'] == 'N') {
-                        echo ' selected ';
-                    }
-                    echo "value='N'>".ynExpander($guid, 'N').'</option>';
-                    echo '<option ';
-                    if ($row['exemplarWork'] == 'Y') {
-                        echo ' selected ';
-                    }
-                    echo "value='Y'>".ynExpander($guid, 'Y').'</option>';
-                    ?>				
+										if ($row['exemplarWork'] == 'N') {
+											echo ' selected ';
+										}
+										echo "value='N'>".ynExpander($guid, 'N').'</option>';
+										echo '<option ';
+										if ($row['exemplarWork'] == 'Y') {
+											echo ' selected ';
+										}
+										echo "value='Y'>".ynExpander($guid, 'Y').'</option>';
+										?>				
 									</select>
 								</td>
 							</tr>
@@ -268,7 +258,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     if ($row['exemplarWorkThumb'] != '') {
                                         echo __($guid, 'Current attachment:')." <a href='".$row['exemplarWorkThumb']."'>".$row['exemplarWorkThumb'].'</a><br/><br/>';
                                     }
-                    ?>
+                    						?>
 									<input type="file" name="file" id="file"><br/><br/>
 									<?php
                                     echo getMaxUpload($guid);
@@ -281,20 +271,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $resultExt->execute($dataExt);
                                     } catch (PDOException $e) {
                                     }
-                    $ext = "'.png','.jpeg','.jpg','.gif'";
-                    ?>
+									$ext = "'.png','.jpeg','.jpg','.gif'";
+									?>
 									<script type="text/javascript">
 										var file=new LiveValidation('file');
-										file.add( Validate.Inclusion, { within: [<?php echo $ext;
-                    ?>], failureMessage: "<?php echo __($guid, 'Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
+										file.add( Validate.Inclusion, { within: [<?php echo $ext; ?>], failureMessage: "<?php echo __($guid, 'Illegal file type!') ?>", partialMatch: true, caseSensitive: false } );
 									</script>
 								</td>
 							</tr>
 							<tr id="linkRow">
 								<td> 
 									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image Credit') ?></b><br/>
-									<span style="font-size: 90%"><i><?php echo __($guid, 'Credit and license for image used above.');
-                    ?></i></span>
+									<span style="font-size: 90%"><i><?php echo __($guid, 'Credit and license for image used above.'); ?></i></span>
 								</td>
 								<td class="right">
 									<input name="exemplarWorkLicense" id="exemplarWorkLicense" maxlength=255 value="<?php echo $row['exemplarWorkLicense'] ?>" type="text" style="width: 300px">
@@ -313,7 +301,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                             echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View Submission').'</a>';
                                         }
                                     }
-                    ?>
+                    				?>
 								</td>
 							</tr>
 							<tr>
@@ -322,7 +310,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 									<p>
 										<?php
                                             echo $row['commentStudent'];
-                    ?>
+                    					?>
 									</p>
 								</td>
 							</tr>
@@ -343,8 +331,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr>
 								<td class="right" colspan=2>
-									<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field');
-                    ?></i></span>
+									<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
 								</td>
 							</tr>
 						</table>

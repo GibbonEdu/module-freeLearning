@@ -30,8 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -148,14 +147,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
                             }
                         }
-        ?>
+       					?>
 					</td>
 				</tr>
 				<tr>
 					<td colspan=2 class="right">
 						<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_unitHistory_byStudent.php">
-						<input type="submit" value="<?php echo __($guid, 'Submit');
-        ?>">
+						<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
 					</td>
 				</tr>
 			</table>

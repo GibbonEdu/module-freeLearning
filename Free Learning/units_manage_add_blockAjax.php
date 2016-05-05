@@ -86,8 +86,7 @@ if ($gibbonUnitBlockID != '') {
         }
         $result = $connection2->prepare($sql);
         $result->execute($data);
-    } catch (PDOException $e) {
-        echo "<div class='error'>".$e->getMessage().'</div>';
+    } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
     }
     if ($result->rowCount() == 1) {
         $row = $result->fetch();

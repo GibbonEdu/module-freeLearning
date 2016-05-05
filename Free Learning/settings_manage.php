@@ -50,29 +50,26 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
                 } catch (PDOException $e) {
                     echo "<div class='error'>".$e->getMessage().'</div>';
                 }
-    $row = $result->fetch();
-    ?>
+				$row = $result->fetch();
+				?>
 				<td>
 					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') {
-    echo __($guid, $row['description']);
-}
-    ?></i></span>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
 						<?php
                         $selected = '';
-    if ($row['value'] == 'Physical') {
-        $selected = 'selected';
-    }
-    echo "<option $selected value='Physical'>Physical</option>";
-    $selected = '';
-    if ($row['value'] == 'Online') {
-        $selected = 'selected';
-    }
-    echo "<option $selected value='Online'>Online</option>";
-    ?>
+						if ($row['value'] == 'Physical') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Physical'>Physical</option>";
+						$selected = '';
+						if ($row['value'] == 'Online') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Online'>Online</option>";
+						?>
 					</select>
 				</td>
 			</tr>
@@ -86,29 +83,26 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
                 } catch (PDOException $e) {
                     echo "<div class='error'>".$e->getMessage().'</div>';
                 }
-    $row = $result->fetch();
-    ?>
+				$row = $result->fetch();
+				?>
 				<td>
 					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') {
-    echo __($guid, $row['description']);
-}
-    ?></i></span>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
 						<?php
                         $selected = '';
-    if ($row['value'] == 'Y') {
-        $selected = 'selected';
-    }
-    echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-    $selected = '';
-    if ($row['value'] == 'N') {
-        $selected = 'selected';
-    }
-    echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-    ?>
+						if ($row['value'] == 'Y') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+						$selected = '';
+						if ($row['value'] == 'N') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+						?>
 					</select>
 				</td>
 			</tr>
@@ -122,29 +116,26 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
                 } catch (PDOException $e) {
                     echo "<div class='error'>".$e->getMessage().'</div>';
                 }
-    $row = $result->fetch();
-    ?>
+				$row = $result->fetch();
+				?>
 				<td>
 					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') {
-    echo __($guid, $row['description']);
-}
-    ?></i></span>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
 						<?php
                         $selected = '';
-    if ($row['value'] == 'Y') {
-        $selected = 'selected';
-    }
-    echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-    $selected = '';
-    if ($row['value'] == 'N') {
-        $selected = 'selected';
-    }
-    echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-    ?>
+						if ($row['value'] == 'Y') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+						$selected = '';
+						if ($row['value'] == 'N') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+						?>
 					</select>
 				</td>
 			</tr>
@@ -158,14 +149,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
                 } catch (PDOException $e) {
                     echo "<div class='error'>".$e->getMessage().'</div>';
                 }
-    $row = $result->fetch();
-    ?>
+				$row = $result->fetch();
+				?>
 				<td style='width: 275px'>
 					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') {
-    echo __($guid, $row['description']);
-}
-    ?></i></span>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
 				</td>
 				<td stclass="right">
 					<input name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" maxlength=50 value="<?php echo htmlPrep($row['value']) ?>" type="text" style="width: 300px">
@@ -185,14 +173,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
                 } catch (PDOException $e) {
                     echo "<div class='error'>".$e->getMessage().'</div>';
                 }
-    $row = $result->fetch();
-    ?>
+				$row = $result->fetch();
+				?>
 				<td>
 					<b><?php echo __($guid, $row['nameDisplay']) ?></b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') {
-    echo __($guid, $row['description']);
-}
-    ?></i></span>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
 				</td>
 				<td class="right">
 					<textarea name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" rows=8 style="width: 300px"><?php echo htmlPrep($row['value']) ?></textarea>
@@ -200,13 +185,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 			</tr>
 			<tr>
 				<td>
-					<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field');
-    ?></i></span>
+					<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
 				</td>
 				<td class="right">
 					<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-					<input type="submit" value="<?php echo __($guid, 'Submit');
-    ?>">
+					<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
 				</td>
 			</tr>
 		</table>

@@ -36,8 +36,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
     } else {
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
     }
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -94,88 +93,88 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo "<form method='get' action='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php'>";
         echo "<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
         ?>
-				<tr>
-					<td> 
-						<b><?php echo __($guid, 'Learning Area') ?></b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
-							<option value=""></option>
-							<?php
-                            $learningAreas = getLearningAreas($connection2, $guid);
-        for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-            if ($gibbonDepartmentID == $learningAreas[$i]) {
-                echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-            } else {
-                echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-            }
-        }
-        ?>			
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td> 
-						<b><?php echo __($guid, 'Difficulty') ?></b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<?php
-                        $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-        echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
-        echo "<option value=''></option>";
-        $difficultiesList = explode(',', $difficulties);
-        foreach ($difficultiesList as $difficultyOption) {
-            $selected = '';
-            if ($difficulty == $difficultyOption) {
-                $selected = 'selected';
-            }
-            echo "<option $selected value='".$difficultyOption."'>".$difficultyOption.'</option>';
-        }
-        echo '</select>';
-        ?>
-					</td>
-				</tr>
-				<tr>
-					<td> 
-						<b><?php echo __($guid, 'Name') ?></b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<?php
-                        echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
-        ?>
-					</td>
-				</tr>
-				<?php
-                if ($canManage) {
-                    ?>
-					<tr>
-						<td> 
-							<b><?php echo __($guid, 'Show Inactive Units?') ?></b><br/>
-							<span style="font-size: 90%"><i></i></span>
-						</td>
-						<td class="right">
-							<select name="showInactive" id="showInactive" style="width: 302px">
-								<?php
-                                $selected = '';
-                    if ($showInactive == 'N') {
-                        $selected = 'selected';
-                    }
-                    echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-                    $selected = '';
-                    if ($showInactive == 'Y') {
-                        $selected = 'selected';
-                    }
-                    echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-                    ?>			
-							</select>
-						</td>
-					</tr>
+		<tr>
+			<td> 
+				<b><?php echo __($guid, 'Learning Area') ?></b><br/>
+				<span style="font-size: 90%"><i></i></span>
+			</td>
+			<td class="right">
+				<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
+					<option value=""></option>
 					<?php
+					$learningAreas = getLearningAreas($connection2, $guid);
+					for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+						if ($gibbonDepartmentID == $learningAreas[$i]) {
+							echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+						} else {
+							echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+						}
+					}
+					?>			
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td> 
+				<b><?php echo __($guid, 'Difficulty') ?></b><br/>
+				<span style="font-size: 90%"><i></i></span>
+			</td>
+			<td class="right">
+				<?php
+				$difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+				echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
+				echo "<option value=''></option>";
+				$difficultiesList = explode(',', $difficulties);
+				foreach ($difficultiesList as $difficultyOption) {
+					$selected = '';
+					if ($difficulty == $difficultyOption) {
+						$selected = 'selected';
+					}
+					echo "<option $selected value='".$difficultyOption."'>".$difficultyOption.'</option>';
+				}
+				echo '</select>';
+				?>
+			</td>
+		</tr>
+		<tr>
+			<td> 
+				<b><?php echo __($guid, 'Name') ?></b><br/>
+				<span style="font-size: 90%"><i></i></span>
+			</td>
+			<td class="right">
+				<?php
+				echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
+        		?>
+			</td>
+		</tr>
+		<?php
+		if ($canManage) {
+			?>
+			<tr>
+				<td> 
+					<b><?php echo __($guid, 'Show Inactive Units?') ?></b><br/>
+					<span style="font-size: 90%"><i></i></span>
+				</td>
+				<td class="right">
+					<select name="showInactive" id="showInactive" style="width: 302px">
+						<?php
+						$selected = '';
+						if ($showInactive == 'N') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+						$selected = '';
+						if ($showInactive == 'Y') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+						?>			
+					</select>
+				</td>
+			</tr>
+			<?php
 
-                }
+		}
 
         echo '<tr>';
         echo "<td class='right' colspan=2>";
@@ -336,8 +335,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     ++$count;
 
-                        //COLOR ROW BY STATUS!
-                        echo "<tr class=$rowNum>";
+					//COLOR ROW BY STATUS!
+					echo "<tr class=$rowNum>";
                     echo "<td style='text-align: center; font-size: 125%'>";
                     echo "<div style='font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>".$row['name'].'</div><br/>';
                     if ($row['logo'] == null) {
@@ -359,9 +358,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 echo "<a target='_blank' href='".$author[3]."'>".$author[1].'</a><br/>';
                             }
                             if (isset($_SESSION[$guid]['username'])) { //Am author chekc only if logged in!
-                                            if ($author[2] == $_SESSION[$guid]['gibbonPersonID']) { // Check to see if I am one of the authors
-                                                $amAuthor = true;
-                                            }
+								if ($author[2] == $_SESSION[$guid]['gibbonPersonID']) { // Check to see if I am one of the authors
+									$amAuthor = true;
+								}
                             }
                         }
                     }
@@ -436,39 +435,39 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo '</td>';
                     if (isset($_SESSION[$guid]['username'])) { //Likes only if logged in!
-                                echo '<td>';
-                                    //DEAL WITH LIKES
-                                    if ($amAuthor) { //I am one of the authors, so cannot like
-                                        echo countLikesByContextAndRecipient($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
-                                    } else { //I am not one of the authors, and so can like
-                                        echo "<div id='star".$row['freeLearningUnitID']."'>";
-                                        $likesGiven = countLikesByContextAndGiver($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
-                                        $comment = addSlashes($row['name']);
-                                        $authorList = '';
-                                        foreach ($authors as $author) {
-                                            if ($author[0] == $row['freeLearningUnitID']) {
-                                                $authorList .= $author[2].',';
-                                            }
-                                        }
-                                        if ($authorList != '') {
-                                            $authorList = substr($authorList, 0, -1);
-                                        }
-                                        echo '<script type="text/javascript">';
-                                        echo '$(document).ready(function(){';
-                                        echo '$("#starAdd'.$row['freeLearningUnitID'].'").click(function(){';
-                                        echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "add", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
-                                        echo '});';
-                                        echo '$("#starRemove'.$row['freeLearningUnitID'].'").click(function(){';
-                                        echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "remove", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
-                                        echo '});';
-                                        echo '});';
-                                        echo '</script>';
-                                        if ($likesGiven < 1) {
-                                            echo "<a id='starAdd".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_off.png'></a>";
-                                        } else {
-                                            echo "<a id='starRemove".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_on.png'></a>";
-                                        }
-                                    }
+						echo '<td>';
+							//DEAL WITH LIKES
+							if ($amAuthor) { //I am one of the authors, so cannot like
+								echo countLikesByContextAndRecipient($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
+							} else { //I am not one of the authors, and so can like
+								echo "<div id='star".$row['freeLearningUnitID']."'>";
+								$likesGiven = countLikesByContextAndGiver($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
+								$comment = addSlashes($row['name']);
+								$authorList = '';
+								foreach ($authors as $author) {
+									if ($author[0] == $row['freeLearningUnitID']) {
+										$authorList .= $author[2].',';
+									}
+								}
+								if ($authorList != '') {
+									$authorList = substr($authorList, 0, -1);
+								}
+								echo '<script type="text/javascript">';
+								echo '$(document).ready(function(){';
+								echo '$("#starAdd'.$row['freeLearningUnitID'].'").click(function(){';
+								echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "add", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
+								echo '});';
+								echo '$("#starRemove'.$row['freeLearningUnitID'].'").click(function(){';
+								echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "remove", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
+								echo '});';
+								echo '});';
+								echo '</script>';
+								if ($likesGiven < 1) {
+									echo "<a id='starAdd".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_off.png'></a>";
+								} else {
+									echo "<a id='starRemove".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_on.png'></a>";
+								}
+							}
                         echo '</div>';
                         echo '</td>';
                     }
@@ -500,12 +499,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $rowNum = 'odd';
                 while ($row = $result->fetch()) {
                     //Row header if needed
-                        if ($count % $columns == 0) {
-                            echo "<tr class='odd'>";
-                        }
+					if ($count % $columns == 0) {
+						echo "<tr class='odd'>";
+					}
 
-                        //Cell style
-                        $cellClass = '';
+					//Cell style
+					$cellClass = '';
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
                         $cellClass = 'current';
                     } elseif ($row['status'] == 'Current' or $row['status'] == 'Complete - Pending') {
@@ -521,8 +520,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo "<img title='".htmlPrep($title)."' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$row['logo']."'/><br/>";
                     }
 
-                            //Actions
-                            $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
+					//Actions
+					$prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
                     if ($prerequisitesActive != false) {
                         $prerequisites = explode(',', $prerequisitesActive);
                         $units = getUnitsArray($connection2);
@@ -562,8 +561,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             } elseif ($view == 'map') {
                 echo '<p>';
                 echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.');
-                echo '</p>';
-                ?>
+                echo '</p>'; ?>
 				<script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
 				<link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 
@@ -636,8 +634,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 ?>
 				<script type="text/javascript">
 					//CREATE NODE ARRAY
-					var nodes = new vis.DataSet([<?php echo $nodeList;
-                ?>]);
+					var nodes = new vis.DataSet([<?php echo $nodeList; ?>]);
 
 					//CREATE EDGET ARRAY
 					var edges = new vis.DataSet([<?php echo $edgeList ?>]);

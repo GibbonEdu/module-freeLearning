@@ -30,8 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -96,10 +95,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 						<tr>
 							<td>
-								<b><?php echo __($guid, 'Are you sure you want to delete this record?');
-                ?></b><br/>
-								<span style="font-size: 90%; color: #cc0000"><i><?php echo __($guid, 'This operation cannot be undone, and may lead to loss of vital data in your system. PROCEED WITH CAUTION!');
-                ?></i></span>
+								<b><?php echo __($guid, 'Are you sure you want to delete this record?'); ?></b><br/>
+								<span style="font-size: 90%; color: #cc0000"><i><?php echo __($guid, 'This operation cannot be undone, and may lead to loss of vital data in your system. PROCEED WITH CAUTION!'); ?></i></span>
 							</td>
 							<td class="right">
 
@@ -109,8 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 							<td>
 								<input name="freeLearningUnitID" id="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>" type="hidden">
 								<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-								<input type="submit" value="<?php echo __($guid, 'Yes');
-                ?>">
+								<input type="submit" value="<?php echo __($guid, 'Yes'); ?>">
 							</td>
 							<td class="right">
 

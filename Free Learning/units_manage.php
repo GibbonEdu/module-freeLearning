@@ -30,8 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -62,63 +61,63 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         echo "<form method='get' action='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php'>";
         echo "<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
         ?>
-				<tr>
-					<td>
-						<b><?php echo __($guid, 'Learning Area') ?></b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
-							<option value=""></option>
-							<?php
-                            $learningAreas = getLearningAreas($connection2, $guid);
-        for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-            if ($gibbonDepartmentID == $learningAreas[$i]) {
-                echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-            } else {
-                echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-            }
-        }
-        ?>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<b><?php echo __($guid, 'Difficulty') ?></b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<?php
-                        $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-        echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
-        echo "<option value=''></option>";
-        $difficultiesList = explode(',', $difficulties);
-        foreach ($difficultiesList as $difficultyOption) {
-            $selected = '';
-            if ($difficulty == $difficultyOption) {
-                $selected = 'selected';
-            }
-            echo "<option $selected value='".$difficultyOption."'>".$difficultyOption.'</option>';
-        }
-        echo '</select>';
-        ?>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<b><?php echo __($guid, 'Name') ?></b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<?php
-                        echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
-        ?>
-					</td>
-				</tr>
+		<tr>
+			<td>
+				<b><?php echo __($guid, 'Learning Area') ?></b><br/>
+				<span style="font-size: 90%"><i></i></span>
+			</td>
+			<td class="right">
+				<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
+					<option value=""></option>
+					<?php
+					$learningAreas = getLearningAreas($connection2, $guid);
+					for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+						if ($gibbonDepartmentID == $learningAreas[$i]) {
+							echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+						} else {
+							echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+						}
+					}
+					?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<b><?php echo __($guid, 'Difficulty') ?></b><br/>
+				<span style="font-size: 90%"><i></i></span>
+			</td>
+			<td class="right">
 				<?php
+				$difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+				echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
+				echo "<option value=''></option>";
+				$difficultiesList = explode(',', $difficulties);
+				foreach ($difficultiesList as $difficultyOption) {
+					$selected = '';
+					if ($difficulty == $difficultyOption) {
+						$selected = 'selected';
+					}
+					echo "<option $selected value='".$difficultyOption."'>".$difficultyOption.'</option>';
+				}
+				echo '</select>';
+				?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<b><?php echo __($guid, 'Name') ?></b><br/>
+				<span style="font-size: 90%"><i></i></span>
+			</td>
+			<td class="right">
+				<?php
+				echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
+       			?>
+			</td>
+		</tr>
+		<?php
 
-                echo '<tr>';
+		echo '<tr>';
         echo "<td class='right' colspan=2>";
         echo "<input type='hidden' name='q' value='".$_GET['q']."'>";
         echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php'>".__($guid, 'Clear Filters').'</a> ';
@@ -214,8 +213,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     $rowNum = 'error';
                 }
 
-                    //COLOR ROW BY STATUS!
-                    echo "<tr class=$rowNum>";
+				//COLOR ROW BY STATUS!
+				echo "<tr class=$rowNum>";
                 echo '<td>';
                 echo $row['name'];
                 echo '</td>';

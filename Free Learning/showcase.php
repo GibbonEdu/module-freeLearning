@@ -34,8 +34,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
     echo '</div>';
 } else {
     echo "<div class='trail'>";
-    if ($publicUnits == 'Y') {
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase').'</div>';
+    if ($publicUnits == 'Y') { echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase').'</div>';
     } else {
         echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase').'</div>';
     }
@@ -56,13 +55,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
         $sqlWork = "SELECT freeLearningUnit.*, freeLearningUnitStudent.*, surname, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
         $resultWork = $connection2->prepare($sqlWork);
         $resultWork->execute($dataWork);
-    } catch (PDOException $e) {
-        echo "<div class='error'>".$e->getMessage().'</div>';
+    } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
     }
     $sqlPage = $sqlWork.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($page - 1) * $_SESSION[$guid]['pagination']);
 
-    if ($resultWork->rowCount() < 1) {
-        echo "<div class='error'>";
+    if ($resultWork->rowCount() < 1) { echo "<div class='error'>";
         echo __($guid, 'There are no records to display.');
         echo '</div>';
     } else {
@@ -115,12 +112,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
             }
             echo '</td>';
             echo "<td style='vertical-align: top; border-left: none'>";
-                        //DISPLAY WORK.
-                        echo '<p>';
+			//DISPLAY WORK.
+			echo '<p>';
             if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+            	echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
             } else { //It's a link
-                                echo "<a target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+                echo "<a target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
             }
             echo '</p>';
             echo '<p>';
