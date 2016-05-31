@@ -88,7 +88,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $status = 'Complete - Pending';
                     $commentStudent = $_POST['commentStudent'];
                     $type = $_POST['type'];
-                    $link = $_POST['link'];
+                    $link = trim($_POST['link']);
                     $gibbonCourseClassID = $row['gibbonCourseClassID'];
 
                     //Validation

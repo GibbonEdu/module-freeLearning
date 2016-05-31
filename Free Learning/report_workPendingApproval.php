@@ -33,20 +33,20 @@ else {
 	print "<div class='trail'>" ;
 	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Work Pending Approval') . "</div>" ;
 	print "</div>" ;
-	
+
 	print "<p>" ;
 		print __($guid, 'This report shows all work that is complete, but pending approval, in all of your classes.') ;
 	print "<p>" ;
-	
+
 	//List students whose status is Current or Complete - Pending
 	try {
-		$dataClass=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]); 
+		$dataClass=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]);
 		$sqlClass="SELECT freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClassPerson.role='Teacher' AND gibbonPerson.status='Full' AND freeLearningUnitStudent.status='Complete - Pending' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "') AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY gibbonCourse.nameShort, gibbonCourseClass.nameShort, freeLearningUnit.name, surname, preferredName" ;
 		$resultClass=$connection2->prepare($sqlClass);
 		$resultClass->execute($dataClass);
 	}
-	catch(PDOException $e) { 
-		print "<div class='error'>" . $e->getMessage() . "</div>" ; 
+	catch(PDOException $e) {
+		print "<div class='error'>" . $e->getMessage() . "</div>" ;
 	}
 	$count=0;
 	$rowNum="odd" ;
@@ -57,18 +57,18 @@ else {
 	}
 	else {
 		?>
-		<table cellspacing='0' style="width: 100%">	
+		<table cellspacing='0' style="width: 100%">
 			<tr class='head'>
-				<th> 
+				<th>
 					<?php print __($guid, 'Class') ?><br/>
 				</th>
-				<th> 
+				<th>
 					<?php print __($guid, 'Unit') ?><br/>
 				</th>
-				<th> 
+				<th>
 					<?php print __($guid, 'Student') ?><br/>
 				</th>
-				<th> 
+				<th>
 					<?php print __($guid, 'Status') ?><br/>
 				</th>
 			</tr>
@@ -81,32 +81,31 @@ else {
 					$rowNum="odd" ;
 				}
 				$count++ ;
-			
+
 				print "<tr class=$rowNum>" ;
 				?>
 					<?php
 					print "<td>" ;
 						if ($rowClass["course"]!="" AND $rowClass["class"]!="") {
 							print $rowClass["course"] . "." . $rowClass["class"] ;
-						}
-						else {
+						} else {
 							print "<i>" . __($guid, 'NA') . "</i>" ;
 						}
 					print "</td>" ;
 					?>
-					<td> 
+					<td>
 						<?php
 							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&tab=1&sidebar=true'>" . $rowClass["unit"] . "</a>" ;
 						?>
-					</td>	
-					<td> 
+					</td>
+					<td>
 						<?php print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true) . "</a>" ?><br/>
 					</td>
-					<td> 
+					<td>
 						<?php print $rowClass["status"] ?><br/>
-					</td>										
-				</tr>
-				<?
+					</td>
+				<?php
+				echo "</tr>" ;
 			}
 			?>
 		</table>

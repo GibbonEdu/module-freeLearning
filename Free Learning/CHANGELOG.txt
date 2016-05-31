@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v3.1.05
+-------
+Fixed link white space issue
+
 v3.1.04
 -------
 Fixed indentation in beautified PHP code
