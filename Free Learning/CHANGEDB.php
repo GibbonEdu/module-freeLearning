@@ -408,4 +408,5 @@ UPDATE gibbonAction SET categoryPermissionStaff='Y', categoryPermissionStudent='
 ALTER TABLE `freeLearningUnitStudent` ADD `enrolmentMethod` ENUM('class','schoolMentor','externalMentor') NOT NULL DEFAULT 'class' AFTER `gibbonSchoolYearID`;end
 ALTER TABLE `freeLearningUnitStudent` ADD `gibbonPersonIDSchoolMentor` INT(10) UNSIGNED ZEROFILL NULL DEFAULT NULL AFTER `gibbonCourseClassID`, ADD `emailExternalMentor` VARCHAR(255) NULL DEFAULT NULL AFTER `gibbonPersonIDSchoolMentor`, ADD `nameExternalMentor` VARCHAR(255) NULL DEFAULT NULL AFTER `emailExternalMentor`;end
 ALTER TABLE `freeLearningUnitStudent` ADD `confirmationKey` VARCHAR(20) NULL DEFAULT NULL AFTER `collaborationKey`;
+ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Current';end
 ";

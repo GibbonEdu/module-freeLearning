@@ -238,7 +238,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             //Attempt to notify the student
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { //Only if status or comment has changed.
                                 $text = sprintf(__($guid, 'A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name);
-                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&sidebar=true&tab=2";
+                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&sidebar=true&tab=1";
                                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                             }
 

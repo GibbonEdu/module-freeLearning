@@ -399,154 +399,160 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
         if ($resultEnrol->rowCount() == 1) { //Already enroled, deal with different statuses
             $rowEnrol = $resultEnrol->fetch();
-            if ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Evidence Not Approved') { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
+            if ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Approved') { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
                 echo '<h4>';
                 echo __($guid, 'Currently Enroled');
                 echo '</h4>';
-                if ($schoolType == 'Physical') {
-                    if ($rowEnrol['status'] == 'Current') {
-                        echo '<p>';
-                        echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $row['name']);
-                        echo '</p>';
-                    } elseif ($rowEnrol['status'] == 'Evidence Not Approved') {
-                        echo "<div class='warning'>";
-                        echo __($guid, 'Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:').'<br/><br/>';
-                        echo '<b>'.$rowEnrol['commentApproval'].'</b>';
-                        echo '</div>';
-                    }
-                } else {
-                    if ($rowEnrol['status'] == 'Current') {
-                        echo '<p>';
-                        echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.'), $row['name']);
-                        echo '</p>';
-                    }
+                if ($rowEnrol['status'] == 'Current - Pending') {
+                    echo '<p>';
+                    echo sprintf(__($guid, 'You are currently enroled in %1$s, but your chosen mentor has yet to confirm their participation. You cannot submit evidence until they have done so.'), $row['name']);
+                    echo '</p>';
                 }
+                else {
+                    if ($schoolType == 'Physical') {
+                        if ($rowEnrol['status'] == 'Current') {
+                            echo '<p>';
+                            echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $row['name']);
+                            echo '</p>';
+                        } elseif ($rowEnrol['status'] == 'Evidence Not Approved') {
+                            echo "<div class='warning'>";
+                            echo __($guid, 'Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:').'<br/><br/>';
+                            echo '<b>'.$rowEnrol['commentApproval'].'</b>';
+                            echo '</div>';
+                        }
+                    } else {
+                        if ($rowEnrol['status'] == 'Current') {
+                            echo '<p>';
+                            echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.'), $row['name']);
+                            echo '</p>';
+                        }
+                    }
 
-                ?>
-                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_completePendingProcess.php?address='.$_GET['q'] ?>" enctype="multipart/form-data">
-                    <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                        <tr>
-                            <td>
-                                <b><?php echo __($guid, 'Status') ?> *</b><br/>
-                                <span style="font-size: 90%"><i><?php echo __($guid, 'This value cannot be changed.') ?></i></span>
-                            </td>
-                            <td class="right">
-                                <input readonly style='width: 300px' type='text' value='Complete - Pending' />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b><?php echo __($guid, 'Comment') ?> *</b><br/>
-                                <span style="font-size: 90%"><i>
-                                    <?php
-                                    echo __($guid, 'Leave a brief reflective comment on this unit<br/>and what you learned.');
+                    ?>
+                    <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_completePendingProcess.php?address='.$_GET['q'] ?>" enctype="multipart/form-data">
+                        <table class='smallIntBorder' cellspacing='0' style="width: 100%">
+                            <tr>
+                                <td>
+                                    <b><?php echo __($guid, 'Status') ?> *</b><br/>
+                                    <span style="font-size: 90%"><i><?php echo __($guid, 'This value cannot be changed.') ?></i></span>
+                                </td>
+                                <td class="right">
+                                    <input readonly style='width: 300px' type='text' value='Complete - Pending' />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b><?php echo __($guid, 'Comment') ?> *</b><br/>
+                                    <span style="font-size: 90%"><i>
+                                        <?php
+                                        echo __($guid, 'Leave a brief reflective comment on this unit<br/>and what you learned.');
+                                        if ($rowEnrol['status'] == 'Evidence Not Approved') {
+                                            echo '<br/><br/>'.__($guid, 'Your previous comment is shown here, for you to edit.');
+                                        }
+                                        ?>
+                                    </i></span>
+                                </td>
+                                <td class="right">
+                                    <script type='text/javascript'>
+                                        $(document).ready(function(){
+                                            autosize($('textarea'));
+                                        });
+                                    </script>
+                                    <textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"><?php
                                     if ($rowEnrol['status'] == 'Evidence Not Approved') {
-                                        echo '<br/><br/>'.__($guid, 'Your previous comment is shown here, for you to edit.');
+                                        echo $rowEnrol['commentStudent'];
+                                    }
+                                    ?></textarea>
+                                    <script type="text/javascript">
+                                        var commentStudent=new LiveValidation('commentStudent');
+                                        commentStudent.add(Validate.Presence);
+                                    </script>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b><?php echo __($guid, 'Type') ?> *</b><br/>
+                                </td>
+                                <td class="right">
+                                    <input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
+                                    <input type="radio" id="type" name="type" class="type" value="File" /> File
+                                </td>
+                            </tr>
+                            <script type="text/javascript">
+                                /* Subbmission type control */
+                                $(document).ready(function(){
+                                    $("#fileRow").css("display","none");
+                                    $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
+
+                                    $(".type").click(function(){
+                                        if ($('input[name=type]:checked').val()=="Link" ) {
+                                            $("#fileRow").css("display","none");
+                                            $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
+                                        } else {
+                                            $("#linkRow").css("display","none");
+                                            $("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
+                                        }
+                                     });
+                                });
+                            </script>
+
+                            <tr id="fileRow">
+                                <td>
+                                    <b><?php echo __($guid, 'Submit File') ?> *</b><br/>
+                                </td>
+                                <td class="right">
+                                    <input type="file" name="file" id="file"><br/><br/>
+                                    <?php
+                                    echo getMaxUpload();
+
+                                    //Get list of acceptable file extensions
+                                    try {
+                                        $dataExt = array();
+                                        $sqlExt = 'SELECT * FROM gibbonFileExtension';
+                                        $resultExt = $connection2->prepare($sqlExt);
+                                        $resultExt->execute($dataExt);
+                                    } catch (PDOException $e) {
+                                    }
+                                    $ext = '';
+                                    while ($rowExt = $resultExt->fetch()) {
+                                        $ext = $ext."'.".$rowExt['extension']."',";
                                     }
                                     ?>
-                                </i></span>
-                            </td>
-                            <td class="right">
-                                <script type='text/javascript'>
-                                    $(document).ready(function(){
-                                        autosize($('textarea'));
-                                    });
-                                </script>
-                                <textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"><?php
-                                if ($rowEnrol['status'] == 'Evidence Not Approved') {
-                                    echo $rowEnrol['commentStudent'];
-                                }
-                                ?></textarea>
-                                <script type="text/javascript">
-                                    var commentStudent=new LiveValidation('commentStudent');
-                                    commentStudent.add(Validate.Presence);
-                                </script>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b><?php echo __($guid, 'Type') ?> *</b><br/>
-                            </td>
-                            <td class="right">
-                                <input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
-                                <input type="radio" id="type" name="type" class="type" value="File" /> File
-                            </td>
-                        </tr>
-                        <script type="text/javascript">
-                            /* Subbmission type control */
-                            $(document).ready(function(){
-                                $("#fileRow").css("display","none");
-                                $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
 
-                                $(".type").click(function(){
-                                    if ($('input[name=type]:checked').val()=="Link" ) {
-                                        $("#fileRow").css("display","none");
-                                        $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
-                                    } else {
-                                        $("#linkRow").css("display","none");
-                                        $("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
-                                    }
-                                 });
-                            });
-                        </script>
-
-                        <tr id="fileRow">
-                            <td>
-                                <b><?php echo __($guid, 'Submit File') ?> *</b><br/>
-                            </td>
-                            <td class="right">
-                                <input type="file" name="file" id="file"><br/><br/>
-                                <?php
-                                echo getMaxUpload();
-
-                                //Get list of acceptable file extensions
-                                try {
-                                    $dataExt = array();
-                                    $sqlExt = 'SELECT * FROM gibbonFileExtension';
-                                    $resultExt = $connection2->prepare($sqlExt);
-                                    $resultExt->execute($dataExt);
-                                } catch (PDOException $e) {
-                                }
-                                $ext = '';
-                                while ($rowExt = $resultExt->fetch()) {
-                                    $ext = $ext."'.".$rowExt['extension']."',";
-                                }
-                                ?>
-
-                                <script type="text/javascript">
-                                    var file=new LiveValidation('file');
-                                    file.add( Validate.Inclusion, { within: [<?php echo $ext; ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
-                                </script>
-                            </td>
-                        </tr>
-                        <tr id="linkRow">
-                            <td>
-                                <b><?php echo __($guid, 'Submit Link') ?> *</b><br/>
-                            </td>
-                            <td class="right">
-                                <input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
-                                <script type="text/javascript">
-                                    var link=new LiveValidation('link');
-                                    link.add( Validate.Inclusion, { within: ['http://', 'https://'], failureMessage: "Address must start with http:// or https://", partialMatch: true } );
-                                </script>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="right" colspan=2>
-                                <input type="hidden" name="freeLearningUnitStudentID" value="<?php echo $rowEnrol['freeLearningUnitStudentID'] ?>">
-                                <input type="hidden" name="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>">
-                                <input type="submit" id="submit" value="Submit">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="right" colspan=2>
-                                <span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
-                            </td>
-                        </tr>
-                    </table>
-                </form>
-                <?php
-
+                                    <script type="text/javascript">
+                                        var file=new LiveValidation('file');
+                                        file.add( Validate.Inclusion, { within: [<?php echo $ext; ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
+                                    </script>
+                                </td>
+                            </tr>
+                            <tr id="linkRow">
+                                <td>
+                                    <b><?php echo __($guid, 'Submit Link') ?> *</b><br/>
+                                </td>
+                                <td class="right">
+                                    <input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
+                                    <script type="text/javascript">
+                                        var link=new LiveValidation('link');
+                                        link.add( Validate.Inclusion, { within: ['http://', 'https://'], failureMessage: "Address must start with http:// or https://", partialMatch: true } );
+                                    </script>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right" colspan=2>
+                                    <input type="hidden" name="freeLearningUnitStudentID" value="<?php echo $rowEnrol['freeLearningUnitStudentID'] ?>">
+                                    <input type="hidden" name="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>">
+                                    <input type="submit" id="submit" value="Submit">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="right" colspan=2>
+                                    <span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                    <?php
+                }
             } elseif ($rowEnrol['status'] == 'Complete - Pending') { //Waiting for teacher feedback
                 echo '<h4>';
                 echo __($guid, 'Complete - Pending Approval');

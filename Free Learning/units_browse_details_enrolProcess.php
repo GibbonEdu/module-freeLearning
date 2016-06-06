@@ -78,7 +78,7 @@ if ($view != 'grid' and $view != 'map') {
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]['timezone']);
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&sidebar=true&tab=2';
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&sidebar=true&tab=1';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
     //Fail 0
@@ -167,11 +167,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         $gibbonPersonIDSchoolMentor = null;
                         $emailExternalMentor = null;
                         $nameExternalMentor = null;
-                        if ($enrolmentMethod =='class') {
+                        if ($enrolmentMethod == 'class') {
                             $gibbonCourseClassID = $_POST['gibbonCourseClassID'];
-                        } elseif ($enrolmentMethod =='schoolMentor') {
+                        } elseif ($enrolmentMethod == 'schoolMentor') {
                             $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
-                        } elseif ($enrolmentMethod =='externalMentor') {
+                            $emailInternalMentor = '' ;
+                            try {
+                                $dataInternal = array('gibbonPersonID' => $gibbonPersonIDSchoolMentor);
+                                $sqlInternal = 'SELECT email FROM gibbonPerson WHERE gibbonPersonID=:gibbonPersonID';
+                                $resultInternal = $connection2->prepare($sqlInternal);
+                                $resultInternal->execute($dataInternal);
+                            } catch (PDOException $e) { }
+                            if ($resultInternal->rowCount() == 1) {
+                                $rowInternal = $resultInternal->fetch() ;
+                                $emailInternalMentor = $rowInternal['email'] ;
+                            }
+                        } elseif ($enrolmentMethod == 'externalMentor') {
                             $emailExternalMentor = $_POST['emailExternalMentor'];
                             $nameExternalMentor = $_POST['nameExternalMentor'];
                         }
@@ -180,7 +191,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         if (isset($_POST['collaborators'])) {
                             $collaborators = $_POST['collaborators'];
                         }
-                        if ($grouping == '' or ($enrolmentMethod =='class' and $gibbonCourseClassID =='') or ($enrolmentMethod =='schoolMentor' and $gibbonPersonIDSchoolMentor =='') or ($enrolmentMethod =='externalMentor' and ($emailExternalMentor =='' or $nameExternalMentor==''))) {
+                        if ($grouping == '' or ($enrolmentMethod == 'class' and $gibbonCourseClassID == '') or ($enrolmentMethod == 'schoolMentor' and $gibbonPersonIDSchoolMentor == '') or ($enrolmentMethod == 'externalMentor' and ($emailExternalMentor == '' or $nameExternalMentor== ''))) {
                             //Fail 3
                             $URL .= '&return=error3';
                             header("Location: {$URL}");
@@ -188,7 +199,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             //If there are mentors, generate a unique confirmation key
                             $confirmationKey = null;
                             $unique = false;
-                            if ($enrolmentMethod =='schoolMentor' or $enrolmentMethod =='externalMentor') {
+                            if ($enrolmentMethod == 'schoolMentor' or $enrolmentMethod == 'externalMentor') {
                                 $spinCount = 0;
                                 while ($spinCount < 100 and $unique != true) {
                                     $confirmationKey = randomPassword(20);
@@ -251,9 +262,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             //Check enrolment (and for collaborators too)
                             try {
+                                $whereExtra = '' ;
                                 if (count($collaborators) > 0) {
                                     $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                    $whereExtra = '' ;
                                     $collaboratorCount = 0;
                                     foreach ($collaborators AS $collaborator) {
                                         $data['gibbonPersonID'.$collaboratorCount] = $collaborator;
@@ -281,44 +292,125 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 header("Location: {$URL}");
                                 exit();
                             } else {
-                                //Write to database
+                                //Create an array of student data, recyclying data query from above
+                                $students = array();
                                 try {
-                                    $data = array('gibbonPersonIDStudent' => $_SESSION[$guid]['gibbonPersonID'], 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                    $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, grouping=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='".date('Y-m-d H:i:s')."'";
+                                    unset($data['freeLearningUnitID']);
+                                    $whereExtra = str_replace ('gibbonPersonIDStudent', 'gibbonPersonID', $whereExtra);
+                                    $sql = 'SELECT email, surname, preferredName FROM gibbonPerson WHERE (gibbonPersonID=:gibbonPersonID'.$whereExtra.') ORDER BY (gibbonPerson.gibbonPersonID=\''.$_SESSION[$guid]['gibbonPersonID'].'\') DESC, surname, preferredName';
                                     $result = $connection2->prepare($sql);
                                     $result->execute($data);
                                 } catch (PDOException $e) {
                                     //Fail 2
-                                    print $e->getMessage() ; exit();
                                     $URL .= '&return=error2';
                                     header("Location: {$URL}");
                                     exit();
                                 }
+                                if ($result->rowCount() < count($collaborators)) {
+                                    //Fail 2
+                                    $URL .= '&return=error2';
+                                    header("Location: {$URL}");
+                                    exit();
+                                } else {
+                                    $studentCount = 0;
+                                    while ($row = $result->fetch()) {
+                                        $students[$studentCount][0] = formatName('', $row['preferredName'], $row['surname'], 'Student', true);
+                                        $students[$studentCount][1] = $row['email'];
+                                        $studentCount ++;
+                                    }
+                                    //Write to database
+                                    try {
+                                        $data = array('gibbonPersonIDStudent' => $_SESSION[$guid]['gibbonPersonID'], 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                        $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, grouping=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current - Pending', timestampJoined='".date('Y-m-d H:i:s')."'";
+                                        $result = $connection2->prepare($sql);
+                                        $result->execute($data);
+                                    } catch (PDOException $e) {
+                                        //Fail 2
+                                        $URL .= '&return=error2';
+                                        header("Location: {$URL}");
+                                        exit();
+                                    }
 
-                                //DEAL WITH COLLABORATORS (availability checked above)!
-                                $partialFail = false;
-                                if (is_array($collaborators)) {
-                                    foreach ($collaborators as $collaborator) {
-                                        //Write to database
+                                    //Last insert ID
+                                    $AI = str_pad($connection2->lastInsertID(), 12, '0', STR_PAD_LEFT);
+
+                                    //DEAL WITH COLLABORATORS (availability checked above)!
+                                    $partialFail = false;
+                                    if (is_array($collaborators)) {
+                                        foreach ($collaborators as $collaborator) {
+                                            //Write to database
+                                            try {
+                                                $data = array('gibbonPersonIDStudent' => $collaborator, 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                                $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, grouping=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current - Pending', timestampJoined='".date('Y-m-d H:i:s')."'";
+                                                $result = $connection2->prepare($sql);
+                                                $result->execute($data);
+                                            } catch (PDOException $e) {
+                                                $partialFail = true;
+                                            }
+                                        }
+                                    }
+
+                                    //Notify internal/external mentors
+                                    if (($enrolmentMethod == 'schoolMentor' and $emailInternalMentor!='') or ($enrolmentMethod == 'externalMentor' and $_POST['emailExternalMentor'] != '')) {
+                                        //Include mailer
+                                        require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/class.phpmailer.php';
+
+                                        //Attempt email send
+                                        $subject = sprintf(__($guid, 'Request For Mentorship via %1$s at %2$s'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
+                                        $body = __($guid, 'To whom it may concern,').'<br/><br/>';
+                                        if ($roleCategory == 'Staff') {
+                                            $roleCategoryFull = 'members of staff';
+                                        }
+                                        else {
+                                            $roleCategoryFull = strtolower($roleCategory);
+                                            $roleCategoryFull .= 's';
+                                        }
+                                        $roleCategoryFull = __($guid, $roleCategoryFull) ;
+
+                                        $body .= sprintf(__($guid, 'The following %1$s at %2$s have requested your input into their %3$sFree Learning%4$s work, with the hope that you will be able to act as a "critical buddy", offering feedback on their progress.'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='https://rossparker.org'>", '</a>');
+                                        $body .= '<br/>';
+                                        $body .= '<ul>';
+                                        foreach ($students AS $student) {
+                                            $body .= '<li>'.$student[0].'</li>';
+                                        }
+                                        $body .= '</ul>';
+                                        $body .= sprintf(__($guid, 'Please %1$sclick here%2$s if you are able to get involved, or, %3$sclick here%4$s if you not in a position to help.'), "<a style='font-weight: bold; text-decoration: underline; color: #390' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey'>", '</a>', "<a style='font-weight: bold; text-decoration: underline; color: #CC0000' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey'>", '</a>');
+                                        $body .= '<br/><br/>';
+                                        $body .= sprintf(__($guid, 'Thank you very much for your time. Should you have any questions about this matter, please reply to this email, or contact %1$s on %2$s.'), $_SESSION[$guid]['organisationAdministratorName'], $_SESSION[$guid]['organisationAdministratorEmail']);
+                                        $body .= '<br/><br/>';
+                                        $body .= sprintf(__($guid, 'Email sent via %1$s at %2$s.'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationName']);
+                                        $body .= '</p>';
+                                        $bodyPlain = emailBodyConvert($body);
+
+                                        $mail = new PHPMailer();
+                                        $mail->SetFrom($students[0][1], $students[0][0]);
+                                        if ($enrolmentMethod == 'schoolMentor')
+                                            $mail->AddAddress($emailInternalMentor);
+                                        elseif ($enrolmentMethod == 'externalMentor')
+                                            $mail->AddAddress($emailExternalMentor);
+                                        $mail->CharSet = 'UTF-8';
+                                        $mail->Encoding = 'base64';
+                                        $mail->IsHTML(true);
+                                        $mail->Subject = $subject;
+                                        $mail->Body = $body;
+                                        $mail->AltBody = $bodyPlain;
+
                                         try {
-                                            $data = array('gibbonPersonIDStudent' => $collaborator, 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                            $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, grouping=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='".date('Y-m-d H:i:s')."'";
-                                            $result = $connection2->prepare($sql);
-                                            $result->execute($data);
-                                        } catch (PDOException $e) {
+                                            $mail->Send();
+                                        } catch (phpmailerException $e) {
                                             $partialFail = true;
                                         }
                                     }
-                                }
 
-                                if ($partialFail == true) {
-                                    //Fail 5
-                                    $URL .= '&return=error5';
-                                    header("Location: {$URL}");
-                                } else {
-                                    //Success 0
-                                    $URL = $URL.'&return=success0';
-                                    header("Location: {$URL}");
+                                    if ($partialFail == true) {
+                                        //Fail 5
+                                        $URL .= '&return=error5';
+                                        header("Location: {$URL}");
+                                    } else {
+                                        //Success 0
+                                        $URL = $URL.'&return=success0';
+                                        header("Location: {$URL}");
+                                    }
                                 }
                             }
                         }

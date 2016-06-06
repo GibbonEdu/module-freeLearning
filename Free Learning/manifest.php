@@ -96,7 +96,7 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   `grouping` ENUM('Individual','Pairs','Threes','Fours','Fives') NOT NULL,
   `collaborationKey` VARCHAR(20) NULL DEFAULT NULL,
   `confirmationKey` varchar(20) DEFAULT NULL,
-  `status` enum('Current','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') NOT NULL DEFAULT 'Current',
+  `status` enum('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') NOT NULL DEFAULT 'Current',
   `timestampJoined` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `timestampCompletePending` timestamp NULL DEFAULT NULL,
   `timestampCompleteApproved` timestamp NULL DEFAULT NULL,

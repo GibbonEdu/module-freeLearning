@@ -67,8 +67,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $showInactive = $_GET['showInactive'];
         }
         $applyAccessControls = 'Y';
-        if ($canManage and isset($_GET['applyAccessControls'])) {
-            $applyAccessControls = $_GET['applyAccessControls'];
+        if ($canManage) {
+            $applyAccessControls = 'N';
+            if (isset($_GET['applyAccessControls'])) {
+                $applyAccessControls = $_GET['applyAccessControls'];
+            }
         }
         $gibbonDepartmentID = null;
         if (isset($_GET['gibbonDepartmentID'])) {

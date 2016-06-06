@@ -362,6 +362,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         <th>
                                             <?php echo __($guid, 'Student') ?><br/>
                                         </th>
+                                        <th>
+                                            <?php
+                                            echo __($guid, 'Status') . '<br/>';
+                                            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Enrolment Method').'</span>';
+                                            ?>
+                                        </th>
                                         <?php
                                         if ($schoolType == 'Physical') {
                                             ?>
@@ -369,12 +375,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                 <?php echo __($guid, 'Class') ?><br/>
                                             </th>
                                             <?php
-
                                         }
                                         ?>
-                                        <th>
-                                            <?php echo __($guid, 'Status') ?><br/>
-                                        </th>
                                         <th>
                                             <?php echo __($guid, 'View') ?><br/>
                                         </th>
@@ -396,6 +398,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             <td>
                                                 <?php echo "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$rowClass['gibbonPersonID']."'>".formatName('', $rowClass['preferredName'], $rowClass['surname'], 'Student', true).'</a>' ?><br/>
                                             </td>
+                                            <td>
+                                                <?php
+                                                echo $rowClass['status'] . '<br/>';
+                                                echo "<span style='font-size: 85%; font-style: italic'>".ucfirst(preg_replace('/(\w+)([A-Z])/U', '\\1 \\2', $rowClass['enrolmentMethod'])).'</span>';
+                                                ?>
+                                            </td>
                                             <?php
                                             if ($schoolType == 'Physical') {
                                                 echo '<td>';
@@ -408,9 +416,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             }
                                             ?>
                                             <td>
-                                                <?php echo $rowClass['status'] ?><br/>
-                                            </td>
-                                            <td>
                                                 <?php
                                                 if ($rowClass['evidenceLocation'] != '') {
                                                     if ($rowClass['evidenceType'] == 'Link') {
@@ -419,7 +424,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                         echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowClass['evidenceLocation']."'>".__($guid, 'View').'</>';
                                                     }
                                                 }
-                                        ?>
+                                                ?>
                                             </td>
                                             <td>
                                                 <?php
@@ -515,13 +520,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 echo '</div>';
                             }
                             if ($rowBlocks['contents'] != '') {
-                                echo "<div style='padding: 15px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>".$rowBlocks['contents'].'</div>';
+                                echo "<div style='margin-top:20px; padding: 15px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>".$rowBlocks['contents'].'</div>';
                                 $resourceContents .= $rowBlocks['contents'];
                             }
                             if (isset($_SESSION[$guid]['username'])) {
                                 if ($roleCategory == 'Staff') {
                                     if ($rowBlocks['teachersNotes'] != '') {
-                                        echo "<div style='background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>".__($guid, "Teacher's Notes").':</b></p> '.$rowBlocks['teachersNotes'].'</div>';
+                                        echo "<div style='margin-top:20px; background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>".__($guid, "Teacher's Notes").':</b></p> '.$rowBlocks['teachersNotes'].'</div>';
                                         $resourceContents .= $rowBlocks['teachersNotes'];
                                     }
                                 }
