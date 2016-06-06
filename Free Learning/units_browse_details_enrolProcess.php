@@ -31,24 +31,66 @@ try {
     echo $e->getMessage();
 }
 
+$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+
 @session_start();
+
+$highestAction = getHighestGroupedAction($guid, $_GET['address'], $connection2);
+
+//Get params
+$freeLearningUnitID = '';
+if (isset($_GET['freeLearningUnitID'])) {
+    $freeLearningUnitID = $_GET['freeLearningUnitID'];
+}
+$canManage = false;
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
+    $canManage = true;
+}
+$showInactive = 'N';
+if ($canManage and isset($_GET['showInactive'])) {
+    $showInactive = $_GET['showInactive'];
+}
+$applyAccessControls = 'Y';
+if ($canManage and isset($_GET['applyAccessControls'])) {
+    $applyAccessControls = $_GET['applyAccessControls'];
+}
+$gibbonDepartmentID = '';
+if (isset($_GET['gibbonDepartmentID'])) {
+    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
+}
+$difficulty = '';
+if (isset($_GET['difficulty'])) {
+    $difficulty = $_GET['difficulty'];
+}
+$name = '';
+if (isset($_GET['name'])) {
+    $name = $_GET['name'];
+}
+$view = '';
+if (isset($_GET['view'])) {
+    $view = $_GET['view'];
+}
+if ($view != 'grid' and $view != 'map') {
+    $view = 'list';
+}
 
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]['timezone']);
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&sidebar=true&tab=1';
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&sidebar=true&tab=2';
 
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
     //Fail 0
     $URL .= '&return=error0';
     header("Location: {$URL}");
 } else {
-    $highestAction = getHighestGroupedAction($guid, $_GET['address'], $connection2);
     if ($highestAction == false) {
         //Fail 0
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
+        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
         $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
 
         $freeLearningUnitID = $_POST['freeLearningUnitID'];
@@ -59,20 +101,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             header("Location: {$URL}");
         } else {
             try {
-                if ($highestAction == 'Browse Units_all' or $schoolType == 'Online') {
-                    $data = array('freeLearningUnitID' => $freeLearningUnitID);
-                    $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
-                } elseif ($highestAction == 'Browse Units_prerequisites') {
-                    if ($schoolType == 'Physical') {
-                        $data['freeLearningUnitID'] = $freeLearningUnitID;
-                        $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                        $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
-                        $sql = "SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC";
-                    } else {
-                        $data['freeLearningUnitID'] = $freeLearningUnitID;
-                        $sql = "SELECT freeLearningUnit.* FROM freeLearningUnit WHERE active='Y' AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC";
-                    }
-                }
+                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID);
+                $data = $unitList[0];
+                $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
             } catch (PDOException $e) {
@@ -111,7 +142,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     header("Location: {$URL}");
                     exit();
                 } else {
-                    if ($schoolType == 'Online') {
+                    if ($schoolType == 'Online') { //ONLINE
                         //Write to database
                         try {
                             $data = array('gibbonPersonIDStudent' => $_SESSION[$guid]['gibbonPersonID'], 'freeLearningUnitID' => $freeLearningUnitID);
@@ -128,132 +159,166 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         //Success 0
                         $URL = $URL.'&return=success0';
                         header("Location: {$URL}");
-                    } else {
-                        //Work out if we student enrolment is allowed
-                        $enrolment = false;
-                        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
-                        if ($roleCategory != 'Student') {
-                            //Fail 2
-                            $URL .= '&return=error2';
-                            header("Location: {$URL}");
-                            exit();
-                        } else {
-                            //Proceed!
-                            //Validate Inputs
+                    } else { //PHYSICAL!
+                        //Proceed!
+                        //Validate Inputs
+                        $enrolmentMethod = $_POST['enrolmentMethod'];
+                        $gibbonCourseClassID = null;
+                        $gibbonPersonIDSchoolMentor = null;
+                        $emailExternalMentor = null;
+                        $nameExternalMentor = null;
+                        if ($enrolmentMethod =='class') {
                             $gibbonCourseClassID = $_POST['gibbonCourseClassID'];
-                            $grouping = $_POST['grouping'];
-                            $collaborators = null;
-                            if (isset($_POST['collaborators'])) {
-                                $collaborators = $_POST['collaborators'];
-                            }
-                            if ($gibbonCourseClassID == '' or $grouping == '') {
-                                //Fail 3
-                                $URL .= '&return=error3';
-                                header("Location: {$URL}");
-                            } else {
-                                //If there are collaborators, generate a unique collaboration key
-                                $collaborationKey = null;
-                                $unique = false;
-                                if (is_array($collaborators)) {
-                                    $spinCount = 0;
-                                    while ($spinCount < 100 and $unique != true) {
-                                        $collaborationKey = randomPassword(20);
-                                        $checkFail = false;
-                                        try {
-                                            $data = array('collaborationKey' => $collaborationKey);
-                                            $sql = 'SELECT * FROM freeLearningUnitStudent WHERE collaborationKey=:collaborationKey';
-                                            $result = $connection2->prepare($sql);
-                                            $result->execute($data);
-                                        } catch (PDOException $e) {
-                                            $checkFail = true;
-                                        }
-                                        if ($checkFail == false) {
-                                            if ($result->rowCount() == 0) {
-                                                $unique = true;
-                                            }
-                                        }
-                                        ++$spinCount;
+                        } elseif ($enrolmentMethod =='schoolMentor') {
+                            $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
+                        } elseif ($enrolmentMethod =='externalMentor') {
+                            $emailExternalMentor = $_POST['emailExternalMentor'];
+                            $nameExternalMentor = $_POST['nameExternalMentor'];
+                        }
+                        $grouping = $_POST['grouping'];
+                        $collaborators = null;
+                        if (isset($_POST['collaborators'])) {
+                            $collaborators = $_POST['collaborators'];
+                        }
+                        if ($grouping == '' or ($enrolmentMethod =='class' and $gibbonCourseClassID =='') or ($enrolmentMethod =='schoolMentor' and $gibbonPersonIDSchoolMentor =='') or ($enrolmentMethod =='externalMentor' and ($emailExternalMentor =='' or $nameExternalMentor==''))) {
+                            //Fail 3
+                            $URL .= '&return=error3';
+                            header("Location: {$URL}");
+                        } else {
+                            //If there are mentors, generate a unique confirmation key
+                            $confirmationKey = null;
+                            $unique = false;
+                            if ($enrolmentMethod =='schoolMentor' or $enrolmentMethod =='externalMentor') {
+                                $spinCount = 0;
+                                while ($spinCount < 100 and $unique != true) {
+                                    $confirmationKey = randomPassword(20);
+                                    $checkFail = false;
+                                    try {
+                                        $data = array('confirmationKey' => $confirmationKey);
+                                        $sql = 'SELECT * FROM freeLearningUnitStudent WHERE confirmationKey=:confirmationKey';
+                                        $result = $connection2->prepare($sql);
+                                        $result->execute($data);
+                                    } catch (PDOException $e) {
+                                        $checkFail = true;
                                     }
-
-                                    if ($unique == false) {
-                                        //Fail 2
-                                        $URL .= '&return=error2';
-                                        header("Location: {$URL}");
-                                        exit();
+                                    if ($checkFail == false) {
+                                        if ($result->rowCount() == 0) {
+                                            $unique = true;
+                                        }
                                     }
+                                    ++$spinCount;
                                 }
 
-                                //Check enrolment
-                                try {
+                                if ($unique == false) {
+                                    //Fail 2
+                                    $URL .= '&return=error2';
+                                    header("Location: {$URL}");
+                                    exit();
+                                }
+                            }
+
+                            //If there are collaborators, generate a unique collaboration key
+                            $collaborationKey = null;
+                            $unique = false;
+                            if (is_array($collaborators)) {
+                                $spinCount = 0;
+                                while ($spinCount < 100 and $unique != true) {
+                                    $collaborationKey = randomPassword(20);
+                                    $checkFail = false;
+                                    try {
+                                        $data = array('collaborationKey' => $collaborationKey);
+                                        $sql = 'SELECT * FROM freeLearningUnitStudent WHERE collaborationKey=:collaborationKey';
+                                        $result = $connection2->prepare($sql);
+                                        $result->execute($data);
+                                    } catch (PDOException $e) {
+                                        $checkFail = true;
+                                    }
+                                    if ($checkFail == false) {
+                                        if ($result->rowCount() == 0) {
+                                            $unique = true;
+                                        }
+                                    }
+                                    ++$spinCount;
+                                }
+
+                                if ($unique == false) {
+                                    //Fail 2
+                                    $URL .= '&return=error2';
+                                    header("Location: {$URL}");
+                                    exit();
+                                }
+                            }
+
+                            //Check enrolment (and for collaborators too)
+                            try {
+                                if (count($collaborators) > 0) {
+                                    $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                                    $whereExtra = '' ;
+                                    $collaboratorCount = 0;
+                                    foreach ($collaborators AS $collaborator) {
+                                        $data['gibbonPersonID'.$collaboratorCount] = $collaborator;
+                                        $whereExtra .= ' OR gibbonPersonIDStudent=:gibbonPersonID'.$collaboratorCount ;
+                                        $collaboratorCount ++;
+                                    }
+                                    $sql = 'SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND (gibbonPersonIDStudent=:gibbonPersonID'.$whereExtra.')';
+                                }
+                                else {
                                     $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
                                     $sql = 'SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID';
+                                }
+                                $result = $connection2->prepare($sql);
+                                $result->execute($data);
+                            } catch (PDOException $e) {
+                                //Fail 2
+                                $URL .= '&return=error2';
+                                header("Location: {$URL}");
+                                exit();
+                            }
+
+                            if ($result->rowCount() > 0) {
+                                //Fail 2
+                                $URL .= '&return=error2';
+                                header("Location: {$URL}");
+                                exit();
+                            } else {
+                                //Write to database
+                                try {
+                                    $data = array('gibbonPersonIDStudent' => $_SESSION[$guid]['gibbonPersonID'], 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                    $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, grouping=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='".date('Y-m-d H:i:s')."'";
                                     $result = $connection2->prepare($sql);
                                     $result->execute($data);
                                 } catch (PDOException $e) {
                                     //Fail 2
+                                    print $e->getMessage() ; exit();
                                     $URL .= '&return=error2';
                                     header("Location: {$URL}");
                                     exit();
                                 }
 
-                                if ($result->rowCount() > 0) {
-                                    //Fail 2
-                                    $URL .= '&return=error2';
-                                    header("Location: {$URL}");
-                                    exit();
-                                } else {
-                                    //Write to database
-                                    try {
-                                        $data = array('gibbonPersonIDStudent' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => $grouping, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                        $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='".date('Y-m-d H:i:s')."'";
-                                        $result = $connection2->prepare($sql);
-                                        $result->execute($data);
-                                    } catch (PDOException $e) {
-                                        //Fail 2
-                                        $URL .= '&return=error2';
-                                        header("Location: {$URL}");
-                                        exit();
-                                    }
-
-                                    //DEAL WITH COLLABORATORS!
-                                    $partialFail = false;
-                                    if (is_array($collaborators)) {
-                                        foreach ($collaborators as $collaborator) {
-                                            //Check enrolment
-                                            try {
-                                                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $collaborator);
-                                                $sql = 'SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID';
-                                                $result = $connection2->prepare($sql);
-                                                $result->execute($data);
-                                            } catch (PDOException $e) {
-                                                $partialFail = true;
-                                            }
-
-                                            if ($result->rowCount() > 0) {
-                                                $partialFail = true;
-                                            } else {
-                                                //Write to database
-                                                try {
-                                                    $data = array('gibbonPersonIDStudent' => $collaborator, 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => $grouping, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                                    $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, gibbonCourseClassID=:gibbonCourseClassID, grouping=:grouping, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='".date('Y-m-d H:i:s')."'";
-                                                    $result = $connection2->prepare($sql);
-                                                    $result->execute($data);
-                                                } catch (PDOException $e) {
-                                                    $partialFail = true;
-                                                }
-                                            }
+                                //DEAL WITH COLLABORATORS (availability checked above)!
+                                $partialFail = false;
+                                if (is_array($collaborators)) {
+                                    foreach ($collaborators as $collaborator) {
+                                        //Write to database
+                                        try {
+                                            $data = array('gibbonPersonIDStudent' => $collaborator, 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                            $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, grouping=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status='Current', timestampJoined='".date('Y-m-d H:i:s')."'";
+                                            $result = $connection2->prepare($sql);
+                                            $result->execute($data);
+                                        } catch (PDOException $e) {
+                                            $partialFail = true;
                                         }
                                     }
+                                }
 
-                                    if ($partialFail == true) {
-                                        //Fail 5
-                                        $URL .= '&return=error5';
-                                        header("Location: {$URL}");
-                                    } else {
-                                        //Success 0
-                                        $URL = $URL.'&return=success0';
-                                        header("Location: {$URL}");
-                                    }
+                                if ($partialFail == true) {
+                                    //Fail 5
+                                    $URL .= '&return=error5';
+                                    header("Location: {$URL}");
+                                } else {
+                                    //Success 0
+                                    $URL = $URL.'&return=success0';
+                                    header("Location: {$URL}");
                                 }
                             }
                         }

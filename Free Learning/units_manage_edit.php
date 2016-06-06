@@ -116,7 +116,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
             if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php')) {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a>";
+                echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=N&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a>";
                 echo '</div>';
             }
 
@@ -232,23 +232,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 							</select>
 						</td>
 					</tr>
-					<?php
-                    $makeUnitsPublic = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
-					if ($makeUnitsPublic == 'Y') {
-						?>
-						<tr>
-							<td>
-								<b><?php echo __($guid, 'Shared Publically') ?> * </b><br/>
-								<span style="font-size: 90%"><i><?php echo __($guid, 'Share this unit via the public listing of units? Useful for building MOOCS.'); ?></i></span>
-							</td>
-							<td class="right">
-								<input  <?php if ($row['sharedPublic'] == 'Y') { echo 'checked'; } ?> type="radio" name="sharedPublic" value="Y" /> <?php echo __($guid, 'Yes') ?>
-								<input  <?php if ($row['sharedPublic'] == 'N') { echo 'checked'; } ?> type="radio" name="sharedPublic" value="N" /> <?php echo __($guid, 'No') ?>
-							</td>
-						</tr>
-						<?php
-					}
-					?>
 					<tr>
 						<td>
 							<b><?php echo __($guid, 'Active') ?> *</b><br/>
@@ -286,6 +269,71 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 							</script>
 						</td>
 					</tr>
+                    <tr>
+                        <td>
+                            <b><?php echo __($guid, 'Major Edit') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'If checked, you will be added as an author.'); ?></i></span>
+                        </td>
+                        <td class="right">
+                            <input type="checkbox" name="majorEdit" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                        </td>
+                    </tr>
+
+
+                    <tr class='break'>
+                        <td colspan=2>
+                            <h3><?php echo __($guid, 'Access') ?></h3>
+                            <p><?php echo __($guid, 'Users with permission to manage units can override avaiability preferences.'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <b><?php echo __($guid, 'Available To Students') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should students be able to browse and enrol?'); ?></i></span>
+                        </td>
+                        <td class="right">
+                            <input <?php if ($row['availableStudents'] == 'Y') { echo 'checked'; } ?> type="radio" name="availableStudents" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                            <input <?php if ($row['availableStudents'] == 'N') { echo 'checked'; } ?> type="radio" name="availableStudents" value="N" /> <?php echo __($guid, 'No') ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b><?php echo __($guid, 'Available To Staff') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should staff be able to browse and enrol?'); ?></i></span>
+                        </td>
+                        <td class="right">
+                            <input <?php if ($row['availableStaff'] == 'Y') { echo 'checked'; } ?> type="radio" name="availableStaff" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                            <input <?php if ($row['availableStaff'] == 'N') { echo 'checked'; } ?> type="radio" name="availableStaff" value="N" /> <?php echo __($guid, 'No') ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b><?php echo __($guid, 'Available To Parents') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should parents be able to browse and enrol?'); ?></i></span>
+                        </td>
+                        <td class="right">
+                            <input <?php if ($row['availableParents'] == 'Y') { echo 'checked'; } ?> type="radio" name="availableParents" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                            <input <?php if ($row['availableParents'] == 'N') { echo 'checked'; } ?> type="radio" name="availableParents" value="N" /> <?php echo __($guid, 'No') ?>
+                        </td>
+                    </tr>
+                    <?php
+                    $makeUnitsPublic = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+					if ($makeUnitsPublic == 'Y') {
+						?>
+						<tr>
+							<td>
+								<b><?php echo __($guid, 'Shared Publically') ?> * </b><br/>
+								<span style="font-size: 90%"><i><?php echo __($guid, 'Share this unit via the public listing of units? Useful for building MOOCS.'); ?></i></span>
+							</td>
+							<td class="right">
+								<input <?php if ($row['sharedPublic'] == 'Y') { echo 'checked'; } ?> type="radio" name="sharedPublic" value="Y" /> <?php echo __($guid, 'Yes') ?>
+								<input <?php if ($row['sharedPublic'] == 'N') { echo 'checked'; } ?> type="radio" name="sharedPublic" value="N" /> <?php echo __($guid, 'No') ?>
+							</td>
+						</tr>
+						<?php
+					}
+					?>
 
 					<tr class='break'>
 						<td colspan=2>

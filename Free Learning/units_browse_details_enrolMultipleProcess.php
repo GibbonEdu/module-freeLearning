@@ -20,6 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 include '../../functions.php';
 include '../../config.php';
 
+include './moduleFunctions.php';
+
 //New PDO DB connection
 try {
     $connection2 = new PDO("mysql:host=$databaseServer;dbname=$databaseName;charset=utf8", $databaseUsername, $databasePassword);
@@ -29,24 +31,67 @@ try {
     echo $e->getMessage();
 }
 
+$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+
 @session_start();
+
+$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details.php', $connection2);
+
+//Get params
+$freeLearningUnitID = '';
+if (isset($_GET['freeLearningUnitID'])) {
+    $freeLearningUnitID = $_GET['freeLearningUnitID'];
+}
+$canManage = false;
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
+    $canManage = true;
+}
+$showInactive = 'N';
+if ($canManage and isset($_GET['showInactive'])) {
+    $showInactive = $_GET['showInactive'];
+}
+$applyAccessControls = 'Y';
+if ($canManage and isset($_GET['applyAccessControls'])) {
+    $applyAccessControls = $_GET['applyAccessControls'];
+}
+$gibbonDepartmentID = '';
+if (isset($_GET['gibbonDepartmentID'])) {
+    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
+}
+$difficulty = '';
+if (isset($_GET['difficulty'])) {
+    $difficulty = $_GET['difficulty'];
+}
+$name = '';
+if (isset($_GET['name'])) {
+    $name = $_GET['name'];
+}
+$view = '';
+if (isset($_GET['view'])) {
+    $view = $_GET['view'];
+}
+if ($view != 'grid' and $view != 'map') {
+    $view = 'list';
+}
 
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]['timezone']);
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_enrolMultiple.php&freeLearningUnitID='.$_GET['freeLearningUnitID'].'&gibbonDepartmentID='.$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&showInactive='.$_GET['showInactive'].'&tab=1';
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_enrolMultiple.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&applyAccessControls='.$applyAccessControls.'&tab=2';
 
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
     //Fail 0
     $URL .= '&return=error0';
     header("Location: {$URL}");
 } else {
-    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details.php', $connection2);
     if ($highestAction == false) {
         //Fail 0
         $URL .= '&updateReturn=error0';
         header("Location: {$URL}");
     } else {
+        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+
         $freeLearningUnitID = '';
         if (isset($_GET['freeLearningUnitID'])) {
             $freeLearningUnitID = $_GET['freeLearningUnitID'];
@@ -58,15 +103,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             header("Location: {$URL}");
         } else {
             try {
-                if ($highestAction == 'Browse Units_all') {
-                    $data = array('freeLearningUnitID' => $freeLearningUnitID);
-                    $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
-                } elseif ($highestAction == 'Browse Units_prerequisites') {
-                    $data['freeLearningUnitID'] = $freeLearningUnitID;
-                    $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                    $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
-                    $sql = "SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC";
-                }
+                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID);
+                $data = $unitList[0];
+                $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
             } catch (PDOException $e) {

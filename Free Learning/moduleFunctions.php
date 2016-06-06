@@ -17,6 +17,98 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID = null, $difficulties = null)
+{
+    $return = array();
+
+    $sql = '';
+    $data = array();
+    $sqlWhere = 'AND ';
+    //Apply filters
+    if ($gibbonDepartmentID != '') {
+        $data['gibbonDepartmentID'] = $gibbonDepartmentID;
+        $sqlWhere .= "gibbonDepartmentIDList LIKE concat('%', :gibbonDepartmentID, '%') AND ";
+    }
+    if ($difficulty != '') {
+        $data['difficulty'] = $difficulty;
+        $sqlWhere .= 'difficulty=:difficulty AND ';
+    }
+    if ($name != '') {
+        $data['name'] = $name;
+        $sqlWhere .= "freeLearningUnit.name LIKE concat('%', :name, '%') AND ";
+    }
+    if ($roleCategory != null and $applyAccessControls == 'Y') {
+        if ($roleCategory == 'Staff') {
+            $sqlWhere .= 'availableStaff=\'Y\' AND ';
+        } elseif ($roleCategory == 'Student') {
+            $sqlWhere .= 'availableStudents=\'Y\' AND ';
+        } elseif ($roleCategory == 'Parent') {
+            $sqlWhere .= 'availableParents=\'Y\' AND ';
+        }
+    }
+
+    //Apply $freeLearningUnitID search
+    if ($freeLearningUnitID != null) {
+        $data['freeLearningUnitID'] = $freeLearningUnitID;
+        $sqlWhere .= 'freeLearningUnit.freeLearningUnitID=:freeLearningUnitID AND ';
+    }
+
+    //Tidy up $sqlWhere
+    if ($sqlWhere == 'AND ') {
+        $sqlWhere = '';
+    } else {
+        $sqlWhere = substr($sqlWhere, 0, -5);
+    }
+
+    //Sort out difficulty order
+    $difficultyOrder = '';
+    if ($difficulties != null) {
+        if ($difficulties != false) {
+            $difficultyOrder = 'FIELD(difficulty';
+            $difficulties = explode(',', $difficulties);
+            foreach ($difficulties as $difficultyOption) {
+                $difficultyOrder .= ",'".$difficultyOption."'";
+            }
+            $difficultyOrder .= '), ';
+        }
+    }
+
+    //Do it!
+    if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
+    } else {
+        if ($highestAction == 'Browse Units_all') {
+            $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+            if ($showInactive == 'Y') {
+                $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name DESC";
+            } else {
+                $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
+            }
+        } elseif ($highestAction == 'Browse Units_prerequisites') {
+            if ($schoolType == 'Physical') {
+                if ($roleCategory == 'Student') {
+                    $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                    $data['gibbonPersonID2'] = $_SESSION[$guid]['gibbonPersonID'];
+                    $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
+                    $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name";
+                }
+                else {
+                    $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                    $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name";
+                }
+            } else {
+                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name";
+            }
+        }
+    }
+
+    $return[0] = $data;
+    $return[1] = $sql;
+    return $return;
+
+}
+
 function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = false)
 {
     $output = false;
@@ -401,49 +493,49 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 			html>body .sortable li { min-height: 58px; line-height: 1.2em; }
 			.sortable .ui-state-highlight { margin-bottom: 5px; min-height: 72px; line-height: 1.2em; width: 100%; }
 		</style>
-											
+
 		<script type='text/javascript'>
 			$(function() {
 				$( ".sortable" ).sortable({
 					placeholder: "ui-state-highlight"
 				});
-			
-				$( ".sortable" ).bind( "sortstart", function(event, ui) { 
+
+				$( ".sortable" ).bind( "sortstart", function(event, ui) {
 					$("#blockInner<?php echo $i ?>").css("display","none") ;
 					$("#block<?php echo $i ?>").css("height","72px") ;
-					$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)"); 
+					$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
 					tinyMCE.execCommand('mceRemoveEditor', false, 'contents<?php echo $i ?>') ;
 					tinyMCE.execCommand('mceRemoveEditor', false, 'teachersNotes<?php echo $i ?>') ;
 					$(".sortable").sortable( "refresh" ) ;
 					$(".sortable").sortable( "refreshPositions" ) ;
 				});
 			});
-			
+
 		</script>
-		<script type='text/javascript'>	
+		<script type='text/javascript'>
 			$(document).ready(function(){
 				$("#blockInner<?php echo $i ?>").css("display","none");
 				$("#block<?php echo $i ?>").css("height","72px")
-			
+
 				//Block contents control
 				$('#show<?php echo $i ?>').unbind('click').click(function() {
 					if ($("#blockInner<?php echo $i ?>").is(":visible")) {
 						$("#blockInner<?php echo $i ?>").css("display","none");
 						$("#block<?php echo $i ?>").css("height","72px")
-						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)"); 
+						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
 						tinyMCE.execCommand('mceRemoveEditor', false, 'contents<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceRemoveEditor', false, 'teachersNotes<?php echo $i ?>') ;
 					} else {
-						$("#blockInner<?php echo $i ?>").slideDown("fast", $("#blockInner<?php echo $i ?>").css("display","table-row")); 
+						$("#blockInner<?php echo $i ?>").slideDown("fast", $("#blockInner<?php echo $i ?>").css("display","table-row"));
 						$("#block<?php echo $i ?>").css("height","auto")
-						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/minus.png\'"?>)"); 
-						tinyMCE.execCommand('mceRemoveEditor', false, 'contents<?php echo $i ?>') ;	
+						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/minus.png\'"?>)");
+						tinyMCE.execCommand('mceRemoveEditor', false, 'contents<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceAddEditor', false, 'contents<?php echo $i ?>') ;
-						tinyMCE.execCommand('mceRemoveEditor', false, 'teachersNotes<?php echo $i ?>') ;	
+						tinyMCE.execCommand('mceRemoveEditor', false, 'teachersNotes<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceAddEditor', false, 'teachersNotes<?php echo $i ?>') ;
 					}
 				});
-			
+
 				<?php if ($mode == 'masterAdd') {
     			?>
 					var titleClick<?php echo $i ?>=false ;
@@ -454,7 +546,7 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 							titleClick<?php echo $i ?>=true ;
 						}
 					});
-				
+
 					var typeClick<?php echo $i ?>=false ;
 					$('#type<?php echo $i ?>').focus(function() {
 						if (typeClick<?php echo $i ?>==false) {
@@ -463,7 +555,7 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 							typeClick<?php echo $i ?>=true ;
 						}
 					});
-				
+
 					var lengthClick<?php echo $i ?>=false ;
 					$('#length<?php echo $i ?>').focus(function() {
 						if (lengthClick<?php echo $i ?>==false) {
@@ -472,10 +564,10 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 							lengthClick<?php echo $i ?>=true ;
 						}
 					});
-				<?php 
+				<?php
 				}
 				?>
-			
+
 				$('#delete<?php echo $i ?>').unbind('click').click(function() {
 					if (confirm("<?php echo __($guid, 'Are you sure you want to delete this record?') ?>")) {
 						$('#block<?php echo $i ?>').fadeOut(600, function(){ $('#block<?php echo $i ?>').remove(); });
@@ -507,7 +599,7 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 			</tr>
 			<tr id="blockInner<?php echo $i ?>">
 				<td colspan=2 style='vertical-align: top'>
-					<?php 
+					<?php
                     if ($mode == 'masterAdd') {
                         $contents = getSettingByScope($connection2, 'Planner', 'smartBlockTemplate');
                     }
@@ -549,15 +641,15 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
 				$( "#<?php echo $type ?>" ).sortable({
 					placeholder: "<?php echo $type ?>-ui-state-highlight"
 				});
-				
-				$( "#<?php echo $type ?>" ).bind( "sortstart", function(event, ui) { 
+
+				$( "#<?php echo $type ?>" ).bind( "sortstart", function(event, ui) {
 					$("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","none");
 					$("#<?php echo $type ?>Block<?php echo $i ?>").css("height","72px") ;
-					$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");  
+					$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
 					tinyMCE.execCommand('mceRemoveEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 					$("#<?php echo $type ?>").sortable( "refreshPositions" ) ;
 				});
-				
+
 				$( "#<?php echo $type ?>" ).bind( "sortstop", function(event, ui) {
 					//This line has been removed to improve performance with long lists
 					//tinyMCE.execCommand('mceAddEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
@@ -569,23 +661,23 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
 			$(document).ready(function(){
 				$("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","none");
 				$("#<?php echo $type ?>Block<?php echo $i ?>").css("height","72px") ;
-				
+
 				//Block contents control
 				$('#<?php echo $type ?>show<?php echo $i ?>').unbind('click').click(function() {
 					if ($("#<?php echo $type ?>BlockInner<?php echo $i ?>").is(":visible")) {
 						$("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","none");
 						$("#<?php echo $type ?>Block<?php echo $i ?>").css("height","72px") ;
-						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");  
+						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
 						tinyMCE.execCommand('mceRemoveEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 					} else {
-						$("#<?php echo $type ?>BlockInner<?php echo $i ?>").slideDown("fast", $("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","table-row")); 
+						$("#<?php echo $type ?>BlockInner<?php echo $i ?>").slideDown("fast", $("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","table-row"));
 						$("#<?php echo $type ?>Block<?php echo $i ?>").css("height","auto")
-						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/minus.png\'"?>)");  
-						tinyMCE.execCommand('mceRemoveEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;	
+						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/minus.png\'"?>)");
+						tinyMCE.execCommand('mceRemoveEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceAddEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 					}
 				});
-				
+
 				$('#<?php echo $type ?>delete<?php echo $i ?>').unbind('click').click(function() {
 					if (confirm("Are you sure you want to delete this record?")) {
 						$('#<?php echo $type ?>blockOuter<?php echo $i ?>').fadeOut(600, function(){ $('#<?php echo $type ?><?php echo $i ?>'); });
@@ -593,7 +685,7 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
 						<?php echo $type ?>Used[<?php echo $type ?>Used.indexOf("<?php echo $gibbonOutcomeID ?>")]="x" ;
 					}
 				});
-				
+
 			});
 		</script>
 		<div class='hiddenReveal' style='border: 1px solid #d8dcdf; margin: 0 0 5px' id="<?php echo $type ?>Block<?php echo $i ?>" style='padding: 0px'>
@@ -620,7 +712,7 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
 				</tr>
 				<tr id="<?php echo $type ?>BlockInner<?php echo $i ?>">
 					<td colspan=2 style='vertical-align: top'>
-						<?php 
+						<?php
                             if ($allowOutcomeEditing == 'Y') {
                                 echo getEditor($guid, false, $type.'contents'.$i, $contents, 20, false, false, false, true);
                             } else {

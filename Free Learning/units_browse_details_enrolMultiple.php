@@ -22,6 +22,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //Module includes
 include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
+$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     //Acess denied
     echo "<div class='error'>";
@@ -33,6 +36,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
+        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+
         //Get params
         $freeLearningUnitID = '';
         if (isset($_GET['freeLearningUnitID'])) {
@@ -45,6 +50,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $showInactive = 'N';
         if ($canManage and isset($_GET['showInactive'])) {
             $showInactive = $_GET['showInactive'];
+        }
+        $applyAccessControls = 'Y';
+        if ($canManage and isset($_GET['applyAccessControls'])) {
+            $applyAccessControls = $_GET['applyAccessControls'];
         }
         $gibbonDepartmentID = '';
         if (isset($_GET['gibbonDepartmentID'])) {
@@ -62,10 +71,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         if (isset($_GET['view'])) {
             $view = $_GET['view'];
         }
+        if ($view != 'grid' and $view != 'map') {
+            $view = 'list';
+        }
 
         //Get action with highest precendence
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID='.$_GET['freeLearningUnitID']."'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&tab=1'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Add Multiple').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID='.$_GET['freeLearningUnitID']."'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&tab=2'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Add Multiple').'</div>';
         echo '</div>';
 
         if ($freeLearningUnitID == '') {
@@ -74,15 +86,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             echo '</div>';
         } else {
             try {
-                if ($highestAction == 'Browse Units_all') {
-                    $data = array('freeLearningUnitID' => $freeLearningUnitID);
-                    $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
-                } elseif ($highestAction == 'Browse Units_prerequisites') {
-                    $data['freeLearningUnitID'] = $freeLearningUnitID;
-                    $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                    $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
-                    $sql = "SELECT freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) AND freeLearningUnitID=:freeLearningUnitID ORDER BY name DESC";
-                }
+                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID);
+                $data = $unitList[0];
+                $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
             } catch (PDOException $e) {
@@ -101,7 +107,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 }
                 ?>
 
-				<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive" ?>">
+				<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls" ?>">
 					<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 						<tr>
 							<td>

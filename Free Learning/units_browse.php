@@ -24,6 +24,7 @@ include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+
 if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false))) {
     //Acess denied
     echo "<div class='error'>";
@@ -33,8 +34,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
     //Get action with highest precendence
     if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
         $highestAction = 'Browse Units_all';
+        $roleCategory = null ;
     } else {
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
+        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
     }
     if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
@@ -54,6 +57,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             echo '</div>';
         }
 
+        //Get params
         $canManage = false;
         if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
             $canManage = true;
@@ -62,7 +66,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if ($canManage and isset($_GET['showInactive'])) {
             $showInactive = $_GET['showInactive'];
         }
-
+        $applyAccessControls = 'Y';
+        if ($canManage and isset($_GET['applyAccessControls'])) {
+            $applyAccessControls = $_GET['applyAccessControls'];
+        }
         $gibbonDepartmentID = null;
         if (isset($_GET['gibbonDepartmentID'])) {
             $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
@@ -79,10 +86,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if (isset($_GET['view'])) {
             $view = $_GET['view'];
         }
-
         if ($view != 'grid' and $view != 'map') {
             $view = 'list';
         }
+
+        //Get data on learning areas, authors and blocks in an efficient manner
         $learningAreaArray = getLearningAreaArray($connection2);
         $authors = getAuthorsArray($connection2);
         $blocks = getBlocksArray($connection2);
@@ -94,7 +102,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo "<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
         ?>
 		<tr>
-			<td> 
+			<td>
 				<b><?php echo __($guid, 'Learning Area') ?></b><br/>
 				<span style="font-size: 90%"><i></i></span>
 			</td>
@@ -110,12 +118,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 							echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
 						}
 					}
-					?>			
+					?>
 				</select>
 			</td>
 		</tr>
 		<tr>
-			<td> 
+			<td>
 				<b><?php echo __($guid, 'Difficulty') ?></b><br/>
 				<span style="font-size: 90%"><i></i></span>
 			</td>
@@ -137,7 +145,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 			</td>
 		</tr>
 		<tr>
-			<td> 
+			<td>
 				<b><?php echo __($guid, 'Name') ?></b><br/>
 				<span style="font-size: 90%"><i></i></span>
 			</td>
@@ -151,7 +159,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 		if ($canManage) {
 			?>
 			<tr>
-				<td> 
+				<td>
 					<b><?php echo __($guid, 'Show Inactive Units?') ?></b><br/>
 					<span style="font-size: 90%"><i></i></span>
 				</td>
@@ -168,7 +176,29 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 							$selected = 'selected';
 						}
 						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-						?>			
+						?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<b><?php echo __($guid, 'Apply Access Controls?') ?></b><br/>
+                    <span style="font-size: 90%"><i><?php echo __($guid, 'Restricts access to staff units.') ?></i></span>
+				</td>
+				<td class="right">
+					<select name="applyAccessControls" id="applyAccessControls" style="width: 302px">
+						<?php
+                        $selected = '';
+						if ($applyAccessControls == 'N') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+                        $selected = '';
+						if ($applyAccessControls == 'Y') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+						?>
 					</select>
 				</td>
 			</tr>
@@ -188,9 +218,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo '</form>';
 
         echo "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=list'>".__($guid, 'List')." <img style='margin-bottom: -5px' title='".__($guid, 'List')."' src='./modules/Free Learning/img/iconList.png'/></a> ";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=grid'>".__($guid, 'Grid')." <img style='margin-bottom: -5px' title='".__($guid, 'Grid')."' src='./modules/Free Learning/img/iconGrid.png'/></a> ";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&view=map'>".__($guid, 'Map')." <img style='margin-bottom: -5px' title='".__($guid, 'Map')."' src='./modules/Free Learning/img/iconMap.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=list'>".__($guid, 'List')." <img style='margin-bottom: -5px' title='".__($guid, 'List')."' src='./modules/Free Learning/img/iconList.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=grid'>".__($guid, 'Grid')." <img style='margin-bottom: -5px' title='".__($guid, 'Grid')."' src='./modules/Free Learning/img/iconGrid.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=map'>".__($guid, 'Map')." <img style='margin-bottom: -5px' title='".__($guid, 'Map')."' src='./modules/Free Learning/img/iconMap.png'/></a> ";
         echo '</div>';
 
         //Set pagination variable
@@ -204,56 +234,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         //Search with filters applied
         try {
-            $data = array();
-            $sqlWhere = 'AND ';
-            if ($gibbonDepartmentID != '') {
-                $data['gibbonDepartmentID'] = $gibbonDepartmentID;
-                $sqlWhere .= "gibbonDepartmentIDList LIKE concat('%', :gibbonDepartmentID, '%') AND ";
-            }
-            if ($difficulty != '') {
-                $data['difficulty'] = $difficulty;
-                $sqlWhere .= 'difficulty=:difficulty AND ';
-            }
-            if ($name != '') {
-                $data['name'] = $name;
-                $sqlWhere .= "freeLearningUnit.name LIKE concat('%', :name, '%') AND ";
-            }
-            if ($sqlWhere == 'AND ') {
-                $sqlWhere = '';
-            } else {
-                $sqlWhere = substr($sqlWhere, 0, -5);
-            }
-            $difficultyOrder = '';
-            if ($difficulties != false) {
-                $difficultyOrder = 'FIELD(difficulty';
-                $difficulties = explode(',', $difficulties);
-                foreach ($difficulties as $difficultyOption) {
-                    $difficultyOrder .= ",'".$difficultyOption."'";
-                }
-                $difficultyOrder .= '), ';
-            }
-            if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
-                $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
-            } else {
-                if ($highestAction == 'Browse Units_all') {
-                    $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                    if ($showInactive == 'Y') {
-                        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name DESC";
-                    } else {
-                        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
-                    }
-                } elseif ($highestAction == 'Browse Units_prerequisites') {
-                    if ($schoolType == 'Physical') {
-                        $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                        $data['gibbonPersonID2'] = $_SESSION[$guid]['gibbonPersonID'];
-                        $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
-                        $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) WHERE active='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) ORDER BY $difficultyOrder name";
-                    } else {
-                        $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                        $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name";
-                    }
-                }
-            }
+            $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, null, $difficulties);
+            $data = $unitList[0];
+            $sql = $unitList[1];
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) {
@@ -272,7 +255,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         } else {
             if ($view == 'list') {
                 if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-                    printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top', "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive");
+                    printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top', "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls");
                 }
 
                 echo "<table cellspacing='0' style='width: 100%'>";
@@ -473,13 +456,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo '<td>';
                     if ($highestAction == 'Browse Units_all' or $schoolType == 'Online') {
-                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
                     } elseif ($highestAction == 'Browse Units_prerequisites') {
                         if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
-                            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
                         } else {
                             if ($prerquisitesMet) {
-                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
                             }
                         }
                     }
@@ -489,7 +472,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '</table>';
 
                 if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-                    printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'bottom', "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive");
+                    printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'bottom', "gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls");
                 }
             } elseif ($view == 'grid') {
                 echo "<table cellspacing='0' style='width: 100%'>";
@@ -532,13 +515,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                     }
                     if ($highestAction == 'Browse Units_all' or $schoolType == 'Online') {
-                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
                     } elseif ($highestAction == 'Browse Units_prerequisites') {
                         if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
-                            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
                         } else {
                             if ($prerquisitesMet) {
-                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
+                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
                             }
                         }
                     }
@@ -574,7 +557,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 						margin-bottom: 20px ;
 					}
 				</style>
-				
+
 				<div id="map"></div>
 
 				<?php
@@ -641,7 +624,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
 					//CREATE NODE TO freeLearningUnitID ARRAY
 					var ids = new Array(<?php echo $idList ?>);
-					
+
 					//CREATE NETWORK
 					var container = document.getElementById('map');
 					var data = {
@@ -664,16 +647,16 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             				shadow:true
 						},
 					  	interaction:{
-							navigationButtons: true,				
+							navigationButtons: true,
     						zoomView: false
 						},
 						layout: {
 							randomSeed: 0.5,
 							improvedLayout:true
-						}						  	
+						}
 					};
 					var network = new vis.Network(container, data, options);
-					
+
 					//CLICK LISTENER
 					network.on( 'click', function(properties) {
 						var nodeNo = properties.nodes ;

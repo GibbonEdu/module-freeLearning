@@ -31,24 +31,67 @@ try {
     echo $e->getMessage();
 }
 
+$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+
 @session_start();
+
+$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
+
+//Get params
+$freeLearningUnitID = '';
+if (isset($_GET['freeLearningUnitID'])) {
+    $freeLearningUnitID = $_GET['freeLearningUnitID'];
+}
+$canManage = false;
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
+    $canManage = true;
+}
+$showInactive = 'N';
+if ($canManage and isset($_GET['showInactive'])) {
+    $showInactive = $_GET['showInactive'];
+}
+$applyAccessControls = 'Y';
+if ($canManage and isset($_GET['applyAccessControls'])) {
+    $applyAccessControls = $_GET['applyAccessControls'];
+}
+$gibbonDepartmentID = '';
+if (isset($_GET['gibbonDepartmentID'])) {
+    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
+}
+$difficulty = '';
+if (isset($_GET['difficulty'])) {
+    $difficulty = $_GET['difficulty'];
+}
+$name = '';
+if (isset($_GET['name'])) {
+    $name = $_GET['name'];
+}
+$view = '';
+if (isset($_GET['view'])) {
+    $view = $_GET['view'];
+}
+if ($view != 'grid' and $view != 'map') {
+    $view = 'list';
+}
 
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]['timezone']);
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&showInactive='.$_GET['showInactive'].'&sidebar=true&tab=1';
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&applyAccessControls='.$applyAccessControls.'&sidebar=true&tab=2';
 
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
     //Fail 0
     $URL .= '&return=error0';
     header("Location: {$URL}");
 } else {
-    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
     if ($highestAction == false) {
         //Fail 0
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
+        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+
         $freeLearningUnitID = $_POST['freeLearningUnitID'];
         $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'];
 
@@ -169,7 +212,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             //Attempt to notify the student, and issue like
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { //Only if status or comment has changed.
                                 $text = sprintf(__($guid, 'A teacher has approved your request for unit completion (%1$s).'), $name);
-                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
+                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=2";
                                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
 
                                 setLike($connection2, 'Free Learning', $_SESSION[$guid]['gibbonSchoolYearID'], 'freeLearningUnitStudentID', $freeLearningUnitStudentID, $_SESSION[$guid]['gibbonPersonID'], $gibbonPersonIDStudent, 'Unit Approval', '');
@@ -195,7 +238,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             //Attempt to notify the student
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { //Only if status or comment has changed.
                                 $text = sprintf(__($guid, 'A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name);
-                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1";
+                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&sidebar=true&tab=2";
                                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                             }
 

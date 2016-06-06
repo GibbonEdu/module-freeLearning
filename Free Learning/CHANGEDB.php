@@ -399,3 +399,13 @@ $sql[$count][1] = '';
 ++$count;
 $sql[$count][0] = '3.1.05';
 $sql[$count][1] = '';
+
+//v4.0.00
+++$count;
+$sql[$count][0] = '4.0.00';
+$sql[$count][1] = "ALTER TABLE `freeLearningUnit` ADD `availableStudents` ENUM('Y','N') NOT NULL DEFAULT 'Y' AFTER `license`, ADD `availableStaff` ENUM('Y','N') NOT NULL DEFAULT 'Y' AFTER `availableStudents`, ADD `availableParents` ENUM('Y','N') NOT NULL DEFAULT 'Y' AFTER `availableStaff`;end
+UPDATE gibbonAction SET categoryPermissionStaff='Y', categoryPermissionStudent='Y', categoryPermissionParent='Y' WHERE name='Browse Units_prerequisites' AND gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning');end
+ALTER TABLE `freeLearningUnitStudent` ADD `enrolmentMethod` ENUM('class','schoolMentor','externalMentor') NOT NULL DEFAULT 'class' AFTER `gibbonSchoolYearID`;end
+ALTER TABLE `freeLearningUnitStudent` ADD `gibbonPersonIDSchoolMentor` INT(10) UNSIGNED ZEROFILL NULL DEFAULT NULL AFTER `gibbonCourseClassID`, ADD `emailExternalMentor` VARCHAR(255) NULL DEFAULT NULL AFTER `gibbonPersonIDSchoolMentor`, ADD `nameExternalMentor` VARCHAR(255) NULL DEFAULT NULL AFTER `emailExternalMentor`;end
+ALTER TABLE `freeLearningUnitStudent` ADD `confirmationKey` VARCHAR(20) NULL DEFAULT NULL AFTER `collaborationKey`;
+";

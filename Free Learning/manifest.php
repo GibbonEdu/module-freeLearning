@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '3.1.05';
+$version = '4.0.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -42,6 +42,9 @@ $moduleTables[0] = "CREATE TABLE `freeLearningUnit` (
   `blurb` text NOT NULL,
   `outline` text NOT NULL,
   `license` varchar(50) DEFAULT NULL,
+  `availableStudents` enum('Y','N') NOT NULL DEFAULT 'Y',
+  `availableStaff` enum('Y','N') NOT NULL DEFAULT 'Y',
+  `availableParents` enum('Y','N') NOT NULL DEFAULT 'Y',
   `sharedPublic` enum('Y','N') DEFAULT NULL,
   `freeLearningUnitIDPrerequisiteList` text,
   `gibbonPersonIDCreator` int(10) unsigned zerofill NOT NULL,
@@ -85,9 +88,14 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   `gibbonPersonIDStudent` int(10) unsigned zerofill DEFAULT NULL,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
   `gibbonSchoolYearID` INT(3) UNSIGNED ZEROFILL NULL DEFAULT NULL,
+  `enrolmentMethod` enum('class','schoolMentor','externalMentor') NOT NULL DEFAULT 'class',
   `gibbonCourseClassID` INT(8) UNSIGNED ZEROFILL NULL DEFAULT NULL,
+  `gibbonPersonIDSchoolMentor` int(10) unsigned zerofill DEFAULT NULL,
+  `emailExternalMentor` varchar(255) DEFAULT NULL,
+  `nameExternalMentor` varchar(255) DEFAULT NULL,
   `grouping` ENUM('Individual','Pairs','Threes','Fours','Fives') NOT NULL,
   `collaborationKey` VARCHAR(20) NULL DEFAULT NULL,
+  `confirmationKey` varchar(20) DEFAULT NULL,
   `status` enum('Current','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') NOT NULL DEFAULT 'Current',
   `timestampJoined` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `timestampCompletePending` timestamp NULL DEFAULT NULL,
@@ -189,9 +197,9 @@ $actionRows[4]['defaultPermissionTeacher'] = 'N';
 $actionRows[4]['defaultPermissionStudent'] = 'Y';
 $actionRows[4]['defaultPermissionParent'] = 'N';
 $actionRows[4]['defaultPermissionSupport'] = 'N';
-$actionRows[4]['categoryPermissionStaff'] = 'N';
+$actionRows[4]['categoryPermissionStaff'] = 'Y';
 $actionRows[4]['categoryPermissionStudent'] = 'Y';
-$actionRows[4]['categoryPermissionParent'] = 'N';
+$actionRows[4]['categoryPermissionParent'] = 'Y';
 $actionRows[4]['categoryPermissionOther'] = 'N';
 
 $actionRows[5]['name'] = 'Current Unit By Class';

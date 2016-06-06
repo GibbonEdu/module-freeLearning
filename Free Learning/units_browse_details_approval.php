@@ -22,6 +22,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //Module includes
 include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
+$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
     //Acess denied
     echo "<div class='error'>";
@@ -34,6 +37,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
+        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+
         //Get params
         $freeLearningUnitStudentID = '';
         if (isset($_GET['freeLearningUnitStudentID'])) {
@@ -50,6 +55,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $showInactive = 'N';
         if ($canManage and isset($_GET['showInactive'])) {
             $showInactive = $_GET['showInactive'];
+        }
+        $applyAccessControls = 'Y';
+        if ($canManage and isset($_GET['applyAccessControls'])) {
+            $applyAccessControls = $_GET['applyAccessControls'];
         }
         $gibbonDepartmentID = '';
         if (isset($_GET['gibbonDepartmentID'])) {
@@ -69,7 +78,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
 
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Approval').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&sidebar=true&tab=2'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Approval').'</div>';
         echo '</div>';
 
         if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
@@ -112,7 +121,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     //Let's go!
                     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php')) {
                         echo "<div class='linkTop'>";
-                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a>";
+                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a>";
                         echo '</div>';
                     }
 
@@ -151,10 +160,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     echo '<p>';
                     echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.');
                     echo '</p>'; ?>
-					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_approvalProcess.php?address='.$_GET['q']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive" ?>"  enctype="multipart/form-data">
-						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_approvalProcess.php?address='.$_GET['q']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls" ?>"  enctype="multipart/form-data">
+						<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 							<tr>
-								<td> 
+								<td>
 									<b><?php echo __($guid, 'Student') ?> *</b><br/>
 									<span style="font-size: 90%"><i><?php echo __($guid, 'This value cannot be changed.') ?></i></span>
 								</td>
@@ -164,7 +173,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								</td>
 							</tr>
 							<tr>
-								<td> 
+								<td>
 									<b><?php echo __($guid, 'Status') ?> *</b><br/>
 								</td>
 								<td class="right">
@@ -195,39 +204,39 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                     }
                     				?>
-									
+
 									$("#status").click(function(){
 										if ($('#status option:selected').val()=="Evidence Not Approved" ) {
-											$("#exemplarRow").css("display","none"); 
-											$("#fileRow").css("display","none"); 
-											$("#linkRow").css("display","none"); 
+											$("#exemplarRow").css("display","none");
+											$("#fileRow").css("display","none");
+											$("#linkRow").css("display","none");
 											file.disable() ;
 										} else {
-											$("#exemplarRow").slideDown("fast", $("#exemplarRow").css("display","table-row")); 
+											$("#exemplarRow").slideDown("fast", $("#exemplarRow").css("display","table-row"));
 											if ($('#exemplarWork option:selected').val()=="Y" ) {
-												$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row")); 
-												$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); 
+												$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
+												$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
 												file.enable() ;
 											}
 										}
 									}) ;
-								
+
 									$("#exemplarWork").click(function(){
 										if ($('#exemplarWork option:selected').val()=="N" ) {
-											$("#fileRow").css("display","none"); 
-											$("#linkRow").css("display","none"); 
+											$("#fileRow").css("display","none");
+											$("#linkRow").css("display","none");
 											file.disable() ;
 										} else {
-											$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row")); 
-											$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); 
+											$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
+											$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
 											file.enable() ;
 										}
 									 });
 								});
 							</script>
-						
+
 							<tr id="exemplarRow">
-								<td> 
+								<td>
 									<b><?php echo __($guid, 'Exmplar Work'); ?> *</b><br/>
 									<span style="font-size: 90%"><i><?php echo __($guid, 'Work and comments will be made viewable to other users.'); ?></i></span>
 								</td>
@@ -244,12 +253,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 											echo ' selected ';
 										}
 										echo "value='Y'>".ynExpander($guid, 'Y').'</option>';
-										?>				
+										?>
 									</select>
 								</td>
 							</tr>
 							<tr id="fileRow">
-								<td> 
+								<td>
 									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image') ?></b><br/>
 									<span style="font-size: 90%"><i>150x150px jpg/png/gif</i><br/></span>
 								</td>
@@ -280,7 +289,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								</td>
 							</tr>
 							<tr id="linkRow">
-								<td> 
+								<td>
 									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image Credit') ?></b><br/>
 									<span style="font-size: 90%"><i><?php echo __($guid, 'Credit and license for image used above.'); ?></i></span>
 								</td>
@@ -289,7 +298,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								</td>
 							</tr>
 							<tr>
-								<td> 
+								<td>
 									<b><?php echo __($guid, 'Submission') ?> *</b><br/>
 								</td>
 								<td class="right">
@@ -305,7 +314,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								</td>
 							</tr>
 							<tr>
-								<td colspan=2> 
+								<td colspan=2>
 									<b><?php echo __($guid, 'Student Comment') ?> *</b><br/>
 									<p>
 										<?php
@@ -314,9 +323,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 									</p>
 								</td>
 							</tr>
-							
+
 							<tr>
-								<td colspan=2> 
+								<td colspan=2>
 									<b><?php echo __($guid, 'Teacher Comment') ?> *</b><br/>
 									<span style="font-size: 90%"><i><?php echo __($guid, 'Leave a comment on the student\'s progress.') ?></i></span>
 									<?php echo getEditor($guid,  true, 'commentApproval', $row['commentApproval'], 15, true, true) ?>

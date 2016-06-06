@@ -22,54 +22,67 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //Module includes
 include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
+$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+
+$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
+
+//Get params
+$freeLearningUnitStudentID = '';
+if (isset($_GET['freeLearningUnitStudentID'])) {
+    $freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'];
+}
+$freeLearningUnitID = '';
+if (isset($_GET['freeLearningUnitID'])) {
+    $freeLearningUnitID = $_GET['freeLearningUnitID'];
+}
+$canManage = false;
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
+    $canManage = true;
+}
+$showInactive = 'N';
+if ($canManage and isset($_GET['showInactive'])) {
+    $showInactive = $_GET['showInactive'];
+}
+$applyAccessControls = 'Y';
+if ($canManage and isset($_GET['applyAccessControls'])) {
+    $applyAccessControls = $_GET['applyAccessControls'];
+}
+$gibbonDepartmentID = '';
+if (isset($_GET['gibbonDepartmentID'])) {
+    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
+}
+$difficulty = '';
+if (isset($_GET['difficulty'])) {
+    $difficulty = $_GET['difficulty'];
+}
+$name = '';
+if (isset($_GET['name'])) {
+    $name = $_GET['name'];
+}
+$view = '';
+if (isset($_GET['view'])) {
+    $view = $_GET['view'];
+}
+if ($view != 'grid' and $view != 'map') {
+    $view = 'list';
+}
+
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_delete.php') == false and !$canManage) {
     //Acess denied
     echo "<div class='error'>";
     echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
     //Get action with highest precendence
-    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
     if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
-        //Get params
-        $freeLearningUnitStudentID = '';
-        if (isset($_GET['freeLearningUnitStudentID'])) {
-            $freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'];
-        }
-        $freeLearningUnitID = '';
-        if (isset($_GET['freeLearningUnitID'])) {
-            $freeLearningUnitID = $_GET['freeLearningUnitID'];
-        }
-        $canManage = false;
-        if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
-            $canManage = true;
-        }
-        $showInactive = 'N';
-        if ($canManage and isset($_GET['showInactive'])) {
-            $showInactive = $_GET['showInactive'];
-        }
-        $gibbonDepartmentID = '';
-        if (isset($_GET['gibbonDepartmentID'])) {
-            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-        }
-        $difficulty = '';
-        if (isset($_GET['difficulty'])) {
-            $difficulty = $_GET['difficulty'];
-        }
-        $name = '';
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
-        }
-        $view = '';
-        if (isset($_GET['view'])) {
-            $view = $_GET['view'];
-        }
+        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
 
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Delete Enrolment').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&sidebar=true&tab=2'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Delete Enrolment').'</div>';
         echo '</div>';
 
         if (isset($_GET['return'])) {
@@ -115,7 +128,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 } else {
                     //Let's go!
                     ?>
-					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module']."/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view" ?>">
+					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module']."/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view" ?>">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 							<tr>
 								<td>
