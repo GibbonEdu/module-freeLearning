@@ -111,12 +111,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $row = $result->fetch();
 
                 $proceed = false;
-                //Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
-                $learningAreas = getLearningAreas($connection2, $guid, true);
-                if ($learningAreas != '') {
-                    for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                        if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
-                            $proceed = true;
+                //Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s) or if canManage is true
+                $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
+                if ($manageAll == true) {
+                    $proceed = true;
+                } else {
+                    $learningAreas = getLearningAreas($connection2, $guid, true);
+                    if ($learningAreas != '') {
+                        for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+                            if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
+                                $proceed = true;
+                            }
                         }
                     }
                 }

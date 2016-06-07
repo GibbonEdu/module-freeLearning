@@ -95,7 +95,7 @@ else {
 					?>
 					<td>
 						<?php
-							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&tab=1&sidebar=true'>" . $rowClass["unit"] . "</a>" ;
+							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $rowClass["unit"] . "</a>" ;
 						?>
 					</td>
 					<td>

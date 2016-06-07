@@ -729,4 +729,47 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
         echo '</div>';
     }
 }
+
+function displayBlockContent($guid, $connection2, $title, $type, $length, $contents, $teachersNotes, $roleCategory = null)
+{
+    $return = false;
+
+    if ($title != '' or $type != '' or $length != '') {
+        $return .= "<div style='min-height: 35px'>";
+        $return .= "<div style='padding-left: 3px; width: 100%; float: left;'>";
+        if ($title != '') {
+            $return .= "<h4 style='padding-bottom: 2px'>";
+            $return .= $title.'<br/>';
+            $return .= "<div style='font-weight: normal; font-size: 75%; text-transform: none; margin-top: 5px'>";
+            if ($type != '') {
+                $return .= $type;
+                if ($length != '') {
+                    $return .= ' | ';
+                }
+            }
+            if ($length != '') {
+                $return .= $length.' min';
+            }
+            $return .= '</div>';
+            $return .= '</h4>';
+        }
+        $return .= '</div>';
+
+        $return .= '</div>';
+    }
+    if ($contents != '') {
+        $return .= "<div style='margin-top:20px; padding: 15px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>".$contents.'</div>';
+    }
+    if (isset($_SESSION[$guid]['username'])) {
+        if ($roleCategory == 'Staff') {
+            if ($teachersNotes != '') {
+                $return .= "<div style='margin-top:20px; background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>".__($guid, "Teacher's Notes").':</b></p> '.$teachersNotes.'</div>';
+                $resourceContents .= $teachersNotes;
+            }
+        }
+    }
+
+    return $return;
+
+}
 ?>

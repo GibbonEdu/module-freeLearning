@@ -316,7 +316,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
                         $rowNum = 'current';
-                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Complete - Pending') {
+                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Evidence Not Approved' or $row['status'] == 'Complete - Pending') {
                         $rowNum = 'warning';
                     }
                     ++$count;

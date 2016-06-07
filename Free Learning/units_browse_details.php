@@ -475,64 +475,26 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo "</div>";
                     }
                     echo "<div id='tabs3'>";
-                    try {
-                        $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
-                        $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
-                        $resultBlocks = $connection2->prepare($sqlBlocks);
-                        $resultBlocks->execute($dataBlocks);
-                    } catch (PDOException $e) {
-                        echo "<div class='error'>".$e->getMessage().'</div>';
-                    }
+                        try {
+                            $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
+                            $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
+                            $resultBlocks = $connection2->prepare($sqlBlocks);
+                            $resultBlocks->execute($dataBlocks);
+                        } catch (PDOException $e) {
+                            echo "<div class='error'>".$e->getMessage().'</div>';
+                        }
 
-                    $resourceContents = '';
-                    $roleCategory = null;
-                    if (isset($_SESSION[$guid]['gibbonRoleIDCurrent'])) {
-                        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
-                    }
-
-                    if ($resultBlocks->rowCount() < 1) {
-                        echo "<div class='error'>";
-                        echo __($guid, 'There are no records to display.');
-                        echo '</div>';
-                    } else {
-                        while ($rowBlocks = $resultBlocks->fetch()) {
-                            if ($rowBlocks['title'] != '' or $rowBlocks['type'] != '' or $rowBlocks['length'] != '') {
-                                echo "<div style='min-height: 35px'>";
-                                echo "<div style='padding-left: 3px; width: 100%; float: left;'>";
-                                if ($rowBlocks['title'] != '') {
-                                    echo "<h3 style='padding-bottom: 2px'>";
-                                    echo $rowBlocks['title'].'<br/>';
-                                    echo "<div style='font-weight: normal; font-size: 75%; text-transform: none; margin-top: 5px'>";
-                                    if ($rowBlocks['type'] != '') {
-                                        echo $rowBlocks['type'];
-                                        if ($rowBlocks['length'] != '') {
-                                            echo ' | ';
-                                        }
-                                    }
-                                    if ($rowBlocks['length'] != '') {
-                                        echo $rowBlocks['length'].' min';
-                                    }
-                                    echo '</div>';
-                                    echo '</h3>';
-                                }
-                                echo '</div>';
-
-                                echo '</div>';
-                            }
-                            if ($rowBlocks['contents'] != '') {
-                                echo "<div style='margin-top:20px; padding: 15px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>".$rowBlocks['contents'].'</div>';
+                        if ($resultBlocks->rowCount() < 1) {
+                            echo "<div class='error'>";
+                            echo __($guid, 'There are no records to display.');
+                            echo '</div>';
+                        } else {
+                            $resourceContents = '';
+                            while ($rowBlocks = $resultBlocks->fetch()) {
+                                echo displayBlockContent($guid, $connection2, $rowBlocks['title'], $rowBlocks['type'], $rowBlocks['length'], $rowBlocks['contents'], $rowBlocks['teachersNotes'], $roleCategory);
                                 $resourceContents .= $rowBlocks['contents'];
                             }
-                            if (isset($_SESSION[$guid]['username'])) {
-                                if ($roleCategory == 'Staff') {
-                                    if ($rowBlocks['teachersNotes'] != '') {
-                                        echo "<div style='margin-top:20px; background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>".__($guid, "Teacher's Notes").':</b></p> '.$rowBlocks['teachersNotes'].'</div>';
-                                        $resourceContents .= $rowBlocks['teachersNotes'];
-                                    }
-                                }
-                            }
                         }
-                    }
                     echo '</div>';
                     echo "<div id='tabs4'>";
 					//Resources
@@ -751,7 +713,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         while ($rowWork = $resultWork->fetch()) {
                             $students = '';
                             if ($rowWork['grouping'] == 'Individual') { //Created by a single student
-                                        $students = formatName('', $rowWork['preferredName'], $rowWork['surname'], 'Student', false);
+                            $students = formatName('', $rowWork['preferredName'], $rowWork['surname'], 'Student', false);
                             } else { //Created by a group of students
                                         try {
                                             $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
@@ -772,8 +734,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo '<h3>';
                             echo $students." . <span style='font-size: 75%'>".__($guid, 'Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
                             echo '</h3>';
-                                    //DISPLAY WORK.
-                                    $extension = strrchr($rowWork['evidenceLocation'], '.');
+                            //DISPLAY WORK.
+                            $extension = strrchr($rowWork['evidenceLocation'], '.');
                             if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
                                         echo "<p style='text-align: center'>";
                                 if ($rowWork['evidenceType'] == 'File') { //It's a file
