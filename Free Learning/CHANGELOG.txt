@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.0.01
+-------
+Fixed class sign up status issue
+
 v4.0.00
 -------
 Integration of staff PD via Free Learning (forked module Free Learning PD to be discontinued)

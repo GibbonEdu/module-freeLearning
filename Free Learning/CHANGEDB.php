@@ -410,3 +410,8 @@ ALTER TABLE `freeLearningUnitStudent` ADD `gibbonPersonIDSchoolMentor` INT(10) U
 ALTER TABLE `freeLearningUnitStudent` ADD `confirmationKey` VARCHAR(20) NULL DEFAULT NULL AFTER `collaborationKey`;
 ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Current';end
 ";
+
+//v4.1.01
+++$count;
+$sql[$count][0] = '4.0.01';
+$sql[$count][1] = "UPDATE freeLearningUnitStudent SET status='Current' WHERE status='Current - Pending' AND enrolmentMethod='class';end";
