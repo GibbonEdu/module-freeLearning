@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.0.02
+-------
+Fixed cases where prerequisites don't show up in mpa view
+
 v4.0.01
 -------
 Fixed class sign up status issue

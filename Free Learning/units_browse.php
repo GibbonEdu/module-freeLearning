@@ -584,7 +584,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
 
                     if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'red'}, borderWidth: 20},";
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'red'}, borderWidth: 10},";
                     } else {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', borderWidth: 2},";
                     }
@@ -605,8 +605,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if (isset($node[2])) {
                         $edgeExplode = explode(',', $node[2]);
                         foreach ($edgeExplode as $edge) {
-                            if (isset($nodeArray[$edge][0])) {
-                                if ($nodeArray[$edge][0] != '') {
+                            if (isset($nodeArray[$edge][0])===true) {
+                                if (is_numeric($nodeArray[$edge][0])) {
                                     $edgeList .= '{from: '.$nodeArray[$node[1]][0].', to: '.$nodeArray[$edge][0].", arrows:'from'},";
                                 }
                             }
@@ -622,7 +622,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 					//CREATE NODE ARRAY
 					var nodes = new vis.DataSet([<?php echo $nodeList; ?>]);
 
-					//CREATE EDGET ARRAY
+					//CREATE EDGE ARRAY
 					var edges = new vis.DataSet([<?php echo $edgeList ?>]);
 
 					//CREATE NODE TO freeLearningUnitID ARRAY

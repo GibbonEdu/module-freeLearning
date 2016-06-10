@@ -415,3 +415,8 @@ ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','C
 ++$count;
 $sql[$count][0] = '4.0.01';
 $sql[$count][1] = "UPDATE freeLearningUnitStudent SET status='Current' WHERE status='Current - Pending' AND enrolmentMethod='class';end";
+
+//v4.1.02
+++$count;
+$sql[$count][0] = '4.0.02';
+$sql[$count][1] = "";
