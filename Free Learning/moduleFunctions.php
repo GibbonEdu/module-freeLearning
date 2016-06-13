@@ -80,9 +80,9 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
         if ($highestAction == 'Browse Units_all') {
             $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
             if ($showInactive == 'Y') {
-                $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name DESC";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name DESC";
             } else {
-                $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
             }
         } elseif ($highestAction == 'Browse Units_prerequisites') {
             if ($schoolType == 'Physical') {
@@ -775,6 +775,12 @@ function displayBlockContent($guid, $connection2, $title, $type, $length, $conte
 
 //Does not return errors, just does its best to get the job done
 function grantAwards($connection2, $guid, $gibbonPersonID) {
+    //Sort out difficulty order
+    $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+    if ($difficulties != false) {
+        $difficulties = explode(',', $difficulties);
+    }
+
     //Get list of active awards, including details on those already issued
     try {
         $data = array('gibbonPersonID' => $gibbonPersonID);
@@ -797,16 +803,129 @@ function grantAwards($connection2, $guid, $gibbonPersonID) {
             //CHECK AWARD CONDITIONS
             if ($row['unitsCompleteTotal'] > 0) { //UNITS COMPLETE TOTAL
                 $hitsNeeded ++;
-
                 try {
-                    //Count CONDITIONS
+                    //Count conditions
                     $dataCount = array('gibbonPersonID' => $gibbonPersonID);
-                    $sqlCount = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND status='Complete - Approved'";
+                    $sqlCount = "SELECT freeLearningUnitStudentID FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND status='Complete - Approved'";
                     $resultCount = $connection2->prepare($sqlCount);
                     $resultCount->execute($dataCount);
                 } catch (PDOException $e) { }
 
                 if ($resultCount->rowCount() >= $row['unitsCompleteTotal']) {
+                    $hitsActually ++;
+                }
+            }
+
+            if ($row['unitsCompleteThisYear'] > 0) { //UNITS COMPLETE THIS YEAR
+                $hitsNeeded ++;
+                try {
+                    //Count conditions
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                    $sqlCount = "SELECT freeLearningUnitStudentID FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID AND status='Complete - Approved'";
+                    $resultCount = $connection2->prepare($sqlCount);
+                    $resultCount->execute($dataCount);
+                } catch (PDOException $e) { }
+
+                if ($resultCount->rowCount() >= $row['unitsCompleteThisYear']) {
+                    $hitsActually ++;
+                }
+            }
+
+            if ($row['unitsCompleteDepartmentCount'] > 0) { //UNITS COMPLETE DEPARTMENT COUNT
+                $hitsNeeded ++;
+                try {
+                    //Count conditions
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID);
+                    $sqlCount = "SELECT DISTINCT gibbonDepartment.name
+                        FROM freeLearningUnitStudent
+                            JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                            JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat( '%', gibbonDepartment.gibbonDepartmentID, '%' ))
+                        WHERE gibbonPersonIDStudent=:gibbonPersonID
+                            AND status='Complete - Approved'";
+                    $resultCount = $connection2->prepare($sqlCount);
+                    $resultCount->execute($dataCount);
+                } catch (PDOException $e) { }
+
+                if ($resultCount->rowCount() >= $row['unitsCompleteDepartmentCount']) {
+                    $hitsActually ++;
+                }
+            }
+
+            if ($row['unitsCompleteIndividual'] > 0) { //UNITS COMPLETE INDIVIDUAL
+                $hitsNeeded ++;
+                try {
+                    //Count conditions
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID);
+                    $sqlCount = "SELECT freeLearningUnitStudentID
+                        FROM freeLearningUnitStudent
+                        WHERE gibbonPersonIDStudent=:gibbonPersonID
+                            AND status='Complete - Approved'
+                            AND grouping='Individual'
+                    ";
+                    $resultCount = $connection2->prepare($sqlCount);
+                    $resultCount->execute($dataCount);
+                } catch (PDOException $e) { }
+
+                if ($resultCount->rowCount() >= $row['unitsCompleteIndividual']) {
+                    $hitsActually ++;
+                }
+            }
+
+            if ($row['unitsCompleteGroup'] > 0) { //UNITS COMPLETE GROUP
+                $hitsNeeded ++;
+                try {
+                    //Count conditions
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID);
+                    $sqlCount = "SELECT freeLearningUnitStudentID
+                        FROM freeLearningUnitStudent
+                        WHERE gibbonPersonIDStudent=:gibbonPersonID
+                            AND status='Complete - Approved'
+                            AND NOT grouping='Individual'
+                    ";
+                    $resultCount = $connection2->prepare($sqlCount);
+                    $resultCount->execute($dataCount);
+                } catch (PDOException $e) { }
+
+                if ($resultCount->rowCount() >= $row['unitsCompleteGroup']) {
+                    $hitsActually ++;
+                }
+            }
+
+            if (!is_null($row['difficultyLevelMaxAchieved']) AND count($difficulties) > 0) { //UNITS COMPLETE GROUP
+                $hitsNeeded ++;
+                try {
+                    //Count conditions
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID);
+                    $sqlCount = "SELECT DISTINCT difficulty
+                        FROM freeLearningUnitStudent
+                            JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                        WHERE gibbonPersonIDStudent=:gibbonPersonID
+                            AND status='Complete - Approved'
+                    ";
+                    $resultCount = $connection2->prepare($sqlCount);
+                    $resultCount->execute($dataCount);
+                } catch (PDOException $e) { }
+
+                $rowCountAll = $resultCount->fetchAll();
+                $minReached = false ;
+                $minAchieved = false ;
+
+                foreach ($difficulties AS $difficulty) {
+                    if ($difficulty == $row['difficultyLevelMaxAchieved']) {
+                        $minReached = true ;
+                    }
+
+                    if ($minReached) {
+                        foreach ($rowCountAll AS $rowCount) {
+                            if ($rowCount['difficulty'] == $row['difficultyLevelMaxAchieved']) {
+                                $minAchieved = true;
+                            }
+
+                        }
+                    }
+                }
+
+                if ($minAchieved) {
                     $hitsActually ++;
                 }
             }
@@ -819,11 +938,13 @@ function grantAwards($connection2, $guid, $gibbonPersonID) {
                     $resultGrant = $connection2->prepare($sqlGrant);
                     $resultGrant->execute($dataGrant);
                 } catch (PDOException $e) {}
+
+                //Notify User
+                $notificationText = __($guid, 'Someone has granted you a badge.');
+                setNotification($connection2, $guid, $gibbonPersonID, $notificationText, 'Badges', "/index.php?q=/modules/Badges/badges_view.php&gibbonPersonID=$gibbonPersonID");
             }
         }
 
     }
-
-
 }
 ?>
