@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.1.00
+-------
+Badges for gamification of learning
+
 v4.0.02
 -------
 Fixed cases where prerequisites don't show up in mpa view

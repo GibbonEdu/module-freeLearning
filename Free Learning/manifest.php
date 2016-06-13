@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.0.02';
+$version = '4.1.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -111,13 +111,27 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   PRIMARY KEY (`freeLearningUnitStudentID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
+$moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
+  `freeLearningBadgeID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `badgesBadgeID` int(8) unsigned zerofill NOT NULL,
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
+  `unitsCompleteTotal` int(2) DEFAULT NULL,
+  `unitsCompleteThisYear` int(2) DEFAULT NULL,
+  `unitsCompleteDepartmentCount` int(2) DEFAULT NULL,
+  `unitsCompleteIndividual` int(2) DEFAULT NULL,
+  `unitsCompleteGroup` int(2) DEFAULT NULL,
+  `difficultyLevelMaxAchieved` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`freeLearningBadgeID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+
 //Settings
-$moduleTables[5] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of dicciulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
-$moduleTables[6] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'publicUnits', 'Public Units', 'Should selected units be made available to members of the public, via the home page?', 'N');";
-$moduleTables[7] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
-$moduleTables[8] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mapLink', 'Map Link', 'A URL pointing to a map of the available units.', '');";
-$moduleTables[9] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'schoolType', 'School Type', 'Determines how enrolment should function', 'Physical');";
-$moduleTables[10] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'learningAreaRestriction', 'Learning Area Restriction', 'Should unit creation be limited to own Learning Areas?', 'Y');";
+//gibbonSettings entries
+$gibbonSetting[0] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of dicciulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
+$gibbonSetting[1] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'publicUnits', 'Public Units', 'Should selected units be made available to members of the public, via the home page?', 'N');";
+$gibbonSetting[2] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
+$gibbonSetting[3] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mapLink', 'Map Link', 'A URL pointing to a map of the available units.', '');";
+$gibbonSetting[4] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'schoolType', 'School Type', 'Determines how enrolment should function', 'Physical');";
+$gibbonSetting[5] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'learningAreaRestriction', 'Learning Area Restriction', 'Should unit creation be limited to own Learning Areas?', 'Y');";
 
 //Action rows
 $actionRows[0]['name'] = 'Manage Units_all';
@@ -320,6 +334,23 @@ $actionRows[11]['categoryPermissionStaff'] = 'Y';
 $actionRows[11]['categoryPermissionStudent'] = 'N';
 $actionRows[11]['categoryPermissionParent'] = 'N';
 $actionRows[11]['categoryPermissionOther'] = 'N';
+
+$actionRows[11]['name'] = 'Manage Badges';
+$actionRows[12]['precedence'] = '0';
+$actionRows[12]['category'] = 'Gamification';
+$actionRows[12]['description'] = 'Allows a user set how badges (from the Badges unit) are awarded.';
+$actionRows[12]['URLList'] = 'badges_manage.php, badges_manage_add.php, badges_manage_edit.php';
+$actionRows[12]['entryURL'] = 'badges_manage.php';
+$actionRows[12]['entrySidebar'] = 'Y';
+$actionRows[12]['defaultPermissionAdmin'] = 'Y';
+$actionRows[12]['defaultPermissionTeacher'] = 'N';
+$actionRows[12]['defaultPermissionStudent'] = 'N';
+$actionRows[12]['defaultPermissionParent'] = 'N';
+$actionRows[12]['defaultPermissionSupport'] = 'N';
+$actionRows[12]['categoryPermissionStaff'] = 'Y';
+$actionRows[12]['categoryPermissionStudent'] = 'N';
+$actionRows[12]['categoryPermissionParent'] = 'N';
+$actionRows[12]['categoryPermissionOther'] = 'N';
 
 $array = array();
 $array['toggleSettingName'] = 'publicUnits';

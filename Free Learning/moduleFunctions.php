@@ -772,4 +772,58 @@ function displayBlockContent($guid, $connection2, $title, $type, $length, $conte
     return $return;
 
 }
+
+//Does not return errors, just does its best to get the job done
+function grantAwards($connection2, $guid, $gibbonPersonID) {
+    //Get list of active awards, including details on those already issued
+    try {
+        $data = array('gibbonPersonID' => $gibbonPersonID);
+        $sql = "SELECT freeLearningBadge.*, gibbonPersonID
+            FROM freeLearningBadge
+                JOIN badgesBadge ON (freeLearningBadge.badgesBadgeID=badgesBadge.badgesBadgeID)
+                LEFT JOIN badgesBadgeStudent ON (badgesBadgeStudent.badgesBadgeID=badgesBadge.badgesBadgeID AND gibbonPersonID=:gibbonPersonID)
+            WHERE
+                freeLearningBadge.active='Y'
+                AND badgesBadge.active='Y'
+        ";
+        $result = $connection2->prepare($sql);
+        $result->execute($data);
+    } catch (PDOException $e) { print $e->getMessage();}
+
+    while ($row = $result->fetch()) {
+        if (is_null($row['gibbonPersonID'])) { //Only work on awards not yet given to this person
+            $hitsNeeded = 0 ;
+            $hitsActually = 0 ;
+            //CHECK AWARD CONDITIONS
+            if ($row['unitsCompleteTotal'] > 0) { //UNITS COMPLETE TOTAL
+                $hitsNeeded ++;
+
+                try {
+                    //Count CONDITIONS
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID);
+                    $sqlCount = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND status='Complete - Approved'";
+                    $resultCount = $connection2->prepare($sqlCount);
+                    $resultCount->execute($dataCount);
+                } catch (PDOException $e) { }
+
+                if ($resultCount->rowCount() >= $row['unitsCompleteTotal']) {
+                    $hitsActually ++;
+                }
+            }
+
+            //GRANT AWARD
+            if ($hitsNeeded > 0 AND $hitsActually == $hitsNeeded) {
+                try {
+                    $dataGrant = array('badgesBadgeID' => $row['badgesBadgeID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonID, 'comment' => '', 'gibbonPersonIDCreator' => 1);
+                    $sqlGrant = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
+                    $resultGrant = $connection2->prepare($sqlGrant);
+                    $resultGrant->execute($dataGrant);
+                } catch (PDOException $e) {}
+            }
+        }
+
+    }
+
+
+}
 ?>

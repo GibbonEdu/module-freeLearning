@@ -100,7 +100,7 @@ if (!$block) {
                 echo '</div>';
             } else {
                 while ($rowBlocks = $resultBlocks->fetch()) {
-                    echo displayBlockContent($guid, $connection2, $rowBlocks['title'], $rowBlocks['type'], $rowBlocks['length'], $rowBlocks['contents'], $rowBlocks['teachersNotes'], $roleCategory);
+                    echo displayBlockContent($guid, $connection2, $rowBlocks['title'], $rowBlocks['type'], $rowBlocks['length'], $rowBlocks['contents'], $rowBlocks['teachersNotes']);
                 }
             }
 

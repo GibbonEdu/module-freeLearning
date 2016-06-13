@@ -100,11 +100,13 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                     exit;
                 }
 
-                //Attempt to notify the student, and issue like
+                //Attempt to notify the student, issue like and grant awards
                 $text = sprintf(__($guid, 'Your mentor has approved your request for unit completion (%1$s).'), $name);
                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                 setLike($connection2, 'Free Learning', $_SESSION[$guid]['gibbonSchoolYearID'], 'freeLearningUnitStudentID', $freeLearningUnitStudentID, $_SESSION[$guid]['gibbonPersonID'], $gibbonPersonIDStudent, 'Unit Approval', '');
+                grantAwards($connection2, $guid, $gibbonPersonIDStudent);
+
 
                 $URL .= '&return=success0';
                 header("Location: {$URL}");

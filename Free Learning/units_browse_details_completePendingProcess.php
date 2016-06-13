@@ -270,7 +270,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     }
 
                                     if ($emailMentor != '') {
-                                        print "here";
                                         //Include mailer
                                         require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/class.phpmailer.php';
 

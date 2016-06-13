@@ -411,12 +411,21 @@ ALTER TABLE `freeLearningUnitStudent` ADD `confirmationKey` VARCHAR(20) NULL DEF
 ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Current';end
 ";
 
-//v4.1.01
+//v4.0.01
 ++$count;
 $sql[$count][0] = '4.0.01';
 $sql[$count][1] = "UPDATE freeLearningUnitStudent SET status='Current' WHERE status='Current - Pending' AND enrolmentMethod='class';end";
 
-//v4.1.02
+//v4.0.02
 ++$count;
 $sql[$count][0] = '4.0.02';
 $sql[$count][1] = "";
+
+//v4.1.00
+++$count;
+$sql[$count][0] = '4.1.00';
+$sql[$count][1] = "
+CREATE TABLE `freeLearningBadge` (  `freeLearningBadgeID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,  `badgesBadgeID` int(8) unsigned zerofill NOT NULL,  `active` enum('Y','N') NOT NULL DEFAULT 'Y', `unitsCompleteTotal` int(2) DEFAULT NULL,  `unitsCompleteThisYear` int(2) DEFAULT NULL,  `unitsCompleteDepartmentCount` int(2) DEFAULT NULL,`unitsCompleteIndividual` int(2) DEFAULT NULL,`unitsCompleteGroup` int(2) DEFAULT NULL,`difficultyLevelMaxAchieved` varchar(255) DEFAULT NULL, PRIMARY KEY (`freeLearningBadgeID`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;end
+INSERT INTO `gibbonAction` (`gibbonActionID`, `gibbonModuleID`, `name`, `precedence`, `category`, `description`, `URLList`, `entryURL`, `entrySidebar`, `defaultPermissionAdmin`, `defaultPermissionTeacher`, `defaultPermissionStudent`, `defaultPermissionParent`, `defaultPermissionSupport`, `categoryPermissionStaff`, `categoryPermissionStudent`, `categoryPermissionParent`, `categoryPermissionOther`) VALUES (NULL, (SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning'), 'Manage Badges', 0, 'Gamification', 'Allows a user set how badges (from the Badges unit) are awarded.', 'badges_manage.php, badges_manage_add.php, badges_manage_edit.php','badges_manage.php', 'Y', 'Y', 'N', 'N', 'N', 'N', 'Y', 'N', 'N', 'N');end
+INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`) VALUES (NULL , '1', (SELECT gibbonActionID FROM gibbonAction JOIN gibbonModule ON (gibbonAction.gibbonModuleID=gibbonModule.gibbonModuleID) WHERE gibbonModule.name='Free Learning' AND gibbonAction.name='Manage Badges'));end
+";

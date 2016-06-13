@@ -119,7 +119,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 						</td>
 					</tr>
 					<?php
-
 				}
 				?>
 				<tr>
