@@ -429,3 +429,8 @@ CREATE TABLE `freeLearningBadge` (  `freeLearningBadgeID` int(8) unsigned zerofi
 INSERT INTO `gibbonAction` (`gibbonActionID`, `gibbonModuleID`, `name`, `precedence`, `category`, `description`, `URLList`, `entryURL`, `entrySidebar`, `defaultPermissionAdmin`, `defaultPermissionTeacher`, `defaultPermissionStudent`, `defaultPermissionParent`, `defaultPermissionSupport`, `categoryPermissionStaff`, `categoryPermissionStudent`, `categoryPermissionParent`, `categoryPermissionOther`) VALUES (NULL, (SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning'), 'Manage Badges', 0, 'Gamification', 'Allows a user set how badges (from the Badges unit) are awarded.', 'badges_manage.php, badges_manage_add.php, badges_manage_edit.php','badges_manage.php', 'Y', 'Y', 'N', 'N', 'N', 'N', 'Y', 'N', 'N', 'N');end
 INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`) VALUES (NULL , '1', (SELECT gibbonActionID FROM gibbonAction JOIN gibbonModule ON (gibbonAction.gibbonModuleID=gibbonModule.gibbonModuleID) WHERE gibbonModule.name='Free Learning' AND gibbonAction.name='Manage Badges'));end
 ";
+
+//v4.1.01
+++$count;
+$sql[$count][0] = '4.1.01';
+$sql[$count][1] = "";

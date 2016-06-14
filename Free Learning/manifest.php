@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.1.00';
+$version = '4.1.01';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -335,7 +335,7 @@ $actionRows[11]['categoryPermissionStudent'] = 'N';
 $actionRows[11]['categoryPermissionParent'] = 'N';
 $actionRows[11]['categoryPermissionOther'] = 'N';
 
-$actionRows[11]['name'] = 'Manage Badges';
+$actionRows[12]['name'] = 'Manage Badges';
 $actionRows[12]['precedence'] = '0';
 $actionRows[12]['category'] = 'Gamification';
 $actionRows[12]['description'] = 'Allows a user set how badges (from the Badges unit) are awarded.';

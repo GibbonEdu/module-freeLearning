@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.1.01
+-------
+Added line breaks to description display
+Fixed manifest issue from v4.1.00's addition of Manage Badges
+
 v4.1.00
 -------
 Badges for gamification of learning
