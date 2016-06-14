@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.1.02
+-------
+Makes use of Badges v2.1.03 null creator when issuing Badges
+Includes a CLI script for issue badges for units completed before badges were set up, in bulk
+
 v4.1.01
 -------
 Added line breaks to description display
