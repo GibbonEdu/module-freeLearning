@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.1.03
+-------
+Refined default access permissions
+
 v4.1.02
 -------
 Makes use of Badges v2.1.03 null creator when issuing Badges

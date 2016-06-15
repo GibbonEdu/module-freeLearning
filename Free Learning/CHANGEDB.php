@@ -435,8 +435,12 @@ INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`
 $sql[$count][0] = '4.1.01';
 $sql[$count][1] = "";
 
-
 //v4.1.02
 ++$count;
 $sql[$count][0] = '4.1.02';
+$sql[$count][1] = "";
+
+//v4.1.03
+++$count;
+$sql[$count][0] = '4.1.03';
 $sql[$count][1] = "";

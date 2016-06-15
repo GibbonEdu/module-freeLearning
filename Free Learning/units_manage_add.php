@@ -173,18 +173,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 				</tr>
 				<tr>
 					<td>
-						<b><?php echo __($guid, 'Active') ?> *</b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<select name="active" id="active" style="width: 302px">
-							<option value="Y"><?php echo __($guid, 'Yes') ?></option>
-							<option value="N"><?php echo __($guid, 'No') ?></option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td>
 						<b><?php echo __($guid, 'Logo') ?></b><br/>
 						<span style="font-size: 90%"><i>125x125px jpg/png/gif</i></span>
 					</td>
@@ -209,7 +197,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         <p><?php echo __($guid, 'Users with permission to manage units can override avaiability preferences.'); ?></p>
                     </td>
                 </tr>
-
+                <tr>
+					<td>
+						<b><?php echo __($guid, 'Active') ?> *</b><br/>
+						<span style="font-size: 90%"><i></i></span>
+					</td>
+					<td class="right">
+                        <input checked type="radio" name="active" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                        <input type="radio" name="active" value="N" /> <?php echo __($guid, 'No') ?>
+					</td>
+				</tr>
                 <tr>
                     <td>
                         <b><?php echo __($guid, 'Available To Students') ?> * </b><br/>
@@ -226,8 +223,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         <span style="font-size: 90%"><i><?php echo __($guid, 'Should staff be able to browse and enrol?'); ?></i></span>
                     </td>
                     <td class="right">
-                        <input type="radio" name="availableStaff" value="Y" /> <?php echo __($guid, 'Yes') ?>
-                        <input checked type="radio" name="availableStaff" value="N" /> <?php echo __($guid, 'No') ?>
+                        <input checked type="radio" name="availableStaff" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                        <input type="radio" name="availableStaff" value="N" /> <?php echo __($guid, 'No') ?>
                     </td>
                 </tr>
                 <tr>
@@ -236,8 +233,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         <span style="font-size: 90%"><i><?php echo __($guid, 'Should parents be able to browse and enrol?'); ?></i></span>
                     </td>
                     <td class="right">
-                        <input type="radio" name="availableParents" value="Y" /> <?php echo __($guid, 'Yes') ?>
-                        <input checked type="radio" name="availableParents" value="N" /> <?php echo __($guid, 'No') ?>
+                        <input checked type="radio" name="availableParents" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                        <input type="radio" name="availableParents" value="N" /> <?php echo __($guid, 'No') ?>
                     </td>
                 </tr>
                 <?php

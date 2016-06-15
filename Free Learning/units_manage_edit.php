@@ -234,18 +234,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</tr>
 					<tr>
 						<td>
-							<b><?php echo __($guid, 'Active') ?> *</b><br/>
-							<span style="font-size: 90%"><i></i></span>
-						</td>
-						<td class="right">
-							<select name="active" id="active" style="width: 302px">
-								<option <?php if ($row['active'] == 'Y') { echo 'selected'; } ?> value="Y"><?php echo __($guid, 'Yes') ?></option>
-								<option <?php if ($row['active'] == 'N') { echo 'selected'; } ?> value="N"><?php echo __($guid, 'No') ?></option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td>
 							<b><?php echo __($guid, 'Logo') ?></b><br/>
 							<span style="font-size: 90%"><i>125x125px jpg/png/gif</i><br/></span>
 							<?php if ($row['logo'] != '') { ?>
@@ -286,7 +274,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             <p><?php echo __($guid, 'Users with permission to manage units can override avaiability preferences.'); ?></p>
                         </td>
                     </tr>
-
+					<tr>
+						<td>
+							<b><?php echo __($guid, 'Active') ?> *</b><br/>
+							<span style="font-size: 90%"><i></i></span>
+						</td>
+						<td class="right">
+                            <input <?php if ($row['active'] == 'Y') { echo 'checked'; } ?> type="radio" name="active" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                            <input <?php if ($row['active'] == 'N') { echo 'checked'; } ?> type="radio" name="active" value="N" /> <?php echo __($guid, 'No') ?>
+						</td>
+					</tr>
                     <tr>
                         <td>
                             <b><?php echo __($guid, 'Available To Students') ?> * </b><br/>
