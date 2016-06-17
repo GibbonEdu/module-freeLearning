@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.1.03';
+$version = '4.1.04';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -296,9 +296,9 @@ $actionRows[9]['defaultPermissionTeacher'] = 'N';
 $actionRows[9]['defaultPermissionStudent'] = 'Y';
 $actionRows[9]['defaultPermissionParent'] = 'N';
 $actionRows[9]['defaultPermissionSupport'] = 'N';
-$actionRows[9]['categoryPermissionStaff'] = 'N';
+$actionRows[9]['categoryPermissionStaff'] = 'Y';
 $actionRows[9]['categoryPermissionStudent'] = 'Y';
-$actionRows[9]['categoryPermissionParent'] = 'N';
+$actionRows[9]['categoryPermissionParent'] = 'Y';
 $actionRows[9]['categoryPermissionOther'] = 'N';
 
 $actionRows[10]['name'] = 'Free Learning Showcase';

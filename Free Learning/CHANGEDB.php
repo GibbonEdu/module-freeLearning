@@ -444,3 +444,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '4.1.03';
 $sql[$count][1] = "";
+
+//v4.1.04
+++$count;
+$sql[$count][0] = '4.1.04';
+$sql[$count][1] = "
+UPDATE gibbonAction SET categoryPermissionStaff='Y', categoryPermissionParent='Y' WHERE gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning') AND name='My Unit History';end
+";

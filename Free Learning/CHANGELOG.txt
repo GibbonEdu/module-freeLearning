@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.1.04
+-------
+Made My Unit History available for staff and parent role categories
+
 v4.1.03
 -------
 Refined default access permissions
