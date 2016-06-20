@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.1.05
+-------
+Added ability to view badges available in the system
+
 v4.1.04
 -------
 Made My Unit History available for staff and parent role categories

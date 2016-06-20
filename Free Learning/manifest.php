@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.1.04';
+$version = '4.1.05';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -351,6 +351,23 @@ $actionRows[12]['categoryPermissionStaff'] = 'Y';
 $actionRows[12]['categoryPermissionStudent'] = 'N';
 $actionRows[12]['categoryPermissionParent'] = 'N';
 $actionRows[12]['categoryPermissionOther'] = 'N';
+
+$actionRows[13]['name'] = 'View Badges';
+$actionRows[13]['precedence'] = '0';
+$actionRows[13]['category'] = 'Gamification';
+$actionRows[13]['description'] = 'Allows a user to view badges that are available via Free Learning.';
+$actionRows[13]['URLList'] = 'badges_view.php';
+$actionRows[13]['entryURL'] = 'badges_view.php';
+$actionRows[13]['entrySidebar'] = 'Y';
+$actionRows[13]['defaultPermissionAdmin'] = 'Y';
+$actionRows[13]['defaultPermissionTeacher'] = 'Y';
+$actionRows[13]['defaultPermissionStudent'] = 'Y';
+$actionRows[13]['defaultPermissionParent'] = 'Y';
+$actionRows[13]['defaultPermissionSupport'] = 'Y';
+$actionRows[13]['categoryPermissionStaff'] = 'Y';
+$actionRows[13]['categoryPermissionStudent'] = 'Y';
+$actionRows[13]['categoryPermissionParent'] = 'Y';
+$actionRows[13]['categoryPermissionOther'] = 'Y';
 
 $array = array();
 $array['toggleSettingName'] = 'publicUnits';
