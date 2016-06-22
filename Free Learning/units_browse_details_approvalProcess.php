@@ -152,9 +152,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'];
                     $exemplarWork = $_POST['exemplarWork'];
                     $exemplarWorkLicense = '';
+                    $exemplarWorkEmbed = '';
                     $attachment = '';
                     if ($exemplarWork == 'Y') {
                         $exemplarWorkLicense = $_POST['exemplarWorkLicense'];
+                        $exemplarWorkEmbed = $_POST['exemplarWorkEmbed'];
                     }
 
                     //Validation
@@ -166,7 +168,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         if ($status == 'Complete - Approved') { //APPROVED!
                             //Move attached file, if there is one
                             if ($exemplarWork == 'Y') {
-                                $attachment = $row['logo'];
+                                $attachment = $row['exemplarWorkThumb'];
                                 $time = time();
                                 if ($_FILES['file']['tmp_name'] != '') {
                                     //Check for folder in uploads based on today's date
@@ -198,8 +200,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             //Write to database
                             try {
-                                $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => $attachment, 'exemplarWorkLicense' => $exemplarWorkLicense, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCompleteApproved' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
-                                $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
+                                $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => $attachment, 'exemplarWorkLicense' => $exemplarWorkLicense, 'exemplarWorkEmbed' => $exemplarWorkEmbed, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCompleteApproved' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                                $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, exemplarWorkEmbed=:exemplarWorkEmbed, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
                                 $result = $connection2->prepare($sql);
                                 $result->execute($data);
                             } catch (PDOException $e) {

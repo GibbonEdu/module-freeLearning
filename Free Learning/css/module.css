@@ -16,3 +16,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+a.button {
+  font-size: 115%;
+  font-weight: bold;
+  text-decoration: none;
+  background-color: #cc0000;
+  color: #ffffff;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #CCCCCC;
+  padding: 15px 30px;
+  border-radius: 5px;
+}
+
+p.button {
+    margin-top: 25px;
+    margin-bottom: 50px;
+}

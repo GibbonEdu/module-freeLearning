@@ -735,37 +735,48 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo $students." . <span style='font-size: 75%'>".__($guid, 'Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
                             echo '</h3>';
                             //DISPLAY WORK.
-                            $extension = strrchr($rowWork['evidenceLocation'], '.');
-                            if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
-                                        echo "<p style='text-align: center'>";
-                                if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                                echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'><img style='max-width: 550px' src='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'/></a>";
-                                } else { //It's a link
-                                                echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'><img style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
+                            echo '<h4 style=\'margin-top: 0px\'>'.__($guid, 'Student Work').'</h4>';
+                            if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
+                                $extension = strrchr($rowWork['evidenceLocation'], '.');
+                                if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
+                                    echo "<p>";
+                                    if ($rowWork['evidenceType'] == 'File') { //It's a file
+                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'/></a>";
+                                    } else { //It's a link
+                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
+                                    }
+                                    echo '</p>';
+                                } else { //Not an image
+                                    echo '<p class=\'button\'>';
+                                    if ($rowWork['evidenceType'] == 'File') { //It's a file
+                                        echo "<a class='button'target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+                                    } else { //It's a link
+                                        echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+                                    }
+                                    echo '</p>';
                                 }
-                                echo '</p>';
-                            } else { //Not an image
-                                        echo '<p>';
-                                if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                                echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
-                                } else { //It's a link
-                                                echo "<a target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
-                                }
+                            } else {
+                                echo '<p>';
+                                print $rowWork['exemplarWorkEmbed'] ;
                                 echo '</p>';
                             }
-                            echo '<p>';
+                            //DISPLAY STUDENT COMMENT
                             if ($rowWork['commentStudent'] != '') {
-                                echo '<b><u>'.__($guid, 'Student Comment').'</u></b><br/><br/>';
-                                echo nl2br($rowWork['commentStudent']).'<br/>';
+                                echo '<h4>'.__($guid, 'Student Comment').'</h4>';
+                                echo '<p style=\'margin-bottom: 0px\'>';
+                                echo nl2br($rowWork['commentStudent']);
+                                echo '</p>';
                             }
+                            //DISPLAY TEACHER COMMENT
                             if ($rowWork['commentApproval'] != '') {
                                 if ($rowWork['commentStudent'] != '') {
                                     echo '<br/>';
                                 }
-                                echo '<b><u>'.__($guid, 'Teacher Comment').'</u></b>';
-                                echo $rowWork['commentApproval'].'<br/>';
+                                echo '<h4>'.__($guid, 'Teacher Comment').'</h4>';
+                                echo '<p>';
+                                echo $rowWork['commentApproval'];
+                                echo '</p>';
                             }
-                            echo '</p>';
                         }
                     }
                     echo '</div>';

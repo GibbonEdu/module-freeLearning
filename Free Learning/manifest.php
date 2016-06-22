@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.1.05';
+$version = '4.2.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -108,6 +108,7 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   `exemplarWork` enum('N','Y') NOT NULL DEFAULT 'N',
   `exemplarWorkThumb` text NOT NULL,
   `exemplarWorkLicense` varchar(255) NOT NULL,
+  `exemplarWorkEmbed` text NOT NULL,
   PRIMARY KEY (`freeLearningUnitStudentID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 

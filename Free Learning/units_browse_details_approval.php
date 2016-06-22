@@ -190,15 +190,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     if ($row['status'] == 'Evidence Not Approved') {
                                         ?>
 										$("#exemplarRow").css("display","none");
-										$("#fileRow").css("display","none");
-										$("#linkRow").css("display","none");
+										$(".exemplarDrop").css("display","none");
 										file.disable() ;
 										<?php
 
                                     } elseif ($row['exemplarWork'] == 'N') {
                                         ?>
-										$("#fileRow").css("display","none");
-										$("#linkRow").css("display","none");
+										$(".exemplarDrop").css("display","none");
 										file.disable() ;
 										<?php
 
@@ -208,14 +206,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 									$("#status").click(function(){
 										if ($('#status option:selected').val()=="Evidence Not Approved" ) {
 											$("#exemplarRow").css("display","none");
-											$("#fileRow").css("display","none");
-											$("#linkRow").css("display","none");
+											$(".exemplarDrop").css("display","none");
 											file.disable() ;
 										} else {
 											$("#exemplarRow").slideDown("fast", $("#exemplarRow").css("display","table-row"));
 											if ($('#exemplarWork option:selected').val()=="Y" ) {
-												$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
-												$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
+												$(".exemplarDrop").slideDown("fast", $(".exemplarDrop").css("display","table-row"));
 												file.enable() ;
 											}
 										}
@@ -223,12 +219,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
 									$("#exemplarWork").click(function(){
 										if ($('#exemplarWork option:selected').val()=="N" ) {
-											$("#fileRow").css("display","none");
-											$("#linkRow").css("display","none");
+											$(".exemplarDrop").css("display","none");
 											file.disable() ;
 										} else {
-											$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
-											$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
+											$(".exemplarDrop").slideDown("fast", $(".exemplarDrop").css("display","table-row"));
 											file.enable() ;
 										}
 									 });
@@ -257,7 +251,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 									</select>
 								</td>
 							</tr>
-							<tr id="fileRow">
+							<tr class="exemplarDrop">
 								<td>
 									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image') ?></b><br/>
 									<span style="font-size: 90%"><i>150x150px jpg/png/gif</i><br/></span>
@@ -288,13 +282,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 									</script>
 								</td>
 							</tr>
-							<tr id="linkRow">
+							<tr class="exemplarDrop">
 								<td>
 									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image Credit') ?></b><br/>
 									<span style="font-size: 90%"><i><?php echo __($guid, 'Credit and license for image used above.'); ?></i></span>
 								</td>
 								<td class="right">
-									<input name="exemplarWorkLicense" id="exemplarWorkLicense" maxlength=255 value="<?php echo $row['exemplarWorkLicense'] ?>" type="text" style="width: 300px">
+									<input name="exemplarWorkLicense" id="exemplarWorkLicense" maxlength=255 value="<?php echo htmlPrep($row['exemplarWorkLicense']) ?>" type="text" style="width: 300px">
+								</td>
+							</tr>
+							<tr class="exemplarDrop">
+								<td>
+									<b><?php echo __($guid, 'Exemplar Work Embed') ?></b><br/>
+									<span style="font-size: 90%"><i><?php echo __($guid, 'Include embed code, otherwise link to work will be used.'); ?></i></span>
+								</td>
+								<td class="right">
+									<input name="exemplarWorkEmbed" id="exemplarWorkEmbed" maxlength=255 value="<?php echo htmlPrep($row['exemplarWorkEmbed']) ?>" type="text" style="width: 300px">
 								</td>
 							</tr>
 							<tr>

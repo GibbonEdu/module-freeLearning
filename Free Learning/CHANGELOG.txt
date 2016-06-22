@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.2.00
+-------
+Improved showcase display
+Fixed enrolment edit bug where unit logo replaces examplar logo
+
 v4.1.05
 -------
 Added ability to view badges available in the system
