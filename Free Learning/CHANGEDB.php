@@ -470,3 +470,9 @@ $sql[$count][0] = '4.2.00';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnitStudent` ADD `exemplarWorkEmbed` TEXT NOT NULL AFTER `exemplarWorkLicense`;end
 ";
+
+//v4.2.01
+++$count;
+$sql[$count][0] = '4.2.01';
+$sql[$count][1] = "
+";
