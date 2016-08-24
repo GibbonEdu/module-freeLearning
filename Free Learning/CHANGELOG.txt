@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.2.02
+-------
+Fixed evidence bug
+
 v4.2.01
 -------
 Switched outgoing PHPMailer emails from PHP's mail function to SMTP

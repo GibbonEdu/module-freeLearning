@@ -476,3 +476,10 @@ ALTER TABLE `freeLearningUnitStudent` ADD `exemplarWorkEmbed` TEXT NOT NULL AFTE
 $sql[$count][0] = '4.2.01';
 $sql[$count][1] = "
 ";
+
+//v4.2.02
+++$count;
+$sql[$count][0] = '4.2.02';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnitStudent` CHANGE `evidenceType` `evidenceType` ENUM('File','Link') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL, CHANGE `evidenceLocation` `evidenceLocation` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+";
