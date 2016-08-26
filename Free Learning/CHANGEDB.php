@@ -483,3 +483,10 @@ $sql[$count][0] = '4.2.02';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnitStudent` CHANGE `evidenceType` `evidenceType` ENUM('File','Link') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL, CHANGE `evidenceLocation` `evidenceLocation` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 ";
+
+//v4.2.03
+++$count;
+$sql[$count][0] = '4.2.03';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnitStudent` CHANGE `commentStudent` `commentStudent` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL, CHANGE `commentApproval` `commentApproval` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL, CHANGE `exemplarWorkThumb` `exemplarWorkThumb` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL, CHANGE `exemplarWorkLicense` `exemplarWorkLicense` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL, CHANGE `exemplarWorkEmbed` `exemplarWorkEmbed` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;end
+";
