@@ -33,6 +33,11 @@ try {
 
 @session_start();
 
+//Check to see if system settings are set from databases
+if (@$_SESSION[$guid]['systemSettingsSet'] == false) {
+    getSystemSettings($guid, $connection2);
+}
+
 //Set return URL
 $URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_mentor.php&sidebar=true';
 

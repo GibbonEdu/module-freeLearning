@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.2.04
+-------
+Fixed mentor approval PHP Notice when not logged in
+
 v4.2.03
 -------
 Fixed evidence bug (really fixed it now!)
