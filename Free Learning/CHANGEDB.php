@@ -496,3 +496,9 @@ ALTER TABLE `freeLearningUnitStudent` CHANGE `commentStudent` `commentStudent` T
 $sql[$count][0] = '4.2.04';
 $sql[$count][1] = "
 ";
+
+//v4.2.05
+++$count;
+$sql[$count][0] = '4.2.05';
+$sql[$count][1] = "
+";

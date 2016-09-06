@@ -121,6 +121,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 exit();
             } else {
                 $row = $result->fetch();
+                $unit = $row['name'];
                 $blurb = $row['blurb'];
 
                 $proceed = false;
@@ -380,7 +381,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                             $body .= '<li>'.$student[0].'</li>';
                                         }
                                         $body .= '</ul>';
-                                        $body .= __($guid, 'The unit you are being asked to advise on is described as follows:').' '.$blurb."<br/><br/>";
+                                        $body .= sprintf(__($guid, 'The unit you are being asked to advise on is called %1$s and is described as follows:'), '<b>'.$unit.'</b>').$blurb."<br/><br/>";
                                         $body .= sprintf(__($guid, 'Please %1$sclick here%2$s if you are able to get involved, or, %3$sclick here%4$s if you not in a position to help.'), "<a style='font-weight: bold; text-decoration: underline; color: #390' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey'>", '</a>', "<a style='font-weight: bold; text-decoration: underline; color: #CC0000' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey'>", '</a>');
                                         $body .= '<br/><br/>';
                                         $body .= sprintf(__($guid, 'Thank you very much for your time. Should you have any questions about this matter, please reply to this email, or contact %1$s on %2$s.'), $_SESSION[$guid]['organisationAdministratorName'], $_SESSION[$guid]['organisationAdministratorEmail']);

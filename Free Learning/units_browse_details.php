@@ -316,6 +316,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             //Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
                             $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
+                            $enrolmentType = '';
                             if ($manageAll == true) {
                                 $enrolmentType = 'staffEdit';
                             } else {
@@ -339,7 +340,18 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             try {
                                 if ($schoolType == 'Physical') {
                                     $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                    $sqlClass = "SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL OR dateEnd>='".date('Y-m-d')."') AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
+                                    $sqlClass = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.surname, gibbonPerson.preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName
+                                        FROM freeLearningUnitStudent
+                                            INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
+                                            LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+                                            LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
+                                            LEFT JOIN gibbonPerson AS mentor ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID)
+                                        WHERE freeLearningUnitID=:freeLearningUnitID
+                                            AND gibbonPerson.status='Full'
+                                            AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='".date('Y-m-d')."')
+                                            AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='".date('Y-m-d')."')
+                                            AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
+                                        ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
                                 } else {
                                     $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID']);
                                     $sqlClass = "SELECT gibbonPersonID, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL OR dateEnd>='".date('Y-m-d')."') ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
@@ -372,7 +384,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         if ($schoolType == 'Physical') {
                                             ?>
                                             <th>
-                                                <?php echo __($guid, 'Class') ?><br/>
+                                                <?php echo __($guid, 'Class/Mentor') ?><br/>
                                             </th>
                                             <?php
                                         }
@@ -407,11 +419,19 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             <?php
                                             if ($schoolType == 'Physical') {
                                                 echo '<td>';
-                                                if ($rowClass['course'] != '' and $rowClass['class'] != '') {
-                                                    echo $rowClass['course'].'.'.$rowClass['class'];
-                                                } else {
-                                                    echo '<i>'.__($guid, 'NA').'</i>';
-                                                }
+                                                    if ($rowClass['enrolmentMethod'] == 'class') {
+                                                        if ($rowClass['course'] != '' and $rowClass['class'] != '') {
+                                                            echo $rowClass['course'].'.'.$rowClass['class'];
+                                                        } else {
+                                                            echo '<i>'.__($guid, 'NA').'</i>';
+                                                        }
+                                                    }
+                                                    else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {
+                                                        echo formatName('', $rowClass['mentorpreferredName'], $rowClass['mentorsurname'], 'Student', false);
+                                                    }
+                                                    else if ($rowClass['enrolmentMethod'] == 'externalMentor') {
+                                                        echo $rowClass['nameExternalMentor'];
+                                                    }
                                                 echo '</td>';
                                             }
                                             ?>

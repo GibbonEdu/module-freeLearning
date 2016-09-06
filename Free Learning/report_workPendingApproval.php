@@ -40,8 +40,35 @@ else {
 
 	//List students whose status is Current or Complete - Pending
 	try {
-		$dataClass=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"]);
-		$sqlClass="SELECT freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClassPerson.role='Teacher' AND gibbonPerson.status='Full' AND freeLearningUnitStudent.status='Complete - Pending' AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "') AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "') AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY gibbonCourse.nameShort, gibbonCourseClass.nameShort, freeLearningUnit.name, surname, preferredName" ;
+		$dataClass=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID2"=>$_SESSION[$guid]["gibbonPersonID"]);
+		$sqlClass="(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonRole.category
+			FROM freeLearningUnit
+				JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+				INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
+				JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
+				LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+				LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
+				LEFT JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+			WHERE gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
+				AND gibbonCourseClassPerson.role='Teacher'
+				AND gibbonPerson.status='Full'
+				AND freeLearningUnitStudent.status='Complete - Pending'
+				AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "')
+				AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "')
+				AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)
+			UNION
+			(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, null AS course, null AS class, gibbonRole.category
+				FROM freeLearningUnit
+					JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+					INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
+					JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
+				WHERE freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID2
+					AND gibbonPerson.status='Full'
+					AND freeLearningUnitStudent.status='Complete - Pending'
+					AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "')
+					AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "')
+					AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)
+			ORDER BY course, class, unit, surname, preferredName" ;
 		$resultClass=$connection2->prepare($sqlClass);
 		$resultClass->execute($dataClass);
 	}
@@ -59,6 +86,9 @@ else {
 		?>
 		<table cellspacing='0' style="width: 100%">
 			<tr class='head'>
+				<th>
+					<?php print __($guid, 'Enrolment Method') ?><br/>
+				</th>
 				<th>
 					<?php print __($guid, 'Class') ?><br/>
 				</th>
@@ -83,8 +113,9 @@ else {
 				$count++ ;
 
 				print "<tr class=$rowNum>" ;
-				?>
-					<?php
+					print '<td>';
+						print ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $rowClass["enrolmentMethod"])).'<br/>';
+					print '</td>';
 					print "<td>" ;
 						if ($rowClass["course"]!="" AND $rowClass["class"]!="") {
 							print $rowClass["course"] . "." . $rowClass["class"] ;
@@ -99,7 +130,12 @@ else {
 						?>
 					</td>
 					<td>
-						<?php print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true) . "</a>" ?><br/>
+						<?php
+						if ($rowClass['category'] == 'Student')
+							print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true) . "</a>";
+						else
+							print formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true);
+						?><br/>
 					</td>
 					<td>
 						<?php print $rowClass["status"] ?><br/>

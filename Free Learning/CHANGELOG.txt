@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v4.2.05
+-------
+Updated Work Pending Approval Report to work with school and external mentors
+Added name of unit to emails sent to potential and assessing mentors
+Added mentor name to Manage Enrolment tab
+
 v4.2.04
 -------
 Fixed mentor approval PHP Notice when not logged in
