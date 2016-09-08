@@ -50,11 +50,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $gibbonPersonID = $_GET['gibbonPersonID'];
         }
         ?>
-	
+
 		<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
-			<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+			<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 				<tr>
-					<td style='width: 275px'> 
+					<td style='width: 275px'>
 						<b><?php echo __($guid, 'Student') ?> *</b><br/>
 					</td>
 					<td class="right">
@@ -105,17 +105,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                                 }
                                 ?>
 									</optgroup>
-									<optgroup label='--<?php echo __($guid, 'Students by Name') ?>--'>
+									<optgroup label='--<?php echo __($guid, 'All Users by Name') ?>--'>
 										<?php
                                         try {
                                             $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                            $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
+                                            $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE status='Full' AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
                                             $resultSelect = $connection2->prepare($sqlSelect);
                                             $resultSelect->execute($dataSelect);
                                         } catch (PDOException $e) {
                                         }
                                 while ($rowSelect = $resultSelect->fetch()) {
-                                    echo "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.htmlPrep($rowSelect['name']).')</option>';
+                                    $selected = '';
+                                    if ($rowSelect['gibbonPersonID'] == $gibbonPersonID AND $rowSelect['name'] == '') {
+                                        $selected = 'selected';
+                                    }
+                                    echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true);
+                                    if ($rowSelect['name'] != '')
+                                        echo ' ('.htmlPrep($rowSelect['name']).')';
+                                    echo '</option>';
                                 }
                                 ?>
 									</optgroup>

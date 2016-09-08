@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.2.06
+-------
+Unit History report now works for staff and parents
+
 v4.2.05
 -------
 Updated Work Pending Approval Report to work with school and external mentors
