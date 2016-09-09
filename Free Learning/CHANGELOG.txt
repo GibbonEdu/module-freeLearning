@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.2.07
+-------
+Improved unit sort in Browse Units
+
 v4.2.06
 -------
 Unit History report now works for staff and parents

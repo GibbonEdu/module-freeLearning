@@ -75,14 +75,14 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
 
     //Do it!
     if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
-        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
+        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name";
     } else {
         if ($highestAction == 'Browse Units_all') {
             $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
             if ($showInactive == 'Y') {
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name DESC";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name";
             } else {
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name DESC";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name";
             }
         } elseif ($highestAction == 'Browse Units_prerequisites') {
             if ($schoolType == 'Physical') {
@@ -257,7 +257,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                 $output .= '</tr>';
                 if ($row['commentStudent'] != '' or $row['commentApproval'] != '') {
                     $output .= "<tr class='comment-".$row['freeLearningUnitStudentID']."' id='comment-".$row['freeLearningUnitStudentID']."'>";
-                    $output .= '<td colspan=6>';
+                    $output .= '<td colspan=7>';
                     if ($row['commentStudent'] != '') {
                         $output .= '<b>'.__($guid, 'Student Comment').'</b><br/>';
                         $output .= nl2br($row['commentStudent']).'<br/>';
