@@ -284,7 +284,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         }
                                         $roleCategoryFull = __($guid, $roleCategoryFull) ;
 
-                                        $body .= sprintf(__($guid, 'The following %1$s at %2$s has requested your feedback on their %3$sFree Learning%4$s work (%5$s), which they have just submitted, and on which you previously agreed to mentor them.'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='https://rossparker.org'>", '</a>', '<b>'.$name.'</b>');
+                                        $body .= sprintf(__($guid, 'The following %1$s at %2$s has requested your feedback on their %3$sFree Learning%4$s work (%5$s), which they have just submitted, and on which you previously agreed to mentor them.'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>', '<b>'.$name.'</b>');
                                         $body .= '<br/>';
                                         $body .= '<ul>';
                                         $body .= '<li>'.$student[0].'</li>';

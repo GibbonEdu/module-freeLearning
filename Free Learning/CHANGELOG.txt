@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.2.08
+-------
+Fixed link to Free Learning page on http://rossparker.org
+
 v4.2.07
 -------
 Improved unit sort in Browse Units
