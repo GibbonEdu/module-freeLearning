@@ -76,6 +76,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $availableStudents = $_POST['availableStudents'];
             $availableStaff = $_POST['availableStaff'];
             $availableParents = $_POST['availableParents'];
+            $availableOther = $_POST['availableOther'];
             $sharedPublic = null;
             if (isset($_POST['sharedPublic'])) {
                 $sharedPublic = $_POST['sharedPublic'];
@@ -128,7 +129,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             }
             $outline = $_POST['outline'];
 
-            if ($name == '' or $difficulty == '' or $active == '' or $availableStudents=='' or $availableStaff=='' or $availableParents=='') {
+            if ($name == '' or $difficulty == '' or $active == '' or $availableStudents == '' or $availableStaff == '' or $availableParents == '' or $availableOther == '') {
                 //Fail 3
                 $URL .= '&return=error3';
                 header("Location: {$URL}");
@@ -193,8 +194,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
                 //Write to database
                 try {
-                    $data = array('name' => $name, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'sharedPublic' => $sharedPublic, 'active' => $active, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'outline' => $outline, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestamp' => date('Y-m-d H:i:s'));
-                    $sql = 'INSERT INTO freeLearningUnit SET name=:name, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, grouping=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp';
+                    $data = array('name' => $name, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'outline' => $outline, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestamp' => date('Y-m-d H:i:s'));
+                    $sql = 'INSERT INTO freeLearningUnit SET name=:name, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, grouping=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp';
                     $result = $connection2->prepare($sql);
                     $result->execute($data);
                 } catch (PDOException $e) {

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.3.00
+-------
+Added option for allowing users with role category other to access units
+
 v4.2.08
 -------
 Fixed link to Free Learning page on http://rossparker.org

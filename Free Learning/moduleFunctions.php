@@ -44,6 +44,8 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
             $sqlWhere .= 'availableStudents=\'Y\' AND ';
         } elseif ($roleCategory == 'Parent') {
             $sqlWhere .= 'availableParents=\'Y\' AND ';
+        } elseif ($roleCategory == 'Other') {
+            $sqlWhere .= 'availableOther=\'Y\' AND ';
         }
     }
 

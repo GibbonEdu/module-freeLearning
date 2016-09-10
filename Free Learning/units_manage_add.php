@@ -237,6 +237,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         <input type="radio" name="availableParents" value="N" /> <?php echo __($guid, 'No') ?>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <b><?php echo __($guid, 'Available To Others') ?> * </b><br/>
+                        <span style="font-size: 90%"><i><?php echo __($guid, 'Should other users be able to browse and enrol?'); ?></i></span>
+                    </td>
+                    <td class="right">
+                        <input checked type="radio" name="availableOther" value="Y" /> <?php echo __($guid, 'Yes') ?>
+                        <input type="radio" name="availableOther" value="N" /> <?php echo __($guid, 'No') ?>
+                    </td>
+                </tr>
                 <?php
                 $makeUnitsPublic = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 				if ($makeUnitsPublic == 'Y') {

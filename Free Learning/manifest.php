@@ -45,6 +45,7 @@ $moduleTables[0] = "CREATE TABLE `freeLearningUnit` (
   `availableStudents` enum('Y','N') NOT NULL DEFAULT 'Y',
   `availableStaff` enum('Y','N') NOT NULL DEFAULT 'Y',
   `availableParents` enum('Y','N') NOT NULL DEFAULT 'Y',
+  `availableOther` enum('Y','N') NOT NULL DEFAULT 'N',
   `sharedPublic` enum('Y','N') DEFAULT NULL,
   `freeLearningUnitIDPrerequisiteList` text,
   `gibbonPersonIDCreator` int(10) unsigned zerofill NOT NULL,
