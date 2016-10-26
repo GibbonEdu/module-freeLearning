@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.2.08';
+$version = '4.4.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -81,7 +81,8 @@ $moduleTables[3] = 'CREATE TABLE `freeLearningUnitAuthor` (
   `surname` varchar(30) NOT NULL,
   `preferredName` varchar(30) NOT NULL,
   `website` varchar(255) NOT NULL,
-  PRIMARY KEY (`freeLearningUnitAuthorID`)
+  PRIMARY KEY (`freeLearningUnitAuthorID`),
+  INDEX(`gibbonPersonID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;';
 
 $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
@@ -110,7 +111,9 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   `exemplarWorkThumb` text NOT NULL,
   `exemplarWorkLicense` varchar(255) NOT NULL,
   `exemplarWorkEmbed` text NOT NULL,
-  PRIMARY KEY (`freeLearningUnitStudentID`)
+  PRIMARY KEY (`freeLearningUnitStudentID`),
+  INDEX(`gibbonPersonIDStudent`),
+  INDEX(`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
 $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
@@ -134,6 +137,9 @@ $gibbonSetting[2] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`sco
 $gibbonSetting[3] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mapLink', 'Map Link', 'A URL pointing to a map of the available units.', '');";
 $gibbonSetting[4] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'schoolType', 'School Type', 'Determines how enrolment should function', 'Physical');";
 $gibbonSetting[5] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'learningAreaRestriction', 'Learning Area Restriction', 'Should unit creation be limited to own Learning Areas?', 'Y');";
+$gibbonSetting[6] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableClassEnrolment', 'Enable Class Enrolment', 'Should class enrolment be an option for learners?', 'Y');";
+$gibbonSetting[7] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableSchoolMentorEnrolment', 'Enable School Mentor Enrolment', 'Should school mentor enrolment be an option for learners?', 'Y');";
+$gibbonSetting[8] = "INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableExternalMentorEnrolment', 'Enable External Mentor Enrolment', 'Should external mentor enrolment be an option for learners?', 'N');";
 
 //Action rows
 $actionRows[0]['name'] = 'Manage Units_all';

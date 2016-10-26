@@ -527,3 +527,15 @@ $sql[$count][0] = '4.3.00';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnit` ADD `availableOther` ENUM('Y','N') NOT NULL DEFAULT 'N' AFTER `availableParents`;end
 ";
+
+//v4.4.00
+++$count;
+$sql[$count][0] = '4.4.00';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableClassEnrolment', 'Enable Class Enrolment', 'Should class enrolment be an option for learners?', 'Y');end
+INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableSchoolMentorEnrolment', 'Enable School Mentor Enrolment', 'Should school mentor enrolment be an option for learners?', 'Y');end
+INSERT INTO `gibbonSetting` (`gibbonSystemSettingsID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableExternalMentorEnrolment', 'Enable External Mentor Enrolment', 'Should external mentor enrolment be an option for learners?', 'N');end
+ALTER TABLE `freeLearningUnitAuthor` ADD INDEX(`gibbonPersonID`);end
+ALTER TABLE `freeLearningUnitStudent` ADD INDEX(`gibbonPersonIDStudent`);end
+ALTER TABLE `freeLearningUnitStudent` ADD INDEX(`status`);end
+";

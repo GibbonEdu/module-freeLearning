@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.4.00
+-------
+Added ability to constrain available enrolment types
+Restricted available School Mentors to authors and those who have completed units
+
 v4.3.00
 -------
 Added option for allowing users with role category other to access units

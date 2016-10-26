@@ -40,7 +40,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 
 	<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/settings_manageProcess.php' ?>">
 		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-			<tr>
+            <tr class='break'>
+                <td colspan=2>
+                	<h3><?php echo __($guid, 'General Settings') ?></h3>
+                </td>
+            </tr>
+            <tr>
 				<?php
                 try {
                     $data = array();
@@ -183,7 +188,111 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 					<textarea name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" rows=8 style="width: 300px"><?php echo htmlPrep($row['value']) ?></textarea>
 				</td>
 			</tr>
-			<tr>
+            <tr class='break'>
+                <td colspan=2>
+                	<h3><?php echo __($guid, 'Enrolment Settings') ?></h3>
+                </td>
+            </tr>
+            <tr>
+				<?php
+                try {
+                    $data = array();
+                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='enableClassEnrolment'";
+                    $result = $connection2->prepare($sql);
+                    $result->execute($data);
+                } catch (PDOException $e) {
+                    echo "<div class='error'>".$e->getMessage().'</div>';
+                }
+				$row = $result->fetch();
+				?>
+				<td>
+					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+				</td>
+				<td class="right">
+					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
+						<?php
+                        $selected = '';
+						if ($row['value'] == 'Y') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+						$selected = '';
+						if ($row['value'] == 'N') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+						?>
+					</select>
+				</td>
+			</tr>
+            <tr>
+				<?php
+                try {
+                    $data = array();
+                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='enableSchoolMentorEnrolment'";
+                    $result = $connection2->prepare($sql);
+                    $result->execute($data);
+                } catch (PDOException $e) {
+                    echo "<div class='error'>".$e->getMessage().'</div>';
+                }
+				$row = $result->fetch();
+				?>
+				<td>
+					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+				</td>
+				<td class="right">
+					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
+						<?php
+                        $selected = '';
+						if ($row['value'] == 'Y') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+						$selected = '';
+						if ($row['value'] == 'N') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+						?>
+					</select>
+				</td>
+			</tr>
+            <tr>
+				<?php
+                try {
+                    $data = array();
+                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='enableExternalMentorEnrolment'";
+                    $result = $connection2->prepare($sql);
+                    $result->execute($data);
+                } catch (PDOException $e) {
+                    echo "<div class='error'>".$e->getMessage().'</div>';
+                }
+				$row = $result->fetch();
+				?>
+				<td>
+					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+				</td>
+				<td class="right">
+					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
+						<?php
+                        $selected = '';
+						if ($row['value'] == 'Y') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+						$selected = '';
+						if ($row['value'] == 'N') {
+							$selected = 'selected';
+						}
+						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+						?>
+					</select>
+				</td>
+			</tr>
+            <tr>
 				<td>
 					<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
 				</td>

@@ -47,9 +47,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $publicUnits = $_POST['publicUnits'];
     $unitOutlineTemplate = $_POST['unitOutlineTemplate'];
     $learningAreaRestriction = $_POST['learningAreaRestriction'];
+    $enableClassEnrolment = $_POST['enableClassEnrolment'];
+    $enableSchoolMentorEnrolment = $_POST['enableSchoolMentorEnrolment'];
+    $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'];
 
     //Validate Inputs
-    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == '') {
+    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '') {
         //Fail 3
         $URL .= '&return=error3';
         header("Location: {$URL}");
@@ -101,6 +104,34 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         } catch (PDOException $e) {
             $fail = true;
         }
+
+        try {
+            $data = array('enableClassEnrolment' => $enableClassEnrolment);
+            $sql = "UPDATE gibbonSetting SET value=:enableClassEnrolment WHERE scope='Free Learning' AND name='enableClassEnrolment'";
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            $fail = true;
+        }
+
+        try {
+            $data = array('enableSchoolMentorEnrolment' => $enableSchoolMentorEnrolment);
+            $sql = "UPDATE gibbonSetting SET value=:enableSchoolMentorEnrolment WHERE scope='Free Learning' AND name='enableSchoolMentorEnrolment'";
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            $fail = true;
+        }
+
+        try {
+            $data = array('enableExternalMentorEnrolment' => $enableExternalMentorEnrolment);
+            $sql = "UPDATE gibbonSetting SET value=:enableExternalMentorEnrolment WHERE scope='Free Learning' AND name='enableExternalMentorEnrolment'";
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            $fail = true;
+        }
+
 
         if ($fail == true) {
             //Fail 2

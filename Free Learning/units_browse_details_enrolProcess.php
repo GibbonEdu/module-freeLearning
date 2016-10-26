@@ -166,6 +166,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     } else { //PHYSICAL!
                         //Proceed!
                         //Validate Inputs
+                        $checkFail = false;
                         $enrolmentMethod = $_POST['enrolmentMethod'];
                         $status = 'Current - Pending';
                         if ($enrolmentMethod == 'class')
@@ -180,14 +181,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
                             $emailInternalMentor = '' ;
                             try {
-                                $dataInternal = array('gibbonPersonID' => $gibbonPersonIDSchoolMentor);
-                                $sqlInternal = 'SELECT email FROM gibbonPerson WHERE gibbonPersonID=:gibbonPersonID';
+                                $dataInternal = array('gibbonPersonID' => $gibbonPersonIDSchoolMentor, 'freeLearningUnitID1' => $freeLearningUnitID, 'freeLearningUnitID2' => $freeLearningUnitID);
+                                $sqlInternal = "SELECT gibbonPerson.email
+                                    FROM gibbonPerson
+                                    LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
+                                    LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
+                                    WHERE gibbonPerson.status='Full'
+                                        AND gibbonPerson.gibbonPersonID=:gibbonPersonID
+                                        AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
+                                    GROUP BY gibbonPerson.gibbonPersonID";
                                 $resultInternal = $connection2->prepare($sqlInternal);
                                 $resultInternal->execute($dataInternal);
                             } catch (PDOException $e) { }
                             if ($resultInternal->rowCount() == 1) {
                                 $rowInternal = $resultInternal->fetch() ;
                                 $emailInternalMentor = $rowInternal['email'] ;
+                            }
+                            else {
+                                $checkFail = true;
                             }
                         } elseif ($enrolmentMethod == 'externalMentor') {
                             $emailExternalMentor = $_POST['emailExternalMentor'];
@@ -198,7 +209,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         if (isset($_POST['collaborators'])) {
                             $collaborators = $_POST['collaborators'];
                         }
-                        if ($grouping == '' or ($enrolmentMethod == 'class' and $gibbonCourseClassID == '') or ($enrolmentMethod == 'schoolMentor' and $gibbonPersonIDSchoolMentor == '') or ($enrolmentMethod == 'externalMentor' and ($emailExternalMentor == '' or $nameExternalMentor== ''))) {
+
+                        $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
+                        if ($roleCategory != 'Student') {
+                            $enableClassEnrolment = 'N';
+                        }
+                        $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+                        $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+
+                        if ($checkFail or $grouping == '' or ($enrolmentMethod == 'class' and $gibbonCourseClassID == '' and $enableClassEnrolment == 'N') or ($enrolmentMethod == 'schoolMentor' and $gibbonPersonIDSchoolMentor == '' and $enableSchoolMentorEnrolment == 'N') or ($enrolmentMethod == 'externalMentor' and $enableExternalMentorEnrolment == 'N' and ($emailExternalMentor == '' or $nameExternalMentor == ''))) {
                             //Fail 3
                             $URL .= '&return=error3';
                             header("Location: {$URL}");

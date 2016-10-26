@@ -48,25 +48,49 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                     <?php
                     if ($schoolType == 'Physical') {
+                        $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
+                        if ($roleCategory != 'Student') {
+                            $enableClassEnrolment = 'N';
+                        }
+                        $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+                        $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+
+                        $checked1 = '';
+                        $checked2 = '';
+                        $checked3 = '';
+                        if ($enableClassEnrolment == 'Y')
+                            $checked1 = 'checked';
+                        else if ($enableSchoolMentorEnrolment == 'Y')
+                            $checked2 = 'checked';
+                        else if ($enableExternalMentorEnrolment == 'Y')
+                            $checked3 = 'checked';
+
                         ?>
                         <script type="text/javascript">
                             /* Subbmission type control */
                             $(document).ready(function(){
                                 <?php
 
-                                if ($roleCategory == 'Student') {
-                                    $checked = '';
+                                if ($enableClassEnrolment == 'Y') {
                                     print '$(".schoolMentor").css("display","none");';
                                     print 'gibbonPersonIDSchoolMentor.disable();' ;
+                                    print '$(".externalMentor").css("display","none");';
+                                    print 'emailExternalMentor.disable();';
+                                    print 'nameExternalMentor.disable();';
                                 }
-                                else {
-                                    $checked = 'checked';
+                                else if ($enableSchoolMentorEnrolment == 'Y') {
+                                    print '$(".class").css("display","none");';
+                                    print 'gibbonCourseClassID.disable();';
+                                    print '$(".externalMentor").css("display","none");';
+                                    print 'emailExternalMentor.disable();';
+                                    print 'nameExternalMentor.disable();';
+                                }
+                                else if ($enableExternalMentorEnrolment == 'Y') {
+                                    print '$(".schoolMentor").css("display","none");';
+                                    print 'gibbonPersonIDSchoolMentor.disable();' ;
                                     print '$(".class").css("display","none");';
                                     print 'gibbonCourseClassID.disable();';
                                 }
-                                print '$(".externalMentor").css("display","none");';
-                                print 'emailExternalMentor.disable();';
-                                print 'nameExternalMentor.disable();';
                                 ?>
                                 $(".enrolmentMethod").click(function(){
                                     if ($('input[name=enrolmentMethod]:checked').val()=="class" ) {
@@ -104,14 +128,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             </td>
                             <td class="right">
                                 <?php
-                                if ($schoolType == 'Physical' and $roleCategory == 'Student') {
-                                    ?>
-                                    <?php echo __($guid, 'Timetable Class') ?> <input checked type="radio" name="enrolmentMethod" class="enrolmentMethod" value="class" /><br/>
-                                    <?php
+                                if ($enableClassEnrolment == 'Y') {
+                                    echo __($guid, 'Timetable Class').' <input '.$checked1.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="class" /><br/>';
+                                }
+                                if ($enableSchoolMentorEnrolment == 'Y') {
+                                    echo __($guid, 'School Mentor').' <input '.$checked2.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="schoolMentor" /><br/>';
+                                }
+                                if ($enableExternalMentorEnrolment == 'Y') {
+                                    echo __($guid, 'External Mentor').' <input '.$checked3.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="externalMentor" /><br/>';
                                 }
                                 ?>
-                                <?php echo __($guid, 'School Mentor') ?> <input <?php echo $checked ?> type="radio" name="enrolmentMethod" class="enrolmentMethod" value="schoolMentor" /><br/>
-                                <?php echo __($guid, 'External Mentor') ?> <input type="radio" name="enrolmentMethod" class="enrolmentMethod" value="externalMentor" /><br/>
                             </td>
                         </tr>
                         <tr class='class'>
@@ -153,16 +179,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
                                     <?php
                                         try {
-                                            $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                            $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
+                                            $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'freeLearningUnitID1' => $freeLearningUnitID, 'freeLearningUnitID2' => $freeLearningUnitID);
+                                            $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
                                                 FROM gibbonPerson
-                                                JOIN gibbonStaff ON (gibbonStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
-                                                WHERE status='Full'
+                                                LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
+                                                LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
+                                                WHERE gibbonPerson.status='Full'
                                                     AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+                                                    AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
+                                                GROUP BY gibbonPersonID
                                                 ORDER BY surname, preferredName";
                                             $resultSelect = $connection2->prepare($sqlSelect);
                                             $resultSelect->execute($dataSelect);
-                                        } catch (PDOException $e) { }
+                                        } catch (PDOException $e) { echo 'error'.$e->getMessage(); }
                                         while ($rowSelect = $resultSelect->fetch()) {
                                             echo "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
                                         }
