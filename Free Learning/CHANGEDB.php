@@ -539,3 +539,9 @@ ALTER TABLE `freeLearningUnitAuthor` ADD INDEX(`gibbonPersonID`);end
 ALTER TABLE `freeLearningUnitStudent` ADD INDEX(`gibbonPersonIDStudent`);end
 ALTER TABLE `freeLearningUnitStudent` ADD INDEX(`status`);end
 ";
+
+//v4.4.01
+++$count;
+$sql[$count][0] = '4.4.01';
+$sql[$count][1] = "
+";

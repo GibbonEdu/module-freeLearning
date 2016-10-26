@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.4.01
+-------
+Fixed Core v12 compatibility issue
+
 v4.4.00
 -------
 Added ability to constrain available enrolment types
