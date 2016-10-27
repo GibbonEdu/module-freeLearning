@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.4.02
+-------
+Changed block placeholders from JS to HTML
+
 v4.4.01
 -------
 Fixed Core v12 compatibility issue
