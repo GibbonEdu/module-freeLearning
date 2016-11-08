@@ -411,7 +411,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                         $mail = new PHPMailer();
                                         $mail->IsSMTP();
-                                        $mail->SetFrom($students[0][1], $students[0][0]);
+                                        $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
+                                        $mail->AddReplyTo($students[0][1], $students[0][0]);
                                         if ($enrolmentMethod == 'schoolMentor')
                                             $mail->AddAddress($emailInternalMentor);
                                         elseif ($enrolmentMethod == 'externalMentor')

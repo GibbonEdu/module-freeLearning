@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v4.4.04
+-------
+Gibbon Core v13 setting compatibility
+
+v4.4.03
+-------
+More reliable email sending (less likely to be marked as spam/phishing)
+
 v4.4.02
 -------
 Changed block placeholders from JS to HTML

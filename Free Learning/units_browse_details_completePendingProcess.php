@@ -299,7 +299,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                         $mail = new PHPMailer();
                                         $mail->IsSMTP();
-                                        $mail->SetFrom($student[1], $student[0]);
+                                        $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
+                                        $mail->AddReplyTo($student[1], $student[0]);
                                         $mail->AddAddress($emailMentor);
                                         $mail->CharSet = 'UTF-8';
                                         $mail->Encoding = 'base64';
