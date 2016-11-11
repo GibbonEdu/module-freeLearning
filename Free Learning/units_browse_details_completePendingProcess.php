@@ -271,7 +271,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                     if ($emailMentor != '') {
                                         //Include mailer
-                                        require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/class.phpmailer.php';
+                                        require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
 
                                         //Attempt email send
                                         $subject = sprintf(__($guid, 'Request For Mentor Feedback via %1$s at %2$s'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);

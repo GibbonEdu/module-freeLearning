@@ -379,7 +379,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     //Notify internal/external mentors
                                     if (($enrolmentMethod == 'schoolMentor' and $emailInternalMentor!='') or ($enrolmentMethod == 'externalMentor' and $_POST['emailExternalMentor'] != '')) {
                                         //Include mailer
-                                        require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/class.phpmailer.php';
+                                        require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
 
                                         //Attempt email send
                                         $subject = sprintf(__($guid, 'Request For Mentorship via %1$s at %2$s'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
