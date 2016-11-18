@@ -146,6 +146,26 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo '</div>';
                     }
 
+                    //Get enrolment Details
+                    try {
+                        $dataEnrol = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                        $sqlEnrol = 'SELECT freeLearningUnitStudent.*, gibbonPerson.surname, gibbonPerson.email, gibbonPerson.preferredName
+                            FROM freeLearningUnitStudent
+                            LEFT JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID)
+                            WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
+                                AND gibbonPersonIDStudent=:gibbonPersonID
+                                AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Approved\')';
+                        $resultEnrol = $connection2->prepare($sqlEnrol);
+                        $resultEnrol->execute($dataEnrol);
+                    } catch (PDOException $e) {
+                        echo "<div class='error'>".$e->getMessage().'</div>';
+                    }
+
+                    $rowEnrol = null;
+                    if ($resultEnrol->rowCount()==1) { //ENROL NOW
+                        $rowEnrol = $resultEnrol->fetch() ;
+                    }
+
                     echo "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>";
                     echo '<tr>';
                     echo "<td style='width: 50%; vertical-align: top'>";
@@ -236,7 +256,19 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                         echo '</td>';
                         echo "<td style='vertical-align: top'>";
-
+                        if ($rowEnrol != null) {
+                            if ($rowEnrol['enrolmentMethod'] == 'schoolMentor' or $rowEnrol['enrolmentMethod'] == 'externalMentor') {
+                                echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Mentor Contacts').'</span><br/>';
+                                if ($rowEnrol['enrolmentMethod'] == 'schoolMentor') {
+                                    echo "<i>".formatName('', $rowEnrol['preferredName'], $rowEnrol['surname'], 'Student').'</i><br/>';
+                                    echo "<i><a href='mailto:".$rowEnrol['email']."'>".$rowEnrol['email'].'</a></i><br/>';
+                                }
+                                else if ($rowEnrol['enrolmentMethod'] == 'externalMentor') {
+                                    echo "<i>".$rowEnrol['nameExternalMentor'].'</i><br/>';
+                                    echo "<i><a href='mailto:".$emailExternalMentor['email']."'>".$rowEnrol['emailExternalMentor'].'</a></i><br/>';
+                                }
+                            }
+                        }
                         echo '</td>';
                         echo '</tr>';
                     }

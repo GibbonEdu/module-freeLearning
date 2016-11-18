@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.4.06
+-------
+Add mentor contract details to unit overview when enroled with a mentor
+
 v4.4.05
 -------
 Gibbon Core v13 PHPMailer compatibility
