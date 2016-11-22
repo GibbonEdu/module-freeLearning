@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.5.02
+-------
+Updated .PO file
+
 v4.5.01
 -------
 Marked outstanding strings for translation

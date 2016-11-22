@@ -18,7 +18,7 @@ msgid "Add"
 msgstr ""
 
 #: badges_manage.php:131 badges_view.php:79 units_manage_add.php:176
-#: units_manage_edit.php:237 badges_manage.php:131 badges_view.php:79
+#: units_manage_edit.php:237 badges_manage.php:131 badges_view.php:78
 #: units_manage_add.php:176 units_manage_edit.php:237
 msgid "Logo"
 msgstr ""
@@ -32,16 +32,16 @@ msgstr ""
 msgid "Add Badges"
 msgstr ""
 
-#: badges_manage_add.php:65 badges_manage_edit.php:87 badges_manage_add.php:65
-#: badges_manage_edit.php:87
+#: badges_manage_add.php:65 badges_manage_edit.php:87 badges_manage_add.php:66
+#: badges_manage_edit.php:88
 msgid "Badge"
 msgstr ""
 
 #: badges_manage_add.php:93 badges_manage_edit.php:118
 #: units_browse_details_enrol.php:168 units_browse_details_enrol.php:202
 #: units_browse_details_enrol.php:271 units_browse_details_enrol.php:409
-#: units_manage_add.php:117 units_manage_edit.php:173 badges_manage_add.php:93
-#: badges_manage_edit.php:118 units_browse_details_enrol.php:168
+#: units_manage_add.php:117 units_manage_edit.php:173 badges_manage_add.php:94
+#: badges_manage_edit.php:119 units_browse_details_enrol.php:168
 #: units_browse_details_enrol.php:202 units_browse_details_enrol.php:271
 #: units_browse_details_enrol.php:409 units_manage_add.php:117
 #: units_manage_edit.php:173
@@ -49,19 +49,19 @@ msgid "Select something!"
 msgstr ""
 
 #: badges_manage_add.php:111 badges_manage_edit.php:136
-#: badges_manage_add.php:111 badges_manage_edit.php:136
+#: badges_manage_add.php:112 badges_manage_edit.php:137
 msgid "Conditions"
 msgstr ""
 
 #: badges_manage_add.php:112 badges_manage_edit.php:137
-#: badges_manage_add.php:112 badges_manage_edit.php:137
+#: badges_manage_add.php:113 badges_manage_edit.php:138
 msgid ""
 "This award will automatically be awarded on unit completion, if all of the "
 "following conditions are met. Fields left blank will be disregarded."
 msgstr ""
 
 #: badges_manage_add.php:117 badges_manage_edit.php:142
-#: badges_manage_add.php:117 badges_manage_edit.php:142
+#: badges_manage_add.php:118 badges_manage_edit.php:143
 msgid "Units Completed - Total"
 msgstr ""
 
@@ -70,36 +70,36 @@ msgstr ""
 #: badges_manage_add.php:170 badges_manage_edit.php:143
 #: badges_manage_edit.php:156 badges_manage_edit.php:169
 #: badges_manage_edit.php:182 badges_manage_edit.php:195
-#: badges_manage_add.php:118 badges_manage_add.php:131
-#: badges_manage_add.php:144 badges_manage_add.php:157
-#: badges_manage_add.php:170 badges_manage_edit.php:143
-#: badges_manage_edit.php:156 badges_manage_edit.php:169
-#: badges_manage_edit.php:182 badges_manage_edit.php:195
+#: badges_manage_add.php:119 badges_manage_add.php:132
+#: badges_manage_add.php:145 badges_manage_add.php:158
+#: badges_manage_add.php:171 badges_manage_edit.php:144
+#: badges_manage_edit.php:157 badges_manage_edit.php:170
+#: badges_manage_edit.php:183 badges_manage_edit.php:196
 msgid "Enter a number greater than zero, or leave blank."
 msgstr ""
 
 #: badges_manage_add.php:130 badges_manage_edit.php:155
-#: badges_manage_add.php:130 badges_manage_edit.php:155
+#: badges_manage_add.php:131 badges_manage_edit.php:156
 msgid "Units Completed - This Year"
 msgstr ""
 
 #: badges_manage_add.php:143 badges_manage_edit.php:168
-#: badges_manage_add.php:143 badges_manage_edit.php:168
+#: badges_manage_add.php:144 badges_manage_edit.php:169
 msgid "Units Completed - Department Spread"
 msgstr ""
 
 #: badges_manage_add.php:156 badges_manage_edit.php:181
-#: badges_manage_add.php:156 badges_manage_edit.php:181
+#: badges_manage_add.php:157 badges_manage_edit.php:182
 msgid "Units Completed - Individual"
 msgstr ""
 
 #: badges_manage_add.php:169 badges_manage_edit.php:194
-#: badges_manage_add.php:169 badges_manage_edit.php:194
+#: badges_manage_add.php:170 badges_manage_edit.php:195
 msgid "Units Completed - Group"
 msgstr ""
 
 #: badges_manage_add.php:187 badges_manage_edit.php:212
-#: badges_manage_add.php:187 badges_manage_edit.php:212
+#: badges_manage_add.php:188 badges_manage_edit.php:213
 msgid "Difficulty Level Threshold"
 msgstr ""
 
@@ -144,7 +144,8 @@ msgid ""
 msgstr ""
 
 #: manifest.php:409 units_manage_add.php:333 units_manage_edit.php:422
-#: manifest.php:409 units_manage_add.php:333 units_manage_edit.php:422
+#: manifest.php:409 units_browse_details_enrol.php:245
+#: units_manage_add.php:333 units_manage_edit.php:422
 msgid "Individual"
 msgstr ""
 
@@ -181,7 +182,7 @@ msgid "Complete - Pending"
 msgstr ""
 
 #: manifest.php:417 units_browse_details_enrol.php:641 manifest.php:417
-#: units_browse_details_enrol.php:641
+#: units_browse_details_enrol.php:641 units_mentor_approval.php:133
 msgid "Complete - Approved"
 msgstr ""
 
@@ -192,7 +193,7 @@ msgstr ""
 msgid "Exempt"
 msgstr ""
 
-#: manifest.php:419 manifest.php:419
+#: manifest.php:419 manifest.php:419 units_mentor_approval.php:134
 msgid "Evidence Not Approved"
 msgstr ""
 
@@ -454,8 +455,9 @@ msgstr ""
 
 #: moduleFunctions.php:191 report_outcomes_byStudent.php:330
 #: units_browse.php:299 units_browse_details.php:678 units_manage.php:199
-#: moduleFunctions.php:191 report_outcomes_byStudent.php:330
-#: units_browse.php:299 units_browse_details.php:678 units_manage.php:199
+#: badges_manage.php:140 moduleFunctions.php:191
+#: report_outcomes_byStudent.php:330 units_browse.php:299
+#: units_browse_details.php:678 units_manage.php:199
 msgid "Actions"
 msgstr ""
 
@@ -472,15 +474,15 @@ msgstr ""
 #: units_browse_details.php:474 units_browse_details.php:476
 #: units_browse_details_enrol.php:622 units_browse_details_enrol.php:624
 #: units_browse_details_enrol.php:680 units_browse_details_enrol.php:682
-#: units_manage.php:241 units_manage_edit.php:119 moduleFunctions.php:239
-#: moduleFunctions.php:241 report_outcomes_byStudent.php:422
-#: units_browse.php:462 units_browse.php:465 units_browse.php:468
-#: units_browse.php:521 units_browse.php:524 units_browse.php:527
-#: units_browse_details.php:425 units_browse_details.php:474
-#: units_browse_details.php:476 units_browse_details_enrol.php:622
-#: units_browse_details_enrol.php:624 units_browse_details_enrol.php:680
-#: units_browse_details_enrol.php:682 units_manage.php:241
-#: units_manage_edit.php:119
+#: units_manage.php:241 units_manage_edit.php:119 badges_manage.php:93
+#: moduleFunctions.php:239 moduleFunctions.php:241
+#: report_outcomes_byStudent.php:422 units_browse.php:462 units_browse.php:465
+#: units_browse.php:468 units_browse.php:521 units_browse.php:524
+#: units_browse.php:527 units_browse_details.php:425
+#: units_browse_details.php:474 units_browse_details.php:476
+#: units_browse_details_enrol.php:622 units_browse_details_enrol.php:624
+#: units_browse_details_enrol.php:680 units_browse_details_enrol.php:682
+#: units_manage.php:241 units_manage_edit.php:119
 msgid "View"
 msgstr ""
 
@@ -556,13 +558,17 @@ msgstr ""
 #: units_browse_details_approval.php:31 units_browse_details_delete.php:74
 #: units_browse_details_enrol.php:25 units_browse_details_enrolMultiple.php:31
 #: units_manage_add.php:28 units_manage_delete.php:28 units_manage_edit.php:28
-#: report_currentUnitByClass.php:28 report_outcomes_byStudent.php:28
-#: report_unitHistory_byStudent.php:28 report_unitHistory_my.php:28
-#: report_workPendingApproval.php:28 settings_manage.php:28 showcase.php:33
-#: units_browse.php:31 units_browse_details.php:31
-#: units_browse_details_approval.php:31 units_browse_details_delete.php:74
-#: units_browse_details_enrol.php:25 units_browse_details_enrolMultiple.php:31
-#: units_manage_add.php:28 units_manage_delete.php:28 units_manage_edit.php:28
+#: badges_manage.php:28 badges_manage_add.php:28 badges_manage_edit.php:28
+#: badges_view.php:28 hook_parentalDashboard_unitHistory.php:39
+#: hook_studentDashboard_unitHistory.php:39
+#: hook_studentProfile_unitHistory.php:28 report_currentUnitByClass.php:28
+#: report_outcomes_byStudent.php:28 report_unitHistory_byStudent.php:28
+#: report_unitHistory_my.php:28 report_workPendingApproval.php:28
+#: settings_manage.php:28 showcase.php:33 units_browse.php:31
+#: units_browse_details.php:31 units_browse_details_approval.php:31
+#: units_browse_details_delete.php:74 units_browse_details_enrol.php:25
+#: units_browse_details_enrolMultiple.php:31 units_manage_add.php:28
+#: units_manage_delete.php:28 units_manage_edit.php:28
 msgid "You do not have access to this action."
 msgstr ""
 
@@ -574,7 +580,8 @@ msgstr ""
 #: units_browse_details_approval.php:81 units_browse_details_delete.php:85
 #: units_browse_details_enrolMultiple.php:80 units_manage.php:38
 #: units_manage_add.php:54 units_manage_delete.php:53 units_manage_edit.php:67
-#: units_mentor.php:26 units_mentor_approval.php:26
+#: units_mentor.php:26 units_mentor_approval.php:26 badges_manage.php:32
+#: badges_manage_add.php:32 badges_manage_edit.php:33 badges_view.php:32
 #: report_currentUnitByClass.php:33 report_outcomes_byStudent.php:33
 #: report_unitHistory_byStudent.php:39 report_unitHistory_my.php:39
 #: report_workPendingApproval.php:34 settings_manage.php:33 showcase.php:37
@@ -675,17 +682,19 @@ msgid "Scope"
 msgstr ""
 
 #: report_outcomes_byStudent.php:219 units_browse_details.php:669
-#: report_outcomes_byStudent.php:219 units_browse_details.php:669
+#: badges_manage.php:137 badges_view.php:84 report_outcomes_byStudent.php:219
+#: units_browse_details.php:669
 msgid "Category"
 msgstr ""
 
 #: report_outcomes_byStudent.php:222 report_outcomes_byStudent.php:310
 #: units_browse.php:152 units_browse.php:267 units_browse_details.php:672
 #: units_manage.php:109 units_manage.php:187 units_manage_add.php:82
-#: units_manage_edit.php:133 report_outcomes_byStudent.php:222
-#: report_outcomes_byStudent.php:310 units_browse.php:152 units_browse.php:267
-#: units_browse_details.php:672 units_manage.php:109 units_manage.php:187
-#: units_manage_add.php:82 units_manage_edit.php:133
+#: units_manage_edit.php:133 badges_manage.php:134 badges_view.php:81
+#: report_outcomes_byStudent.php:222 report_outcomes_byStudent.php:310
+#: units_browse.php:152 units_browse.php:267 units_browse_details.php:672
+#: units_manage.php:109 units_manage.php:187 units_manage_add.php:82
+#: units_manage_edit.php:133
 msgid "Name"
 msgstr ""
 
@@ -960,8 +969,9 @@ msgstr ""
 #: units_browse_details.php:97 units_browse_details_approval.php:86
 #: units_browse_details_delete.php:94
 #: units_browse_details_enrolMultiple.php:85 units_manage_delete.php:63
-#: units_mentor_approval.php:50 units_browse_details.php:97
-#: units_browse_details_approval.php:86 units_browse_details_delete.php:94
+#: units_mentor_approval.php:50 badges_manage_edit.php:55
+#: units_browse_details.php:97 units_browse_details_approval.php:86
+#: units_browse_details_delete.php:94
 #: units_browse_details_enrolMultiple.php:85 units_manage_delete.php:63
 #: units_mentor_approval.php:50
 msgid "You have not specified one or more required parameters."
@@ -980,6 +990,7 @@ msgstr ""
 
 #: units_browse_details.php:118 units_manage_add.php:68
 #: units_manage_delete.php:89 units_manage_edit.php:113
+#: badges_manage_add.php:57 badges_manage_edit.php:80
 #: units_browse_details.php:118 units_manage_add.php:68
 #: units_manage_delete.php:89 units_manage_edit.php:113
 msgid "Back to Search Results"
@@ -1456,7 +1467,8 @@ msgid "Manage Units"
 msgstr ""
 
 #: units_manage.php:196 units_manage_add.php:202 units_manage_edit.php:279
-#: units_manage.php:196 units_manage_add.php:202 units_manage_edit.php:279
+#: badges_manage_add.php:100 badges_manage_edit.php:125 units_manage.php:196
+#: units_manage_add.php:202 units_manage_edit.php:279
 msgid "Active"
 msgstr ""
 
@@ -1658,8 +1670,9 @@ msgid "Delete Unit"
 msgstr ""
 
 #: units_manage_delete.php:82 units_manage_edit.php:106
-#: units_mentor_approval.php:73 units_manage_delete.php:82
-#: units_manage_edit.php:106 units_mentor_approval.php:73
+#: units_mentor_approval.php:73 badges_manage_edit.php:72
+#: units_manage_delete.php:82 units_manage_edit.php:106
+#: units_mentor_approval.php:73
 msgid "The specified record cannot be found."
 msgstr ""
 
@@ -1769,4 +1782,86 @@ msgstr ""
 msgid ""
 "Your mentorship request for the Free Learning unit %1$s has been rejected. "
 "Your enrolment has been deleted."
+msgstr ""
+
+#: badges_manage.php:38 badges_manage_add.php:38 badges_manage_edit.php:39
+#: badges_view.php:38
+msgid ""
+"This functionality requires the Badges module to be installed, active and "
+"available."
+msgstr ""
+
+#: badges_manage.php:43 badges_manage_add.php:43
+msgid ""
+"The Badges module is installed, active and available, so you can access this "
+"functionality."
+msgstr ""
+
+#: badges_manage.php:65
+msgid "Search"
+msgstr ""
+
+#: badges_manage.php:72
+msgid "Search For"
+msgstr ""
+
+#: badges_manage.php:73
+msgid "Name, Category"
+msgstr ""
+
+#: badges_manage.php:121 badges_view.php:68
+msgid "There are no badges to display."
+msgstr ""
+
+#: badges_manage_add.php:211 badges_manage_edit.php:236
+msgid "* denotes a required field"
+msgstr ""
+
+#: badges_view.php:87
+msgid "Description"
+msgstr ""
+
+#: units_browse.php:56
+msgid "View Our Free Learning Showcase"
+msgstr ""
+
+#: units_browse_details_enrol.php:248
+msgid "Pair"
+msgstr ""
+
+#: units_browse_details_enrol.php:253
+msgid "Three"
+msgstr ""
+
+#: units_browse_details_enrol.php:258
+msgid "Four"
+msgstr ""
+
+#: units_browse_details_enrol.php:263
+msgid "Five"
+msgstr ""
+
+#: units_mentor.php:30
+msgid "Your request was completed successfully. Thank you for your time."
+msgstr ""
+
+#: units_mentor.php:30
+msgid ""
+"Your request was completed successfully. Thank you for your time. The "
+"learners you are helping will be in touch in due course: in the meanwhile, "
+"no further action is required on your part."
+msgstr ""
+
+#: units_mentor_approval.php:31
+msgid ""
+"Your request was completed successfully. Thank you for your time. The "
+"learner you are helping has been notified of your positive feedback."
+msgstr ""
+
+#: units_mentor_approval.php:31
+msgid ""
+"Your request was completed successfully. Thank you for your time. The "
+"learner you are helping has been notified of your feedback and will resubmit "
+"their work in due course, at which point your input will be requested once "
+"again: in the meanwhile, no further action is required on your part."
 msgstr ""
