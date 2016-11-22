@@ -25,18 +25,18 @@ include './modules/Free Learning/moduleFunctions.php';
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manage_edit.php') == false) {
     //Acess denied
     echo "<div class='error'>";
-    echo 'You do not have access to this action.';
+    echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
     //Proceed!
     echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/badges_manage.php'>".__($guid, 'Manage Badges', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Badges', 'Free Learning').'</div>';
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid,'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/badges_manage.php'>".__($guid, 'Manage Badges', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Badges', 'Free Learning').'</div>';
     echo '</div>';
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";
-        echo 'This functionality requires the Badges module to be installed, active and available.';
+        echo __($guid, 'This functionality requires the Badges module to be installed, active and available.', 'Free Learning');
         echo '</div>';
     } else {
         //Acess denied
@@ -50,8 +50,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         //Check if school year specified
         $freeLearningBadgeID = $_GET['freeLearningBadgeID'];
-        if ($freeLearningBadgeID == '') { echo "<div class='error'>";
-            echo 'You have not specified a policy.';
+        if ($freeLearningBadgeID == '') { 
+        	echo "<div class='error'>";
+            echo __($guid, 'You have not specified one or more required parameters.');
             echo '</div>';
         } else {
             try {
@@ -68,7 +69,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
             if ($result->rowCount() != 1) {
                 echo "<div class='error'>";
-                echo 'The selected policy does not exist.';
+               echo __($guid, 'The specified record cannot be found.');
                 echo '</div>';
             } else {
                 //Let's go!
@@ -76,7 +77,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
                 if ($_GET['search'] != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>Back to Search Results</a>";
+                    echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__($guid, 'Back to Search Results')."</a>";
                     echo '</div>';
                 }
                 ?>
@@ -121,13 +122,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             			</tr>
             			<tr>
             				<td>
-            					<b>Active *</b><br/>
+            					<b><?php echo __($guid, 'Active') ;?> *</b><br/>
             					<span style="font-size: 90%"><i></i></span>
             				</td>
             				<td class="right">
             					<select name="active" id="active" style="width: 302px">
-            						<option <?php if ($row['active'] == 'Y') { echo 'selected '; } ?>value="Y">Y</option>
-            						<option <?php if ($row['active'] == 'N') { echo 'selected '; } ?>value="N">N</option>
+            						<option <?php if ($row['active'] == 'Y') { echo 'selected '; } ?>value="Y"><?php echo ynExpander($guid, 'Y') ;?></option>
+            						<option <?php if ($row['active'] == 'N') { echo 'selected '; } ?>value="N"><?php echo ynExpander($guid, 'N') ;?></option>
             					</select>
             				</td>
             			</tr>
@@ -232,7 +233,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				?>
     					<tr>
     						<td>
-    							<span style="font-size: 90%"><i>* denotes a required field</i></span>
+    							<span style="font-size: 90%"><i><?php echo __($guid, '* denotes a required field'); ?></i></span>
     						</td>
     						<td class="right">
     							<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">

@@ -242,25 +242,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     $group = false;
                                     $extraSlots = 0;
                                     if (strpos($row['grouping'], 'Individual') !== false) {
-                                        echo '<option value="Individual">Individual</option>';
+                                        echo '<option value="Individual">'.__($guid,'Individual', 'Free Learning').'</option>';
                                     }
                                     if (strpos($row['grouping'], 'Pairs') !== false) {
-                                        echo '<option value="Pairs">Pair</option>';
+                                        echo '<option value="Pairs">'.__($guid,'Pair', 'Free Learning').'</option>';
                                         $group = true;
                                         $extraSlots = 1;
                                     }
                                     if (strpos($row['grouping'], 'Threes') !== false) {
-                                        echo '<option value="Threes">Three</option>';
+                                        echo '<option value="Threes">'.__($guid,'Three', 'Free Learning').'</option>';
                                         $group = true;
                                         $extraSlots = 2;
                                     }
                                     if (strpos($row['grouping'], 'Fours') !== false) {
-                                        echo '<option value="Fours">Four</option>';
+                                        echo '<option value="Fours">'.__($guid,'Four', 'Free Learning').'</option>';
                                         $group = true;
                                         $extraSlots = 3;
                                     }
                                     if (strpos($row['grouping'], 'Fives') !== false) {
-                                        echo '<option value="Fives">Five</option>';
+                                        echo '<option value="Fives">'.__($guid,'Five', 'Free Learning').'</option>';
                                         $group = true;
                                         $extraSlots = 4;
                                     }

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.5.01
+-------
+Marked outstanding strings for translation
+
 v4.5.00
 -------
 Translatable, using Core v13's new module translation setup

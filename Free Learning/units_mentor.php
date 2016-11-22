@@ -27,7 +27,7 @@ echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__(
 echo '</div>';
 
 if (isset($_GET['return'])) {
-    returnProcess($guid, $_GET['return'], null, array('success0' => 'Your request was completed successfully. Thank you for your time.', 'success1' => 'Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.'));
+    returnProcess($guid, $_GET['return'], null, array('success0' => __($guid, 'Your request was completed successfully. Thank you for your time.', 'Free Learning'), 'success1' => __($guid, 'Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.', 'Free Learning')));
 }
 
 ?>

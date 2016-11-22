@@ -69,7 +69,7 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
             $difficultyOrder = 'FIELD(difficulty';
             $difficulties = explode(',', $difficulties);
             foreach ($difficulties as $difficultyOption) {
-                $difficultyOrder .= ",'".$difficultyOption."'";
+                $difficultyOrder .= ",'".__($guid, $difficultyOption, 'Free Learning')."'";
             }
             $difficultyOrder .= '), ';
         }

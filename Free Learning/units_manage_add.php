@@ -106,7 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 								<?php
                                 for ($i = 0; $i < count($difficulties); ++$i) {
                                     ?>
-									<option value="<?php echo trim($difficulties[$i]) ?>"><?php echo trim($difficulties[$i]) ?></option>
+									<option value="<?php echo __($guid, trim($difficulties[$i]), 'Free Learning') ?>"><?php echo __($guid, trim($difficulties[$i]), 'Free Learning') ?></option>
 								<?php
 
                                 }

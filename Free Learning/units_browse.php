@@ -53,7 +53,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
             echo "<div class='linkTop'>";
-            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>View Our Free Learning Showcase</a>";
+            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>".__($guid, 'View Our Free Learning Showcase', 'Free Learning')."</a>";
             echo '</div>';
         }
 
@@ -141,7 +141,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 					if ($difficulty == $difficultyOption) {
 						$selected = 'selected';
 					}
-					echo "<option $selected value='".$difficultyOption."'>".$difficultyOption.'</option>';
+					echo "<option $selected value='".__($guid, $difficultyOption, 'Free Learning')."'>".__($guid, $difficultyOption, 'Free Learning').'</option>';
 				}
 				echo '</select>';
 				?>
@@ -362,7 +362,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo '</td>';
                     echo '<td>';
-                    echo '<b>'.$row['difficulty'].'</b><br/>';
+                    echo '<b>'.__($guid, $row['difficulty'], 'Free Learning').'</b><br/>';
                     echo "<div style='font-size: 100%; text-align: justify'>";
                     echo $row['blurb'];
                     echo '</div>';

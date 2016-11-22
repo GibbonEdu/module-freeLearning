@@ -58,8 +58,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td>
-					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">

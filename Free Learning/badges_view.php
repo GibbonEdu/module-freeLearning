@@ -25,17 +25,17 @@ include './modules/Free Learning/moduleFunctions.php';
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.php') == false) {
     //Acess denied
     echo "<div class='error'>";
-    echo 'You do not have access to this action.';
+    echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
     echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > </div><div class='trailEnd'>View Badges</div>";
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid,'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>View Badges</div>";
     echo '</div>';
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";
-        echo 'This functionality requires the Badges module to be installed, active and available.';
+        echo __($guid, 'This functionality requires the Badges module to be installed, active and available.', 'Free Learning');
         echo '</div>';
     } else {
         //Set pagination variable
@@ -64,9 +64,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
         }
 
 
-
         if ($result->rowCount() < 1) { echo "<div class='error'>";
-            echo 'There are no badges to display.';
+            echo __($guid, 'There are no badges to display.', 'Free Learning');
             echo '</div>';
         } else {
             if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
@@ -79,13 +78,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
             echo __($guid, 'Logo', 'Free Learning');
             echo '</th>';
             echo '<th>';
-            echo 'Name<br/>';
+            echo __($guid, 'Name').'<br/>';
             echo '</th>';
             echo '<th>';
-            echo 'Category';
+            echo __($guid, 'Category');
             echo '</th>';
             echo "<th>";
-            echo 'Description';
+            echo __($guid, 'Description');
             echo '</th>';
             echo '</tr>';
 

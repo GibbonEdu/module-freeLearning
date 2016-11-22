@@ -36,7 +36,7 @@ if ($included == false) {
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_my.php') == false) {
     //Acess denied
     $returnInt .= "<div class='error'>";
-    $returnInt .= 'You do not have access to this action.';
+    $returnInt .= __($guid, 'You do not have access to this action.');
     $returnInt .= '</div>';
 } else {
     $returnInt .= "<div class='linkTop'>";

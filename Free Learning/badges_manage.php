@@ -25,22 +25,22 @@ include './modules/Free Learning/moduleFunctions.php';
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manage.php') == false) {
     //Acess denied
     echo "<div class='error'>";
-    echo 'You do not have access to this action.';
+    echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
     echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > </div><div class='trailEnd'>Manage Badges</div>";
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid,'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'><?php echo __($guid, 'Manage Badges'); ?></div>";
     echo '</div>';
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";
-        echo 'This functionality requires the Badges module to be installed, active and available.';
+        echo __($guid, 'This functionality requires the Badges module to be installed, active and available.', 'Free Learning');
         echo '</div>';
     } else {
         //Acess denied
         echo "<div class='success'>";
-        echo 'The Badges module is installed, active and available, so you can access this functionality.';
+        echo __($guid, 'The Badges module is installed, active and available, so you can access this functionality.', 'Free Learning');
         echo '</div>';
 
         if (isset($_GET['return'])) {
@@ -62,15 +62,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         }
 
         echo "<h2 class='top'>";
-        echo 'Search';
+        echo __($guid, 'Search');
         echo '</h2>';
         ?>
     	<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
     		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
     			<tr>
     				<td>
-    					<b>Search For</b><br/>
-    					<span style="font-size: 90%"><i>Name, Category</i></span>
+    					<b><?php echo __($guid, 'Search For'); ?></b><br/>
+    					<span style="font-size: 90%"><i><?php echo __($guid, 'Name, Category') ?></i></span>
     				</td>
     				<td class="right">
     					<input name="search" id="search" maxlength=20 value="<?php echo $search ?>" type="text" style="width: 300px">
@@ -90,7 +90,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
     	<?php
         echo "<h2 class='top'>";
-        echo 'View';
+        echo __($guid, 'View');
         echo '</h2>';
 
         try {
@@ -118,7 +118,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         echo '</div>';
 
         if ($result->rowCount() < 1) { echo "<div class='error'>";
-            echo 'There are no badges to display.';
+            echo __($guid, 'There are no badges to display.', 'Free Learning');
             echo '</div>';
         } else {
             if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
@@ -131,13 +131,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             echo __($guid, 'Logo', 'Free Learning');
             echo '</th>';
             echo '<th>';
-            echo 'Name<br/>';
+            echo __($guid, 'Name').'<br/>';
             echo '</th>';
             echo '<th>';
-            echo 'Category';
+            echo __($guid, 'Category');
             echo '</th>';
             echo "<th style='width: 120px'>";
-            echo 'Actions';
+            echo __($guid, 'Actions');
             echo '</th>';
             echo '</tr>';
 

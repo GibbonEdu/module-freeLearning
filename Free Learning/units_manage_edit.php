@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         //Proceed!
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_manage.php'>".__($guid, 'Manage Units')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Unit').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_manage.php'>".__($guid, 'Manage Units')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Unit', 'Free Learning').'</div>';
         echo '</div>';
 
         if (isset($_GET['return'])) {
@@ -162,7 +162,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                         }
                                         ?>
 										<option <?php echo $selected;
-                                        ?> value="<?php echo trim($difficulties[$i]) ?>"><?php echo trim($difficulties[$i]) ?></option>
+                                        ?> value="<?php echo __($guid, trim($difficulties[$i]), 'Free Learning') ?>"><?php echo __($guid, trim($difficulties[$i]), 'Free Learning') ?></option>
 									<?php
 
                                     }
@@ -596,7 +596,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                                         $categories = array_unique($categories);
                                                     $categories = msort($categories);
                                                     foreach ($categories as $category) {
-                                                        echo "<option value='$category'>$category</option>";
+                                                        echo "<option value='$category'>$categor<?php echo ynExpander($guid, 'Y') ;?></option>";
                                                     }
                                                     ?>
 													</select>

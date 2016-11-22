@@ -98,7 +98,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					if ($difficulty == $difficultyOption) {
 						$selected = 'selected';
 					}
-					echo "<option $selected value='".$difficultyOption."'>".$difficultyOption.'</option>';
+					echo "<option $selected value='".__($guid, $difficultyOption, 'Free Learning')."'>".__($guid, $difficultyOption, 'Free Learning').'</option>';
 				}
 				echo '</select>';
 				?>
@@ -134,7 +134,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $difficultyOrder = 'FIELD(difficulty';
             $difficulties = explode(',', $difficulties);
             foreach ($difficulties as $difficultyOption) {
-                $difficultyOrder .= ",'".$difficultyOption."'";
+                $difficultyOrder .= ",'".__($guid, $difficultyOption, 'Free Learning')."'";
             }
             $difficultyOrder .= '), ';
         }

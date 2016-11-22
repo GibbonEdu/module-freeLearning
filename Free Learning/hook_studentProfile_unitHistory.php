@@ -25,7 +25,7 @@ include './modules/Free Learning/moduleFunctions.php';
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_byStudent.php') == false) {
     //Acess denied
     echo "<div class='error'>";
-    echo 'You do not have access to this action.';
+    echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
     echo getStudentHistory($connection2, $guid, $gibbonPersonID);

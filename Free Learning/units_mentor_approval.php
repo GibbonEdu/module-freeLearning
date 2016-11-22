@@ -28,7 +28,7 @@ echo '</div>';
 
 $block = false;
 if (isset($_GET['return'])) {
-    returnProcess($guid, $_GET['return'], null, array('success0' => 'Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your positive feedback.', 'success1' => 'Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your feedback and will resubmit their work in due course, at which point your input will be requested once again: in the meanwhile, no further action is required on your part.'));
+    returnProcess($guid, $_GET['return'], null, array('success0' => __($guid, 'Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your positive feedback.', 'Free Learning'), 'success1' => __($guid, 'Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your feedback and will resubmit their work in due course, at which point your input will be requested once again: in the meanwhile, no further action is required on your part.', 'Free Learning')));
     if ($_GET['return'] == 'success0' or $_GET['return'] == 'success1') {
         $block = true;
     }
@@ -130,8 +130,8 @@ if (!$block) {
                         </td>
                         <td class="right">
                             <select style="width: 302px" name="status" id="status">
-                                <option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'>Complete - Approved</option>
-                                <option <?php if ($row['status'] == 'Evidence Not Approved') { echo 'selected'; } ?> value='Evidence Not Approved'>Evidence Not Approved</option>
+                                <option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'><?php echo __($guid, 'Complete - Approved', 'Free Learning'); ?></option>
+                                <option <?php if ($row['status'] == 'Evidence Not Approved') { echo 'selected'; } ?> value='Evidence Not Approved'><?php echo __($guid, 'Evidence Not Approved', 'Free Learning'); ?></option>
                             </select>
                         </td>
                     </tr>
