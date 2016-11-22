@@ -78,7 +78,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
 
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&sidebar=true&tab=2'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Approval').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&sidebar=true&tab=2'>".__($guid, 'Unit Details', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Approval', 'Free Learning').'</div>';
         echo '</div>';
 
         if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
@@ -128,14 +128,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     echo "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>";
                     echo '<tr>';
                     echo "<td style='width: 33%; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Unit Name').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Unit Name', 'Free Learning').'</span><br/>';
                     echo $row['name'];
                     echo '</td>';
                     echo "<td style='width: 34%; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Departments').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Departments', 'Free Learning').'</span><br/>';
                     $learningAreas = getLearningAreas($connection2, $guid);
                     if ($learningAreas == '') {
-                        echo '<i>'.__($guid, 'No Learning Areas available.').'</i>';
+                        echo '<i>'.__($guid, 'No Learning Areas available.', 'Free Learning').'</i>';
                     } else {
                         for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
                             if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
@@ -145,7 +145,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     }
                     echo '</td>';
                     echo "<td style='width: 34%; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Authors').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Authors', 'Free Learning').'</span><br/>';
                     $authors = getAuthorsArray($connection2, $freeLearningUnitID);
                     foreach ($authors as $author) {
                         echo $author[1].'<br/>';
@@ -155,10 +155,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     echo '</table>';
 
                     echo '<h4>';
-                    echo __($guid, 'Unit Complete Approval');
+                    echo __($guid, 'Unit Complete Approval', 'Free Learning');
                     echo '</h4>';
                     echo '<p>';
-                    echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.');
+                    echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.', 'Free Learning');
                     echo '</p>'; ?>
 					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_approvalProcess.php?address='.$_GET['q']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls" ?>"  enctype="multipart/form-data">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">
@@ -174,7 +174,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr>
 								<td>
-									<b><?php echo __($guid, 'Status') ?> *</b><br/>
+									<b><?php echo __($guid, 'Status', 'Free Learning') ?> *</b><br/>
 								</td>
 								<td class="right">
 									<select style="width: 302px" name="status" id="status">
@@ -231,8 +231,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
 							<tr id="exemplarRow">
 								<td>
-									<b><?php echo __($guid, 'Exmplar Work'); ?> *</b><br/>
-									<span style="font-size: 90%"><i><?php echo __($guid, 'Work and comments will be made viewable to other users.'); ?></i></span>
+									<b><?php echo __($guid, 'Exmplar Work', 'Free Learning'); ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php echo __($guid, 'Work and comments will be made viewable to other users.', 'Free Learning'); ?></i></span>
 								</td>
 								<td class="right">
 									<select name="exemplarWork" id="exemplarWork" style="width: 302px">
@@ -253,13 +253,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr class="exemplarDrop">
 								<td>
-									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image') ?></b><br/>
+									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image', 'Free Learning') ?></b><br/>
 									<span style="font-size: 90%"><i>150x150px jpg/png/gif</i><br/></span>
 								</td>
 								<td class="right">
 									<?php
                                     if ($row['exemplarWorkThumb'] != '') {
-                                        echo __($guid, 'Current attachment:')." <a href='".$row['exemplarWorkThumb']."'>".$row['exemplarWorkThumb'].'</a><br/><br/>';
+                                        echo __($guid, 'Current attachment:', 'Free Learning')." <a href='".$row['exemplarWorkThumb']."'>".$row['exemplarWorkThumb'].'</a><br/><br/>';
                                     }
                     						?>
 									<input type="file" name="file" id="file"><br/><br/>
@@ -284,8 +284,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr class="exemplarDrop">
 								<td>
-									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image Credit') ?></b><br/>
-									<span style="font-size: 90%"><i><?php echo __($guid, 'Credit and license for image used above.'); ?></i></span>
+									<b><?php echo __($guid, 'Exemplar Work Thumbnail Image Credit', 'Free Learning') ?></b><br/>
+									<span style="font-size: 90%"><i><?php echo __($guid, 'Credit and license for image used above.', 'Free Learning'); ?></i></span>
 								</td>
 								<td class="right">
 									<input name="exemplarWorkLicense" id="exemplarWorkLicense" maxlength=255 value="<?php echo htmlPrep($row['exemplarWorkLicense']) ?>" type="text" style="width: 300px">
@@ -293,8 +293,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr class="exemplarDrop">
 								<td>
-									<b><?php echo __($guid, 'Exemplar Work Embed') ?></b><br/>
-									<span style="font-size: 90%"><i><?php echo __($guid, 'Include embed code, otherwise link to work will be used.'); ?></i></span>
+									<b><?php echo __($guid, 'Exemplar Work Embed', 'Free Learning') ?></b><br/>
+									<span style="font-size: 90%"><i><?php echo __($guid, 'Include embed code, otherwise link to work will be used.', 'Free Learning'); ?></i></span>
 								</td>
 								<td class="right">
 									<input name="exemplarWorkEmbed" id="exemplarWorkEmbed" maxlength=255 value="<?php echo htmlPrep($row['exemplarWorkEmbed']) ?>" type="text" style="width: 300px">
@@ -302,15 +302,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr>
 								<td>
-									<b><?php echo __($guid, 'Submission') ?> *</b><br/>
+									<b><?php echo __($guid, 'Submission', 'Free Learning') ?> *</b><br/>
 								</td>
 								<td class="right">
 									<?php
                                     if ($row['evidenceLocation'] != '') {
                                         if ($row['evidenceType'] == 'Link') {
-                                            echo "<a target='_blank' href='".$row['evidenceLocation']."'>".__($guid, 'View Submission').'</a>';
+                                            echo "<a target='_blank' href='".$row['evidenceLocation']."'>".__($guid, 'View Submission', 'Free Learning').'</a>';
                                         } else {
-                                            echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View Submission').'</a>';
+                                            echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View Submission', 'Free Learning').'</a>';
                                         }
                                     }
                     				?>
@@ -318,7 +318,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr>
 								<td colspan=2>
-									<b><?php echo __($guid, 'Student Comment') ?> *</b><br/>
+									<b><?php echo __($guid, 'Student Comment', 'Free Learning') ?> *</b><br/>
 									<p>
 										<?php
                                             echo $row['commentStudent'];
@@ -329,8 +329,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
 							<tr>
 								<td colspan=2>
-									<b><?php echo __($guid, 'Teacher Comment') ?> *</b><br/>
-									<span style="font-size: 90%"><i><?php echo __($guid, 'Leave a comment on the student\'s progress.') ?></i></span>
+									<b><?php echo __($guid, 'Teacher Comment', 'Free Learning') ?> *</b><br/>
+									<span style="font-size: 90%"><i><?php echo __($guid, 'Leave a comment on the student\'s progress.', 'Free Learning') ?></i></span>
 									<?php echo getEditor($guid,  true, 'commentApproval', $row['commentApproval'], 15, true, true) ?>
 								</td>
 							</tr>

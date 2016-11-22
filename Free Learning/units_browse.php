@@ -45,9 +45,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
     } else {
         echo "<div class='trail'>";
         if ($publicUnits == 'Y') {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units').'</div>';
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units', 'Free Learning').'</div>';
         } else {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units').'</div>';
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units', 'Free Learning').'</div>';
         }
         echo '</div>';
 
@@ -127,7 +127,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 		</tr>
 		<tr>
 			<td>
-				<b><?php echo __($guid, 'Difficulty') ?></b><br/>
+				<b><?php echo __($guid, 'Difficulty', 'Free Learning') ?></b><br/>
 				<span style="font-size: 90%"><i></i></span>
 			</td>
 			<td class="right">
@@ -163,7 +163,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 			?>
 			<tr>
 				<td>
-					<b><?php echo __($guid, 'Show Inactive Units?') ?></b><br/>
+					<b><?php echo __($guid, 'Show Inactive Units?', 'Free Learning') ?></b><br/>
 					<span style="font-size: 90%"><i></i></span>
 				</td>
 				<td class="right">
@@ -185,8 +185,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 			</tr>
 			<tr>
 				<td>
-					<b><?php echo __($guid, 'Apply Access Controls?') ?></b><br/>
-                    <span style="font-size: 90%"><i><?php echo __($guid, 'Restricts access to staff units.') ?></i></span>
+					<b><?php echo __($guid, 'Apply Access Controls?', 'Free Learning') ?></b><br/>
+                    <span style="font-size: 90%"><i><?php echo __($guid, 'Restricts access to staff units.', 'Free Learning') ?></i></span>
 				</td>
 				<td class="right">
 					<select name="applyAccessControls" id="applyAccessControls" style="width: 302px">
@@ -221,9 +221,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo '</form>';
 
         echo "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=list'>".__($guid, 'List')." <img style='margin-bottom: -5px' title='".__($guid, 'List')."' src='./modules/Free Learning/img/iconList.png'/></a> ";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=grid'>".__($guid, 'Grid')." <img style='margin-bottom: -5px' title='".__($guid, 'Grid')."' src='./modules/Free Learning/img/iconGrid.png'/></a> ";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=map'>".__($guid, 'Map')." <img style='margin-bottom: -5px' title='".__($guid, 'Map')."' src='./modules/Free Learning/img/iconMap.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=list'>".__($guid, 'List', 'Free Learning')." <img style='margin-bottom: -5px' title='".__($guid, 'List', 'Free Learning')."' src='./modules/Free Learning/img/iconList.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=grid'>".__($guid, 'Grid', 'Free Learning')." <img style='margin-bottom: -5px' title='".__($guid, 'Grid', 'Free Learning')."' src='./modules/Free Learning/img/iconGrid.png'/></a> ";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view&view=map'>".__($guid, 'Map', 'Free Learning')." <img style='margin-bottom: -5px' title='".__($guid, 'Map', 'Free Learning')."' src='./modules/Free Learning/img/iconMap.png'/></a> ";
         echo '</div>';
 
         //Set pagination variable
@@ -268,12 +268,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Status').'</span>';
                 echo '</th>';
                 echo "<th style='width: 100px!important'>";
-                echo __($guid, 'Authors').'<br/>';
-                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Learning Areas').'</span>';
+                echo __($guid, 'Authors', 'Free Learning').'<br/>';
+                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Learning Areas', 'Free Learning').'</span>';
                 echo '</th>';
                 echo "<th style='max-width: 325px!important'>";
-                echo __($guid, 'Difficulty').'</br>';
-                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Blurb').'</span>';
+                echo __($guid, 'Difficulty', 'Free Learning').'</br>';
+                echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Blurb', 'Free Learning').'</span>';
                 echo '</th>';
                 echo '<th>';
                 echo __($guid, 'Length').'</br>';
@@ -281,14 +281,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '</th>';
                 if ($schoolType == 'Physical') {
                     echo '<th>';
-                    echo __($guid, 'Grouping').'</br>';
+                    echo __($guid, 'Grouping', 'Free Learning').'</br>';
                     echo '</th>';
                 }
                 echo "<th style='min-width: 150px'>";
                 if ($schoolType == 'Online') {
-                    echo __($guid, 'Recommended').'<br/>';
+                    echo __($guid, 'Recommended', 'Free Learning').'<br/>';
                 }
-                echo __($guid, 'Prerequisites').'</br>';
+                echo __($guid, 'Prerequisites', 'Free Learning').'</br>';
                 echo '</th>';
                 if (isset($_SESSION[$guid]['username'])) { //Likes only if logged in!
                             echo "<th style='min-width: 50px'>";
@@ -379,7 +379,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                     }
                     if (is_null($timing)) {
-                        echo '<i>'.__($guid, 'NA').'</i>';
+                        echo '<i>'.__($guid, 'N\A').'</i>';
                     } else {
                         echo $timing;
                     }
@@ -400,12 +400,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         if ($prerequisitesActive != false) {
                             $prerquisitesMet = prerquisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
                             if ($prerquisitesMet) {
-                                echo "<span style='font-weight: bold; color: #00cc00'>".__($guid, 'OK!').'<br/></span>';
+                                echo "<span style='font-weight: bold; color: #00cc00'>".__($guid, 'OK!', 'Free Learning').'<br/></span>';
                             } else {
                                 if ($schoolType == 'Online') {
-                                    echo "<span style='font-weight: bold; color: #D65602'>".__($guid, 'Consider Studying').'<br/></span>';
+                                    echo "<span style='font-weight: bold; color: #D65602'>".__($guid, 'Consider Studying', 'Free Learning').'<br/></span>';
                                 } else {
-                                    echo "<span style='font-weight: bold; color: #cc0000'>".__($guid, 'Not Met').'<br/></span>';
+                                    echo "<span style='font-weight: bold; color: #cc0000'>".__($guid, 'Not Met', 'Free Learning').'<br/></span>';
                                 }
                             }
                         }
@@ -417,7 +417,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo $units[$prerequisite][0].'<br/>';
                         }
                     } else {
-                        echo '<i>'.__($guid, 'None').'<br/></i>';
+                        echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';
                     }
                     echo '</td>';
                     if (isset($_SESSION[$guid]['username'])) { //Likes only if logged in!
@@ -546,7 +546,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '</table>';
             } elseif ($view == 'map') {
                 echo '<p>';
-                echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.');
+                echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.', 'Free Learning');
                 echo '</p>'; ?>
 				<script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
 				<link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />

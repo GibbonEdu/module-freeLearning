@@ -35,7 +35,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         echo '</div>';
     } else {
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Manage Units').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Manage Units', 'Free Learning').'</div>';
         echo '</div>';
 
         if (isset($_GET['return'])) {
@@ -84,7 +84,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 		</tr>
 		<tr>
 			<td>
-				<b><?php echo __($guid, 'Difficulty') ?></b><br/>
+				<b><?php echo __($guid, 'Difficulty', 'Free Learning') ?></b><br/>
 				<span style="font-size: 90%"><i></i></span>
 			</td>
 			<td class="right">
@@ -187,7 +187,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             echo __($guid, 'Name');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Difficulty');
+            echo __($guid, 'Difficulty', 'Free Learning');
             echo '</th>';
             echo '<th>';
             echo __($guid, 'Learning Areas');
@@ -230,7 +230,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         }
                     }
                 } else {
-                    echo '<i>'.__($guid, 'None').'</i>';
+                    echo '<i>'.__($guid, 'None', 'Free Learning').'</i>';
                 }
                 echo '</td>';
                 echo '<td>';

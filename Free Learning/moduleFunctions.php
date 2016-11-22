@@ -175,7 +175,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
             $output .= '</th>';
             if ($schoolType == 'Physical') {
                 $output .= '<th>';
-					$output .= __($guid, 'Enrolment Method').'<br/>';
+					$output .= __($guid, 'Enrolment Method', 'Free Learning').'<br/>';
 				$output .= '</th>';
 				$output .= '<th>';
                 $output .= __($guid, 'Class');
@@ -185,7 +185,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
             $output .= __($guid, 'Status');
             $output .= '</th>';
             $output .= '<th>';
-            $output .= __($guid, 'Evidence');
+            $output .= __($guid, 'Evidence', 'Free Learning');
             $output .= '</th>';
             $output .= "<th style='width: 70px!important'>";
             $output .= __($guid, 'Actions');
@@ -226,7 +226,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
 						if ($row["course"]!="" AND $row["class"]!="") {
 							$output .= $row["course"] . "." . $row["class"] ;
 						} else {
-							$output .= "<i>" . __($guid, 'NA') . "</i>" ;
+							$output .= "<i>" . __($guid, 'N/A') . "</i>" ;
 						}
 					$output .= "</td>" ;
                 }
@@ -261,14 +261,14 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                     $output .= "<tr class='comment-".$row['freeLearningUnitStudentID']."' id='comment-".$row['freeLearningUnitStudentID']."'>";
                     $output .= '<td colspan=7>';
                     if ($row['commentStudent'] != '') {
-                        $output .= '<b>'.__($guid, 'Student Comment').'</b><br/>';
+                        $output .= '<b>'.__($guid, 'Student Comment', 'Free Learning').'</b><br/>';
                         $output .= nl2br($row['commentStudent']).'<br/>';
                     }
                     if ($row['commentApproval'] != '') {
                         if ($row['commentStudent'] != '') {
                             $output .= '<br/>';
                         }
-                        $output .= '<b>'.__($guid, 'Teacher Comment').'</b><br/>';
+                        $output .= '<b>'.__($guid, 'Teacher Comment', 'Free Learning').'</b><br/>';
                         $output .= nl2br($row['commentApproval']).'<br/>';
                     }
                     $output .= '</td>';
@@ -920,7 +920,7 @@ function grantAwards($connection2, $guid, $gibbonPersonID) {
                 } catch (PDOException $e) {}
 
                 //Notify User
-                $notificationText = __($guid, 'Someone has granted you a badge.');
+                $notificationText = __($guid, 'Someone has granted you a badge.', 'Free Learning');
                 setNotification($connection2, $guid, $gibbonPersonID, $notificationText, 'Badges', "/index.php?q=/modules/Badges/badges_view.php&gibbonPersonID=$gibbonPersonID");
             }
         }

@@ -77,7 +77,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         //Get action with highest precendence
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID='.$_GET['freeLearningUnitID']."'>".__($guid, 'Browse Units')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&tab=2'>".__($guid, 'Unit Details')."</a> > </div><div class='trailEnd'>".__($guid, 'Add Multiple').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID='.$_GET['freeLearningUnitID']."'>".__($guid, 'Browse Units', 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&tab=2'>".__($guid, 'Unit Details', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Add Multiple', 'Free Learning').'</div>';
         echo '</div>';
 
         if ($freeLearningUnitID == '') {
@@ -150,7 +150,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 						</tr>
 						<tr>
 							<td style='width: 275px'>
-								<b><?php echo __($guid, 'Students In Class') ?> *</b><br/>
+								<b><?php echo __($guid, 'Students In Class', 'Free Learning') ?> *</b><br/>
 								<span style="font-size: 90%"><i><?php echo __($guid, 'Use Control, Command and/or Shift to select multiple.') ?> </span>
 							</td>
 							<td class="right">
@@ -175,12 +175,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 						</script>
 						<tr>
 							<td>
-								<b><?php echo __($guid, 'Status') ?> *</b><br/>
+								<b><?php echo __($guid, 'Status', 'Free Learning') ?> *</b><br/>
 								<span style="font-size: 90%"><i></i></span>
 							</td>
 							<td class="right">
 								<select name="status" id="status" style="width: 302px">
-									<option value="Exempt"><?php echo __($guid, 'Exempt') ?></option>
+									<option value="Exempt"><?php echo __($guid, 'Exempt', 'Free Learning') ?></option>
 								</select>
 							</td>
 						</tr>

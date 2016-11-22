@@ -94,7 +94,7 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
             }
 
             //Notify student
-            $notificationText = sprintf(__($guid, 'Your mentorship request for the Free Learning unit %1$s has been accepted.'), $unit);
+            $notificationText = sprintf(__($guid, 'Your mentorship request for the Free Learning unit %1$s has been accepted.', 'Free Learning'), $unit);
             setNotification($connection2, $guid, $row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
 
             //Return to thanks page
@@ -114,7 +114,7 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
             }
 
             //Notify student
-            $notificationText = sprintf(__($guid, 'Your mentorship request for the Free Learning unit %1$s has been rejected. Your enrolment has been deleted.'), $unit);
+            $notificationText = sprintf(__($guid, 'Your mentorship request for the Free Learning unit %1$s has been rejected. Your enrolment has been deleted.', 'Free Learning'), $unit);
             setNotification($connection2, $guid, $row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
 
             //Return to thanks page

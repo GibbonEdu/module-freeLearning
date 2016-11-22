@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.5.00
+-------
+Translatable, using Core v13's new module translation setup
+
 v4.4.06
 -------
 Add mentor contract details to unit overview when enroled with a mentor

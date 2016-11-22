@@ -128,7 +128,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             echo "<table cellspacing='0' style='width: 100%'>";
             echo "<tr class='head'>";
             echo "<th style='width: 180px'>";
-            echo __($guid, 'Logo');
+            echo __($guid, 'Logo', 'Free Learning');
             echo '</th>';
             echo '<th>';
             echo 'Name<br/>';

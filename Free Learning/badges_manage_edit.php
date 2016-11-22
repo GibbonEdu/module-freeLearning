@@ -30,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 } else {
     //Proceed!
     echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/badges_manage.php'>".__($guid, 'Manage Badges')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Badges').'</div>';
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/badges_manage.php'>".__($guid, 'Manage Badges', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Badges', 'Free Learning').'</div>';
     echo '</div>';
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
@@ -84,7 +84,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     				<table class='smallIntBorder' cellspacing='0' style="width: 100%">
                         <tr>
             				<td>
-            					<b><?php echo __($guid, 'Badge') ?> *</b><br/>
+            					<b><?php echo __($guid, 'Badge', 'Free Learning') ?> *</b><br/>
             					<span style="font-size: 90%"><i></i></span>
             				</td>
             				<td class="right">
@@ -133,14 +133,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             			</tr>
                         <tr class='break'>
                             <td colspan=2>
-                                <h3><?php echo __($guid, 'Conditions') ?></h3>
-                                <p><?php echo __($guid, 'This award will automatically be awarded on unit completion, if all of the following conditions are met. Fields left blank will be disregarded.') ?></p>
+                                <h3><?php echo __($guid, 'Conditions', 'Free Learning') ?></h3>
+                                <p><?php echo __($guid, 'This award will automatically be awarded on unit completion, if all of the following conditions are met. Fields left blank will be disregarded.', 'Free Learning') ?></p>
                             </td>
                         </tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Total') ?> *</b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.') ?></span>
+        						<b><?php echo __($guid, 'Units Completed - Total', 'Free Learning') ?> *</b><br/>
+        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
         						<input name="unitsCompleteTotal" ID="unitsCompleteTotal" value="<?php echo $row['unitsCompleteTotal'] ?>" maxlength=2 type="text" class="standardWidth">
@@ -152,8 +152,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - This Year') ?> *</b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.') ?></span>
+        						<b><?php echo __($guid, 'Units Completed - This Year', 'Free Learning') ?> *</b><br/>
+        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
         						<input name="unitsCompleteThisYear" ID="unitsCompleteThisYear" value="<?php echo $row['unitsCompleteThisYear'] ?>" maxlength=2 type="text" class="standardWidth">
@@ -165,8 +165,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Department Spread') ?> *</b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.') ?></span>
+        						<b><?php echo __($guid, 'Units Completed - Department Spread', 'Free Learning') ?> *</b><br/>
+        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
         						<input name="unitsCompleteDepartmentCount" ID="unitsCompleteDepartmentCount" value="<?php echo $row['unitsCompleteDepartmentCount'] ?>" maxlength=2 type="text" class="standardWidth">
@@ -178,8 +178,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Individual') ?> *</b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.') ?></span>
+        						<b><?php echo __($guid, 'Units Completed - Individual', 'Free Learning') ?> *</b><br/>
+        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
         						<input name="unitsCompleteIndividual" ID="unitsCompleteIndividual" value="<?php echo $row['unitsCompleteIndividual'] ?>" maxlength=2 type="text" class="standardWidth">
@@ -191,8 +191,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Group') ?> *</b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.') ?></span>
+        						<b><?php echo __($guid, 'Units Completed - Group', 'Free Learning') ?> *</b><br/>
+        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
         						<input name="unitsCompleteGroup" ID="unitsCompleteGroup" value="<?php echo $row['unitsCompleteGroup'] ?>" maxlength=2 type="text" class="standardWidth">
@@ -209,7 +209,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         					?>
         					<tr>
         						<td>
-        							<b><?php echo __($guid, 'Difficulty Level Threshold') ?> *</b><br/>
+        							<b><?php echo __($guid, 'Difficulty Level Threshold', 'Free Learning') ?> *</b><br/>
         							<span style="font-size: 90%"><i></i></span>
         						</td>
         						<td class="right">

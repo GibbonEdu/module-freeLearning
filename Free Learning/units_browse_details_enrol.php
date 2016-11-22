@@ -40,7 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($enrolCheckFail == false) {
         if ($resultEnrol->rowCount()==0) { //ENROL NOW
             echo '<h3>';
-            echo __($guid, 'Enrol Now');
+            echo __($guid, 'Enrol Now', 'Free Learning');
             echo '</h3>';
 
             ?>
@@ -123,19 +123,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         </script>
                         <tr>
                             <td>
-                                <b><?php echo __($guid, 'Enrolment Method') ?> * </b><br/>
+                                <b><?php echo __($guid, 'Enrolment Method', 'Free Learning') ?> * </b><br/>
                                 <span style="font-size: 90%"><i></i></span>
                             </td>
                             <td class="right">
                                 <?php
                                 if ($enableClassEnrolment == 'Y') {
-                                    echo __($guid, 'Timetable Class').' <input '.$checked1.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="class" /><br/>';
+                                    echo __($guid, 'Timetable Class', 'Free Learning').' <input '.$checked1.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="class" /><br/>';
                                 }
                                 if ($enableSchoolMentorEnrolment == 'Y') {
-                                    echo __($guid, 'School Mentor').' <input '.$checked2.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="schoolMentor" /><br/>';
+                                    echo __($guid, 'School Mentor', 'Free Learning').' <input '.$checked2.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="schoolMentor" /><br/>';
                                 }
                                 if ($enableExternalMentorEnrolment == 'Y') {
-                                    echo __($guid, 'External Mentor').' <input '.$checked3.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="externalMentor" /><br/>';
+                                    echo __($guid, 'External Mentor', 'Free Learning').' <input '.$checked3.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="externalMentor" /><br/>';
                                 }
                                 ?>
                             </td>
@@ -143,7 +143,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         <tr class='class'>
                             <td>
                                 <b><?php echo __($guid, 'Class') ?> *</b><br/>
-                                <span style="font-size: 90%"><i><?php echo __($guid, 'Which class are you enroling for?') ?></i></span>
+                                <span style="font-size: 90%"><i><?php echo __($guid, 'Which class are you enroling for?', 'Free Learning') ?></i></span>
                             </td>
                             <td class="right">
                                 <?php
@@ -171,7 +171,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         </tr>
                         <tr class='schoolMentor'>
                             <td>
-                                <b><?php echo __($guid, 'School Mentor') ?> *</b><br/>
+                                <b><?php echo __($guid, 'School Mentor', 'Free Learning') ?> *</b><br/>
                                 <span style="font-size: 90%"><i></i></span>
                             </td>
                             <td class="right">
@@ -205,7 +205,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         </tr>
                         <tr class='externalMentor'>
                             <td>
-                                <b><?php echo __($guid, 'External Mentor Name') ?> *</b><br/>
+                                <b><?php echo __($guid, 'External Mentor Name', 'Free Learning') ?> *</b><br/>
                                 <span style="font-size: 90%"><i></i></span>
                             </td>
                             <td class="right">
@@ -218,7 +218,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         </tr>
                         <tr class='externalMentor'>
                             <td>
-                                <b><?php echo __($guid, 'External Mentor Email') ?> *</b><br/>
+                                <b><?php echo __($guid, 'External Mentor Email', 'Free Learning') ?> *</b><br/>
                                 <span style="font-size: 90%"><i></i></span>
                             </td>
                             <td class="right">
@@ -232,8 +232,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         </tr>
                         <tr>
                             <td style='width: 275px'>
-                                <b><?php echo __($guid, 'Grouping') ?> *</b><br/>
-                                <span style="font-size: 90%"><i><?php echo __($guid, 'How do you want to study this unit?') ?></i></span>
+                                <b><?php echo __($guid, 'Grouping', 'Free Learning') ?> *</b><br/>
+                                <span style="font-size: 90%"><i><?php echo __($guid, 'How do you want to study this unit?', 'Free Learning') ?></i></span>
                             </td>
                             <td class="right">
                                 <select name="grouping" id="grouping" style="width: 302px">
@@ -393,7 +393,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 ?>
                                 <tr class='collaborator' id='<?php echo "trCollaborator$i" ?>'>
                                     <td style='width: 275px'>
-                                        <b><?php echo sprintf(__($guid, 'Collaborator %1$s'), $i) ?> *</b><br/>
+                                        <b><?php echo sprintf(__($guid, 'Collaborator %1$s', 'Free Learning'), $i) ?> *</b><br/>
                                     </td>
                                     <td class="right">
                                         <select name="collaborators[]" id="collaborator<?php echo $i ?>" style="width: 302px">
@@ -434,29 +434,29 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $rowEnrol = $resultEnrol->fetch();
             if ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Approved') { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
                 echo '<h4>';
-                echo __($guid, 'Currently Enroled');
+                echo __($guid, 'Currently Enroled', 'Free Learning');
                 echo '</h4>';
                 if ($rowEnrol['status'] == 'Current - Pending') {
                     echo '<p>';
-                    echo sprintf(__($guid, 'You are currently enroled in %1$s, but your chosen mentor has yet to confirm their participation. You cannot submit evidence until they have done so.'), $row['name']);
+                    echo sprintf(__($guid, 'You are currently enroled in %1$s, but your chosen mentor has yet to confirm their participation. You cannot submit evidence until they have done so.', 'Free Learning'), $row['name']);
                     echo '</p>';
                 }
                 else {
                     if ($schoolType == 'Physical') {
                         if ($rowEnrol['status'] == 'Current') {
                             echo '<p>';
-                            echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $row['name']);
+                            echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.', 'Free Learning'), $row['name']);
                             echo '</p>';
                         } elseif ($rowEnrol['status'] == 'Evidence Not Approved') {
                             echo "<div class='warning'>";
-                            echo __($guid, 'Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:').'<br/><br/>';
+                            echo __($guid, 'Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:', 'Free Learning').'<br/><br/>';
                             echo '<b>'.$rowEnrol['commentApproval'].'</b>';
                             echo '</div>';
                         }
                     } else {
                         if ($rowEnrol['status'] == 'Current') {
                             echo '<p>';
-                            echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.'), $row['name']);
+                            echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.', 'Free Learning'), $row['name']);
                             echo '</p>';
                         }
                     }
@@ -475,12 +475,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             </tr>
                             <tr>
                                 <td>
-                                    <b><?php echo __($guid, 'Comment') ?> *</b><br/>
+                                    <b><?php echo __($guid, 'Comment', 'Free Learning') ?> *</b><br/>
                                     <span style="font-size: 90%"><i>
                                         <?php
-                                        echo __($guid, 'Leave a brief reflective comment on this unit<br/>and what you learned.');
+                                        echo __($guid, 'Leave a brief reflective comment on this unit<br/>and what you learned.', 'Free Learning');
                                         if ($rowEnrol['status'] == 'Evidence Not Approved') {
-                                            echo '<br/><br/>'.__($guid, 'Your previous comment is shown here, for you to edit.');
+                                            echo '<br/><br/>'.__($guid, 'Your previous comment is shown here, for you to edit.', 'Free Learning');
                                         }
                                         ?>
                                     </i></span>
@@ -504,7 +504,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             </tr>
                             <tr>
                                 <td>
-                                    <b><?php echo __($guid, 'Type') ?> *</b><br/>
+                                    <b><?php echo __($guid, 'Type', 'Free Learning') ?> *</b><br/>
                                 </td>
                                 <td class="right">
                                     <input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
@@ -531,7 +531,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             <tr id="fileRow">
                                 <td>
-                                    <b><?php echo __($guid, 'Submit File') ?> *</b><br/>
+                                    <b><?php echo __($guid, 'Submit File', 'Free Learning') ?> *</b><br/>
                                 </td>
                                 <td class="right">
                                     <input type="file" name="file" id="file"><br/><br/>
@@ -560,7 +560,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             </tr>
                             <tr id="linkRow">
                                 <td>
-                                    <b><?php echo __($guid, 'Submit Link') ?> *</b><br/>
+                                    <b><?php echo __($guid, 'Submit Link', 'Free Learning') ?> *</b><br/>
                                 </td>
                                 <td class="right">
                                     <input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
@@ -588,16 +588,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 }
             } elseif ($rowEnrol['status'] == 'Complete - Pending') { //Waiting for teacher feedback
                 echo '<h4>';
-                echo __($guid, 'Complete - Pending Approval');
+                echo __($guid, 'Complete - Pending Approval', 'Free Learning');
                 echo '</h4>';
                 echo '<p>';
-                echo __($guid, 'Your evidence, shown below, has been submitted to your teacher/mentor for approval. This screen will show a teacher comment, once approval has been given.');
+                echo __($guid, 'Your evidence, shown below, has been submitted to your teacher/mentor for approval. This screen will show a teacher comment, once approval has been given.', 'Free Learning');
                 echo '</p>';
                 ?>
                 <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Status') ?></b><br/>
+                            <b><?php echo __($guid, 'Status', 'Free Learning') ?></b><br/>
                         </td>
                         <td class="right">
                             <input readonly style='width: 300px' type='text' value='Complete - Pending' />
@@ -605,7 +605,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Evidence Type') ?></b><br/>
+                            <b><?php echo __($guid, 'Evidence Type', 'Free Learning') ?></b><br/>
                         </td>
                         <td class="right">
                             <input readonly style='width: 300px' type='text' value='<?php echo $rowEnrol['evidenceType'] ?>' />
@@ -613,7 +613,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Evidence') ?></b><br/>
+                            <b><?php echo __($guid, 'Evidence', 'Free Learning') ?></b><br/>
                         </td>
                         <td class="right">
                             <div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
@@ -630,7 +630,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 </table>
                 <?php
                 echo '<h4>';
-                echo __($guid, 'Student Comment');
+                echo __($guid, 'Student Comment', 'Free Learning');
                 echo '</h4>';
                 echo '<p>';
                 echo $rowEnrol['commentStudent'];
@@ -638,24 +638,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             } elseif ($rowEnrol['status'] == 'Complete - Approved') { //Complete, show status and feedback from teacher.
                 if ($schoolType == 'Physical') {
                     echo '<h4>';
-                    echo __($guid, 'Complete - Approved');
+                    echo __($guid, 'Complete - Approved', 'Free Learning');
                     echo '</h4>';
                     echo '<p>';
-                    echo __($guid, 'Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.');
+                    echo __($guid, 'Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.', 'Free Learning');
                     echo '</p>';
                 } else {
                     echo '<h4>';
-                    echo __($guid, 'Complete');
+                    echo __($guid, 'Complete', 'Free Learning');
                     echo '</h4>';
                     echo '<p>';
-                    echo __($guid, 'Congralutations! You have submitted your evidence, shown below, and so the unit is complete. Feel free to move on to another unit.');
+                    echo __($guid, 'Congralutations! You have submitted your evidence, shown below, and so the unit is complete. Feel free to move on to another unit.', 'Free Learning');
                     echo '</p>';
                 }
                 ?>
                 <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Status') ?></b><br/>
+                            <b><?php echo __($guid, 'Status', 'Free Learning') ?></b><br/>
                         </td>
                         <td class="right">
                             <input readonly style='width: 300px' type='text' value='Complete - Approved' />
@@ -663,7 +663,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Evidence Type') ?></b><br/>
+                            <b><?php echo __($guid, 'Evidence Type', 'Free Learning') ?></b><br/>
                         </td>
                         <td class="right">
                             <input readonly style='width: 300px' type='text' value='<?php echo $rowEnrol['evidenceType'] ?>' />
@@ -671,7 +671,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Evidence') ?></b><br/>
+                            <b><?php echo __($guid, 'Evidence', 'Free Learning') ?></b><br/>
                         </td>
                         <td class="right">
                             <div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
@@ -689,7 +689,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 <?php
                 if ($schoolType == 'Physical') {
                     echo '<h4>';
-                    echo __($guid, 'Teacher Comment');
+                    echo __($guid, 'Teacher Comment', 'Free Learning');
                     echo '</h4>';
                     echo '<p>';
                     echo $rowEnrol['commentApproval'];
@@ -697,17 +697,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 }
 
                 echo '<h4>';
-                echo __($guid, 'Student Comment');
+                echo __($guid, 'Student Comment', 'Free Learning');
                 echo '</h4>';
                 echo '<p>';
                 echo $rowEnrol['commentStudent'];
                 echo '</p>';
             } elseif ($rowEnrol['status'] == 'Exempt') { //Exempt, let student know
                 echo '<h4>';
-                echo __($guid, 'Exempt');
+                echo __($guid, 'Exempt', 'Free Learning');
                 echo '</h4>';
                 echo '<p>';
-                echo __($guid, 'You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.');
+                echo __($guid, 'You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.', 'Free Learning');
                 echo '</p>';
             }
         }

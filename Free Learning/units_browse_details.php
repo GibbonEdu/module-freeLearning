@@ -82,9 +82,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         echo "<div class='trail'>";
         if ($publicUnits == 'Y') {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details').'</div>';
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
         } else {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details').'</div>';
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
         }
         echo '</div>';
 
@@ -115,7 +115,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $row = $result->fetch();
                 if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Back to Search Results').'</a>';
+                    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
                     echo '</div>';
                 }
 
@@ -169,11 +169,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>";
                     echo '<tr>';
                     echo "<td style='width: 50%; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Unit Name').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Unit Name', 'Free Learning').'</span><br/>';
                     echo '<i>'.$row['name'].'</i>';
                     echo '</td>';
                     echo "<td style='width: 50%; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Time').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Time', 'Free Learning').'</span><br/>';
                     $timing = null;
                     $blocks = getBlocksArray($connection2, $freeLearningUnitID);
                     if ($blocks != false) {
@@ -186,7 +186,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                     }
                     if (is_null($timing)) {
-                        echo '<i>'.__($guid, 'NA').'</i>';
+                        echo '<i>'.__($guid, 'N\A').'</i>';
                     } else {
                         echo '<i>'.$timing.'</i>';
                     }
@@ -201,11 +201,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '</tr>';
                     echo '<tr>';
                     echo "<td style='padding-top: 15px; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Difficulty').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Difficulty', 'Free Learning').'</span><br/>';
                     echo '<i>'.$row['difficulty'].'<i>';
                     echo '</td>';
                     echo "<td style='padding-top: 15px; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Prerequisites').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Prerequisites', 'Free Learning').'</span><br/>';
                     $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
                     if ($prerequisitesActive != false) {
                         $prerequisites = explode(',', $prerequisitesActive);
@@ -214,16 +214,16 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo '<i>'.$units[$prerequisite][0].'</i><br/>';
                         }
                     } else {
-                        echo '<i>'.__($guid, 'None').'<br/></i>';
+                        echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';
                     }
                     echo '</td>';
                     echo '</tr>';
                     echo '<tr>';
                     echo "<td style='vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Departments').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Departments', 'Free Learning').'</span><br/>';
                     $learningAreas = getLearningAreas($connection2, $guid);
                     if ($learningAreas == '') {
-                        echo '<i>'.__($guid, 'No Learning Areas available.').'</i>';
+                        echo '<i>'.__($guid, 'No Learning Areas available.', 'Free Learning').'</i>';
                     } else {
                         for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
                             if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
@@ -233,7 +233,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo '</td>';
                     echo "<td style='vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Authors').'</span><br/>';
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Authors', 'Free Learning').'</span><br/>';
                     $authors = getAuthorsArray($connection2, $freeLearningUnitID);
                     foreach ($authors as $author) {
                         if ($author[3] == '') {
@@ -247,7 +247,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if ($schoolType == 'Physical') {
                         echo '<tr>';
                         echo "<td style='vertical-align: top'>";
-                        echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Groupings').'</span><br/>';
+                        echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Groupings', 'Free Learning').'</span><br/>';
                         if ($row['grouping'] != '') {
                             $groupings = explode(',', $row['grouping']);
                             foreach ($groupings as $grouping) {
@@ -258,7 +258,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo "<td style='vertical-align: top'>";
                         if ($rowEnrol != null) {
                             if ($rowEnrol['enrolmentMethod'] == 'schoolMentor' or $rowEnrol['enrolmentMethod'] == 'externalMentor') {
-                                echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Mentor Contacts').'</span><br/>';
+                                echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Mentor Contacts', 'Free Learning').'</span><br/>';
                                 if ($rowEnrol['enrolmentMethod'] == 'schoolMentor') {
                                     echo "<i>".formatName('', $rowEnrol['preferredName'], $rowEnrol['surname'], 'Student').'</i><br/>';
                                     echo "<i><a href='mailto:".$rowEnrol['email']."'>".$rowEnrol['email'].'</a></i><br/>';
@@ -300,31 +300,31 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo "<div id='tabs' style='margin: 20px 0'>";
                     //Tab links
                     echo '<ul>';
-                    echo "<li><a href='#tabs0'>".__($guid, 'Unit Overview').'</a></li>';
-                    echo "<li><a href='#tabs1'>".__($guid, 'Enrol').'</a></li>';
+                    echo "<li><a href='#tabs0'>".__($guid, 'Unit Overview', 'Free Learning').'</a></li>';
+                    echo "<li><a href='#tabs1'>".__($guid, 'Enrol', 'Free Learning').'</a></li>';
                     if ($canManage) {
-                        echo "<li><a href='#tabs2'>".__($guid, 'Manage Enrolment').'</a></li>';
+                        echo "<li><a href='#tabs2'>".__($guid, 'Manage Enrolment', 'Free Learning').'</a></li>';
                     }
-                    echo "<li><a href='#tabs3'>".__($guid, 'Content').'</a></li>';
-                    echo "<li><a href='#tabs4'>".__($guid, 'Resources').'</a></li>';
-                    echo "<li><a href='#tabs5'>".__($guid, 'Outcomes').'</a></li>';
-                    echo "<li><a href='#tabs6'>".__($guid, 'Exemplar Work').'</a></li>';
+                    echo "<li><a href='#tabs3'>".__($guid, 'Content', 'Free Learning').'</a></li>';
+                    echo "<li><a href='#tabs4'>".__($guid, 'Resources', 'Free Learning').'</a></li>';
+                    echo "<li><a href='#tabs5'>".__($guid, 'Outcomes', 'Free Learning').'</a></li>';
+                    echo "<li><a href='#tabs6'>".__($guid, 'Exemplar Work', 'Free Learning').'</a></li>';
                     echo '</ul>';
 
 					//Tabs
 					echo "<div id='tabs0'>";
                     echo '<h3>';
-                    echo __($guid, 'Blurb');
+                    echo __($guid, 'Blurb', 'Free Learning');
                     echo '</h3>';
                     echo '<p>';
                     echo $row['blurb'];
                     echo '</p>';
                     if ($row['license'] != '') {
                         echo '<h4>';
-                        echo __($guid, 'License');
+                        echo __($guid, 'License', 'Free Learning');
                         echo '</h4>';
                         echo '<p>';
-                        echo __($guid, 'This work is shared under the following license:').' '.$row['license'];
+                        echo __($guid, 'This work is shared under the following license:', 'Free Learning').' '.$row['license'];
                         echo '</p>';
                     }
                     if ($row['outline'] != '') {
@@ -343,7 +343,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if ($canManage) {
                         echo "<div id='tabs2'>";
                             echo '<p>';
-                            echo __($guid, 'Below you can view the students currently enroled in this unit, including both those who are working on it, and those who are awaiting approval.');
+                            echo __($guid, 'Below you can view the students currently enroled in this unit, including both those who are working on it, and those who are awaiting approval.', 'Free Learning');
                             echo '</p>';
 
                             //Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
@@ -408,15 +408,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         </th>
                                         <th>
                                             <?php
-                                            echo __($guid, 'Status') . '<br/>';
-                                            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Enrolment Method').'</span>';
+                                            echo __($guid, 'Status', 'Free Learning') . '<br/>';
+                                            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Enrolment Method', 'Free Learning').'</span>';
                                             ?>
                                         </th>
                                         <?php
                                         if ($schoolType == 'Physical') {
                                             ?>
                                             <th>
-                                                <?php echo __($guid, 'Class/Mentor') ?><br/>
+                                                <?php echo __($guid, 'Class/Mentor', 'Free Learning') ?><br/>
                                             </th>
                                             <?php
                                         }
@@ -455,7 +455,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                         if ($rowClass['course'] != '' and $rowClass['class'] != '') {
                                                             echo $rowClass['course'].'.'.$rowClass['class'];
                                                         } else {
-                                                            echo '<i>'.__($guid, 'NA').'</i>';
+                                                            echo '<i>'.__($guid, 'N\A').'</i>';
                                                         }
                                                     }
                                                     else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {
@@ -506,14 +506,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             echo "<tr class='comment-".$rowClass['freeLearningUnitStudentID']."' id='comment-".$rowClass['freeLearningUnitStudentID']."'>";
                                             echo '<td colspan=5>';
                                             if ($rowClass['commentStudent'] != '') {
-                                                echo '<b>'.__($guid, 'Student Comment').'</b><br/>';
+                                                echo '<b>'.__($guid, 'Student Comment', 'Free Learning').'</b><br/>';
                                                 echo nl2br($rowClass['commentStudent']).'<br/>';
                                             }
                                             if ($rowClass['commentApproval'] != '') {
                                                 if ($rowClass['commentStudent'] != '') {
                                                     echo '<br/>';
                                                 }
-                                                echo '<b>'.__($guid, 'Teacher Comment').'</b><br/>';
+                                                echo '<b>'.__($guid, 'Teacher Comment', 'Free Learning').'</b><br/>';
                                                 echo nl2br($rowClass['commentApproval']).'<br/>';
                                             }
                                             echo '</td>';
@@ -663,10 +663,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo "<table cellspacing='0' style='width: 100%'>";
                         echo "<tr class='head'>";
                         echo '<th>';
-                        echo __($guid, 'Scope');
+                        echo __($guid, 'Scope', 'Free Learning');
                         echo '</th>';
                         echo '<th>';
-                        echo __($guid, 'Category');
+                        echo __($guid, 'Category', 'Free Learning');
                         echo '</th>';
                         echo '<th>';
                         echo __($guid, 'Name');
@@ -728,7 +728,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo '});';
                             echo '</script>';
                             if ($rowBlocks['content'] != '') {
-                                echo "<a title='".__($guid, 'View Description')."' class='show_hide-$count' onclick='false' href='#'><img style='padding-left: 0px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
+                                echo "<a title='".__($guid, 'View Description', 'Free Learning')."' class='show_hide-$count' onclick='false' href='#'><img style='padding-left: 0px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
                             }
                             echo '</td>';
                             echo '</tr>';
@@ -784,10 +784,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
 
                             echo '<h3>';
-                            echo $students." . <span style='font-size: 75%'>".__($guid, 'Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
+                            echo $students." . <span style='font-size: 75%'>".__($guid, 'Shared on', 'Free Learning').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
                             echo '</h3>';
                             //DISPLAY WORK.
-                            echo '<h4 style=\'margin-top: 0px\'>'.__($guid, 'Student Work').'</h4>';
+                            echo '<h4 style=\'margin-top: 0px\'>'.__($guid, 'Student Work', 'Free Learning').'</h4>';
                             if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
                                 $extension = strrchr($rowWork['evidenceLocation'], '.');
                                 if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
@@ -801,9 +801,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 } else { //Not an image
                                     echo '<p class=\'button\'>';
                                     if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                        echo "<a class='button'target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+                                        echo "<a class='button'target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                                     } else { //It's a link
-                                        echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+                                        echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                                     }
                                     echo '</p>';
                                 }
@@ -814,7 +814,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
                             //DISPLAY STUDENT COMMENT
                             if ($rowWork['commentStudent'] != '') {
-                                echo '<h4>'.__($guid, 'Student Comment').'</h4>';
+                                echo '<h4>'.__($guid, 'Student Comment', 'Free Learning').'</h4>';
                                 echo '<p style=\'margin-bottom: 0px\'>';
                                 echo nl2br($rowWork['commentStudent']);
                                 echo '</p>';
@@ -824,7 +824,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 if ($rowWork['commentStudent'] != '') {
                                     echo '<br/>';
                                 }
-                                echo '<h4>'.__($guid, 'Teacher Comment').'</h4>';
+                                echo '<h4>'.__($guid, 'Teacher Comment', 'Free Learning').'</h4>';
                                 echo '<p>';
                                 echo $rowWork['commentApproval'];
                                 echo '</p>';

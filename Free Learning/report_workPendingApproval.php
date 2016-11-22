@@ -31,11 +31,11 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workP
 else {
 	//Proceed!
 	print "<div class='trail'>" ;
-	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Work Pending Approval') . "</div>" ;
+	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"]), 'Free Learning') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Work Pending Approval', 'Free Learning') . "</div>" ;
 	print "</div>" ;
 
 	print "<p>" ;
-		print __($guid, 'This report shows all work that is complete, but pending approval, in all of your classes.') ;
+		print __($guid, 'This report shows all work that is complete, but pending approval, in all of your classes.', 'Free Learning') ;
 	print "<p>" ;
 
 	//List students whose status is Current or Complete - Pending
@@ -87,7 +87,7 @@ else {
 		<table cellspacing='0' style="width: 100%">
 			<tr class='head'>
 				<th>
-					<?php print __($guid, 'Enrolment Method') ?><br/>
+					<?php print __($guid, 'Enrolment Method', 'Free Learning') ?><br/>
 				</th>
 				<th>
 					<?php print __($guid, 'Class') ?><br/>
@@ -120,7 +120,7 @@ else {
 						if ($rowClass["course"]!="" AND $rowClass["class"]!="") {
 							print $rowClass["course"] . "." . $rowClass["class"] ;
 						} else {
-							print "<i>" . __($guid, 'NA') . "</i>" ;
+							print "<i>" . __($guid, 'N/A') . "</i>" ;
 						}
 					print "</td>" ;
 					?>

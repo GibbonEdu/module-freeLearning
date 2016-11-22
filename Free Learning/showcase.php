@@ -34,9 +34,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
     echo '</div>';
 } else {
     echo "<div class='trail'>";
-    if ($publicUnits == 'Y') { echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase').'</div>';
+    if ($publicUnits == 'Y') { echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase', 'Free Learning').'</div>';
     } else {
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase', 'Free Learning').'</div>';
     }
     echo '</div>';
 
@@ -92,7 +92,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
             echo $rowWork['name']."<span style='font-size: 75%; text-transform: none'> by ".$students.'</span>';
             echo '</h3>';
             echo "<p style='font-style: italic; margin-top 0; margin-bottom: 5px; font-size: 10.5px'>";
-            echo __($guid, 'Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']);
+            echo __($guid, 'Shared on', 'Free Learning').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']);
             echo '</p>';
             if ($canEdit) {
                 echo "<div class='linkTop'>";
@@ -113,7 +113,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
             echo '</td>';
             echo "<td style='vertical-align: top; border-left: none'>";
             //DISPLAY WORK.
-            echo '<h4 style=\'margin-top: 0px\'>'.__($guid, 'Student Work').'</h4>';
+            echo '<h4 style=\'margin-top: 0px\'>'.__($guid, 'Student Work', 'Free Learning').'</h4>';
             if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
                 $extension = strrchr($rowWork['evidenceLocation'], '.');
                 if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
@@ -127,9 +127,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 } else { //Not an image
                     echo '<p class=\'button\'>';
                     if ($rowWork['evidenceType'] == 'File') { //It's a file
-                        echo "<a class='button'target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+                        echo "<a class='button'target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                     } else { //It's a link
-                        echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work').'</a>';
+                        echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                     }
                     echo '</p>';
                 }
@@ -140,7 +140,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
             }
             //DISPLAY STUDENT COMMENT
             if ($rowWork['commentStudent'] != '') {
-                echo '<h4>'.__($guid, 'Student Comment').'</h4>';
+                echo '<h4>'.__($guid, 'Student Comment', 'Free Learning').'</h4>';
                 echo '<p style=\'margin-bottom: 0px\'>';
                 echo nl2br($rowWork['commentStudent']);
                 echo '</p>';
@@ -150,7 +150,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 if ($rowWork['commentStudent'] != '') {
                     echo '<br/>';
                 }
-                echo '<h4>'.__($guid, 'Teacher Comment').'</h4>';
+                echo '<h4>'.__($guid, 'Teacher Comment', 'Free Learning').'</h4>';
                 echo '<p>';
                 echo $rowWork['commentApproval'];
                 echo '</p>';

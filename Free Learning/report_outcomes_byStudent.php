@@ -30,13 +30,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 } else {
     //Proceed!
     echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Outcomes By Student').'</div>';
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Outcomes By Student', 'Free Learning').'</div>';
     echo '</div>';
 
     $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
 
     echo '<h2>';
-    echo __($guid, 'Choose Student');
+    echo __($guid, 'Choose Student', 'Free Learning');
     echo '</h2>';
 
     $gibbonPersonID = null;
@@ -46,9 +46,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
     ?>
 
 	<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
-		<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 			<tr>
-				<td style='width: 275px'> 
+				<td style='width: 275px'>
 					<b><?php echo __($guid, 'Student') ?> *</b><br/>
 				</td>
 				<td class="right">
@@ -166,8 +166,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
             //Create array of each outcome the student has met in Free Learning
             try {
                 $dataFreeLearning = array('gibbonPersonIDStudent' => $gibbonPersonID);
-                $sqlFreeLearning = "SELECT gibbonOutcomeID, freeLearningUnit.name FROM freeLearningUnit 
-					JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) 
+                $sqlFreeLearning = "SELECT gibbonOutcomeID, freeLearningUnit.name FROM freeLearningUnit
+					JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
 					JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
 					WHERE (status='Complete - Approved' OR status='Exempt') AND gibbonPersonIDStudent=:gibbonPersonIDStudent
 					ORDER BY gibbonOutcomeID";
@@ -193,7 +193,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
             //Get all school and department outcomes for the students' years in school and store in variable
             $output = '';
             $output .= '<h4>';
-            $output .= __($guid, 'Outcome Completion');
+            $output .= __($guid, 'Outcome Completion', 'Free Learning');
             $output .= '</h4>';
             try {
                 $dataOutcomes = array('gibbonPersonID' => $gibbonPersonID);
@@ -251,11 +251,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $output .= '</td>';
                     $output .= '<td>';
                     if (isset($outcomesMet[$rowOutcomes['gibbonOutcomeID']][0]) == false) {
-                        $output .= "<img title='".__($guid, 'Outcome not met')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconCross.png'/> ";
+                        $output .= "<img title='".__($guid, 'Outcome not met', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconCross.png'/> ";
                         $outcomesNotMet[$outcomesNotMetCount] = $rowOutcomes['gibbonOutcomeID'];
                         ++$outcomesNotMetCount;
                     } else {
-                        $output .= "<img title='".__($guid, 'Outcome met in units:').' '.htmlPrep($outcomesMet[$rowOutcomes['gibbonOutcomeID']][1])."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconTick.png'/> x".$outcomesMet[$rowOutcomes['gibbonOutcomeID']][0];
+                        $output .= "<img title='".__($guid, 'Outcome met in units:', 'Free Learning').' '.htmlPrep($outcomesMet[$rowOutcomes['gibbonOutcomeID']][1])."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconTick.png'/> x".$outcomesMet[$rowOutcomes['gibbonOutcomeID']][0];
                     }
                     $output .= '</td>';
                     $output .= '</tr>';
@@ -277,14 +277,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $dataRecommend['gibbonPersonID'] = $gibbonPersonID;
                     $dataRecommend['gibbonPersonID2'] = $gibbonPersonID;
                     $dataRecommend['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
-                    $sqlRecommend = "SELECT DISTINCT freeLearningUnitStudent.status, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 
-						FROM freeLearningUnit 
+                    $sqlRecommend = "SELECT DISTINCT freeLearningUnitStudent.status, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
+						FROM freeLearningUnit
 						JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-						LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) 
-						LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) 
-						JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) 
-						JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) 
-						WHERE $outcomesNotMetWhere AND (status IS NULL OR NOT status='Current') AND active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) 
+						LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
+						LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID)
+						JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
+						JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
+						WHERE $outcomesNotMetWhere AND (status IS NULL OR NOT status='Current') AND active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber)
 						ORDER BY RAND() LIMIT 0, 3";
                     $resultRecommend = $connection2->prepare($sqlRecommend);
                     $resultRecommend->execute($dataRecommend);
@@ -298,10 +298,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $blocks = getBlocksArray($connection2);
 
                     echo '<h4>';
-                    echo __($guid, 'Recommended Units');
+                    echo __($guid, 'Recommended Units', 'Free Learning');
                     echo '</h4>';
                     echo '<p>';
-                    echo __($guid, 'The units below (up to a total of 3) are chosen at random from a list of units that have outcomes this student has not met, but can do based on year group.');
+                    echo __($guid, 'The units below (up to a total of 3) are chosen at random from a list of units that have outcomes this student has not met, but can do based on year group.', 'Free Learning');
                     echo '</p>';
 
                     echo "<table cellspacing='0' style='width: 100%'>";
@@ -310,21 +310,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     echo __($guid, 'Name').'</br>';
                     echo '</th>';
                     echo "<th style='width: 100px!important'>";
-                    echo __($guid, 'Authors').'<br/>';
+                    echo __($guid, 'Authors', 'Free Learning').'<br/>';
                     echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Learning Areas').'</span>';
                     echo '</th>';
                     echo "<th style='max-width: 325px!important'>";
-                    echo __($guid, 'Difficulty').'</br>';
+                    echo __($guid, 'Difficulty', 'Free Learning').'</br>';
                     echo '</th>';
                     echo '<th>';
-                    echo __($guid, 'Length').'</br>';
-                    echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes').'</span>';
+                    echo __($guid, 'Length', 'Free Learning').'</br>';
+                    echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes', 'Free Learning').'</span>';
                     echo '</th>';
                     echo '<th>';
-                    echo __($guid, 'Grouping').'</br>';
+                    echo __($guid, 'Grouping', 'Free Learning').'</br>';
                     echo '</th>';
                     echo '<th>';
-                    echo __($guid, 'Prerequisites').'</br>';
+                    echo __($guid, 'Prerequisites', 'Free Learning').'</br>';
                     echo '</th>';
                     echo "<th style='min-width: 70px'>";
                     echo __($guid, 'Actions');
@@ -385,7 +385,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                             }
                         }
                         if (is_null($timing)) {
-                            echo '<i>'.__($guid, 'NA').'</i>';
+                            echo '<i>'.__($guid, 'N/A').'</i>';
                         } else {
                             echo $timing;
                         }
@@ -407,14 +407,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                                 echo $units[$prerequisite][0].'<br/>';
                             }
                         } else {
-                            echo '<i>'.__($guid, 'None').'<br/></i>';
+                            echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';
                         }
                         if ($prerequisitesActive != false) {
                             $prerquisitesMet = prerquisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
                             if ($prerquisitesMet) {
-                                echo "<span style='font-weight: bold; color: #00cc00'>".__($guid, 'OK!').'</span>';
+                                echo "<span style='font-weight: bold; color: #00cc00'>".__($guid, 'OK!', 'Free Learning').'</span>';
                             } else {
-                                echo "<span style='font-weight: bold; color: #cc0000'>".__($guid, 'Not Met').'</span>';
+                                echo "<span style='font-weight: bold; color: #cc0000'>".__($guid, 'Not Met', 'Free Learning').'</span>';
                             }
                         }
                         echo '</td>';

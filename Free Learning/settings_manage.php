@@ -30,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 } else {
     //Proceed!
     echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Manage Settings').'</div>';
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Manage Settings', 'Free Learning').'</div>';
     echo '</div>';
 
     if (isset($_GET['return'])) {
@@ -42,7 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
             <tr class='break'>
                 <td colspan=2>
-                	<h3><?php echo __($guid, 'General Settings') ?></h3>
+                	<h3><?php echo __($guid, 'General Settings', 'Free Learning') ?></h3>
                 </td>
             </tr>
             <tr>
@@ -91,8 +91,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td>
-					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
@@ -124,8 +124,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td>
-					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
@@ -157,8 +157,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td style='width: 275px'>
-					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td stclass="right">
 					<input name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" maxlength=50 value="<?php echo htmlPrep($row['value']) ?>" type="text" style="width: 300px">
@@ -181,8 +181,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td>
-					<b><?php echo __($guid, $row['nameDisplay']) ?></b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?></b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td class="right">
 					<textarea name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" rows=8 style="width: 300px"><?php echo htmlPrep($row['value']) ?></textarea>
@@ -190,7 +190,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 			</tr>
             <tr class='break'>
                 <td colspan=2>
-                	<h3><?php echo __($guid, 'Enrolment Settings') ?></h3>
+                	<h3><?php echo __($guid, 'Enrolment Settings', 'Free Learning') ?></h3>
                 </td>
             </tr>
             <tr>
@@ -206,8 +206,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td>
-					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
@@ -239,8 +239,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td>
-					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
@@ -272,8 +272,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 				$row = $result->fetch();
 				?>
 				<td>
-					<b><?php echo __($guid, $row['nameDisplay']) ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description']); } ?></i></span>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
 				<td class="right">
 					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">

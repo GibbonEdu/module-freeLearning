@@ -247,7 +247,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $result->execute($data);
                                     } catch (PDOException $e) { }
 
-                                    $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).'), $name);
+                                    $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
                                     $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=2&applyAccessControls=N";
                                     while ($row = $result->fetch()) {
                                         setNotification($connection2, $guid, $row['gibbonPersonID'], $text, 'Free Learning', $actionLink);
@@ -274,8 +274,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
 
                                         //Attempt email send
-                                        $subject = sprintf(__($guid, 'Request For Mentor Feedback via %1$s at %2$s'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
-                                        $body = __($guid, 'To whom it may concern,').'<br/><br/>';
+                                        $subject = sprintf(__($guid, 'Request For Mentor Feedback via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
+                                        $body = __($guid, 'To whom it may concern,', 'Free Learning').'<br/><br/>';
                                         if ($roleCategory == 'Staff') {
                                             $roleCategoryFull = 'member of staff';
                                         }
@@ -284,16 +284,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         }
                                         $roleCategoryFull = __($guid, $roleCategoryFull) ;
 
-                                        $body .= sprintf(__($guid, 'The following %1$s at %2$s has requested your feedback on their %3$sFree Learning%4$s work (%5$s), which they have just submitted, and on which you previously agreed to mentor them.'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>', '<b>'.$name.'</b>');
+                                        $body .= sprintf(__($guid, 'The following %1$s at %2$s has requested your feedback on their %3$sFree Learning%4$s work (%5$s), which they have just submitted, and on which you previously agreed to mentor them.', 'Free Learning'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>', '<b>'.$name.'</b>');
                                         $body .= '<br/>';
                                         $body .= '<ul>';
                                         $body .= '<li>'.$student[0].'</li>';
                                         $body .= '</ul>';
-                                        $body .= sprintf(__($guid, 'Please %1$sclick here%2$s to view and give feedback on the submitted work.'), "<a style='font-weight: bold; text-decoration: underline; color: #390' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey'>", '</a>');
+                                        $body .= sprintf(__($guid, 'Please %1$sclick here%2$s to view and give feedback on the submitted work.', 'Free Learning'), "<a style='font-weight: bold; text-decoration: underline; color: #390' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey'>", '</a>');
                                         $body .= '<br/><br/>';
-                                        $body .= sprintf(__($guid, 'Thank you very much for your time. Should you have any questions about this matter, please reply to this email, or contact %1$s on %2$s.'), $_SESSION[$guid]['organisationAdministratorName'], $_SESSION[$guid]['organisationAdministratorEmail']);
+                                        $body .= sprintf(__($guid, 'Thank you very much for your time. Should you have any questions about this matter, please reply to this email, or contact %1$s on %2$s.', 'Free Learning'), $_SESSION[$guid]['organisationAdministratorName'], $_SESSION[$guid]['organisationAdministratorEmail']);
                                         $body .= '<br/><br/>';
-                                        $body .= sprintf(__($guid, 'Email sent via %1$s at %2$s.'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationName']);
+                                        $body .= sprintf(__($guid, 'Email sent via %1$s at %2$s.', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationName']);
                                         $body .= '</p>';
                                         $bodyPlain = emailBodyConvert($body);
 

@@ -30,11 +30,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 } else {
     //Proceed!
     echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > </div><div class='trailEnd'>".__($guid, 'Current Unit By Class').'</div>';
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Current Unit By Class', 'Free Learning').'</div>';
     echo '</div>';
 
     echo '<h2>';
-    echo __($guid, 'Choose Class');
+    echo __($guid, 'Choose Class', 'Free Learning');
     echo '</h2>';
 
     $gibbonCourseClassID = null;
@@ -78,7 +78,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 			</tr>
 			<tr>
 				<td>
-					<b><?php echo __($guid, 'Sort By') ?></b><br/>
+					<b><?php echo __($guid, 'Sort By', 'Free Learning') ?></b><br/>
 				</td>
 				<td class="right">
 					<select name="sort" style="width: 300px">
@@ -145,17 +145,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             echo __($guid, 'Student');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Group');
+            echo __($guid, 'Group', 'Free Learning');
             echo '</th>';
             echo '<th>';
             echo __($guid, 'Unit');
             echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Status').'</span>';
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Date Started');
+            echo __($guid, 'Date Started', 'Free Learning');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Days Since Started');
+            echo __($guid, 'Days Since Started', 'Free Learning');
             echo '</th>';
             echo '</tr>';
 

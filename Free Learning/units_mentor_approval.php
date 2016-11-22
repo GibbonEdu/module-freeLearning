@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
 echo "<div class='trail'>";
-echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Mentor Feedback').'</div>';
+echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Mentor Feedback', 'Free Learning').'</div>';
 echo '</div>';
 
 $block = false;
@@ -78,12 +78,12 @@ if (!$block) {
             $freeLearningUnitID = $row['freeLearningUnitID'];
 
             echo '<p>';
-                echo __($guid, 'This screen allows you to give feedback on the submitted work. Immediately below you can browse the contents of the unit, which will tell you what has been learned. Following that you can view and feedback on the submitted work.');
+                echo __($guid, 'This screen allows you to give feedback on the submitted work. Immediately below you can browse the contents of the unit, which will tell you what has been learned. Following that you can view and feedback on the submitted work.', 'Free Learning');
             echo '</p>';
 
             //Show unit content
             echo '<h3>';
-                echo __($guid, 'Unit Content');
+                echo __($guid, 'Unit Content', 'Free Learning');
             echo '</h3>';
             try {
                 $dataBlocks = array('freeLearningUnitID' => $row['freeLearningUnitID']);
@@ -106,10 +106,10 @@ if (!$block) {
 
             //Show feedback form
             echo '<h3>';
-                echo __($guid, 'Feedback Form');
+                echo __($guid, 'Feedback Form', 'Free Learning');
             echo '</h3>';
             echo '<p>';
-            echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.');
+            echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.', 'Free Learning');
             echo '</p>';
             ?>
             <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_mentor_approvalProcess.php' ?>">
@@ -137,15 +137,15 @@ if (!$block) {
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Submission') ?> *</b><br/>
+                            <b><?php echo __($guid, 'Submission', 'Free Learning') ?> *</b><br/>
                         </td>
                         <td class="right">
                             <?php
                             if ($row['evidenceLocation'] != '') {
                                 if ($row['evidenceType'] == 'Link') {
-                                    echo "<a target='_blank' href='".$row['evidenceLocation']."'>".__($guid, 'View Student Work').'</a>';
+                                    echo "<a target='_blank' href='".$row['evidenceLocation']."'>".__($guid, 'View Student Work', 'Free Learning').'</a>';
                                 } else {
-                                    echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View Student Work').'</a>';
+                                    echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View Student Work', 'Free Learning').'</a>';
                                 }
                             }
                             ?>
@@ -153,7 +153,7 @@ if (!$block) {
                     </tr>
                     <tr>
                         <td colspan=2>
-                            <b><?php echo __($guid, 'Student Comment') ?> *</b><br/>
+                            <b><?php echo __($guid, 'Student Comment', 'Free Learning') ?> *</b><br/>
                             <p>
                                 <?php
                                     echo $row['commentStudent'];
@@ -164,8 +164,8 @@ if (!$block) {
 
                     <tr>
                         <td colspan=2>
-                            <b><?php echo __($guid, 'Mentor Comment') ?> *</b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'Leave a comment on the student\'s progress.') ?></i></span>
+                            <b><?php echo __($guid, 'Mentor Comment', 'Free Learning') ?> *</b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Leave a comment on the student\'s progress.', 'Free Learning') ?></i></span>
                             <?php echo getEditor($guid,  true, 'commentApproval', $row['commentApproval'], 15, false, true) ?>
                         </td>
                     </tr>

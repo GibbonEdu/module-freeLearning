@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         //Proceed!
         echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_manage.php'>".__($guid, 'Manage Units')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Unit').'</div>';
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_manage.php'>".__($guid, 'Manage Units')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Unit').'</div>';
         echo '</div>';
 
         if (isset($_GET['return'])) {
@@ -80,7 +80,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $class = 'error';
         if (!($addReturn == '')) {
             if ($addReturn == 'success0') {
-                $addReturnMessage = __($guid, 'Your Smart Unit was successfully created: you can now edit it using the form below.');
+                $addReturnMessage = __($guid, 'Your Smart Unit was successfully created: you can now edit it using the form below.', 'Free Learning');
                 $class = 'success';
             }
             echo "<div class='$class'>";
@@ -125,7 +125,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 				<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 					<tr class='break'>
 						<td colspan=2>
-							<h3><?php echo __($guid, 'Unit Basics') ?></h3>
+							<h3><?php echo __($guid, 'Unit Basics', 'Free Learning') ?></h3>
 						</td>
 					</tr>
 					<tr>
@@ -148,8 +148,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 						?>
 						<tr>
 							<td>
-								<b><?php echo __($guid, 'Difficulty') ?> *</b><br/>
-								<span style="font-size: 90%"><i><?php echo __($guid, 'How hard is this unit?') ?></i></span>
+								<b><?php echo __($guid, 'Difficulty', 'Free Learning') ?> *</b><br/>
+								<span style="font-size: 90%"><i><?php echo __($guid, 'How hard is this unit?', 'Free Learning') ?></i></span>
 							</td>
 							<td class="right">
 								<select name="difficulty" id="difficulty" style="width: 302px">
@@ -180,7 +180,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					?>
 					<tr>
 						<td colspan=2>
-							<b><?php echo __($guid, 'Blurb') ?> *</b>
+							<b><?php echo __($guid, 'Blurb', 'Free Learning') ?> *</b>
 							<textarea name='blurb' id='blurb' rows=5 style='width: 300px'><?php echo htmlPrep($row['blurb']) ?></textarea>
 							<script type="text/javascript">
 								var blurb=new LiveValidation('blurb');
@@ -218,23 +218,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</tr>
 					<tr>
 						<td>
-							<b><?php echo __($guid, 'License') ?></b><br/>
-							<span style="font-size: 90%"><i><?php echo __($guid, 'Under what conditions can this work be reused?'); ?></i></span>
+							<b><?php echo __($guid, 'License', 'Free Learning') ?></b><br/>
+							<span style="font-size: 90%"><i><?php echo __($guid, 'Under what conditions can this work be reused?', 'Free Learning'); ?></i></span>
 						</td>
 						<td class="right">
 							<select name="license" id="license" style="width: 302px">
 								<option <?php if ($row['license'] == '') { echo 'selected'; } ?> value=""></option>
-								<option <?php if ($row['license'] == 'Copyright') { echo 'selected'; } ?> value="Copyright"><?php echo __($guid, 'Copyright') ?></option>
-								<option <?php if ($row['license'] == 'Creative Commons BY') { echo 'selected'; } ?> value="Creative Commons BY"><?php echo __($guid, 'Creative Commons BY') ?></option>
-								<option <?php if ($row['license'] == 'Creative Commons BY-SA') { echo 'selected'; } ?> value="Creative Commons BY-SA"><?php echo __($guid, 'Creative Commons BY-SA') ?></option>
-								<option <?php if ($row['license'] == 'Creative Commons BY-SA-NC') { echo 'selected'; } ?> value="Creative Commons BY-SA-NC"><?php echo __($guid, 'Creative Commons BY-SA-NC') ?></option>
-								<option <?php if ($row['license'] == 'Public Domain') { echo 'selected'; } ?> value="Public Domain"><?php echo __($guid, 'Public Domain') ?></option>
+								<option <?php if ($row['license'] == 'Copyright') { echo 'selected'; } ?> value="Copyright"><?php echo __($guid, 'Copyright', 'Free Learning') ?></option>
+								<option <?php if ($row['license'] == 'Creative Commons BY') { echo 'selected'; } ?> value="Creative Commons BY"><?php echo __($guid, 'Creative Commons BY', 'Free Learning') ?></option>
+								<option <?php if ($row['license'] == 'Creative Commons BY-SA') { echo 'selected'; } ?> value="Creative Commons BY-SA"><?php echo __($guid, 'Creative Commons BY-SA', 'Free Learning') ?></option>
+								<option <?php if ($row['license'] == 'Creative Commons BY-SA-NC') { echo 'selected'; } ?> value="Creative Commons BY-SA-NC"><?php echo __($guid, 'Creative Commons BY-SA-NC', 'Free Learning') ?></option>
+								<option <?php if ($row['license'] == 'Public Domain') { echo 'selected'; } ?> value="Public Domain"><?php echo __($guid, 'Public Domain', 'Free Learning') ?></option>
 							</select>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<b><?php echo __($guid, 'Logo') ?></b><br/>
+							<b><?php echo __($guid, 'Logo', 'Free Learning') ?></b><br/>
 							<span style="font-size: 90%"><i>125x125px jpg/png/gif</i><br/></span>
 							<?php if ($row['logo'] != '') { ?>
 							<span style="font-size: 90%"><i><?php echo __($guid, 'Will overwrite existing attachment.') ?></i></span>
@@ -259,8 +259,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Major Edit') ?> * </b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'If checked, you will be added as an author.'); ?></i></span>
+                            <b><?php echo __($guid, 'Major Edit', 'Free Learning') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'If checked, you will be added as an author.', 'Free Learning'); ?></i></span>
                         </td>
                         <td class="right">
                             <input type="checkbox" name="majorEdit" value="Y" /> <?php echo __($guid, 'Yes') ?>
@@ -270,8 +270,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
                     <tr class='break'>
                         <td colspan=2>
-                            <h3><?php echo __($guid, 'Access') ?></h3>
-                            <p><?php echo __($guid, 'Users with permission to manage units can override avaiability preferences.'); ?></p>
+                            <h3><?php echo __($guid, 'Access', 'Free Learning') ?></h3>
+                            <p><?php echo __($guid, 'Users with permission to manage units can override avaiability preferences.', 'Free Learning'); ?></p>
                         </td>
                     </tr>
 					<tr>
@@ -286,8 +286,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Available To Students') ?> * </b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should students be able to browse and enrol?'); ?></i></span>
+                            <b><?php echo __($guid, 'Available To Students', 'Free Learning') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should students be able to browse and enrol?', 'Free Learning'); ?></i></span>
                         </td>
                         <td class="right">
                             <input <?php if ($row['availableStudents'] == 'Y') { echo 'checked'; } ?> type="radio" name="availableStudents" value="Y" /> <?php echo __($guid, 'Yes') ?>
@@ -296,8 +296,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Available To Staff') ?> * </b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should staff be able to browse and enrol?'); ?></i></span>
+                            <b><?php echo __($guid, 'Available To Staff', 'Free Learning') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should staff be able to browse and enrol?', 'Free Learning'); ?></i></span>
                         </td>
                         <td class="right">
                             <input <?php if ($row['availableStaff'] == 'Y') { echo 'checked'; } ?> type="radio" name="availableStaff" value="Y" /> <?php echo __($guid, 'Yes') ?>
@@ -306,8 +306,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Available To Parents') ?> * </b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should parents be able to browse and enrol?'); ?></i></span>
+                            <b><?php echo __($guid, 'Available To Parents', 'Free Learning') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should parents be able to browse and enrol?', 'Free Learning'); ?></i></span>
                         </td>
                         <td class="right">
                             <input <?php if ($row['availableParents'] == 'Y') { echo 'checked'; } ?> type="radio" name="availableParents" value="Y" /> <?php echo __($guid, 'Yes') ?>
@@ -316,8 +316,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     </tr>
                     <tr>
                         <td>
-                            <b><?php echo __($guid, 'Available To Others') ?> * </b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should other users be able to browse and enrol?'); ?></i></span>
+                            <b><?php echo __($guid, 'Available To Others', 'Free Learning') ?> * </b><br/>
+                            <span style="font-size: 90%"><i><?php echo __($guid, 'Should other users be able to browse and enrol?', 'Free Learning'); ?></i></span>
                         </td>
                         <td class="right">
                             <input <?php if ($row['availableOther'] == 'Y') { echo 'checked'; } ?> type="radio" name="availableOther" value="Y" /> <?php echo __($guid, 'Yes') ?>
@@ -330,8 +330,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 						?>
 						<tr>
 							<td>
-								<b><?php echo __($guid, 'Shared Publically') ?> * </b><br/>
-								<span style="font-size: 90%"><i><?php echo __($guid, 'Share this unit via the public listing of units? Useful for building MOOCS.'); ?></i></span>
+								<b><?php echo __($guid, 'Shared Publically', 'Free Learning') ?> * </b><br/>
+								<span style="font-size: 90%"><i><?php echo __($guid, 'Share this unit via the public listing of units? Useful for building MOOCS.', 'Free Learning'); ?></i></span>
 							</td>
 							<td class="right">
 								<input <?php if ($row['sharedPublic'] == 'Y') { echo 'checked'; } ?> type="radio" name="sharedPublic" value="Y" /> <?php echo __($guid, 'Yes') ?>
@@ -344,12 +344,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 					<tr class='break'>
 						<td colspan=2>
-							<h3><?php echo __($guid, 'Constraints') ?></h3>
+							<h3><?php echo __($guid, 'Constraints', 'Free Learning') ?></h3>
 						</td>
 					</tr>
 					<tr>
 						<td style='width: 275px'>
-							<b><?php echo __($guid, 'Prerequisite Units') ?></b><br/>
+							<b><?php echo __($guid, 'Prerequisite Units', 'Free Learning') ?></b><br/>
 							<span style="font-size: 90%"><i><?php echo __($guid, 'Use Control, Command and/or Shift to select multiple.') ?></i></span>
 						</td>
 						<td class="right">
@@ -369,7 +369,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 									}
 									echo "<option $selected value='".$rowSelect['freeLearningUnitID']."'>".$rowSelect['name'].' ('.$rowSelect['difficulty'].')';
 									if ($rowSelect['active'] == 'N') {
-										echo ' - '.__($guid, 'Inactive');
+										echo ' - '.__($guid, 'Inactive', 'Free Learning');
 									}
 									echo '</option>';
 								}
@@ -383,8 +383,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         ?>
 						<tr>
 							<td style='width: 275px'>
-								<b><?php echo __($guid, 'Minimum Year Group') ?></b><br/>
-								<span style="font-size: 90%"><i><?php echo __($guid, 'Lowest age group allowed to view unit.').'<br/>'.__($guid, 'Public sharing disabled if set.') ?></i></span>
+								<b><?php echo __($guid, 'Minimum Year Group', 'Free Learning') ?></b><br/>
+								<span style="font-size: 90%"><i><?php echo __($guid, 'Lowest age group allowed to view unit.', 'Free Learning').'<br/>'.__($guid, 'Public sharing disabled if set.', 'Free Learning') ?></i></span>
 							</td>
 							<td class="right">
 								<select name="gibbonYearGroupIDMinimum" id="gibbonYearGroupIDMinimum" style="width: 302px">
@@ -410,8 +410,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 						</tr>
 						<tr>
 							<td style='width: 275px'>
-								<b><?php echo __($guid, 'Grouping') ?></b><br/>
-								<span style="font-size: 90%"><i><?php echo __($guid, 'How should students work during this unit?') ?></i></span>
+								<b><?php echo __($guid, 'Grouping', 'Free Learning') ?></b><br/>
+								<span style="font-size: 90%"><i><?php echo __($guid, 'How should students work during this unit?', 'Free Learning') ?></i></span>
 							</td>
 							<td class="right">
 								<?php
@@ -419,27 +419,27 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 								if (strpos($row['grouping'], 'Individual') !== false) {
 									$checked = 'checked';
 								}
-								echo __($guid, 'Individual')."<input $checked type='checkbox' name='Individual'><br/>";
+								echo __($guid, 'Individual', 'Free Learning')."<input $checked type='checkbox' name='Individual'><br/>";
 								$checked = '';
 								if (strpos($row['grouping'], 'Pairs') !== false) {
 									$checked = 'checked';
 								}
-								echo __($guid, 'Pairs')."<input $checked type='checkbox' name='Pairs'><br/>";
+								echo __($guid, 'Pairs', 'Free Learning')."<input $checked type='checkbox' name='Pairs'><br/>";
 								$checked = '';
 								if (strpos($row['grouping'], 'Threes') !== false) {
 									$checked = 'checked';
 								}
-								echo __($guid, 'Threes')."<input $checked type='checkbox' name='Threes'><br/>";
+								echo __($guid, 'Threes', 'Free Learning')."<input $checked type='checkbox' name='Threes'><br/>";
 								$checked = '';
 								if (strpos($row['grouping'], 'Fours') !== false) {
 									$checked = 'checked';
 								}
-								echo __($guid, 'Fours')."<input $checked type='checkbox' name='Fours'><br/>";
+								echo __($guid, 'Fours', 'Free Learning')."<input $checked type='checkbox' name='Fours'><br/>";
 								$checked = '';
 								if (strpos($row['grouping'], 'Fives') !== false) {
 									$checked = 'checked';
 								}
-								echo __($guid, 'Fives')."<input $checked type='checkbox' name='Fives'><br/>";
+								echo __($guid, 'Fives', 'Free Learning')."<input $checked type='checkbox' name='Fives'><br/>";
 								?>
 							</td>
 						</tr>
@@ -476,7 +476,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</script>
 					<tr>
 						<td colspan=2>
-							<p><?php echo __($guid, 'Link this unit to outcomes (defined in the Manage Outcomes section of the Planner), and track which outcomes are being met in which units, classes and courses.') ?></p>
+							<p><?php echo __($guid, 'Link this unit to outcomes (defined in the Manage Outcomes section of the Planner), and track which outcomes are being met in which units, classes and courses.', 'Free Learning') ?></p>
 							<div class="outcome" id="outcome" style='width: 100%; padding: 5px 0px 0px 0px; min-height: 66px'>
 								<?php
                                 $i = 1;
@@ -642,7 +642,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</tr>
 					<tr>
 						<td colspan=2>
-							<p><?php echo __($guid, 'The contents of this field are viewable to all users, SO AVOID CONFIDENTIAL OR SENSITIVE DATA!') ?></p>
+							<p><?php echo __($guid, 'The contents of this field are viewable to all users, SO AVOID CONFIDENTIAL OR SENSITIVE DATA!', 'Free Learning') ?></p>
 							<?php echo getEditor($guid,  true, 'outline', $row['outline'], 40, true, false, false) ?>
 						</td>
 					</tr>
@@ -656,7 +656,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					<tr>
 						<td colspan=2>
 							<p>
-								<?php echo __($guid, 'Smart Blocks aid unit planning by giving teachers help in creating and maintaining new units, splitting material into smaller chunks. As well as predefined fields to fill, Smart Blocks provide a visual view of the content blocks that make up a unit. Blocks may be any kind of content, such as discussion, assessments, group work, outcome etc.') ?>
+								<?php echo __($guid, 'Smart Blocks aid unit planning by giving teachers help in creating and maintaining new units, splitting material into smaller chunks. As well as predefined fields to fill, Smart Blocks provide a visual view of the content blocks that make up a unit. Blocks may be any kind of content, such as discussion, assessments, group work, outcome etc.', 'Free Learning') ?>
 							</p>
 
 							<style>
