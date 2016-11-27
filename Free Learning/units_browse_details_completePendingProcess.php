@@ -72,6 +72,12 @@ if (isset($_GET['view'])) {
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
+$gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+if ($canManage) {
+    if (isset($_GET['gibbonPersonID'])) {
+        $gibbonPersonID = $_GET['gibbonPersonID'];
+    }
+}
 
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]['timezone']);
