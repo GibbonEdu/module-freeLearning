@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.6.00
+-------
+Individual achievement colouring in Map view
+Ability for those with manage privileges to view unit list as given user
+
 v4.5.02
 -------
 Updated .PO file

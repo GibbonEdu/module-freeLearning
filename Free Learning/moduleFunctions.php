@@ -80,7 +80,7 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
         $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name";
     } else {
         if ($highestAction == 'Browse Units_all') {
-            $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+            $data['gibbonPersonID'] = $gibbonPersonID;
             if ($showInactive == 'Y') {
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name";
             } else {

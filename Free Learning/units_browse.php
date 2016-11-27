@@ -92,6 +92,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if ($view != 'grid' and $view != 'map') {
             $view = 'list';
         }
+        $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+        if ($canManage) {
+            if (isset($_GET['gibbonPersonID'])) {
+                $gibbonPersonID = $_GET['gibbonPersonID'];
+            }
+        }
 
         //Get data on learning areas, authors and blocks in an efficient manner
         $learningAreaArray = getLearningAreaArray($connection2);
@@ -205,6 +211,84 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 					</select>
 				</td>
 			</tr>
+            <tr>
+                <td style='width: 275px'>
+                    <b><?php echo __($guid, 'View As') ?> *</b><br/>
+                </td>
+                <td class="right">
+                    <?php
+                    if ($schoolType == 'Physical') {
+                        ?>
+                        <select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
+                            <option></option>
+                            <optgroup label='--<?php echo __($guid, 'Students by Roll Group', 'Free Learning') ?>--'>
+                                <?php
+                                try {
+                                    $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                    $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName";
+                                    $resultSelect = $connection2->prepare($sqlSelect);
+                                    $resultSelect->execute($dataSelect);
+                                } catch (PDOException $e) {
+                                }
+                        while ($rowSelect = $resultSelect->fetch()) {
+                            $selected = '';
+                            if ($rowSelect['gibbonPersonID'] == $gibbonPersonID) {
+                                $selected = 'selected';
+                            }
+                            echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".htmlPrep($rowSelect['name']).' - '.formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
+                        }
+                        ?>
+                            </optgroup>
+                            <optgroup label='--<?php echo __($guid, 'All Users by Name', 'Free Learning') ?>--'>
+                                <?php
+                                try {
+                                    $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                    $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE status='Full' AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
+                                    $resultSelect = $connection2->prepare($sqlSelect);
+                                    $resultSelect->execute($dataSelect);
+                                } catch (PDOException $e) {
+                                }
+                        while ($rowSelect = $resultSelect->fetch()) {
+                            $selected = '';
+                            if ($rowSelect['gibbonPersonID'] == $gibbonPersonID AND $rowSelect['name'] == '') {
+                                $selected = 'selected';
+                            }
+                            echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true);
+                            if ($rowSelect['name'] != '')
+                                echo ' ('.htmlPrep($rowSelect['name']).')';
+                            echo '</option>';
+                        }
+                        ?>
+                            </optgroup>
+                        </select>
+                        <?php
+
+                    } else {
+                        ?>
+                        <select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
+                            <option></option>
+                            <?php
+                                try {
+                                    $dataSelect = array();
+                                    $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname, username FROM gibbonPerson LEFT JOIN gibbonRole ON (gibbonRole.gibbonRoleID LIKE concat( '%', gibbonPerson.gibbonRoleIDAll, '%' ) AND category='Student') WHERE status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
+                                    $resultSelect = $connection2->prepare($sqlSelect);
+                                    $resultSelect->execute($dataSelect);
+                                } catch (PDOException $e) {
+                                }
+                        while ($rowSelect = $resultSelect->fetch()) {
+                            $selected = '';
+                            if ($rowSelect['gibbonPersonID'] == $gibbonPersonID) {
+                                $selected = 'selected';
+                            }
+                            echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.$rowSelect['username'].')</option>';
+                        }
+                        ?>
+                        </select>
+                        <?php
+                    }
+                    ?>
+                </td>
+            </tr>
 			<?php
 
 		}
@@ -237,7 +321,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         //Search with filters applied
         try {
-            $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, null, $difficulties);
+            $unitList = getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, null, $difficulties);
             $data = $unitList[0];
             $sql = $unitList[1];
             $result = $connection2->prepare($sql);
@@ -583,11 +667,19 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $title = addSlashes($row['blurb']);
                     }
 
-                    if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'red'}, borderWidth: 10},";
-                    } else {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', borderWidth: 2},";
+                    if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
+                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Evidence Not Approved' or $row['status'] == 'Complete - Pending') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
                     }
+                    else {
+                        if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'blue'}, borderWidth: 10},";
+                        } else {
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', borderWidth: 2},";
+                        }
+                    }
+
                     $nodeArray[$row['freeLearningUnitID']][0] = $countNodes;
                     $nodeArray[$row['freeLearningUnitID']][1] = $row['freeLearningUnitID'];
                     $nodeArray[$row['freeLearningUnitID']][2] = $row['freeLearningUnitIDPrerequisiteList'];
