@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.7.00
+-------
+Graphing of learner activity
+
 v4.6.00
 -------
 Individual achievement colouring in Map view
