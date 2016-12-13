@@ -303,7 +303,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $body .= '</p>';
                                         $bodyPlain = emailBodyConvert($body);
 
-                                        $mail = new PHPMailer();
+                                        $mail=getGibbonMailer($guid);
                                         $mail->IsSMTP();
                                         $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
                                         $mail->AddReplyTo($student[1], $student[0]);

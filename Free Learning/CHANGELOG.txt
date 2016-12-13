@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.7.01
+-------
+Use of Gibbon v13's inbuilt mailer class
+
 v4.7.00
 -------
 Graphing of learner activity

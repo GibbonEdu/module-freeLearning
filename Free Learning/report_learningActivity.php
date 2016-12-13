@@ -35,7 +35,7 @@ else {
 	print "</div>" ;
 
 	echo '<h2>';
-    echo __($guid, 'Choose Class', 'Free Learning');
+    echo __($guid, 'Choose Time Frame', 'Free Learning');
     echo '</h2>';
 
     $timePeriod = null;
