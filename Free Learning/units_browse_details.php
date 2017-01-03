@@ -192,7 +192,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                     }
                     if (is_null($timing)) {
-                        echo '<i>'.__($guid, 'N\A').'</i>';
+                        echo '<i>'.__($guid, 'N/A').'</i>';
                     } else {
                         echo '<i>'.$timing.'</i>';
                     }
@@ -461,7 +461,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                         if ($rowClass['course'] != '' and $rowClass['class'] != '') {
                                                             echo $rowClass['course'].'.'.$rowClass['class'];
                                                         } else {
-                                                            echo '<i>'.__($guid, 'N\A').'</i>';
+                                                            echo '<i>'.__($guid, 'N/A').'</i>';
                                                         }
                                                     }
                                                     else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {

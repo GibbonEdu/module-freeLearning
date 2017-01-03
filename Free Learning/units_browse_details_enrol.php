@@ -333,7 +333,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 }
                                 ?>
                                 $('#grouping').change(function(){
-                                    if ($('select#grouping option:selected').val()=='Individual') {
+                                    if ($('#grouping').val()=='Individual') {
                                         $('#trCollaborator1').css('display','none');
                                         collaborator1.disable() ;
                                         $('#trCollaborator2').css('display','none');
@@ -343,7 +343,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $('#trCollaborator4').css('display','none');
                                         collaborator4.disable() ;
                                     }
-                                    else if ($('select#grouping option:selected').val()=='Pairs') {
+                                    else if ($('#grouping').val()=='Pairs') {
                                         $('#trCollaborator1').css('display','table-row');
                                         collaborator1.enable() ;
                                         $('#trCollaborator2').css('display','none');
@@ -353,7 +353,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $('#trCollaborator4').css('display','none');
                                         collaborator4.disable() ;
                                     }
-                                    else if ($('select#grouping option:selected').val()=='Threes') {
+                                    else if ($('#grouping').val()=='Threes') {
                                         $('#trCollaborator1').css('display','table-row');
                                         collaborator1.enable() ;
                                         $('#trCollaborator2').css('display','table-row');
@@ -363,7 +363,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $('#trCollaborator4').css('display','none');
                                         collaborator4.disable() ;
                                     }
-                                    else if ($('select#grouping option:selected').val()=='Fours') {
+                                    else if ($('#grouping').val()=='Fours') {
                                         $('#trCollaborator1').css('display','table-row');
                                         collaborator1.enable() ;
                                         $('#trCollaborator2').css('display','table-row');
@@ -373,7 +373,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $('#trCollaborator4').css('display','none');
                                         collaborator4.disable() ;
                                     }
-                                    else if ($('select#grouping option:selected').val()=='Fives') {
+                                    else if ($('#grouping').val()=='Fives') {
                                         $('#trCollaborator1').css('display','table-row');
                                         collaborator1.enable() ;
                                         $('#trCollaborator2').css('display','table-row');

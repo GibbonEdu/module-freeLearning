@@ -210,13 +210,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     				?>
 
 									$("#status").click(function(){
-										if ($('#status option:selected').val()=="Evidence Not Approved" ) {
+										if ($('#status').val()=="Evidence Not Approved" ) {
 											$("#exemplarRow").css("display","none");
 											$(".exemplarDrop").css("display","none");
 											file.disable() ;
 										} else {
 											$("#exemplarRow").slideDown("fast", $("#exemplarRow").css("display","table-row"));
-											if ($('#exemplarWork option:selected').val()=="Y" ) {
+											if ($('#exemplarWork').val()=="Y" ) {
 												$(".exemplarDrop").slideDown("fast", $(".exemplarDrop").css("display","table-row"));
 												file.enable() ;
 											}
@@ -224,7 +224,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 									}) ;
 
 									$("#exemplarWork").click(function(){
-										if ($('#exemplarWork option:selected').val()=="N" ) {
+										if ($('#exemplarWork').val()=="N" ) {
 											$(".exemplarDrop").css("display","none");
 											file.disable() ;
 										} else {

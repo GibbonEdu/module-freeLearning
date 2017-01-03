@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.8.00
+-------
+Better estimates of class time invested by students in a unit
+Active links to prerequisites from Browse Units' List view 
+
 v4.7.01
 -------
 Use of Gibbon v13's inbuilt mailer class

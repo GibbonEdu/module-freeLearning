@@ -360,7 +360,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Blurb', 'Free Learning').'</span>';
                 echo '</th>';
                 echo '<th>';
-                echo __($guid, 'Length').'</br>';
+                echo __($guid, 'Length', 'Free Learning').'</br>';
                 echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes').'</span>';
                 echo '</th>';
                 if ($schoolType == 'Physical') {
@@ -463,7 +463,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                     }
                     if (is_null($timing)) {
-                        echo '<i>'.__($guid, 'N\A').'</i>';
+                        echo '<i>'.__($guid, 'N/A').'</i>';
                     } else {
                         echo $timing;
                     }
@@ -498,7 +498,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $prerequisites = explode(',', $prerequisitesActive);
                         $units = getUnitsArray($connection2);
                         foreach ($prerequisites as $prerequisite) {
-                            echo $units[$prerequisite][0].'<br/>';
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=list&freeLearningUnitID=".$prerequisite."'>".$units[$prerequisite][0]."<a/><br/>";
                         }
                     } else {
                         echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';

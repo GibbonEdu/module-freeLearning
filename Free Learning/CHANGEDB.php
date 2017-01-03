@@ -613,3 +613,10 @@ INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`
 $sql[$count][0] = '4.7.01';
 $sql[$count][1] = "
 ";
+
+//v4.8.00
+++$count;
+$sql[$count][0] = '4.8.00';
+$sql[$count][1] = "
+UPDATE gibbonAction SET entrySidebar='N' WHERE name='Current Unit By Class' AND gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning');end
+";

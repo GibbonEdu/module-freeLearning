@@ -119,6 +119,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             $row = $result->fetch();
             echo "<p style='margin-bottom: 0px'><b>".__($guid, 'Class').'</b>: '.$row['course'].'.'.$row['class'].'</p>';
 
+            //Get data on blocks in an efficient manner
+            $blocks = getBlocksArray($connection2);
+
             try {
                 $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
                 if ($sort == 'student') {
@@ -156,6 +159,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             echo '</th>';
             echo '<th>';
             echo __($guid, 'Days Since Started', 'Free Learning');
+            echo '</th>';
+            echo '<th>';
+            echo __($guid, 'Length', 'Free Learning').'</br>';
+            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes').'</span>';
+            echo '</th>';
+            echo '<th>';
+            echo __($guid, 'Time Spent', 'Free Learning').'</br>';
+            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes By Day\'s End', 'Free Learning').'</span>';
             echo '</th>';
             echo '</tr>';
 
@@ -202,7 +213,59 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     echo round((time() - strtotime($row['timestampJoined'])) / (60 * 60 * 24));
                 }
                 echo '</td>';
+                echo '<td>';
+                    if ($row['timestampJoined'] != '') {
+                        $timing = null;
+                        if ($blocks != false) {
+                            foreach ($blocks as $block) {
+                                if ($block[0] == $row['freeLearningUnitID']) {
+                                    if (is_numeric($block[2])) {
+                                        $timing += $block[2];
+                                    }
+                                }
+                            }
+                        }
+                        if (is_null($timing)) {
+                            echo '<i>'.__($guid, 'N/A').'</i>';
+                        } else {
+                            echo $timing;
+                        }
+                    }
+                echo '</td>';
+                echo '<td>';
+                    $spent = 0;
+                    if ($row['timestampJoined'] != '') {
+                        try {
+                            $dataLessons = array('gibbonCourseClassID' => $gibbonCourseClassID, "dateJoined" => substr($row['timestampJoined'], 0, 10), "today" => date('Y-m-d'));
+                            $sqlLessons = "SELECT date, timeStart, timeEnd FROM gibbonPlannerEntry WHERE name LIKE '%Free Learning%' AND gibbonCourseClassID=:gibbonCourseClassID AND date>=:dateJoined AND date<=:today";
+                            $resultLessons = $connection2->prepare($sqlLessons);
+                            $resultLessons->execute($dataLessons);
+                        } catch (PDOException $e) {
+                            echo "<div class='error'>".$e->getMessage().'</div>';
+                        }
+                        if ($resultLessons->rowCount() < 1) {
+                            echo $spent;
+                        }
+                        else {
+                            while ($rowLessons = $resultLessons->fetch()) {
+                                $start_date = new DateTime($rowLessons['date'].' '.$rowLessons['timeStart']);
+                                $since_start = $start_date->diff(new DateTime($rowLessons['date'].' '.$rowLessons['timeEnd']));
+                                $spent += (60*$since_start->h) + $since_start->i;
+                            }
 
+                            if (is_null($timing)) { //No length to compare to, so just spit out answer
+                                echo $spent;
+                            }
+                            else if ($spent<=$timing) { //OK for time, spit out in green
+                                echo "<span style='font-weight: bold; color: #390;'>$spent</span>";
+                            }
+                            else { //Over time, spit out in orange
+                                echo "<span style='font-weight: bold; color: #D65602;'>$spent</span>";
+                            }
+
+                        }
+                    }
+                echo '</td>';
                 echo '</tr>';
             }
             if ($count == 0) {
