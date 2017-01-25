@@ -1,9 +1,13 @@
 CHANGELOG
 =========
+v4.8.01
+-------
+Fixed Showcase blank image issue
+
 v4.8.00
 -------
 Better estimates of class time invested by students in a unit
-Active links to prerequisites from Browse Units' List view 
+Active links to prerequisites from Browse Units' List view
 
 v4.7.01
 -------

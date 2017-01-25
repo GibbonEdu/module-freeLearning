@@ -108,7 +108,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                     echo "<span style='font-size: 85%; font-style: italic'>".$rowWork['exemplarWorkLicense'].'</span>';
                 }
             } else {
-                echo "<img style='height: 150px; width: 150px; opacity: 1.0' class='user' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_240_square.jpg'/><br/>";
+                if ($rowWork['logo'] != '') {
+                    echo "<img style='height: 150px; width: 150px; opacity: 1.0' class='user' src='".$rowWork['logo']."'/><br/>";
+                }
+                else {
+                    echo "<img style='height: 150px; width: 150px; opacity: 1.0' class='user' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_240_square.jpg'/><br/>";
+                }
             }
             echo '</td>';
             echo "<td style='vertical-align: top; border-left: none'>";
