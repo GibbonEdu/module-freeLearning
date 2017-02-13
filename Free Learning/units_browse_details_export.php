@@ -257,7 +257,7 @@ $pdf->SetCreator($_SESSION[$guid]['organisationName']);
 $pdf->SetAuthor($_SESSION[$guid]['organisationName']);
 $pdf->SetTitle($_SESSION[$guid]['organisationName'].' Free Learning');
 
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, $_SESSION[$guid]['organisationName'], 'Free Learning Unit Export');
+$pdf->SetHeaderData('', 0, $_SESSION[$guid]['organisationName'], 'Free Learning Unit Export');
 
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
