@@ -24,6 +24,8 @@ include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
+$canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
+$browseAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php', 'Browse Units_all');
 
 if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false))) {
     //Acess denied
@@ -48,8 +50,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if (isset($_GET['freeLearningUnitID'])) {
             $freeLearningUnitID = $_GET['freeLearningUnitID'];
         }
-        $canManage = false;
-        if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
+        if ($canManage and $highestAction == 'Browse Units_all') {
             $canManage = true;
         }
         $showInactive = 'N';
@@ -146,9 +147,17 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '</div>';
                 } else {
                     //Let's go!
-                    if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php')) {
+                    if ($canManage || $browseAll) {
                         echo "<div class='linkTop'>";
-                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a>";
+                        if ($canManage) {
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a>";
+                        }
+                        if ($canManage & $browseAll) {
+                            echo " | ";
+                        }
+                        if ($browseAll) {
+                            echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__($guid, 'Export')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Export')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/download.png'/></a>";
+                        }
                         echo '</div>';
                     }
 
