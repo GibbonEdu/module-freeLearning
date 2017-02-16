@@ -633,3 +633,15 @@ $sql[$count][0] = '4.9.00';
 $sql[$count][1] = "
 UPDATE gibbonAction SET URLList='units_browse.php, units_browse_details.php, units_browse_details_approval.php, units_browse_details_export.php' WHERE gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning') AND name='Browse Units_all';end
 ";
+
+//v4.9.01
+++$count;
+$sql[$count][0] = '4.9.01';
+$sql[$count][1] = "
+";
+
+//v4.9.02
+++$count;
+$sql[$count][0] = '4.9.02';
+$sql[$count][1] = "
+";

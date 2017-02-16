@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v4.9.02
+-------
+Improved tools for School Mentor approval and management
+
+v4.9.01
+-------
+Added email address to enrolment view when Student Profile not enabled
+
 v4.9.00
 -------
 Unit export to PDF

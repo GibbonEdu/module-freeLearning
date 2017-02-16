@@ -382,10 +382,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         }
                                     }
 
-                                    //Notify internal/external mentors
+                                    //Notify internal mentors by gibbon
+                                    if ($enrolmentMethod == 'schoolMentor') {
+                                        $notificationText = sprintf(__($guid, 'A learner (or group of learners) has requested that you mentor them for the Free Learning unit (%1$s). Click to accept, or see email for details.', 'Free Learning'), $unit);
+                                        setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', "/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey");
+                                    }
+
+                                    //Notify internal/external mentors by email
                                     if (($enrolmentMethod == 'schoolMentor' and $emailInternalMentor!='') or ($enrolmentMethod == 'externalMentor' and $_POST['emailExternalMentor'] != '')) {
                                         //Include mailer
-                                        require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
+                                        if ($enrolmentMethod != 'schoolMentor') {
+                                            require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
+                                        }
 
                                         //Attempt email send
                                         $subject = sprintf(__($guid, 'Request For Mentorship via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
