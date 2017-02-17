@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.03
+-------
+Adjusted actions to allow roles of category Other to access Browse Units_prerequisites
+
 v4.9.02
 -------
 Improved tools for School Mentor approval and management
