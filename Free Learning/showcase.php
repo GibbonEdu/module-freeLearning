@@ -132,7 +132,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 } else { //Not an image
                     echo '<p class=\'button\'>';
                     if ($rowWork['evidenceType'] == 'File') { //It's a file
-                        echo "<a class='button'target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
+                        echo "<a class='button' target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                     } else { //It's a link
                         echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                     }

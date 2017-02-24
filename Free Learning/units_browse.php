@@ -44,7 +44,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo '</div>';
     } else {
         echo "<div class='trail'>";
-        if ($publicUnits == 'Y') {
+        if (isset($_SESSION[$guid]['username']) == false) {
             echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units', 'Free Learning').'</div>';
         } else {
             echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Browse Units', 'Free Learning').'</div>';
@@ -53,7 +53,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
             echo "<div class='linkTop'>";
-            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>".__($guid, 'View Our Free Learning Showcase', 'Free Learning')."</a>";
+                echo "<a class='button' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>".__($guid, 'View Our Free Learning Showcase', 'Free Learning')."</a>";
             echo '</div>';
         }
 
@@ -661,10 +661,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     } else {
                         $image = $_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName'].'/img/anonymous_240_square.jpg';
                     }
+                    $titleTemp = $string = trim(preg_replace('/\s\s+/', ' ', $row['blurb']));
                     if (strlen($row['blurb']) > 90) {
-                        $title = addSlashes(substr($row['blurb'], 0, 90)).'...';
+                        $title = addSlashes(substr($titleTemp, 0, 90)).'...';
                     } else {
-                        $title = addSlashes($row['blurb']);
+                        $title = addSlashes($titleTemp);
                     }
 
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {

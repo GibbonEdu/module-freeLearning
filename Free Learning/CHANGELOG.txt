@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.9.04
+-------
+Fixed description bug that broke map view for certain units
+Fixed missing module name in Browse Units landing page
+
 v4.9.03
 -------
 Adjusted actions to allow roles of category Other to access Browse Units_prerequisites
