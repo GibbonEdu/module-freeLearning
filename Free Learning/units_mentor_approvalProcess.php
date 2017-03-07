@@ -105,7 +105,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                 setLike($connection2, 'Free Learning', $_SESSION[$guid]['gibbonSchoolYearID'], 'freeLearningUnitStudentID', $freeLearningUnitStudentID, $_SESSION[$guid]['gibbonPersonID'], $gibbonPersonIDStudent, 'Unit Approval', '');
-                grantAwards($connection2, $guid, $gibbonPersonIDStudent);
+                grantBadges($connection2, $guid, $gibbonPersonIDStudent);
 
 
                 $URL .= '&return=success0';

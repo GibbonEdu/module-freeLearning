@@ -658,3 +658,10 @@ UPDATE gibbonAction SET categoryPermissionOther='Y' WHERE gibbonModuleID=(SELECT
 $sql[$count][0] = '4.9.04';
 $sql[$count][1] = "
 ";
+
+//v4.9.05
+++$count;
+$sql[$count][0] = '4.9.05';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningBadge` ADD `specificUnitsComplete` TEXT DEFAULT NULL AFTER `difficultyLevelMaxAchieved`;end
+";

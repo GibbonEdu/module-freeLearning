@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.05
+-------
+Added ability to hand out badge on completing a specific unit
+
 v4.9.04
 -------
 Fixed description bug that broke map view for certain units

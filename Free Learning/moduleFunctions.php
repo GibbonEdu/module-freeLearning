@@ -754,7 +754,7 @@ function displayBlockContent($guid, $connection2, $title, $type, $length, $conte
 }
 
 //Does not return errors, just does its best to get the job done
-function grantAwards($connection2, $guid, $gibbonPersonID) {
+function grantBadges($connection2, $guid, $gibbonPersonID) {
     //Sort out difficulty order
     $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
     if ($difficulties != false) {
@@ -910,6 +910,38 @@ function grantAwards($connection2, $guid, $gibbonPersonID) {
                 }
             }
 
+
+            if ($row['specificUnitsComplete'] != '') { //SPECIFIC UNIT COMPLETION
+                $hitsNeeded ++;
+
+                $units = explode(',', $row['specificUnitsComplete']);
+                $sqlCountWhere = ' AND (';
+                $dataCount = array();
+                foreach ($units AS $unit) {
+                    $dataCount['unit'.$unit] = $unit;
+                    $sqlCountWhere .= 'freeLearningUnitID=:unit'.$unit.' OR ';
+                }
+                $sqlCountWhere = substr($sqlCountWhere, 0, -4);
+                $sqlCountWhere .= ')';
+
+                try {
+                    //Count conditions
+                    $dataCount['gibbonPersonID'] = $gibbonPersonID;
+                    $sqlCount = "SELECT freeLearningUnitStudentID
+                        FROM freeLearningUnitStudent
+                        WHERE gibbonPersonIDStudent=:gibbonPersonID
+                            AND status='Complete - Approved'
+                            $sqlCountWhere
+                    ";
+                    $resultCount = $connection2->prepare($sqlCount);
+                    $resultCount->execute($dataCount);
+                } catch (PDOException $e) {}
+
+                if ($resultCount->rowCount() > 0) {
+                    $hitsActually ++;
+                }
+            }
+
             //GRANT AWARD
             if ($hitsNeeded > 0 AND $hitsActually == $hitsNeeded) {
                 try {
@@ -924,7 +956,6 @@ function grantAwards($connection2, $guid, $gibbonPersonID) {
                 setNotification($connection2, $guid, $gibbonPersonID, $notificationText, 'Badges', "/index.php?q=/modules/Badges/badges_view.php&gibbonPersonID=$gibbonPersonID");
             }
         }
-
     }
 }
 ?>

@@ -105,8 +105,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                 if ($_POST['difficultyLevelMaxAchieved'] != '') {
                     $difficultyLevelMaxAchieved = $_POST['difficultyLevelMaxAchieved'];
                 }
+                $specificUnitsCompleteList = null;
+                if (isset($_POST['specificUnitsComplete'])) {
+                    $specificUnitsComplete = $_POST['specificUnitsComplete'];
+                    foreach ($specificUnitsComplete as $specificUnitComplete) {
+                        $specificUnitsCompleteList .= $specificUnitComplete.',';
+                    }
+                    $specificUnitsCompleteList = substr($specificUnitsCompleteList, 0, -1);
+                }
 
-                if ($badgesBadgeID == '' or $active == ''or ($unitsCompleteTotal == '' and $unitsCompleteThisYear == '' and $unitsCompleteDepartmentCount == '' and $unitsCompleteIndividual == '' and $unitsCompleteGroup == '' and $difficultyLevelMaxAchieved == '')) {
+                if ($badgesBadgeID == '' or $active == ''or ($unitsCompleteTotal == '' and $unitsCompleteThisYear == '' and $unitsCompleteDepartmentCount == '' and $unitsCompleteIndividual == '' and $unitsCompleteGroup == '' and $difficultyLevelMaxAchieved == '' and $specificUnitsCompleteList == '')) {
                     //Fail 3
                     $URL = $URL.'&return=error3';
                     header("Location: {$URL}");
@@ -131,8 +139,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                     else {
                         //Write to database
                         try {
-                            $data = array('badgesBadgeID' => $badgesBadgeID, 'active' => $active, 'unitsCompleteTotal' => $unitsCompleteTotal, 'unitsCompleteThisYear' => $unitsCompleteThisYear, 'unitsCompleteDepartmentCount' => $unitsCompleteDepartmentCount, 'unitsCompleteIndividual' => $unitsCompleteIndividual, 'unitsCompleteGroup' => $unitsCompleteGroup, 'difficultyLevelMaxAchieved' => $difficultyLevelMaxAchieved, 'freeLearningBadgeID' => $freeLearningBadgeID);
-                            $sql = 'UPDATE freeLearningBadge SET badgesBadgeID=:badgesBadgeID, active=:active, unitsCompleteTotal=:unitsCompleteTotal, unitsCompleteThisYear=:unitsCompleteThisYear, unitsCompleteDepartmentCount=:unitsCompleteDepartmentCount, unitsCompleteIndividual=:unitsCompleteIndividual, unitsCompleteGroup=:unitsCompleteGroup, difficultyLevelMaxAchieved=:difficultyLevelMaxAchieved WHERE freeLearningBadgeID=:freeLearningBadgeID';
+                            $data = array('badgesBadgeID' => $badgesBadgeID, 'active' => $active, 'unitsCompleteTotal' => $unitsCompleteTotal, 'unitsCompleteThisYear' => $unitsCompleteThisYear, 'unitsCompleteDepartmentCount' => $unitsCompleteDepartmentCount, 'unitsCompleteIndividual' => $unitsCompleteIndividual, 'unitsCompleteGroup' => $unitsCompleteGroup, 'difficultyLevelMaxAchieved' => $difficultyLevelMaxAchieved, 'specificUnitsComplete' => $specificUnitsCompleteList, 'freeLearningBadgeID' => $freeLearningBadgeID);
+                            $sql = 'UPDATE freeLearningBadge SET badgesBadgeID=:badgesBadgeID, active=:active, unitsCompleteTotal=:unitsCompleteTotal, unitsCompleteThisYear=:unitsCompleteThisYear, unitsCompleteDepartmentCount=:unitsCompleteDepartmentCount, unitsCompleteIndividual=:unitsCompleteIndividual, unitsCompleteGroup=:unitsCompleteGroup, difficultyLevelMaxAchieved=:difficultyLevelMaxAchieved, specificUnitsComplete=:specificUnitsComplete WHERE freeLearningBadgeID=:freeLearningBadgeID';
                             $result = $connection2->prepare($sql);
                             $result->execute($data);
                         } catch (PDOException $e) {

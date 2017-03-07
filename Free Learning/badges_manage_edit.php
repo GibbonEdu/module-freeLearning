@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         //Check if school year specified
         $freeLearningBadgeID = $_GET['freeLearningBadgeID'];
-        if ($freeLearningBadgeID == '') { 
+        if ($freeLearningBadgeID == '') {
         	echo "<div class='error'>";
             echo __($guid, 'You have not specified one or more required parameters.');
             echo '</div>';
@@ -85,7 +85,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     				<table class='smallIntBorder' cellspacing='0' style="width: 100%">
                         <tr>
             				<td>
-            					<b><?php echo __($guid, 'Badge', 'Free Learning') ?> *</b><br/>
+            					<b><?php echo __($guid, 'Badge', 'Free Learning') ?></b><br/>
             					<span style="font-size: 90%"><i></i></span>
             				</td>
             				<td class="right">
@@ -122,7 +122,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             			</tr>
             			<tr>
             				<td>
-            					<b><?php echo __($guid, 'Active') ;?> *</b><br/>
+            					<b><?php echo __($guid, 'Active') ;?></b><br/>
             					<span style="font-size: 90%"><i></i></span>
             				</td>
             				<td class="right">
@@ -140,7 +140,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                         </tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Total', 'Free Learning') ?> *</b><br/>
+        						<b><?php echo __($guid, 'Units Completed - Total', 'Free Learning') ?></b><br/>
         						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
@@ -153,7 +153,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - This Year', 'Free Learning') ?> *</b><br/>
+        						<b><?php echo __($guid, 'Units Completed - This Year', 'Free Learning') ?></b><br/>
         						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
@@ -166,7 +166,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Department Spread', 'Free Learning') ?> *</b><br/>
+        						<b><?php echo __($guid, 'Units Completed - Department Spread', 'Free Learning') ?></b><br/>
         						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
@@ -179,7 +179,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Individual', 'Free Learning') ?> *</b><br/>
+        						<b><?php echo __($guid, 'Units Completed - Individual', 'Free Learning') ?></b><br/>
         						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
@@ -192,7 +192,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         				</tr>
                         <tr>
         					<td>
-        						<b><?php echo __($guid, 'Units Completed - Group', 'Free Learning') ?> *</b><br/>
+        						<b><?php echo __($guid, 'Units Completed - Group', 'Free Learning') ?></b><br/>
         						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
         					</td>
         					<td class="right">
@@ -210,7 +210,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         					?>
         					<tr>
         						<td>
-        							<b><?php echo __($guid, 'Difficulty Level Threshold', 'Free Learning') ?> *</b><br/>
+        							<b><?php echo __($guid, 'Difficulty Level Threshold', 'Free Learning') ?></b><br/>
         							<span style="font-size: 90%"><i></i></span>
         						</td>
         						<td class="right">
@@ -227,6 +227,33 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         							</select>
         						</td>
         					</tr>
+                            <tr>
+                                <td style='width: 275px'>
+                                    <b><?php echo __($guid, 'Specific Unit Completion', 'Free Learning') ?></b><br/>
+                                    <span style="font-size: 90%"><i><?php echo __($guid, 'Completing any of the selected units will grant badge.') ?><br/><?php echo __($guid, 'Use Control, Command and/or Shift to select multiple.') ?></i></span>
+                                </td>
+                                <td class="right">
+                                    <select name="specificUnitsComplete[]" id="specificUnitsComplete[]" multiple style="width: 302px; height: 150px">
+                                        <?php
+                                        try {
+                                            $dataSelect = array();
+                                            $sqlSelect = 'SELECT freeLearningUnitID, name FROM freeLearningUnit WHERE active=\'Y\' ORDER BY name';
+                                            $resultSelect = $connection2->prepare($sqlSelect);
+                                            $resultSelect->execute($dataSelect);
+                                        } catch (PDOException $e) {
+                                        }
+                                        while ($rowSelect = $resultSelect->fetch()) {
+                                            $selected = '';
+        									if (is_numeric(strpos($row['specificUnitsComplete'], str_pad($rowSelect['freeLearningUnitID'], 10, '0', STR_PAD_LEFT)))) {
+        										$selected = 'selected';
+        									}
+                                            echo "<option $selected value='".$rowSelect['freeLearningUnitID']."'>".$rowSelect['name'].'</option>';
+                                        }
+                                        ?>
+                                        </optgroup>
+                                    </select>
+                                </td>
+                            </tr>
         					<?php
 
         				}

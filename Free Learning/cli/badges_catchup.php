@@ -56,7 +56,7 @@ if (php_sapi_name() != 'cli') { echo __($guid, 'This script cannot be run from a
 
     if ($result->rowCount() > 0) {
         while ($row = $result->fetch()) {
-            grantAwards($connection2, $guid, $row['gibbonPersonID']);
+            grantBadges($connection2, $guid, $row['gibbonPersonID']);
         }
     }
 
