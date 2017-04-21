@@ -665,3 +665,9 @@ $sql[$count][0] = '4.9.05';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningBadge` ADD `specificUnitsComplete` TEXT DEFAULT NULL AFTER `difficultyLevelMaxAchieved`;end
 ";
+
+//v4.9.06
+++$count;
+$sql[$count][0] = '4.9.06';
+$sql[$count][1] = "
+";

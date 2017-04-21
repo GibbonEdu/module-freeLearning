@@ -444,6 +444,23 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         </th>
                                     </tr>
                                     <?php
+
+                                    //Get list of my classes before we start looping, for efficiency's sake
+                                    $myClasses = array();
+                                    try {
+                                        $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                                        $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND role='Teacher' ORDER BY gibbonCourseClassID";
+                                        $resultClasses = $connection2->prepare($sqlClasses);
+                                        $resultClasses->execute($dataClasses);
+                                    } catch (PDOException $e) {}
+
+                                    if ($resultClasses->rowCount() > 0) {
+                                        while ($rowClasses = $resultClasses->fetch()) {
+                                            array_push($myClasses,$rowClasses['gibbonCourseClassID']);
+                                        }
+                                    }
+
+                                    //Start looping through enrolments
                                     while ($rowClass = $resultClass->fetch()) {
                                         if ($count % 2 == 0) {
                                             $rowNum = 'even';
@@ -503,13 +520,34 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             </td>
                                             <td>
                                                 <?php
+                                                //Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
+                                                $editEnrolment = false;
+                                                if ($manageAll == true) {
+                                                    $editEnrolment = true;
+                                                }
+                                                else {
+                                                    if ($rowClass['enrolmentMethod'] == 'class') { //Is teacher of this class?
+                                                        foreach ($myClasses AS $class) {
+                                                            if ($rowClass['gibbonCourseClassID'] == $class) {
+                                                                $editEnrolment = true;
+                                                            }
+                                                        }
+                                                    }
+                                                    else if ($rowClass['enrolmentMethod'] == 'schoolMentor' && $rowClass['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) { //Is mentor of this student?
+                                                        $editEnrolment = true;
+                                                    }
+                                                }
+
+                                                //Layout the actions
                                                 if ($enrolmentType == 'staffEdit') {
-                                                    if ($rowClass['status'] == 'Complete - Pending' or $rowClass['status'] == 'Complete - Approved' or $rowClass['status'] == 'Evidence Not Approved') {
+                                                    if ($editEnrolment && ($rowClass['status'] == 'Complete - Pending' or $rowClass['status'] == 'Complete - Approved' or $rowClass['status'] == 'Evidence Not Approved')) {
                                                         echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
                                                     }
-                                                    echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/></a> ";
+                                                    if ($editEnrolment) {
+                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/></a> ";
+                                                    }
                                                 }
-                                                if ($rowClass['status'] == 'Current - Pending' && $rowClass['enrolmentMethod'] == 'schoolMentor' && $rowClass['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) {
+                                                if ($editEnrolment && $rowClass['status'] == 'Current - Pending' && $rowClass['enrolmentMethod'] == 'schoolMentor') {
                                                         echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Approve', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconTick.png'/><a/> ";
                                                         echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Reject', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconCross.png'/><a/>";
                                                 }

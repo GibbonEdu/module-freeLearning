@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.06
+-------
+Limited enrolment management action to own classes for those without access to Manage Units_all
+
 v4.9.05
 -------
 Added ability to hand out badge on completing a specific unit
