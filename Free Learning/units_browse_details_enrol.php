@@ -536,7 +536,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 <td class="right">
                                     <input type="file" name="file" id="file"><br/><br/>
                                     <?php
-                                    echo getMaxUpload();
+                                    echo getMaxUpload($guid);
 
                                     //Get list of acceptable file extensions
                                     try {

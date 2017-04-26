@@ -182,30 +182,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $partialFail = true;
                             } else {
                                 //Attempt file upload
-                                $time = time();
-                                if ($_FILES['file']['tmp_name'] != '') {
-                                    //Check for folder in uploads based on today's date
-                                    $path = $_SESSION[$guid]['absolutePath'];
-                                    if (is_dir($path.'/uploads/'.date('Y', $time).'/'.date('m', $time)) == false) {
-                                        mkdir($path.'/uploads/'.date('Y', $time).'/'.date('m', $time), 0777, true);
-                                    }
-                                    $unique = false;
-                                    $count = 0;
-                                    while ($unique == false and $count < 100) {
-                                        $suffix = randomPassword(16);
-                                        $location = 'uploads/'.date('Y', $time).'/'.date('m', $time).'/'.$_SESSION[$guid]['username'].'_'.preg_replace('/[^a-zA-Z0-9]/', '', $row['name'])."_$suffix".strrchr($_FILES['file']['name'], '.');
-                                        if (!(file_exists($path.'/'.$location))) {
-                                            $unique = true;
-                                        }
-                                        ++$count;
-                                    }
+                                $partialFail = false;
 
-                                    if (!(move_uploaded_file($_FILES['file']['tmp_name'], $path.'/'.$location))) {
-                                        //Fail 5
-                                        $URL .= '&addReturn=error3';
-                                        header("Location: {$URL}");
+                                //Move attached image  file, if there is one
+                                if (!empty($_FILES['file']['tmp_name'])) {
+                                    $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
+
+                                    $file = (isset($_FILES['file']))? $_FILES['file'] : null;
+
+                                    // Upload the file, return the /uploads relative path
+                                    $location = $fileUploader->uploadFromPost($file, $_SESSION[$guid]['username']);
+
+                                    if (empty($location)) {
+                                        $partialFail = true;
                                     }
-                                } else {
+                                }
+                                else {
                                     $partialFail = true;
                                 }
                             }
@@ -325,8 +317,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             }
 
                             //Success 0
-                            $URL .= '&return=success0';
-                            header("Location: {$URL}");
+                            if ($partialFail == true) {
+                                $URL .= '&return=warning1';
+                                header("Location: {$URL}");
+                            } else {
+                                $URL .= "&return=success0";
+                                header("Location: {$URL}");
+                            }
                         }
                     }
                 }
