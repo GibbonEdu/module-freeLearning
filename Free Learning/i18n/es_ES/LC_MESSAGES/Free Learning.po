@@ -954,7 +954,7 @@ msgstr ""
 msgid ""
 "The map below shows all units selected by the filters above. Lines between "
 "units represent prerequisites. Units without prerequisites, which make good "
-"starting units, are highlighted by a red border."
+"starting units, are highlighted by a blue border."
 msgstr ""
 
 #: units_browse_details.php:85 units_browse_details.php:87

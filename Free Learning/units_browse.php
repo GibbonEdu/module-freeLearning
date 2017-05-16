@@ -630,7 +630,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '</table>';
             } elseif ($view == 'map') {
                 echo '<p>';
-                echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a red border.', 'Free Learning');
+                echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.', 'Free Learning');
                 echo '</p>'; ?>
 				<script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
 				<link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />

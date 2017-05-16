@@ -179,15 +179,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
                                     <?php
                                         try {
-                                            $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'freeLearningUnitID1' => $freeLearningUnitID, 'freeLearningUnitID2' => $freeLearningUnitID);
-                                            $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                            $dataSelect = array('gibbonPersonID1' => $_SESSION[$guid]['gibbonPersonID'], 'freeLearningUnitID1' => $freeLearningUnitID, 'freeLearningUnitID2' => $freeLearningUnitID, 'freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID']);
+                                            $sqlSelect = "(SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
                                                 FROM gibbonPerson
                                                 LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
                                                 LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
                                                 WHERE gibbonPerson.status='Full'
-                                                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+                                                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
                                                     AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
-                                                GROUP BY gibbonPersonID
+                                                GROUP BY gibbonPersonID)
+                                                UNION
+                                                (SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                                FROM gibbonPerson
+                                                    JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
+                                                    JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
+                                                WHERE gibbonPerson.status='Full'
+                                                    AND freeLearningUnitID=:freeLearningUnitID3
+                                                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID2
+                                                )
                                                 ORDER BY surname, preferredName";
                                             $resultSelect = $connection2->prepare($sqlSelect);
                                             $resultSelect->execute($dataSelect);
