@@ -235,7 +235,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					<tr>
 						<td>
 							<b><?php echo __($guid, 'Logo', 'Free Learning') ?></b><br/>
-							<span style="font-size: 90%"><i>125x125px jpg/png/gif</i><br/></span>
+							<span style="font-size: 90%"><i><?php echo __($guid, "125x125px jpg/png/gif") ?></i><br/></span>
 							<?php if ($row['logo'] != '') { ?>
 							<span style="font-size: 90%"><i><?php echo __($guid, 'Will overwrite existing attachment.') ?></i></span>
 							<?php
@@ -244,8 +244,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 						</td>
 						<td class="right">
 							<?php
+                            $logoText = $row['logo'];
+                            if (strlen($logoText) > 50) {
+                                $logoText = substr($logoText, 0, 50)."...";
+                            }
                             if ($row['logo'] != '') {
-                                echo __($guid, 'Current attachment:')." <a href='".$row['logo']."'>".$row['logo'].'</a><br/><br/>'; } ?>
+                                echo __($guid, 'Current attachment:')." <a target='_blank' href='".$row['logo']."'>".$logoText.'</a><br/><br/>';
+                            }
+                            ?>
 							<input type="file" name="file" id="file"><br/><br/>
 							<?php
                             echo getMaxUpload($guid);

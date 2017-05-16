@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.08
+-------
+Fixed long link issue in edit page
+
 v4.9.07
 -------
 Fixed PHP execution vulnerability
