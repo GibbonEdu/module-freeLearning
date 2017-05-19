@@ -188,7 +188,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                                     AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
                                                     AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
                                                 GROUP BY gibbonPersonID)
-                                                UNION
+                                                UNION DISTINCT
                                                 (SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
                                                 FROM gibbonPerson
                                                     JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
