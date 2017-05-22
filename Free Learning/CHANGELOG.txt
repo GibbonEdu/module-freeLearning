@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.11
+-------
+Made error message in unit details more useful for users who have not met prerequisites
+
 v4.9.10
 -------
 Fixed enrolment issue caused by v4.9.09

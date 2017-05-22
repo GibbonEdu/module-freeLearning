@@ -410,8 +410,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                             echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';
                         }
                         if ($prerequisitesActive != false) {
-                            $prerquisitesMet = prerquisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
-                            if ($prerquisitesMet) {
+                            $prerequisitesMet = prerequisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
+                            if ($prerequisitesMet) {
                                 echo "<span style='font-weight: bold; color: #00cc00'>".__($guid, 'OK!', 'Free Learning').'</span>';
                             } else {
                                 echo "<span style='font-weight: bold; color: #cc0000'>".__($guid, 'Not Met', 'Free Learning').'</span>';

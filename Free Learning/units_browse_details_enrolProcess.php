@@ -138,8 +138,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         $proceed = true;
                     } else {
                         $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
-                        $prerquisitesMet = prerquisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
-                        if ($prerquisitesMet) {
+                        $prerequisitesMet = prerequisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
+                        if ($prerequisitesMet) {
                             $proceed = true;
                         }
                     }

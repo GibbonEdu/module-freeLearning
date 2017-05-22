@@ -134,16 +134,16 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $proceed = true;
                     } else {
                         $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
-                        $prerquisitesMet = prerquisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
-                        if ($prerquisitesMet) {
+                        $prerequisitesMet = prerequisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
+                        if ($prerequisitesMet) {
                             $proceed = true;
                         }
                     }
                 }
 
                 if ($proceed == false) {
-                    echo "<div class='error'>";
-                    echo __($guid, 'The selected record does not exist, or you do not have access to it.');
+                    echo "<div class='warning'>";
+                    echo __($guid, 'You do not have access to this unit, as you have not yet met the prerequisites for it.', 'Free Learning');
                     echo '</div>';
                 } else {
                     //Let's go!

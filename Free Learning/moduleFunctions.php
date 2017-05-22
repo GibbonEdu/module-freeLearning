@@ -310,7 +310,7 @@ function prerequisitesRemoveInactive($connection2, $prerequisites)
     return $return;
 }
 
-function prerquisitesMet($connection2, $gibbonPersonID, $prerequisites)
+function prerequisitesMet($connection2, $gibbonPersonID, $prerequisites)
 {
     $return = false;
 
