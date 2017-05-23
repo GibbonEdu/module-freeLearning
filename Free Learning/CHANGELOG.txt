@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.9.12
+-------
+Added school mentor details to Work Pending Approval report
+Removed email notifications for school mentors, moved entirely to system notifications.
+
 v4.9.11
 -------
 Made error message in unit details more useful for users who have not met prerequisites

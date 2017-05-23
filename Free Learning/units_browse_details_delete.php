@@ -121,6 +121,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
                 if ($manageAll == true) {
                     $proceed = true;
+                }
+                else if ($row['enrolmentMethod'] == 'schoolMentor' && $row['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) {
+                    $proceed = true;
                 } else {
                     $learningAreas = getLearningAreas($connection2, $guid, true);
                     if ($learningAreas != '') {

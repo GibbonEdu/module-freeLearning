@@ -41,7 +41,7 @@ else {
 	//List students whose status is Current or Complete - Pending
 	try {
 		$dataClass=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID2"=>$_SESSION[$guid]["gibbonPersonID"]);
-		$sqlClass="(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonRole.category
+		$sqlClass="(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonRole.category, NULL AS mentorsurname, NULL AS mentorpreferredName
 			FROM freeLearningUnit
 				JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
 				INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
@@ -53,22 +53,23 @@ else {
 				AND gibbonCourseClassPerson.role='Teacher'
 				AND gibbonPerson.status='Full'
 				AND freeLearningUnitStudent.status='Complete - Pending'
-				AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "')
-				AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "')
+				AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='" . date("Y-m-d") . "')
+				AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='" . date("Y-m-d") . "')
 				AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)
 			UNION
-			(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnitStudent.*, null AS course, null AS class, gibbonRole.category
+			(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, null AS course, null AS class, gibbonRole.category, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName
 				FROM freeLearningUnit
 					JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
 					INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
 					JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
+					LEFT JOIN gibbonPerson AS mentor ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID)
 				WHERE freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID2
 					AND gibbonPerson.status='Full'
 					AND freeLearningUnitStudent.status='Complete - Pending'
-					AND (dateStart IS NULL OR dateStart<='" . date("Y-m-d") . "')
-					AND (dateEnd IS NULL OR dateEnd>='" . date("Y-m-d") . "')
+					AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='" . date("Y-m-d") . "')
+					AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='" . date("Y-m-d") . "')
 					AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)
-			ORDER BY course, class, unit, surname, preferredName" ;
+			ORDER BY course, class, unit, studentsurname, studentpreferredName" ;
 		$resultClass=$connection2->prepare($sqlClass);
 		$resultClass->execute($dataClass);
 	}
@@ -90,7 +91,7 @@ else {
 					<?php print __($guid, 'Enrolment Method', 'Free Learning') ?><br/>
 				</th>
 				<th>
-					<?php print __($guid, 'Class') ?><br/>
+					<?php print __($guid, 'Class/Mentor', 'Free Learning') ?><br/>
 				</th>
 				<th>
 					<?php print __($guid, 'Unit') ?><br/>
@@ -117,10 +118,18 @@ else {
 						print ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $rowClass["enrolmentMethod"])).'<br/>';
 					print '</td>';
 					print "<td>" ;
-						if ($rowClass["course"]!="" AND $rowClass["class"]!="") {
-							print $rowClass["course"] . "." . $rowClass["class"] ;
-						} else {
-							print "<i>" . __($guid, 'N/A') . "</i>" ;
+						if ($rowClass['enrolmentMethod'] == 'class') {
+							if ($rowClass['course'] != '' and $rowClass['class'] != '') {
+								echo $rowClass['course'].'.'.$rowClass['class'];
+							} else {
+								echo '<i>'.__($guid, 'N/A').'</i>';
+							}
+						}
+						else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {
+							echo formatName('', $rowClass['mentorpreferredName'], $rowClass['mentorsurname'], 'Student', false);
+						}
+						else if ($rowClass['enrolmentMethod'] == 'externalMentor') {
+							echo $rowClass['nameExternalMentor'];
 						}
 					print "</td>" ;
 					?>
@@ -132,9 +141,9 @@ else {
 					<td>
 						<?php
 						if ($rowClass['category'] == 'Student')
-							print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true) . "</a>";
+							print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["studentpreferredName"], $rowClass["studentsurname"], "Student", true) . "</a>";
 						else
-							print formatName("", $rowClass["preferredName"], $rowClass["surname"], "Student", true);
+							print formatName("", $rowClass["studentpreferredName"], $rowClass["studentsurname"], "Student", true);
 						?><br/>
 					</td>
 					<td>

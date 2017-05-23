@@ -185,7 +185,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $gibbonCourseClassID = $_POST['gibbonCourseClassID'];
                         } elseif ($enrolmentMethod == 'schoolMentor') {
                             $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
-                            $emailInternalMentor = '' ;
                             try {
                                 $dataInternal = array('gibbonPersonID1' => $_SESSION[$guid]['gibbonPersonID'], 'freeLearningUnitID1' => $freeLearningUnitID, 'freeLearningUnitID2' => $freeLearningUnitID, 'freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonPersonIDSchoolMentor1' => $gibbonPersonIDSchoolMentor, 'gibbonPersonIDSchoolMentor2' => $gibbonPersonIDSchoolMentor);
                                 $sqlInternal = "(SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
@@ -213,7 +212,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             } catch (PDOException $e) {}
                             if ($resultInternal->rowCount() == 1) {
                                 $rowInternal = $resultInternal->fetch() ;
-                                $emailInternalMentor = $rowInternal['email'] ;
                             }
                             else {
                                 echo $resultInternal->rowCount(); exit();
@@ -397,16 +395,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                     //Notify internal mentors by gibbon
                                     if ($enrolmentMethod == 'schoolMentor') {
-                                        $notificationText = sprintf(__($guid, 'A learner (or group of learners) has requested that you mentor them for the Free Learning unit (%1$s). Click to accept, or see email for details.', 'Free Learning'), $unit);
-                                        setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', "/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey");
+                                        $notificationText = sprintf(__($guid, 'A learner (or group of learners) has requested that you mentor them for the Free Learning unit %1$s.', 'Free Learning'), $unit);
+                                        $actionLink = "/index.php?q=/modules/Free Learning/units_mentor.php&mode=internal&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey";
+                                        setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', $actionLink);
                                     }
 
-                                    //Notify internal/external mentors by email
-                                    if (($enrolmentMethod == 'schoolMentor' and $emailInternalMentor!='') or ($enrolmentMethod == 'externalMentor' and $_POST['emailExternalMentor'] != '')) {
-                                        //Include mailer
-                                        if ($enrolmentMethod != 'schoolMentor') {
-                                            require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
-                                        }
+                                    //Notify external mentors by email
+                                    if (($enrolmentMethod == 'externalMentor' and $_POST['emailExternalMentor'] != '')) {
+                                        require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
 
                                         //Attempt email send
                                         $subject = sprintf(__($guid, 'Request For Mentorship via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
@@ -440,10 +436,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $mail->IsSMTP();
                                         $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
                                         $mail->AddReplyTo($students[0][1], $students[0][0]);
-                                        if ($enrolmentMethod == 'schoolMentor')
-                                            $mail->AddAddress($emailInternalMentor);
-                                        elseif ($enrolmentMethod == 'externalMentor')
-                                            $mail->AddAddress($emailExternalMentor);
+                                        $mail->AddAddress($emailExternalMentor);
                                         $mail->CharSet = 'UTF-8';
                                         $mail->Encoding = 'base64';
                                         $mail->IsHTML(true);

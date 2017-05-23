@@ -280,7 +280,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 }
                                 else if ($rowEnrol['enrolmentMethod'] == 'externalMentor') {
                                     echo "<i>".$rowEnrol['nameExternalMentor'].'</i><br/>';
-                                    echo "<i><a href='mailto:".$emailExternalMentor['email']."'>".$rowEnrol['emailExternalMentor'].'</a></i><br/>';
+                                    echo "<i><a href='mailto:".$rowEnrol['emailExternalMentor']."'>".$rowEnrol['emailExternalMentor'].'</a></i><br/>';
                                 }
                             }
                         }

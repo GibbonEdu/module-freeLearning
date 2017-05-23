@@ -171,12 +171,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         $URL .= '&return=error3';
                         header("Location: {$URL}");
                     } else {
+                        $partialFail = false;
+
                         if ($status == 'Complete - Approved') { //APPROVED!
                             //Move attached file, if there is one
                             if ($exemplarWork == 'Y') {
                                 $attachment = $row['exemplarWorkThumb'];
                                 $time = time();
-                                $partialFail = false;
 
                                 //Move attached image  file, if there is one
                                 if (!empty($_FILES['file']['tmp_name'])) {

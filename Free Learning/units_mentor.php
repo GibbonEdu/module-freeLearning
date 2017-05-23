@@ -78,9 +78,17 @@ $freeLearningUnitID = null;
 if (isset($_GET['freeLearningUnitID'])) {
     $freeLearningUnitID = $_GET['freeLearningUnitID'];
 }
+$mode = 'external';
+if (isset($_GET['mode']) && $_GET['mode'] == 'internal') {
+    $mode = $_GET['mode'];
+}
+$confirmationKey = null;
+if (isset($_GET['confirmationKey'])) {
+    $confirmationKey = $_GET['confirmationKey'];
+}
 
 if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
-    //Check student & confirmation key
+    //Check unit
     try {
         $data = array('freeLearningUnitID' => $freeLearningUnitID) ;
         $sql = 'SELECT freeLearningUnit.* FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
@@ -99,6 +107,46 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
         echo "<div class='trail'>";
         echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php)'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&sidebar=true&tab=2'>".__($guid, 'Unit Details', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Approval', 'Free Learning').'</div>';
         echo '</div>';
+
+        //Show choice for school mentor
+        if ($mode == "internal" && $confirmationKey != '') {
+            echo '<p>';
+            echo sprintf(__($guid, 'The following users at %1$s have requested your input into their %2$sFree Learning%3$s work, with the hope that you will be able to act as a "critical buddy" or mentor, offering feedback on their progress.', 'Free Learning'), $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>');
+            echo '<br/>';
+            echo '</p>';
+
+            $freeLearningUnitStudentID = null;
+
+            try {
+                $dataConfCheck = array('confirmationKey' => $confirmationKey) ;
+                $sqlConfCheck = 'SELECT freeLearningUnitStudentID, preferredName, surname
+                    FROM freeLearningUnitStudent
+                    JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
+                    WHERE confirmationKey=:confirmationKey
+                    ORDER BY freeLearningUnitStudentID';
+                $resultConfCheck = $connection2->prepare($sqlConfCheck);
+                $resultConfCheck->execute($dataConfCheck);
+            } catch (PDOException $e) {
+                echo "<div class='error'>".$e->getMessage().'</div>';
+            }
+            if ($resultConfCheck->rowCount() < 1) {
+                echo "<div class='error'>";
+                echo __($guid, 'An error occurred.');
+                echo '</div>';
+            }
+            else {
+                echo '<ul>';
+                while ($rowConfCheck = $resultConfCheck->fetch()) {
+                    $freeLearningUnitStudentID = (is_null($freeLearningUnitStudentID) ? $rowConfCheck['freeLearningUnitStudentID'] : $freeLearningUnitStudentID);
+                    echo '<li>'.formatName('', $rowConfCheck['preferredName'], $rowConfCheck['surname'], 'Student', true).'</li>';
+                }
+                echo '</ul>';
+                echo '<p style=\'margin-top: 20px\'>';
+                echo sprintf(__($guid, 'The unit you are being asked to advise on is called %1$s and is described as follows:', 'Free Learning'), '<b>'.$row['name'].'</b>').$row['blurb']."<br/><br/>";
+                echo sprintf(__($guid, 'Please %1$sclick here%2$s if you are able to get involved, or, %3$sclick here%4$s if you not in a position to help.', 'Free Learning'), "<a style='font-weight: bold; text-decoration: underline; color: #390' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>', "<a style='font-weight: bold; text-decoration: underline; color: #CC0000' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>');
+                echo '</p>';
+            }
+        }
     }
 }
 else {
