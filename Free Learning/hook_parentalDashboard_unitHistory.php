@@ -40,7 +40,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= '</div>';
 } else {
     $returnInt .= "<div class='linkTop'>";
-    $returnInt .= sprintf(__($guid, '%1$sView Showcase of Student Work%2$s', 'Free Learning'), "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
+    $returnInt .= sprintf(__($guid, '%1$sView Showcase of Student Work%2$s', 'Free Learning'), "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>')." | ";
+    $returnInt .= sprintf(__($guid, '%1$sBrowse Units%2$s', 'Free Learning'), "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
     $returnInt .= '</div>';
     $returnInt .= "<p style='margin-top: 20px'>";
     $returnInt .= __($guid, 'This table shows recent results and enrolment for Free Learning units studied by your child:', 'Free Learning');

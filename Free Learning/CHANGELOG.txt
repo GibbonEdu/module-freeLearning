@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.9.13
+-------
+Added Browse Units link to dashboard
+Switched dashboard error to warning when no units have been undertaken
+
 v4.9.12
 -------
 Added school mentor details to Work Pending Approval report

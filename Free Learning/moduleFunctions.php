@@ -158,7 +158,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
         }
 
         if ($result->rowCount() < 1) {
-            $output .= "<div class='error'>";
+            $output .= "<div class='warning'>";
             $output .= __($guid, 'There are no records to display.');
             $output .= '</div>';
         } else {
