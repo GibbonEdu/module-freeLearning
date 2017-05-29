@@ -183,9 +183,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     echo "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>";
                     echo '<tr>';
-                    echo "<td style='width: 50%; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Unit Name', 'Free Learning').'</span><br/>';
-                    echo '<i>'.$row['name'].'</i>';
+                    echo "<td style='width: 50%; vertical-align: middle'>";
+                    echo "<span style='font-size: 150%; font-weight: bold'>".$row['name'].'</span><br/>';
                     echo '</td>';
                     echo "<td style='width: 50%; vertical-align: top'>";
                     echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Time', 'Free Learning').'</span><br/>';
