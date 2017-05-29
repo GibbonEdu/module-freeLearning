@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID = null, $difficulties = null)
+function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID = null, $difficulty = null, $name = null, $showInactive = null, $applyAccessControls = null, $publicUnits = null, $freeLearningUnitID = null, $difficulties = null)
 {
     $return = array();
 

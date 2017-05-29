@@ -498,7 +498,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $prerequisites = explode(',', $prerequisitesActive);
                         $units = getUnitsArray($connection2);
                         foreach ($prerequisites as $prerequisite) {
-                            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=list&freeLearningUnitID=".$prerequisite."'>".$units[$prerequisite][0]."<a/><br/>";
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=list&freeLearningUnitID=".$prerequisite."'>".$units[$prerequisite][0]."<a/><br/>";
                         }
                     } else {
                         echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.15
+-------
+URL encoding issue fix 
+
 v4.9.14
 -------
 Bigger unit name in unit details page

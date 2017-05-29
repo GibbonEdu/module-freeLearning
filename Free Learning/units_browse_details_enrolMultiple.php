@@ -92,7 +92,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             echo '</div>';
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, $gibbonDepartmentID, $difficulty, $name, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID);
+                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, null, null, null, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID, null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
