@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v4.9.16
+-------
+Added Complete - Pending units to student Dashboard view
+
 v4.9.15
 -------
-URL encoding issue fix 
+URL encoding issue fix
 
 v4.9.14
 -------
