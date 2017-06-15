@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.9.16';
+$version = '4.9.17';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 

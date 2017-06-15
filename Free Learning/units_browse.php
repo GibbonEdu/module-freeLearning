@@ -656,16 +656,22 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $idList = '';
                 $countNodes = 0;
                 while ($row = $result->fetch()) {
-                    if ($row['logo'] != '') {
-                        $image = $row['logo'];
-                    } else {
-                        $image = $_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName'].'/img/anonymous_240_square.jpg';
+                    if ($result->rowCount() <= 125) {
+                        if ($row['logo'] != '') {
+                            $image = $row['logo'];
+                        } else {
+                            $image = $_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName'].'/img/anonymous_240_square.jpg';
+                        }
+                    }
+                    else {
+                        $image = 'undefined';
                     }
                     $titleTemp = $string = trim(preg_replace('/\s\s+/', ' ', $row['blurb']));
+                    $title = addSlashes($row['name']);
                     if (strlen($row['blurb']) > 90) {
-                        $title = addSlashes(substr($titleTemp, 0, 90)).'...';
+                        $title .= ': '.addSlashes(substr($titleTemp, 0, 90)).'...';
                     } else {
-                        $title = addSlashes($titleTemp);
+                        $title .= ': '.addSlashes($titleTemp);
                     }
 
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
@@ -675,7 +681,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     else {
                         if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
-                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'blue'}, borderWidth: 10},";
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'blue'}, borderWidth: 7},";
                         } else {
                             $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', borderWidth: 2},";
                         }
