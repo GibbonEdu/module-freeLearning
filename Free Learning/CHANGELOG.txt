@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.18
+-------
+Fixed typo
+
 v4.9.17
 -------
 Large maps (over 125 nodes) no longer show images, in order to optimise them

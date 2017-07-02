@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.9.17';
+$version = '4.9.18';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -132,7 +132,7 @@ $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
 
 //Settings
 //gibbonSettings entries
-$gibbonSetting[0] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of dicciulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
+$gibbonSetting[0] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of difficulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
 $gibbonSetting[1] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'publicUnits', 'Public Units', 'Should selected units be made available to members of the public, via the home page?', 'N');";
 $gibbonSetting[2] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitOutlineTemplate', 'Unit Outline Template', 'An HTML template to be used as the default for all new units.', '');";
 $gibbonSetting[3] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mapLink', 'Map Link', 'A URL pointing to a map of the available units.', '');";
@@ -436,7 +436,7 @@ __($guid, 'Complete - Approved');
 __($guid, 'Exempt');
 __($guid, 'Evidence Not Approved');
 __($guid, 'Difficulty Options');
-__($guid, 'The range of dicciulty options available when creating units, from lowest to highest, as a comma-separated list.');
+__($guid, 'The range of difficulty options available when creating units, from lowest to highest, as a comma-separated list.');
 __($guid, 'Low');
 __($guid, 'Medium');
 __($guid, 'High');

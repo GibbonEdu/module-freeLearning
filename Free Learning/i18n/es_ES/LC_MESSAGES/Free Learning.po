@@ -203,7 +203,7 @@ msgstr ""
 
 #: manifest.php:421 manifest.php:421
 msgid ""
-"The range of dicciulty options available when creating units, from lowest to "
+"The range of difficulty options available when creating units, from lowest to "
 "highest, as a comma-separated list."
 msgstr ""
 
