@@ -310,7 +310,8 @@ function prerequisitesRemoveInactive($connection2, $prerequisites)
     return $return;
 }
 
-function prerequisitesMet($connection2, $gibbonPersonID, $prerequisites)
+//When $strict is false, a Complete - Pending unit counts as complete
+function prerequisitesMet($connection2, $gibbonPersonID, $prerequisites, $strict = false)
 {
     $return = false;
 
@@ -318,7 +319,12 @@ function prerequisitesMet($connection2, $gibbonPersonID, $prerequisites)
     $complete = array();
     try {
         $data = array('gibbonPersonID' => $gibbonPersonID);
-        $sql = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND (status='Complete - Approved' OR status='Exempt') ORDER BY freeLearningUnitID";
+        if ($strict) {
+            $sql = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND (status='Complete - Approved' OR status='Exempt') ORDER BY freeLearningUnitID";
+        }
+        else {
+                $sql = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND (status='Complete - Approved' OR status='Complete - Pending' OR status='Exempt') ORDER BY freeLearningUnitID";
+        }
         $result = $connection2->prepare($sql);
         $result->execute($data);
     } catch (PDOException $e) {

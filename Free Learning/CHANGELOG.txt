@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v4.9.19
+-------
+Adjusted unit accessibility so that students can view units immediately following Complete - Pending
+Fixed SQL blank default field issue
+
 v4.9.18
 -------
 Fixed typo

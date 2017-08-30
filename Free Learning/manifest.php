@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '4.9.18';
+$version = '4.9.19';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -105,12 +105,12 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   `gibbonPersonIDApproval` int(10) unsigned zerofill DEFAULT NULL,
   `evidenceType` enum('File','Link') NULL DEFAULT NULL,
   `evidenceLocation` text NULL DEFAULT NULL,
-  `commentStudent` text NOT NULL,
-  `commentApproval` text NOT NULL,
+  `commentStudent` text NULL DEFAULT NULL,
+  `commentApproval` text NULL DEFAULT NULL,
   `exemplarWork` enum('N','Y') NOT NULL DEFAULT 'N',
-  `exemplarWorkThumb` text NOT NULL,
-  `exemplarWorkLicense` varchar(255) NOT NULL,
-  `exemplarWorkEmbed` text NOT NULL,
+  `exemplarWorkThumb` text NULL DEFAULT NULL,
+  `exemplarWorkLicense` varchar(255) NULL DEFAULT NULL,
+  `exemplarWorkEmbed` text NULL DEFAULT NULL,
   PRIMARY KEY (`freeLearningUnitStudentID`),
   INDEX(`gibbonPersonIDStudent`),
   INDEX(`status`)
