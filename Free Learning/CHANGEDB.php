@@ -750,3 +750,9 @@ $sql[$count][0] = '4.9.19';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnitStudent` CHANGE `commentStudent` `commentStudent` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `commentApproval` `commentApproval` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `exemplarWorkThumb` `exemplarWorkThumb` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `exemplarWorkLicense` `exemplarWorkLicense` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL, CHANGE `exemplarWorkEmbed` `exemplarWorkEmbed` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL;end
 ";
+
+//v4.9.20
+++$count;
+$sql[$count][0] = '4.9.20';
+$sql[$count][1] = "
+";
