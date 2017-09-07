@@ -127,6 +127,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     }
                 }
 
+                //Check to see if class is in one teacher teachers
+                if ($row['enrolmentMethod'] == 'class') { //Is teacher of this class?
+                    try {
+                        $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonCourseClassID' => $row['gibbonCourseClassID']);
+                        $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClass.gibbonCourseClassID=:gibbonCourseClassID AND role='Teacher'";
+                        $resultClasses = $connection2->prepare($sqlClasses);
+                        $resultClasses->execute($dataClasses);
+                    } catch (PDOException $e) {}
+                    if ($resultClasses->rowCount() > 0) {
+                        $proceed = true;
+                    }
+                }
+
                 if ($proceed == false) {
                     echo "<div class='error'>";
                     echo __($guid, 'The selected record does not exist, or you do not have access to it.');

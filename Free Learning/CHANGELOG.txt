@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.21
+-------
+Fixed missing Enrolment management tools for teachers
+
 v4.9.20
 -------
 Improved persistence of view filter setting across pages

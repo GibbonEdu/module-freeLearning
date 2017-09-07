@@ -538,7 +538,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                 }
 
                                                 //Layout the actions
-                                                if ($enrolmentType == 'staffEdit') {
+                                                if ($enrolmentType == 'staffEdit' || $editEnrolment) {
                                                     if ($editEnrolment && ($rowClass['status'] == 'Complete - Pending' or $rowClass['status'] == 'Complete - Approved' or $rowClass['status'] == 'Evidence Not Approved')) {
                                                         echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
                                                     }
