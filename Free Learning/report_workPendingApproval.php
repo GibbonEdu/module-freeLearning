@@ -88,6 +88,9 @@ else {
 		<table cellspacing='0' style="width: 100%">
 			<tr class='head'>
 				<th>
+					<?php print __($guid, 'Count') ?><br/>
+				</th>
+				<th>
 					<?php print __($guid, 'Enrolment Method', 'Free Learning') ?><br/>
 				</th>
 				<th>
@@ -114,6 +117,9 @@ else {
 				$count++ ;
 
 				print "<tr class=$rowNum>" ;
+					print '<td>';
+						echo $count;
+					print '</td>';
 					print '<td>';
 						print ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $rowClass["enrolmentMethod"])).'<br/>';
 					print '</td>';
