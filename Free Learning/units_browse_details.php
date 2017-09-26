@@ -815,7 +815,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 						//Spit out exemplar work
 						try {
 							$dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
-							$sqlWork = "SELECT freeLearningUnitStudent.*, surname, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
+							$sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
 							$resultWork = $connection2->prepare($sqlWork);
 							$resultWork->execute($dataWork);
 						} catch (PDOException $e) {
@@ -829,17 +829,17 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         while ($rowWork = $resultWork->fetch()) {
                             $students = '';
                             if ($rowWork['grouping'] == 'Individual') { //Created by a single student
-                            $students = formatName('', $rowWork['preferredName'], $rowWork['surname'], 'Student', false);
+                            $students = $rowWork['preferredName'];
                             } else { //Created by a group of students
                                         try {
                                             $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
-                                            $sqlStudents = "SELECT surname, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY surname, preferredName";
+                                            $sqlStudents = "SELECT preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY preferredName";
                                             $resultStudents = $connection2->prepare($sqlStudents);
                                             $resultStudents->execute($dataStudents);
                                         } catch (PDOException $e) {
                                         }
                                 while ($rowStudents = $resultStudents->fetch()) {
-                                    $students .= formatName('', $rowStudents['preferredName'], $rowStudents['surname'], 'Student', false).', ';
+                                    $students .= $rowStudents['preferredName'].', ';
                                 }
                                 if ($students != '') {
                                     $students = substr($students, 0, -2);
