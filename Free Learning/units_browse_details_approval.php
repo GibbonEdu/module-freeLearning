@@ -258,7 +258,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
 							<tr id="exemplarRow">
 								<td>
-									<b><?php echo __($guid, 'Exmplar Work', 'Free Learning'); ?> *</b><br/>
+									<b><?php echo __($guid, 'Exemplar Work', 'Free Learning'); ?> *</b><br/>
 									<span style="font-size: 90%"><i><?php echo __($guid, 'Work and comments will be made viewable to other users.', 'Free Learning'); ?></i></span>
 								</td>
 								<td class="right">

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v4.9.25
+-------
+Fixed interface typo
+
 v4.9.24
 -------
 Removed student surname from showcase and exemplar work for privacy reasons

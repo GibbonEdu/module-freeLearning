@@ -1115,7 +1115,7 @@ msgid "This value cannot be changed."
 msgstr ""
 
 #: units_browse_details_approval.php:234 units_browse_details_approval.php:234
-msgid "Exmplar Work"
+msgid "Exemplar Work"
 msgstr ""
 
 #: units_browse_details_approval.php:235 units_browse_details_approval.php:235
