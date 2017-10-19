@@ -186,35 +186,55 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         } elseif ($enrolmentMethod == 'schoolMentor') {
                             $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
                             try {
-                                $dataInternal = array('gibbonPersonID1' => $_SESSION[$guid]['gibbonPersonID'], 'freeLearningUnitID1' => $freeLearningUnitID, 'freeLearningUnitID2' => $freeLearningUnitID, 'freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonPersonIDSchoolMentor1' => $gibbonPersonIDSchoolMentor, 'gibbonPersonIDSchoolMentor2' => $gibbonPersonIDSchoolMentor);
-                                $sqlInternal = "(SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                    FROM gibbonPerson
-                                    LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
-                                    LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
-                                    WHERE gibbonPerson.status='Full'
-                                        AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
-                                        AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
-                                        AND gibbonPerson.gibbonPersonID=:gibbonPersonIDSchoolMentor1
-                                    GROUP BY gibbonPersonID)
-                                    UNION DISTINCT
-                                    (SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                $dataInternal = array('freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonPersonIDSchoolMentor1' => $gibbonPersonIDSchoolMentor);
+                                $sqlInternal = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
                                     FROM gibbonPerson
                                         JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
                                         JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
                                     WHERE gibbonPerson.status='Full'
                                         AND freeLearningUnitID=:freeLearningUnitID3
                                         AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID2
-                                        AND gibbonPerson.gibbonPersonID=:gibbonPersonIDSchoolMentor2
-                                    )
-                                    ORDER BY surname, preferredName";
+                                        AND gibbonPerson.gibbonPersonID=:gibbonPersonIDSchoolMentor1
+                                    )";
+                                if ($row['schoolMentorCompletors'] == 'Y') {
+                                    $dataInternal['gibbonPersonID1'] = $_SESSION[$guid]['gibbonPersonID'];
+                                    $dataInternal['freeLearningUnitID1'] = $freeLearningUnitID;
+                                    $dataInternal['freeLearningUnitID2'] = $freeLearningUnitID;
+                                    $dataInternal['gibbonPersonIDSchoolMentor2'] = $gibbonPersonIDSchoolMentor;
+                                    $sqlInternal .= " UNION DISTINCT
+                                        (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                            FROM gibbonPerson
+                                            LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
+                                            LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
+                                            WHERE gibbonPerson.status='Full'
+                                                AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
+                                                AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
+                                                AND gibbonPerson.gibbonPersonID=:gibbonPersonIDSchoolMentor2
+                                            GROUP BY gibbonPersonID)";
+                                }
+                                if ($row['schoolMentorCustom'] != '') {
+                                    $staffs = explode(",", $row['schoolMentorCustom']);
+                                    $staffCount = 0 ;
+                                    foreach ($staffs AS $staff) {
+                                        $dataInternal["staff$staffCount"] = $staff;
+                                        $dataInternal["mentor$staffCount"] = $gibbonPersonIDSchoolMentor;
+                                        $sqlInternal .= " UNION DISTINCT
+                                        (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                            FROM gibbonPerson
+                                            WHERE gibbonPersonID=:staff$staffCount
+                                                AND gibbonPersonID=:mentor$staffCount
+                                                AND status='Full')";
+                                        $staffCount ++;
+                                    }
+                                }
+                                $sqlInternal .= " ORDER BY surname, preferredName";
                                 $resultInternal = $connection2->prepare($sqlInternal);
                                 $resultInternal->execute($dataInternal);
-                            } catch (PDOException $e) {}
+                            } catch (PDOException $e) { echo $e->getMessage();}
                             if ($resultInternal->rowCount() == 1) {
                                 $rowInternal = $resultInternal->fetch() ;
                             }
                             else {
-                                echo $resultInternal->rowCount(); exit();
                                 $checkFail = true;
                             }
                         } elseif ($enrolmentMethod == 'externalMentor') {

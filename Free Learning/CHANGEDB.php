@@ -786,3 +786,10 @@ $sql[$count][1] = "
 $sql[$count][0] = '4.9.25';
 $sql[$count][1] = "
 ";
+
+//v5.0.00
+++$count;
+$sql[$count][0] = '5.0.00';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnit` ADD `schoolMentorCompletors` ENUM('N','Y') NULL DEFAULT NULL AFTER `freeLearningUnitIDPrerequisiteList`, ADD `schoolMentorCustom` TEXT NULL DEFAULT NULL AFTER `schoolMentorCompletors`;end
+";

@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.0.00
+-------
+Certificate printing
+School mentor controls
+
 v4.9.25
 -------
 Fixed interface typo

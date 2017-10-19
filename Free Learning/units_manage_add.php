@@ -48,6 +48,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         if (isset($_GET['name'])) {
             $name = $_GET['name'];
         }
+        $view = '';
+        if (isset($_GET['view'])) {
+            $view = $_GET['view'];
+        }
 
         //Proceed!
         echo "<div class='trail'>";
@@ -263,9 +267,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					</tr>
 					<?php
 				}
-				?>
-
-				<tr class='break'>
+                ?>
+                <tr class='break'>
 					<td colspan=2>
 						<h3><?php echo __($guid, 'Constraints', 'Free Learning') ?></h3>
 					</td>
@@ -341,7 +344,51 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 					<?php
 
                 }
-        		?>
+
+                $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+				if ($enableSchoolMentorEnrolment == 'Y') {
+					?>
+                    <tr class='break'>
+                        <td colspan=2>
+                            <h3><?php echo __($guid, 'Mentorship', 'Free Learning') ?></h3>
+                        </td>
+                    </tr>
+                    <tr>
+						<td>
+							<b><?php echo __($guid, 'Completors', 'Free Learning') ?> * </b><br/>
+							<span style="font-size: 90%"><i><?php echo __($guid, 'Allow students who have completed a unit to become a mentor?', 'Free Learning'); ?></i></span>
+						</td>
+						<td class="right">
+							<input type="radio" name="schoolMentorCompletors" value="Y" /> <?php echo __($guid, 'Yes') ?>
+							<input checked type="radio" name="schoolMentorCompletors" value="N" /> <?php echo __($guid, 'No') ?>
+						</td>
+					</tr>
+                    <tr>
+						<td>
+							<b><?php echo __($guid, 'Specific Users', 'Free Learning') ?> * </b><br/>
+							<span style="font-size: 90%"><i><?php echo __($guid, 'Choose specific users who can act as mentors.', 'Free Learning'); ?></i></span>
+                            <span class="emphasis small"><?php echo __($guid, 'Use Control, Command and/or Shift to select multiple.') ?></span>
+						</td>
+            			<td class="right">
+            				<select name="schoolMentorCustom[]" id="schoolMentorCustom[]" multiple class='standardWidth' style="height: 150px">
+            					<?php
+                                try {
+            						$dataSelect = array();
+            						$sqlSelect = "SELECT gibbonPersonID, surname, preferredName, status FROM gibbonPerson WHERE status='Full' ORDER BY surname, preferredName";
+            						$resultSelect = $connection2->prepare($sqlSelect);
+            						$resultSelect->execute($dataSelect);
+            					} catch (PDOException $e) {
+            					}
+            					while ($rowSelect = $resultSelect->fetch()) {
+            						echo "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true)."</option>";
+            					}
+                                ?>
+            				</select>
+            			</td>
+					</tr>
+                    <?php
+                }
+                ?>
 
 				<tr class='break'>
 					<td colspan=2>
