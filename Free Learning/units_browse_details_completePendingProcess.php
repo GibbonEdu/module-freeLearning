@@ -118,7 +118,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
                         WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
                             AND freeLearningUnitStudentID=:freeLearningUnitStudentID
-                            AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Evidence Not Approved')";
+                            AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Evidence Not Yet Approved')";
                     $result = $connection2->prepare($sql);
                     $result->execute($data);
                 } catch (PDOException $e) {

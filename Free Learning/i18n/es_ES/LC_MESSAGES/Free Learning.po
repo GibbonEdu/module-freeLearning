@@ -194,7 +194,7 @@ msgid "Exempt"
 msgstr ""
 
 #: manifest.php:419 manifest.php:419 units_mentor_approval.php:134
-msgid "Evidence Not Approved"
+msgid "Evidence Not Yet Approved"
 msgstr ""
 
 #: manifest.php:420 manifest.php:420

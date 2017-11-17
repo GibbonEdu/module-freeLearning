@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.1.00
+-------
+Growth mindset language 
+
 v5.0.00
 -------
 Certificate printing

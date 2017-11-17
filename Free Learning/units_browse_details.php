@@ -169,7 +169,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             LEFT JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID)
                             WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
                                 AND gibbonPersonIDStudent=:gibbonPersonID
-                                AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Approved\')';
+                                AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Yet Approved\')';
                         $resultEnrol = $connection2->prepare($sqlEnrol);
                         $resultEnrol->execute($dataEnrol);
                     } catch (PDOException $e) {
@@ -397,10 +397,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='".date('Y-m-d')."')
                                             AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='".date('Y-m-d')."')
                                             AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
-                                        ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
+                                        ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
                                 } else {
                                     $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID']);
-                                    $sqlClass = "SELECT gibbonPersonID, email, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL OR dateEnd>='".date('Y-m-d')."') ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
+                                    $sqlClass = "SELECT gibbonPersonID, email, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL OR dateEnd>='".date('Y-m-d')."') ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
                                 }
                                 $resultClass = $connection2->prepare($sqlClass);
                                 $resultClass->execute($dataClass);
@@ -539,7 +539,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                                                 //Layout the actions
                                                 if ($enrolmentType == 'staffEdit' || $editEnrolment) {
-                                                    if ($editEnrolment && ($rowClass['status'] == 'Complete - Pending' or $rowClass['status'] == 'Complete - Approved' or $rowClass['status'] == 'Evidence Not Approved')) {
+                                                    if ($editEnrolment && ($rowClass['status'] == 'Complete - Pending' or $rowClass['status'] == 'Complete - Approved' or $rowClass['status'] == 'Evidence Not Yet Approved')) {
                                                         echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
                                                     }
                                                     if ($editEnrolment) {

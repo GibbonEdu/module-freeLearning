@@ -400,7 +400,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
                         $rowNum = 'current';
-                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Evidence Not Approved' or $row['status'] == 'Complete - Pending') {
+                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Evidence Not Yet Approved' or $row['status'] == 'Complete - Pending') {
                         $rowNum = 'warning';
                     }
                     ++$count;
@@ -676,7 +676,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
-                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Evidence Not Approved' or $row['status'] == 'Complete - Pending') {
+                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Evidence Not Yet Approved' or $row['status'] == 'Complete - Pending') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
                     }
                     else {

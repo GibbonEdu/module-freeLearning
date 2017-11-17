@@ -131,7 +131,7 @@ if (!$block) {
                         <td class="right">
                             <select style="width: 302px" name="status" id="status">
                                 <option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'><?php echo __($guid, 'Complete - Approved', 'Free Learning'); ?></option>
-                                <option <?php if ($row['status'] == 'Evidence Not Approved') { echo 'selected'; } ?> value='Evidence Not Approved'><?php echo __($guid, 'Evidence Not Approved', 'Free Learning'); ?></option>
+                                <option <?php if ($row['status'] == 'Evidence Not Yet Approved') { echo 'selected'; } ?> value='Evidence Not Yet Approved'><?php echo __($guid, 'Evidence Not Yet Approved', 'Free Learning'); ?></option>
                             </select>
                         </td>
                     </tr>

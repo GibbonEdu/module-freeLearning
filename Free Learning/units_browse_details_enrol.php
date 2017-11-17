@@ -481,7 +481,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             }
             if ($resultEnrol->rowCount() == 1) { //Already enroled, deal with different statuses
                 $rowEnrol = $resultEnrol->fetch();
-                if ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Approved') { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
+                if ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Yet Approved') { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
                     echo '<h4>';
                     echo __($guid, 'Currently Enroled', 'Free Learning');
                     echo '</h4>';
@@ -496,7 +496,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 echo '<p>';
                                 echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.', 'Free Learning'), $row['name']);
                                 echo '</p>';
-                            } elseif ($rowEnrol['status'] == 'Evidence Not Approved') {
+                            } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
                                 echo "<div class='warning'>";
                                 echo __($guid, 'Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:', 'Free Learning').'<br/><br/>';
                                 echo '<b>'.$rowEnrol['commentApproval'].'</b>';
@@ -528,7 +528,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         <span style="font-size: 90%"><i>
                                             <?php
                                             echo __($guid, 'Leave a brief reflective comment on this unit<br/>and what you learned.', 'Free Learning');
-                                            if ($rowEnrol['status'] == 'Evidence Not Approved') {
+                                            if ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
                                                 echo '<br/><br/>'.__($guid, 'Your previous comment is shown here, for you to edit.', 'Free Learning');
                                             }
                                             ?>
@@ -541,7 +541,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                             });
                                         </script>
                                         <textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"><?php
-                                        if ($rowEnrol['status'] == 'Evidence Not Approved') {
+                                        if ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
                                             echo $rowEnrol['commentStudent'];
                                         }
                                         ?></textarea>

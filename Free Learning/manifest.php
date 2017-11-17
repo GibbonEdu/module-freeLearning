@@ -19,13 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //This file describes the module, including database tables
 
-//Basica variables
+//Basic variables
 $name = 'Free Learning';
 $description = "Free Learning is a module which enables a student-focused and student-driven pedagogy that goes by the same name as the module (see <a href='http://rossparker.org/free-learning'>http://rossparker.org/free-learning</a> for more).";
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.0.00';
+$version = '5.1.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -100,7 +100,7 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   `grouping` ENUM('Individual','Pairs','Threes','Fours','Fives') NOT NULL,
   `collaborationKey` VARCHAR(20) NULL DEFAULT NULL,
   `confirmationKey` varchar(20) DEFAULT NULL,
-  `status` enum('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved') NOT NULL DEFAULT 'Current',
+  `status` enum('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Yet Approved') NOT NULL DEFAULT 'Current',
   `timestampJoined` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `timestampCompletePending` timestamp NULL DEFAULT NULL,
   `timestampCompleteApproved` timestamp NULL DEFAULT NULL,
@@ -436,7 +436,7 @@ __($guid, 'Current - Pending');
 __($guid, 'Complete - Pending');
 __($guid, 'Complete - Approved');
 __($guid, 'Exempt');
-__($guid, 'Evidence Not Approved');
+__($guid, 'Evidence Not Yet Approved');
 __($guid, 'Difficulty Options');
 __($guid, 'The range of difficulty options available when creating units, from lowest to highest, as a comma-separated list.');
 __($guid, 'Low');

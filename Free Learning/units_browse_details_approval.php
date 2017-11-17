@@ -206,7 +206,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								<td class="right">
 									<select style="width: 302px" name="status" id="status">
 										<option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'>Complete - Approved</option>
-										<option <?php if ($row['status'] == 'Evidence Not Approved') { echo 'selected'; } ?> value='Evidence Not Approved'>Evidence Not Approved</option>
+										<option <?php if ($row['status'] == 'Evidence Not Yet Approved') { echo 'selected'; } ?> value='Evidence Not Yet Approved'>Evidence Not Yet Approved</option>
 									</select>
 								</td>
 							</tr>
@@ -214,7 +214,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								/* Subbmission type control */
 								$(document).ready(function(){
 									<?php
-                                    if ($row['status'] == 'Evidence Not Approved') {
+                                    if ($row['status'] == 'Evidence Not Yet Approved') {
                                         ?>
 										$("#exemplarRow").css("display","none");
 										$(".exemplarDrop").css("display","none");
@@ -231,7 +231,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     				?>
 
 									$("#status").click(function(){
-										if ($('#status').val()=="Evidence Not Approved" ) {
+										if ($('#status').val()=="Evidence Not Yet Approved" ) {
 											$("#exemplarRow").css("display","none");
 											$(".exemplarDrop").css("display","none");
 											file.disable() ;

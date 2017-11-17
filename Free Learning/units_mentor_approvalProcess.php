@@ -110,7 +110,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
 
                 $URL .= '&return=success0';
                 header("Location: {$URL}");
-            } elseif ($status == 'Evidence Not Approved') { //NOT APPROVED
+            } elseif ($status == 'Evidence Not Yet Approved') { //NOT YET APPROVED
                 //Write to database
                 try {
                     $data = array('status' => $status, 'commentApproval' => $commentApproval, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCompleteApproved' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
