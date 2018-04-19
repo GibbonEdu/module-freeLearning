@@ -21,12 +21,6 @@ require getcwd().'/../../../config.php';
 require getcwd().'/../../../functions.php';
 require getcwd().'/../moduleFunctions.php';
 
-//New PDO DB connection
-$pdo = new Gibbon\sqlConnection();
-$connection2 = $pdo->getConnection();
-
-@session_start();
-
 getSystemSettings($guid, $connection2);
 
 setCurrentSchoolYear($guid, $connection2);
@@ -41,8 +35,6 @@ if (isset($_SESSION[$guid]['i18n']['code'])) {
     }
 }
 
-//Set timezone from session variable
-date_default_timezone_set($_SESSION[$guid]['timezone']);
 
 //Check for CLI, so this cannot be run through browser
 if (php_sapi_name() != 'cli') { echo __($guid, 'This script cannot be run from a browser, only via CLI.');
