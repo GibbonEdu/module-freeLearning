@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.1.00';
+$version = '5.2.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -53,7 +53,7 @@ $moduleTables[0] = "CREATE TABLE `freeLearningUnit` (
   `gibbonPersonIDCreator` int(10) unsigned zerofill NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`freeLearningUnitID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[1] = 'CREATE TABLE `freeLearningUnitBlock` (
 `freeLearningUnitBlockID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
@@ -65,7 +65,7 @@ $moduleTables[1] = 'CREATE TABLE `freeLearningUnitBlock` (
   `teachersNotes` text NOT NULL,
   `sequenceNumber` int(4) NOT NULL,
   PRIMARY KEY (`freeLearningUnitBlockID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
 $moduleTables[2] = 'CREATE TABLE `freeLearningUnitOutcome` (
 `freeLearningUnitOutcomeID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
@@ -74,7 +74,7 @@ $moduleTables[2] = 'CREATE TABLE `freeLearningUnitOutcome` (
   `sequenceNumber` int(4) NOT NULL,
   `content` text NOT NULL,
   PRIMARY KEY (`freeLearningUnitOutcomeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
 $moduleTables[3] = 'CREATE TABLE `freeLearningUnitAuthor` (
 `freeLearningUnitAuthorID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
@@ -85,7 +85,7 @@ $moduleTables[3] = 'CREATE TABLE `freeLearningUnitAuthor` (
   `website` varchar(255) NOT NULL,
   PRIMARY KEY (`freeLearningUnitAuthorID`),
   INDEX(`gibbonPersonID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
 $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
 `freeLearningUnitStudentID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
@@ -116,7 +116,7 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   PRIMARY KEY (`freeLearningUnitStudentID`),
   INDEX(`gibbonPersonIDStudent`),
   INDEX(`status`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
   `freeLearningBadgeID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
@@ -130,7 +130,7 @@ $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
   `difficultyLevelMaxAchieved` varchar(255) DEFAULT NULL,
   `specificUnitsComplete` text DEFAULT NULL,
   PRIMARY KEY (`freeLearningBadgeID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 //Settings
 //gibbonSettings entries

@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v5.2.00
+-------
+Updated default database storage engine to InnoDB
+
 v5.1.00
 -------
-Growth mindset language 
+Growth mindset language
 
 v5.0.00
 -------

@@ -801,5 +801,9 @@ $sql[$count][1] = "
 ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Approved','Evidence Not Yet Approved') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Current';end
 UPDATE freeLearningUnitStudent SET status='Evidence Not Yet Approved' WHERE status='Evidence Not Approved';end
 ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','Current - Pending','Complete - Pending','Complete - Approved','Exempt','Evidence Not Yet Approved') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Current';end
-
 ";
+
+//v5.2.00
+++$count;
+$sql[$count][0] = '5.2.00';
+$sql[$count][1] = "";
