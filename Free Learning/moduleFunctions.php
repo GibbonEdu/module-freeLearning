@@ -943,7 +943,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                     $resultCount->execute($dataCount);
                 } catch (PDOException $e) {}
 
-                if ($resultCount->rowCount() > 0) {
+                if ($resultCount->rowCount() == count($units)) {
                     $hitsActually ++;
                 }
             }

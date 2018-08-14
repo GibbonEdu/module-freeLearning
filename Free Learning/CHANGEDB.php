@@ -807,3 +807,8 @@ ALTER TABLE `freeLearningUnitStudent` CHANGE `status` `status` ENUM('Current','C
 ++$count;
 $sql[$count][0] = '5.2.00';
 $sql[$count][1] = "";
+
+//v5.2.01
+++$count;
+$sql[$count][0] = '5.2.01';
+$sql[$count][1] = "";

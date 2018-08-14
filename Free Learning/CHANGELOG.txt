@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.2.01
+-------
+Fixed "Everyone's A Winner" bug in badge granting mechanism
+
 v5.2.00
 -------
 Updated default database storage engine to InnoDB
