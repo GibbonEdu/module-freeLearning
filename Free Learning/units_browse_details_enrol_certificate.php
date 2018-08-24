@@ -36,7 +36,6 @@ try {
 }
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
-$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     //Acess denied

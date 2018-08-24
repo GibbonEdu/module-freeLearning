@@ -812,3 +812,14 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.2.01';
 $sql[$count][1] = "";
+
+//v5.3.00
+++$count;
+$sql[$count][0] = '5.3.00';
+$sql[$count][1] = "
+DELETE FROM gibbonSetting WHERE scope='Free Learning' AND name='schoolType';end
+";
+
+
+
+

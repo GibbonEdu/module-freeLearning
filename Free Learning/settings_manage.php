@@ -45,39 +45,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
                 	<h3><?php echo __($guid, 'General Settings', 'Free Learning') ?></h3>
                 </td>
             </tr>
-            <tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='schoolType'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
-						<?php
-                        $selected = '';
-						if ($row['value'] == 'Physical') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Physical'>Physical</option>";
-						$selected = '';
-						if ($row['value'] == 'Online') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Online'>Online</option>";
-						?>
-					</select>
-				</td>
-			</tr>
 			<tr>
 				<?php
                 try {

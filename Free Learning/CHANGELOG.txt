@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.3.00
+-------
+Removed defunct options (e.g. School Type, Apply Access Controls)
+Improved breadcrumb trail in Browse Units
+
 v5.2.01
 -------
 Fixed "Everyone's A Winner" bug in badge granting mechanism

@@ -27,7 +27,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 } else {
     //Check ability to enrol
     $proceed = false;
-    if ($highestAction == 'Browse Units_all' or $schoolType == 'Online') {
+    if ($highestAction == 'Browse Units_all') {
         $proceed = true;
     } elseif ($highestAction == 'Browse Units_prerequisites') {
         if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
@@ -66,401 +66,399 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 echo '</h3>';
 
                 ?>
-                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolProcess.php?address='.$_GET['q'].'&applyAccessControls='.$applyAccessControls ?>">
+                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolProcess.php?address='.$_GET['q'] ?>">
                     <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                         <?php
-                        if ($schoolType == 'Physical') {
-                            $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
-                            if ($roleCategory != 'Student') {
-                                $enableClassEnrolment = 'N';
-                            }
-                            $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
-                            $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+                        $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
+                        if ($roleCategory != 'Student') {
+                            $enableClassEnrolment = 'N';
+                        }
+                        $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+                        $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
 
-                            $checked1 = '';
-                            $checked2 = '';
-                            $checked3 = '';
-                            if ($enableClassEnrolment == 'Y')
-                                $checked1 = 'checked';
-                            else if ($enableSchoolMentorEnrolment == 'Y')
-                                $checked2 = 'checked';
-                            else if ($enableExternalMentorEnrolment == 'Y')
-                                $checked3 = 'checked';
+                        $checked1 = '';
+                        $checked2 = '';
+                        $checked3 = '';
+                        if ($enableClassEnrolment == 'Y')
+                            $checked1 = 'checked';
+                        else if ($enableSchoolMentorEnrolment == 'Y')
+                            $checked2 = 'checked';
+                        else if ($enableExternalMentorEnrolment == 'Y')
+                            $checked3 = 'checked';
 
-                            ?>
-                            <script type="text/javascript">
-                                /* Subbmission type control */
-                                $(document).ready(function(){
+                        ?>
+                        <script type="text/javascript">
+                            /* Subbmission type control */
+                            $(document).ready(function(){
+                                <?php
+
+                                if ($enableClassEnrolment == 'Y') {
+                                    print '$(".schoolMentor").css("display","none");';
+                                    print 'gibbonPersonIDSchoolMentor.disable();' ;
+                                    print '$(".externalMentor").css("display","none");';
+                                    print 'emailExternalMentor.disable();';
+                                    print 'nameExternalMentor.disable();';
+                                }
+                                else if ($enableSchoolMentorEnrolment == 'Y') {
+                                    print '$(".class").css("display","none");';
+                                    print 'gibbonCourseClassID.disable();';
+                                    print '$(".externalMentor").css("display","none");';
+                                    print 'emailExternalMentor.disable();';
+                                    print 'nameExternalMentor.disable();';
+                                }
+                                else if ($enableExternalMentorEnrolment == 'Y') {
+                                    print '$(".schoolMentor").css("display","none");';
+                                    print 'gibbonPersonIDSchoolMentor.disable();' ;
+                                    print '$(".class").css("display","none");';
+                                    print 'gibbonCourseClassID.disable();';
+                                }
+                                ?>
+                                $(".enrolmentMethod").click(function(){
+                                    if ($('input[name=enrolmentMethod]:checked').val()=="class" ) {
+                                        $(".class").slideDown("fast", $(".class").css("display","table-row"));
+                                        $(".schoolMentor").css("display","none");
+                                        $(".externalMentor").css("display","none");
+                                        gibbonCourseClassID.enable();
+                                        gibbonPersonIDSchoolMentor.disable();
+                                        emailExternalMentor.disable();
+                                        nameExternalMentor.disable();
+                                    } else if ($('input[name=enrolmentMethod]:checked').val()=="schoolMentor" ) {
+                                        $(".class").css("display","none");
+                                        $(".schoolMentor").slideDown("fast", $(".schoolMentor").css("display","table-row"));
+                                        $(".externalMentor").css("display","none");
+                                        gibbonCourseClassID.disable();
+                                        gibbonPersonIDSchoolMentor.enable();
+                                        emailExternalMentor.disable();
+                                        nameExternalMentor.disable();
+                                    } else {
+                                        $(".class").css("display","none");
+                                        $(".schoolMentor").css("display","none");
+                                        $(".externalMentor").slideDown("fast", $(".externalMentor").css("display","table-row"));
+                                        gibbonCourseClassID.disable();
+                                        gibbonPersonIDSchoolMentor.disable();
+                                        emailExternalMentor.enable();
+                                        nameExternalMentor.enable();
+                                    }
+                                    });
+                            });
+                        </script>
+                        <tr>
+                            <td>
+                                <b><?php echo __($guid, 'Enrolment Method', 'Free Learning') ?> * </b><br/>
+                                <span style="font-size: 90%"><i></i></span>
+                            </td>
+                            <td class="right">
+                                <?php
+                                if ($enableClassEnrolment == 'Y') {
+                                    echo __($guid, 'Timetable Class', 'Free Learning').' <input '.$checked1.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="class" /><br/>';
+                                }
+                                if ($enableSchoolMentorEnrolment == 'Y') {
+                                    echo __($guid, 'School Mentor', 'Free Learning').' <input '.$checked2.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="schoolMentor" /><br/>';
+                                }
+                                if ($enableExternalMentorEnrolment == 'Y') {
+                                    echo __($guid, 'External Mentor', 'Free Learning').' <input '.$checked3.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="externalMentor" /><br/>';
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                        <tr class='class'>
+                            <td>
+                                <b><?php echo __($guid, 'Class') ?> *</b><br/>
+                                <span style="font-size: 90%"><i><?php echo __($guid, 'Which class are you enroling for?', 'Free Learning') ?></i></span>
+                            </td>
+                            <td class="right">
+                                <?php
+                                try {
+                                    $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                                    $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse, gibbonCourseClass, gibbonCourseClassPerson WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID AND gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND NOT role LIKE '% - Left%' ORDER BY course, class";
+                                    $resultClasses = $connection2->prepare($sqlClasses);
+                                    $resultClasses->execute($dataClasses);
+                                } catch (PDOException $e) {
+                                }
+                                ?>
+                                <select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
+                                    <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
                                     <?php
-
-                                    if ($enableClassEnrolment == 'Y') {
-                                        print '$(".schoolMentor").css("display","none");';
-                                        print 'gibbonPersonIDSchoolMentor.disable();' ;
-                                        print '$(".externalMentor").css("display","none");';
-                                        print 'emailExternalMentor.disable();';
-                                        print 'nameExternalMentor.disable();';
-                                    }
-                                    else if ($enableSchoolMentorEnrolment == 'Y') {
-                                        print '$(".class").css("display","none");';
-                                        print 'gibbonCourseClassID.disable();';
-                                        print '$(".externalMentor").css("display","none");';
-                                        print 'emailExternalMentor.disable();';
-                                        print 'nameExternalMentor.disable();';
-                                    }
-                                    else if ($enableExternalMentorEnrolment == 'Y') {
-                                        print '$(".schoolMentor").css("display","none");';
-                                        print 'gibbonPersonIDSchoolMentor.disable();' ;
-                                        print '$(".class").css("display","none");';
-                                        print 'gibbonCourseClassID.disable();';
+                                    while ($rowClasses = $resultClasses->fetch()) {
+                                        echo "<option value='".$rowClasses['gibbonCourseClassID']."'>".$rowClasses['course'].'.'.$rowClasses['class'].'</option>';
                                     }
                                     ?>
-                                    $(".enrolmentMethod").click(function(){
-                                        if ($('input[name=enrolmentMethod]:checked').val()=="class" ) {
-                                            $(".class").slideDown("fast", $(".class").css("display","table-row"));
-                                            $(".schoolMentor").css("display","none");
-                                            $(".externalMentor").css("display","none");
-                                            gibbonCourseClassID.enable();
-                                            gibbonPersonIDSchoolMentor.disable();
-                                            emailExternalMentor.disable();
-                                            nameExternalMentor.disable();
-                                        } else if ($('input[name=enrolmentMethod]:checked').val()=="schoolMentor" ) {
-                                            $(".class").css("display","none");
-                                            $(".schoolMentor").slideDown("fast", $(".schoolMentor").css("display","table-row"));
-                                            $(".externalMentor").css("display","none");
-                                            gibbonCourseClassID.disable();
-                                            gibbonPersonIDSchoolMentor.enable();
-                                            emailExternalMentor.disable();
-                                            nameExternalMentor.disable();
-                                        } else {
-                                            $(".class").css("display","none");
-                                            $(".schoolMentor").css("display","none");
-                                            $(".externalMentor").slideDown("fast", $(".externalMentor").css("display","table-row"));
-                                            gibbonCourseClassID.disable();
-                                            gibbonPersonIDSchoolMentor.disable();
-                                            emailExternalMentor.enable();
-                                            nameExternalMentor.enable();
+                                </select>
+                                <script type="text/javascript">
+                                    var gibbonCourseClassID=new LiveValidation('gibbonCourseClassID');
+                                    gibbonCourseClassID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
+                                    </script>
+                            </td>
+                        </tr>
+                        <tr class='schoolMentor'>
+                            <td>
+                                <b><?php echo __($guid, 'School Mentor', 'Free Learning') ?> *</b><br/>
+                                <span style="font-size: 90%"><i></i></span>
+                            </td>
+                            <td class="right">
+                                <select name="gibbonPersonIDSchoolMentor" id="gibbonPersonIDSchoolMentor" style="width: 302px">
+                                    <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
+                                    <?php
+                                        try {
+                                            $dataSelect = array('freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID']);
+                                            $sqlSelect = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                                FROM gibbonPerson
+                                                    JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
+                                                    JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
+                                                WHERE gibbonPerson.status='Full'
+                                                    AND freeLearningUnitID=:freeLearningUnitID3
+                                                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID2
+                                                )";
+                                            if ($row['schoolMentorCompletors'] == 'Y') {
+                                                $dataSelect['gibbonPersonID1'] = $_SESSION[$guid]['gibbonPersonID'];
+                                                $dataSelect['freeLearningUnitID1'] = $freeLearningUnitID;
+                                                $dataSelect['freeLearningUnitID2'] = $freeLearningUnitID;
+                                                $sqlSelect .= " UNION DISTINCT
+                                                    (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                                        FROM gibbonPerson
+                                                        LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
+                                                        LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
+                                                        WHERE gibbonPerson.status='Full'
+                                                            AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
+                                                            AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
+                                                        GROUP BY gibbonPersonID)";
+                                            }
+                                            if ($row['schoolMentorCustom'] != '') {
+                                                $staffs = explode(",", $row['schoolMentorCustom']);
+                                                $staffCount = 0 ;
+                                                foreach ($staffs AS $staff) {
+                                                    $dataSelect["staff$staffCount"] = $staff;
+                                                    $sqlSelect .= " UNION DISTINCT
+                                                    (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                                        FROM gibbonPerson
+                                                        WHERE gibbonPersonID=:staff$staffCount
+                                                            AND status='Full')";
+                                                    $staffCount ++;
+                                                }
+                                            }
+                                            $sqlSelect .= " ORDER BY surname, preferredName";
+                                            $resultSelect = $connection2->prepare($sqlSelect);
+                                            $resultSelect->execute($dataSelect);
+                                        } catch (PDOException $e) { echo 'error'.$e->getMessage(); }
+                                        while ($rowSelect = $resultSelect->fetch()) {
+                                            echo "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
                                         }
-                                     });
+                                    ?>
+                                </select>
+                                <script type="text/javascript">
+                                    var gibbonPersonIDSchoolMentor=new LiveValidation('gibbonPersonIDSchoolMentor');
+                                    gibbonPersonIDSchoolMentor.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
+                                </script>
+                            </td>
+                        </tr>
+                        <tr class='externalMentor'>
+                            <td>
+                                <b><?php echo __($guid, 'External Mentor Name', 'Free Learning') ?> *</b><br/>
+                                <span style="font-size: 90%"><i></i></span>
+                            </td>
+                            <td class="right">
+                                <input name="nameExternalMentor" id="nameExternalMentor" maxlength=255 value="" type="text" class="standardWidth">
+                                <script type="text/javascript">
+                                    var nameExternalMentor=new LiveValidation('nameExternalMentor');
+                                    nameExternalMentor.add(Validate.Presence);
+                                </script>
+                            </td>
+                        </tr>
+                        <tr class='externalMentor'>
+                            <td>
+                                <b><?php echo __($guid, 'External Mentor Email', 'Free Learning') ?> *</b><br/>
+                                <span style="font-size: 90%"><i></i></span>
+                            </td>
+                            <td class="right">
+                                <input name="emailExternalMentor" id="emailExternalMentor" maxlength=255 value="" type="text" class="standardWidth">
+                                <script type="text/javascript">
+                                    var emailExternalMentor=new LiveValidation('emailExternalMentor');
+                                    emailExternalMentor.add(Validate.Presence);
+                                    emailExternalMentor.add(Validate.Email);
+                                </script>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style='width: 275px'>
+                                <b><?php echo __($guid, 'Grouping', 'Free Learning') ?> *</b><br/>
+                                <span style="font-size: 90%"><i><?php echo __($guid, 'How do you want to study this unit?', 'Free Learning') ?></i></span>
+                            </td>
+                            <td class="right">
+                                <select name="grouping" id="grouping" style="width: 302px">
+                                    <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
+                                    <?php
+                                    $group = false;
+                                    $extraSlots = 0;
+                                    if (strpos($row['grouping'], 'Individual') !== false) {
+                                        echo '<option value="Individual">'.__($guid,'Individual', 'Free Learning').'</option>';
+                                    }
+                                    if (strpos($row['grouping'], 'Pairs') !== false) {
+                                        echo '<option value="Pairs">'.__($guid,'Pair', 'Free Learning').'</option>';
+                                        $group = true;
+                                        $extraSlots = 1;
+                                    }
+                                    if (strpos($row['grouping'], 'Threes') !== false) {
+                                        echo '<option value="Threes">'.__($guid,'Three', 'Free Learning').'</option>';
+                                        $group = true;
+                                        $extraSlots = 2;
+                                    }
+                                    if (strpos($row['grouping'], 'Fours') !== false) {
+                                        echo '<option value="Fours">'.__($guid,'Four', 'Free Learning').'</option>';
+                                        $group = true;
+                                        $extraSlots = 3;
+                                    }
+                                    if (strpos($row['grouping'], 'Fives') !== false) {
+                                        echo '<option value="Fives">'.__($guid,'Five', 'Free Learning').'</option>';
+                                        $group = true;
+                                        $extraSlots = 4;
+                                    }
+                                    ?>
+                                </select>
+                                <script type="text/javascript">
+                                    var grouping=new LiveValidation('grouping');
+                                    grouping.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
+                                    </script>
+                            </td>
+                        </tr>
+                        <?php
+                        if ($group) {
+                            //Get array of possible collaborators, dependent on role category
+                            $students = array();
+                            $studentCount = 0;
+                            if ($roleCategory == 'Student') {
+                                try {
+                                    $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                                    $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID ORDER BY surname, preferredName";
+                                    $resultSelect = $connection2->prepare($sqlSelect);
+                                    $resultSelect->execute($dataSelect);
+                                } catch (PDOException $e) { }
+                                while ($rowSelect = $resultSelect->fetch()) {
+                                    $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.$rowSelect['rollGroup'].')</option>';
+                                    ++$studentCount;
+                                }
+                            } elseif ($roleCategory == 'Staff') {
+                                try {
+                                    $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                                    $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
+                                        FROM gibbonPerson
+                                        JOIN gibbonStaff ON (gibbonStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
+                                        WHERE status='Full'
+                                            AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+                                        ORDER BY surname, preferredName";
+                                    $resultSelect = $connection2->prepare($sqlSelect);
+                                    $resultSelect->execute($dataSelect);
+                                } catch (PDOException $e) { }
+                                while ($rowSelect = $resultSelect->fetch()) {
+                                    $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
+                                    ++$studentCount;
+                                }
+                            } elseif ($roleCategory == 'Parent') {
+                                try {
+                                    $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                                    $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
+                                        FROM gibbonPerson
+                                        JOIN gibbonRole ON (gibbonRole.gibbonRoleID LIKE concat( '%', gibbonPerson.gibbonRoleIDAll, '%' ) AND category='Parent')
+                                        WHERE status='Full'
+                                            AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+                                        ORDER BY surname, preferredName";
+                                    $resultSelect = $connection2->prepare($sqlSelect);
+                                    $resultSelect->execute($dataSelect);
+                                } catch (PDOException $e) { }
+                                while ($rowSelect = $resultSelect->fetch()) {
+                                    $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
+                                    ++$studentCount;
+                                }
+                            }
+
+                            //Controls for lists
+                            ?>
+                            <script type='text/javascript'>
+                                $(document).ready(function(){
+                                $('tr.collaborator').css('display','none');
+                                <?php
+                                for ($i = 1; $i <= $extraSlots; ++$i) {
+                                    echo 'collaborator'.$i.'.disable();';
+                                }
+                                ?>
+                                $('#grouping').change(function(){
+                                    if ($('#grouping').val()=='Individual') {
+                                        $('#trCollaborator1').css('display','none');
+                                        collaborator1.disable() ;
+                                        $('#trCollaborator2').css('display','none');
+                                        collaborator2.disable() ;
+                                        $('#trCollaborator3').css('display','none');
+                                        collaborator3.disable() ;
+                                        $('#trCollaborator4').css('display','none');
+                                        collaborator4.disable() ;
+                                    }
+                                    else if ($('#grouping').val()=='Pairs') {
+                                        $('#trCollaborator1').css('display','table-row');
+                                        collaborator1.enable() ;
+                                        $('#trCollaborator2').css('display','none');
+                                        collaborator2.disable() ;
+                                        $('#trCollaborator3').css('display','none');
+                                        collaborator3.disable() ;
+                                        $('#trCollaborator4').css('display','none');
+                                        collaborator4.disable() ;
+                                    }
+                                    else if ($('#grouping').val()=='Threes') {
+                                        $('#trCollaborator1').css('display','table-row');
+                                        collaborator1.enable() ;
+                                        $('#trCollaborator2').css('display','table-row');
+                                        collaborator2.enable() ;
+                                        $('#trCollaborator3').css('display','none');
+                                        collaborator3.disable() ;
+                                        $('#trCollaborator4').css('display','none');
+                                        collaborator4.disable() ;
+                                    }
+                                    else if ($('#grouping').val()=='Fours') {
+                                        $('#trCollaborator1').css('display','table-row');
+                                        collaborator1.enable() ;
+                                        $('#trCollaborator2').css('display','table-row');
+                                        collaborator2.enable() ;
+                                        $('#trCollaborator3').css('display','table-row');
+                                        collaborator3.enable() ;
+                                        $('#trCollaborator4').css('display','none');
+                                        collaborator4.disable() ;
+                                    }
+                                    else if ($('#grouping').val()=='Fives') {
+                                        $('#trCollaborator1').css('display','table-row');
+                                        collaborator1.enable() ;
+                                        $('#trCollaborator2').css('display','table-row');
+                                        collaborator2.enable() ;
+                                        $('#trCollaborator3').css('display','table-row');
+                                        collaborator3.enable() ;
+                                        $('#trCollaborator4').css('display','table-row');
+                                        collaborator4.enable() ;
+                                    }
+                                    });
                                 });
                             </script>
-                            <tr>
-                                <td>
-                                    <b><?php echo __($guid, 'Enrolment Method', 'Free Learning') ?> * </b><br/>
-                                    <span style="font-size: 90%"><i></i></span>
-                                </td>
-                                <td class="right">
-                                    <?php
-                                    if ($enableClassEnrolment == 'Y') {
-                                        echo __($guid, 'Timetable Class', 'Free Learning').' <input '.$checked1.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="class" /><br/>';
-                                    }
-                                    if ($enableSchoolMentorEnrolment == 'Y') {
-                                        echo __($guid, 'School Mentor', 'Free Learning').' <input '.$checked2.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="schoolMentor" /><br/>';
-                                    }
-                                    if ($enableExternalMentorEnrolment == 'Y') {
-                                        echo __($guid, 'External Mentor', 'Free Learning').' <input '.$checked3.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="externalMentor" /><br/>';
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                            <tr class='class'>
-                                <td>
-                                    <b><?php echo __($guid, 'Class') ?> *</b><br/>
-                                    <span style="font-size: 90%"><i><?php echo __($guid, 'Which class are you enroling for?', 'Free Learning') ?></i></span>
-                                </td>
-                                <td class="right">
-                                    <?php
-                                    try {
-                                        $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                        $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse, gibbonCourseClass, gibbonCourseClassPerson WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID AND gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND NOT role LIKE '% - Left%' ORDER BY course, class";
-                                        $resultClasses = $connection2->prepare($sqlClasses);
-                                        $resultClasses->execute($dataClasses);
-                                    } catch (PDOException $e) {
-                                    }
-                                    ?>
-                                    <select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
-                                        <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
-                                        <?php
-                                        while ($rowClasses = $resultClasses->fetch()) {
-                                            echo "<option value='".$rowClasses['gibbonCourseClassID']."'>".$rowClasses['course'].'.'.$rowClasses['class'].'</option>';
-                                        }
-                                        ?>
-                                    </select>
-                                    <script type="text/javascript">
-                                        var gibbonCourseClassID=new LiveValidation('gibbonCourseClassID');
-                                        gibbonCourseClassID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
-                                     </script>
-                                </td>
-                            </tr>
-                            <tr class='schoolMentor'>
-                                <td>
-                                    <b><?php echo __($guid, 'School Mentor', 'Free Learning') ?> *</b><br/>
-                                    <span style="font-size: 90%"><i></i></span>
-                                </td>
-                                <td class="right">
-                                    <select name="gibbonPersonIDSchoolMentor" id="gibbonPersonIDSchoolMentor" style="width: 302px">
-                                        <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
-                                        <?php
-                                            try {
-                                                $dataSelect = array('freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID']);
-                                                $sqlSelect = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                                    FROM gibbonPerson
-                                                        JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
-                                                        JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
-                                                    WHERE gibbonPerson.status='Full'
-                                                        AND freeLearningUnitID=:freeLearningUnitID3
-                                                        AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID2
-                                                    )";
-                                                if ($row['schoolMentorCompletors'] == 'Y') {
-                                                    $dataSelect['gibbonPersonID1'] = $_SESSION[$guid]['gibbonPersonID'];
-                                                    $dataSelect['freeLearningUnitID1'] = $freeLearningUnitID;
-                                                    $dataSelect['freeLearningUnitID2'] = $freeLearningUnitID;
-                                                    $sqlSelect .= " UNION DISTINCT
-                                                        (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                                            FROM gibbonPerson
-                                                            LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
-                                                            LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
-                                                            WHERE gibbonPerson.status='Full'
-                                                                AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
-                                                                AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
-                                                            GROUP BY gibbonPersonID)";
-                                                }
-                                                if ($row['schoolMentorCustom'] != '') {
-                                                    $staffs = explode(",", $row['schoolMentorCustom']);
-                                                    $staffCount = 0 ;
-                                                    foreach ($staffs AS $staff) {
-                                                        $dataSelect["staff$staffCount"] = $staff;
-                                                        $sqlSelect .= " UNION DISTINCT
-                                                        (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                                            FROM gibbonPerson
-                                                            WHERE gibbonPersonID=:staff$staffCount
-                                                                AND status='Full')";
-                                                        $staffCount ++;
-                                                    }
-                                                }
-                                                $sqlSelect .= " ORDER BY surname, preferredName";
-                                                $resultSelect = $connection2->prepare($sqlSelect);
-                                                $resultSelect->execute($dataSelect);
-                                            } catch (PDOException $e) { echo 'error'.$e->getMessage(); }
-                                            while ($rowSelect = $resultSelect->fetch()) {
-                                                echo "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                                            }
-                                        ?>
-                                    </select>
-                                    <script type="text/javascript">
-                                        var gibbonPersonIDSchoolMentor=new LiveValidation('gibbonPersonIDSchoolMentor');
-                                        gibbonPersonIDSchoolMentor.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
-                                    </script>
-                                </td>
-                            </tr>
-                            <tr class='externalMentor'>
-                                <td>
-                                    <b><?php echo __($guid, 'External Mentor Name', 'Free Learning') ?> *</b><br/>
-                                    <span style="font-size: 90%"><i></i></span>
-                                </td>
-                                <td class="right">
-                                    <input name="nameExternalMentor" id="nameExternalMentor" maxlength=255 value="" type="text" class="standardWidth">
-                					<script type="text/javascript">
-                						var nameExternalMentor=new LiveValidation('nameExternalMentor');
-                						nameExternalMentor.add(Validate.Presence);
-                					</script>
-                                </td>
-                            </tr>
-                            <tr class='externalMentor'>
-                                <td>
-                                    <b><?php echo __($guid, 'External Mentor Email', 'Free Learning') ?> *</b><br/>
-                                    <span style="font-size: 90%"><i></i></span>
-                                </td>
-                                <td class="right">
-                                    <input name="emailExternalMentor" id="emailExternalMentor" maxlength=255 value="" type="text" class="standardWidth">
-                					<script type="text/javascript">
-                						var emailExternalMentor=new LiveValidation('emailExternalMentor');
-                						emailExternalMentor.add(Validate.Presence);
-                                        emailExternalMentor.add(Validate.Email);
-                					</script>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style='width: 275px'>
-                                    <b><?php echo __($guid, 'Grouping', 'Free Learning') ?> *</b><br/>
-                                    <span style="font-size: 90%"><i><?php echo __($guid, 'How do you want to study this unit?', 'Free Learning') ?></i></span>
-                                </td>
-                                <td class="right">
-                                    <select name="grouping" id="grouping" style="width: 302px">
-                                        <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
-                                        <?php
-                                        $group = false;
-                                        $extraSlots = 0;
-                                        if (strpos($row['grouping'], 'Individual') !== false) {
-                                            echo '<option value="Individual">'.__($guid,'Individual', 'Free Learning').'</option>';
-                                        }
-                                        if (strpos($row['grouping'], 'Pairs') !== false) {
-                                            echo '<option value="Pairs">'.__($guid,'Pair', 'Free Learning').'</option>';
-                                            $group = true;
-                                            $extraSlots = 1;
-                                        }
-                                        if (strpos($row['grouping'], 'Threes') !== false) {
-                                            echo '<option value="Threes">'.__($guid,'Three', 'Free Learning').'</option>';
-                                            $group = true;
-                                            $extraSlots = 2;
-                                        }
-                                        if (strpos($row['grouping'], 'Fours') !== false) {
-                                            echo '<option value="Fours">'.__($guid,'Four', 'Free Learning').'</option>';
-                                            $group = true;
-                                            $extraSlots = 3;
-                                        }
-                                        if (strpos($row['grouping'], 'Fives') !== false) {
-                                            echo '<option value="Fives">'.__($guid,'Five', 'Free Learning').'</option>';
-                                            $group = true;
-                                            $extraSlots = 4;
-                                        }
-                                        ?>
-                                    </select>
-                                    <script type="text/javascript">
-                                        var grouping=new LiveValidation('grouping');
-                                        grouping.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
-                                     </script>
-                                </td>
-                            </tr>
+
                             <?php
-                            if ($group) {
-                                //Get array of possible collaborators, dependent on role category
-                                $students = array();
-                                $studentCount = 0;
-                                if ($roleCategory == 'Student') {
-                                    try {
-                                        $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID ORDER BY surname, preferredName";
-                                        $resultSelect = $connection2->prepare($sqlSelect);
-                                        $resultSelect->execute($dataSelect);
-                                    } catch (PDOException $e) { }
-                                    while ($rowSelect = $resultSelect->fetch()) {
-                                        $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.$rowSelect['rollGroup'].')</option>';
-                                        ++$studentCount;
-                                    }
-                                } elseif ($roleCategory == 'Staff') {
-                                    try {
-                                        $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                        $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
-                                            FROM gibbonPerson
-                                            JOIN gibbonStaff ON (gibbonStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
-                                            WHERE status='Full'
-                                                AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
-                                            ORDER BY surname, preferredName";
-                                        $resultSelect = $connection2->prepare($sqlSelect);
-                                        $resultSelect->execute($dataSelect);
-                                    } catch (PDOException $e) { }
-                                    while ($rowSelect = $resultSelect->fetch()) {
-                                        $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                                        ++$studentCount;
-                                    }
-                                } elseif ($roleCategory == 'Parent') {
-                                    try {
-                                        $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                        $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
-                                            FROM gibbonPerson
-                                            JOIN gibbonRole ON (gibbonRole.gibbonRoleID LIKE concat( '%', gibbonPerson.gibbonRoleIDAll, '%' ) AND category='Parent')
-                                            WHERE status='Full'
-                                                AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
-                                            ORDER BY surname, preferredName";
-                                        $resultSelect = $connection2->prepare($sqlSelect);
-                                        $resultSelect->execute($dataSelect);
-                                    } catch (PDOException $e) { }
-                                    while ($rowSelect = $resultSelect->fetch()) {
-                                        $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                                        ++$studentCount;
-                                    }
-                                }
-
-                                //Controls for lists
+                            //Output select lists
+                            for ($i = 1; $i <= $extraSlots; ++$i) {
                                 ?>
-                                <script type='text/javascript'>
-                                    $(document).ready(function(){
-                                    $('tr.collaborator').css('display','none');
-                                    <?php
-                                    for ($i = 1; $i <= $extraSlots; ++$i) {
-                                        echo 'collaborator'.$i.'.disable();';
-                                    }
-                                    ?>
-                                    $('#grouping').change(function(){
-                                        if ($('#grouping').val()=='Individual') {
-                                            $('#trCollaborator1').css('display','none');
-                                            collaborator1.disable() ;
-                                            $('#trCollaborator2').css('display','none');
-                                            collaborator2.disable() ;
-                                            $('#trCollaborator3').css('display','none');
-                                            collaborator3.disable() ;
-                                            $('#trCollaborator4').css('display','none');
-                                            collaborator4.disable() ;
-                                        }
-                                        else if ($('#grouping').val()=='Pairs') {
-                                            $('#trCollaborator1').css('display','table-row');
-                                            collaborator1.enable() ;
-                                            $('#trCollaborator2').css('display','none');
-                                            collaborator2.disable() ;
-                                            $('#trCollaborator3').css('display','none');
-                                            collaborator3.disable() ;
-                                            $('#trCollaborator4').css('display','none');
-                                            collaborator4.disable() ;
-                                        }
-                                        else if ($('#grouping').val()=='Threes') {
-                                            $('#trCollaborator1').css('display','table-row');
-                                            collaborator1.enable() ;
-                                            $('#trCollaborator2').css('display','table-row');
-                                            collaborator2.enable() ;
-                                            $('#trCollaborator3').css('display','none');
-                                            collaborator3.disable() ;
-                                            $('#trCollaborator4').css('display','none');
-                                            collaborator4.disable() ;
-                                        }
-                                        else if ($('#grouping').val()=='Fours') {
-                                            $('#trCollaborator1').css('display','table-row');
-                                            collaborator1.enable() ;
-                                            $('#trCollaborator2').css('display','table-row');
-                                            collaborator2.enable() ;
-                                            $('#trCollaborator3').css('display','table-row');
-                                            collaborator3.enable() ;
-                                            $('#trCollaborator4').css('display','none');
-                                            collaborator4.disable() ;
-                                        }
-                                        else if ($('#grouping').val()=='Fives') {
-                                            $('#trCollaborator1').css('display','table-row');
-                                            collaborator1.enable() ;
-                                            $('#trCollaborator2').css('display','table-row');
-                                            collaborator2.enable() ;
-                                            $('#trCollaborator3').css('display','table-row');
-                                            collaborator3.enable() ;
-                                            $('#trCollaborator4').css('display','table-row');
-                                            collaborator4.enable() ;
-                                        }
-                                        });
-                                    });
-                                </script>
-
+                                <tr class='collaborator' id='<?php echo "trCollaborator$i" ?>'>
+                                    <td style='width: 275px'>
+                                        <b><?php echo sprintf(__($guid, 'Collaborator %1$s', 'Free Learning'), $i) ?> *</b><br/>
+                                    </td>
+                                    <td class="right">
+                                        <select name="collaborators[]" id="collaborator<?php echo $i ?>" style="width: 302px">
+                                            <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
+                                            <?php
+                                            foreach ($students as $student) {
+                                                echo $student;
+                                            }
+                                            ?>
+                                        </select>
+                                        <script type="text/javascript">
+                                            var collaborator<?php echo $i ?>=new LiveValidation('collaborator<?php echo $i ?>');
+                                            collaborator<?php echo $i ?>.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
+                                        </script>
+                                    </td>
+                                </tr>
                                 <?php
-                                //Output select lists
-                                for ($i = 1; $i <= $extraSlots; ++$i) {
-                                    ?>
-                                    <tr class='collaborator' id='<?php echo "trCollaborator$i" ?>'>
-                                        <td style='width: 275px'>
-                                            <b><?php echo sprintf(__($guid, 'Collaborator %1$s', 'Free Learning'), $i) ?> *</b><br/>
-                                        </td>
-                                        <td class="right">
-                                            <select name="collaborators[]" id="collaborator<?php echo $i ?>" style="width: 302px">
-                                                <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
-                                                <?php
-                                                foreach ($students as $student) {
-                                                    echo $student;
-                                                }
-                                                ?>
-                                            </select>
-                                            <script type="text/javascript">
-                                                var collaborator<?php echo $i ?>=new LiveValidation('collaborator<?php echo $i ?>');
-                                                collaborator<?php echo $i ?>.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
-                                            </script>
-                                        </td>
-                                    </tr>
-                                    <?php
-                                }
                             }
                         }
                         ?>
@@ -491,27 +489,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         echo '</p>';
                     }
                     else {
-                        if ($schoolType == 'Physical') {
-                            if ($rowEnrol['status'] == 'Current') {
-                                echo '<p>';
-                                echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.', 'Free Learning'), $row['name']);
-                                echo '</p>';
-                            } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
-                                echo "<div class='warning'>";
-                                echo __($guid, 'Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:', 'Free Learning').'<br/><br/>';
-                                echo '<b>'.$rowEnrol['commentApproval'].'</b>';
-                                echo '</div>';
-                            }
-                        } else {
-                            if ($rowEnrol['status'] == 'Current') {
-                                echo '<p>';
-                                echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your unit completion will be automatically approved, and you can move onto the next unit.', 'Free Learning'), $row['name']);
-                                echo '</p>';
-                            }
+                        if ($rowEnrol['status'] == 'Current') {
+                            echo '<p>';
+                            echo sprintf(__($guid, 'You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.', 'Free Learning'), $row['name']);
+                            echo '</p>';
+                        } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
+                            echo "<div class='warning'>";
+                            echo __($guid, 'Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:', 'Free Learning').'<br/><br/>';
+                            echo '<b>'.$rowEnrol['commentApproval'].'</b>';
+                            echo '</div>';
                         }
 
                         ?>
-                        <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_completePendingProcess.php?address='.$_GET['q'].'&applyAccessControls='.$applyAccessControls ?>" enctype="multipart/form-data">
+                        <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_completePendingProcess.php?address='.$_GET['q'] ?>" enctype="multipart/form-data">
                             <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                                 <tr>
                                     <td>
@@ -685,21 +675,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     echo $rowEnrol['commentStudent'];
                     echo '</p>';
                 } elseif ($rowEnrol['status'] == 'Complete - Approved') { //Complete, show status and feedback from teacher.
-                    if ($schoolType == 'Physical') {
-                        echo '<h4>';
-                        echo __($guid, 'Complete - Approved', 'Free Learning');
-                        echo '</h4>';
-                        echo '<p>';
-                        echo __($guid, 'Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.', 'Free Learning');
-                        echo '</p>';
-                    } else {
-                        echo '<h4>';
-                        echo __($guid, 'Complete', 'Free Learning');
-                        echo '</h4>';
-                        echo '<p>';
-                        echo __($guid, 'Congralutations! You have submitted your evidence, shown below, and so the unit is complete. Feel free to move on to another unit.', 'Free Learning');
-                        echo '</p>';
-                    }
+                    echo '<h4>';
+                    echo __($guid, 'Complete - Approved', 'Free Learning');
+                    echo '</h4>';
+                    echo '<p>';
+                    echo __($guid, 'Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.', 'Free Learning');
+                    echo '</p>';
                     ?>
                     <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                         <tr>
@@ -734,34 +715,26 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 </div>
                             </td>
                         </tr>
-                        <?php
-                        if ($schoolType == 'Physical') {
-                            ?>
-                            <tr>
-                                <td>
-                                    <b><?php echo __($guid, 'Certificate of Completion', 'Free Learning') ?></b><br/>
-                                </td>
-                                <td class="right">
-                                    <div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
-                                        <?php
-                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_browse_details_enrol_certificate.php?freeLearningUnitID=$freeLearningUnitID'>".__($guid, 'Print Certificate')."</a>";
-                                        ?>
-                                    </div>
-                                </td>
-                            </tr>
-                            <?php
-                        }
-                        ?>
+                        <tr>
+                            <td>
+                                <b><?php echo __($guid, 'Certificate of Completion', 'Free Learning') ?></b><br/>
+                            </td>
+                            <td class="right">
+                                <div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
+                                    <?php
+                                    echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_browse_details_enrol_certificate.php?freeLearningUnitID=$freeLearningUnitID'>".__($guid, 'Print Certificate')."</a>";
+                                    ?>
+                                </div>
+                            </td>
+                        </tr>
                     </table>
                     <?php
-                    if ($schoolType == 'Physical') {
-                        echo '<h4>';
-                        echo __($guid, 'Teacher Comment', 'Free Learning');
-                        echo '</h4>';
-                        echo '<p>';
-                        echo $rowEnrol['commentApproval'];
-                        echo '</p>';
-                    }
+                    echo '<h4>';
+                    echo __($guid, 'Teacher Comment', 'Free Learning');
+                    echo '</h4>';
+                    echo '<p>';
+                    echo $rowEnrol['commentApproval'];
+                    echo '</p>';
 
                     echo '<h4>';
                     echo __($guid, 'Student Comment', 'Free Learning');

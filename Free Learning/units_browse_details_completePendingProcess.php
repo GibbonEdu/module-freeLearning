@@ -30,7 +30,6 @@ try {
 }
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
-$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
 
 @session_start();
 
@@ -48,10 +47,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 $showInactive = 'N';
 if ($canManage and isset($_GET['showInactive'])) {
     $showInactive = $_GET['showInactive'];
-}
-$applyAccessControls = 'Y';
-if ($canManage and isset($_GET['applyAccessControls'])) {
-    $applyAccessControls = $_GET['applyAccessControls'];
 }
 $gibbonDepartmentID = '';
 if (isset($_GET['gibbonDepartmentID'])) {
@@ -82,7 +77,7 @@ if ($canManage) {
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]['timezone']);
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&applyAccessControls='.$applyAccessControls.'&sidebar=true&tab=1&view='.$view;
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     //Fail 0
@@ -100,8 +95,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $URL .= '&return=error6';
             header("Location: {$URL}");
         } else {
-            $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
-
             $freeLearningUnitID = $_POST['freeLearningUnitID'];
             $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'];
 
@@ -209,102 +202,87 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $URL .= '&return=error6';
                             header("Location: {$URL}");
                         } else {
-                            if ($schoolType == 'Online') {
-                                //Write to database
+                            //Write to database
+                            try {
+                                $data = array('status' => $status, 'commentStudent' => $commentStudent, 'evidenceType' => $type, 'evidenceLocation' => $location, 'timestampCompletePending' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                                $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
+                                $result = $connection2->prepare($sql);
+                                $result->execute($data);
+                            } catch (PDOException $e) {
+                                //Fail 2
+                                $URL .= '&return=error2';
+                                header("Location: {$URL}");
+                                exit;
+                            }
+
+
+                            if ($enrolmentMethod == 'class') { //Attempt to notify teacher(s) of class
                                 try {
-                                    $data = array('commentStudent' => $commentStudent, 'evidenceType' => $type, 'evidenceLocation' => $location, 'timestampCompletePending' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
-                                    $sql = "UPDATE freeLearningUnitStudent SET status='Complete - Approved', commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID";
+                                    $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
+                                    $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND role='Teacher'";
                                     $result = $connection2->prepare($sql);
                                     $result->execute($data);
-                                } catch (PDOException $e) {
-                                    //Fail 2
-                                    $URL .= '&return=error2';
-                                    header("Location: {$URL}");
-                                    exit;
+                                } catch (PDOException $e) { }
+
+                                $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
+                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=2";
+                                while ($row = $result->fetch()) {
+                                    setNotification($connection2, $guid, $row['gibbonPersonID'], $text, 'Free Learning', $actionLink);
                                 }
-                            } else {
-                                //Write to database
-                                try {
-                                    $data = array('status' => $status, 'commentStudent' => $commentStudent, 'evidenceType' => $type, 'evidenceLocation' => $location, 'timestampCompletePending' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
-                                    $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
-                                    $result = $connection2->prepare($sql);
-                                    $result->execute($data);
-                                } catch (PDOException $e) {
-                                    //Fail 2
-                                    $URL .= '&return=error2';
-                                    header("Location: {$URL}");
-                                    exit;
-                                }
+                            }
+                            else if ($enrolmentMethod == 'schoolMentor' && $gibbonPersonIDSchoolMentor != '') { //Attempt to notify school mentor
+                                $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
+                                $actionLink = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey";
+                                setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $text, 'Free Learning', $actionLink);
+                            }
+                            elseif ($enrolmentMethod == 'externalMentor' && $emailExternalMentor != '') { //Attempt to notify external mentors
+                                //Include mailer
+                                require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
 
-
-                                if ($enrolmentMethod == 'class') { //Attempt to notify teacher(s) of class
-                                    try {
-                                        $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
-                                        $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND role='Teacher'";
-                                        $result = $connection2->prepare($sql);
-                                        $result->execute($data);
-                                    } catch (PDOException $e) { }
-
-                                    $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
-                                    $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=2&applyAccessControls=N";
-                                    while ($row = $result->fetch()) {
-                                        setNotification($connection2, $guid, $row['gibbonPersonID'], $text, 'Free Learning', $actionLink);
-                                    }
-                                }
-                                else if ($enrolmentMethod == 'schoolMentor' && $gibbonPersonIDSchoolMentor != '') { //Attempt to notify school mentor
-                                    $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
-                                    $actionLink = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey";
-                                    setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $text, 'Free Learning', $actionLink);
-                                }
-                                elseif ($enrolmentMethod == 'externalMentor' && $emailExternalMentor != '') { //Attempt to notify external mentors
-                                    //Include mailer
-                                    require $_SESSION[$guid]['absolutePath'].'/lib/PHPMailer/PHPMailerAutoload.php';
-
-                                    //Attempt email send
-                                    $subject = sprintf(__($guid, 'Request For Mentor Feedback via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
-                                    $body = __($guid, 'To whom it may concern,', 'Free Learning').'<br/><br/>';
-                                    if ($roleCategory == 'Staff') {
-                                        $roleCategoryFull = 'member of staff';
-                                    }
-                                    else {
-                                        $roleCategoryFull = strtolower($roleCategory);
-                                    }
-                                    $roleCategoryFull = __($guid, $roleCategoryFull) ;
-
-                                    $body .= sprintf(__($guid, 'The following %1$s at %2$s has requested your feedback on their %3$sFree Learning%4$s work (%5$s), which they have just submitted, and on which you previously agreed to mentor them.', 'Free Learning'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>', '<b>'.$name.'</b>');
-                                    $body .= '<br/>';
-                                    $body .= '<ul>';
-                                    $body .= '<li>'.$student[0].'</li>';
-                                    $body .= '</ul>';
-                                    $body .= sprintf(__($guid, 'Please %1$sclick here%2$s to view and give feedback on the submitted work.', 'Free Learning'), "<a style='font-weight: bold; text-decoration: underline; color: #390' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey'>", '</a>');
-                                    $body .= '<br/><br/>';
-                                    $body .= sprintf(__($guid, 'Thank you very much for your time. Should you have any questions about this matter, please reply to this email, or contact %1$s on %2$s.', 'Free Learning'), $_SESSION[$guid]['organisationAdministratorName'], $_SESSION[$guid]['organisationAdministratorEmail']);
-                                    $body .= '<br/><br/>';
-                                    $body .= sprintf(__($guid, 'Email sent via %1$s at %2$s.', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationName']);
-                                    $body .= '</p>';
-                                    $bodyPlain = emailBodyConvert($body);
-
-                                    $mail=getGibbonMailer($guid);
-                                    $mail->IsSMTP();
-                                    $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
-                                    $mail->AddReplyTo($student[1], $student[0]);
-                                    $mail->AddAddress($emailExternalMentor);
-                                    $mail->CharSet = 'UTF-8';
-                                    $mail->Encoding = 'base64';
-                                    $mail->IsHTML(true);
-                                    $mail->Subject = $subject;
-                                    $mail->Body = $body;
-                                    $mail->AltBody = $bodyPlain;
-
-                                    try {
-                                        $mail->Send();
-                                    } catch (phpmailerException $e) {
-                                        print "there"; exit();
-                                    }
+                                //Attempt email send
+                                $subject = sprintf(__($guid, 'Request For Mentor Feedback via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
+                                $body = __($guid, 'To whom it may concern,', 'Free Learning').'<br/><br/>';
+                                if ($roleCategory == 'Staff') {
+                                    $roleCategoryFull = 'member of staff';
                                 }
                                 else {
-                                    $partialFail = true;
+                                    $roleCategoryFull = strtolower($roleCategory);
                                 }
+                                $roleCategoryFull = __($guid, $roleCategoryFull) ;
+
+                                $body .= sprintf(__($guid, 'The following %1$s at %2$s has requested your feedback on their %3$sFree Learning%4$s work (%5$s), which they have just submitted, and on which you previously agreed to mentor them.', 'Free Learning'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>', '<b>'.$name.'</b>');
+                                $body .= '<br/>';
+                                $body .= '<ul>';
+                                $body .= '<li>'.$student[0].'</li>';
+                                $body .= '</ul>';
+                                $body .= sprintf(__($guid, 'Please %1$sclick here%2$s to view and give feedback on the submitted work.', 'Free Learning'), "<a style='font-weight: bold; text-decoration: underline; color: #390' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey'>", '</a>');
+                                $body .= '<br/><br/>';
+                                $body .= sprintf(__($guid, 'Thank you very much for your time. Should you have any questions about this matter, please reply to this email, or contact %1$s on %2$s.', 'Free Learning'), $_SESSION[$guid]['organisationAdministratorName'], $_SESSION[$guid]['organisationAdministratorEmail']);
+                                $body .= '<br/><br/>';
+                                $body .= sprintf(__($guid, 'Email sent via %1$s at %2$s.', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationName']);
+                                $body .= '</p>';
+                                $bodyPlain = emailBodyConvert($body);
+
+                                $mail=getGibbonMailer($guid);
+                                $mail->IsSMTP();
+                                $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
+                                $mail->AddReplyTo($student[1], $student[0]);
+                                $mail->AddAddress($emailExternalMentor);
+                                $mail->CharSet = 'UTF-8';
+                                $mail->Encoding = 'base64';
+                                $mail->IsHTML(true);
+                                $mail->Subject = $subject;
+                                $mail->Body = $body;
+                                $mail->AltBody = $bodyPlain;
+
+                                try {
+                                    $mail->Send();
+                                } catch (phpmailerException $e) {
+                                    print "there"; exit();
+                                }
+                            }
+                            else {
+                                $partialFail = true;
                             }
 
                             //Success 0

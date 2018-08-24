@@ -32,7 +32,6 @@ try {
 }
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
-$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
 
 @session_start();
 
@@ -61,10 +60,6 @@ if (isset($_GET['freeLearningUnitID'])) {
 $showInactive = 'N';
 if ($canManage and isset($_GET['showInactive'])) {
     $showInactive = $_GET['showInactive'];
-}
-$applyAccessControls = 'Y';
-if ($canManage and isset($_GET['applyAccessControls'])) {
-    $applyAccessControls = $_GET['applyAccessControls'];
 }
 $gibbonDepartmentID = '';
 if (isset($_GET['gibbonDepartmentID'])) {
@@ -104,7 +99,7 @@ if (@$_SESSION[$guid]['systemSettingsSet'] == false) {
 }
 
 //Set return URL
-$URL = $_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor.php&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view";
+$URL = $_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor.php&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view";
 
 if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '') {
     $URL .= '&return=error3';

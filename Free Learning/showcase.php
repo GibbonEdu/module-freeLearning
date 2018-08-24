@@ -23,7 +23,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
-$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
 
 $canEdit = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php');
 

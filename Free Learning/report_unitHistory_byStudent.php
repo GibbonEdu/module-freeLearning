@@ -39,8 +39,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit History By Student', 'Free Learning').'</div>';
         echo '</div>';
 
-        $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
-
         echo '<h2>';
         echo __($guid, 'Choose Student', 'Free Learning');
         echo '</h2>';
@@ -83,76 +81,50 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 							<?php
 
                         } else {
-                            if ($schoolType == 'Physical') {
-                                ?>
-								<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
-									<option></option>
-									<optgroup label='--<?php echo __($guid, 'Students by Roll Group', 'Free Learning') ?>--'>
-										<?php
-                                        try {
-                                            $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                            $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName";
-                                            $resultSelect = $connection2->prepare($sqlSelect);
-                                            $resultSelect->execute($dataSelect);
-                                        } catch (PDOException $e) {
-                                        }
-                                while ($rowSelect = $resultSelect->fetch()) {
-                                    $selected = '';
-                                    if ($rowSelect['gibbonPersonID'] == $gibbonPersonID) {
-                                        $selected = 'selected';
+                            ?>
+                            <select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
+                                <option></option>
+                                <optgroup label='--<?php echo __($guid, 'Students by Roll Group', 'Free Learning') ?>--'>
+                                    <?php
+                                    try {
+                                        $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName";
+                                        $resultSelect = $connection2->prepare($sqlSelect);
+                                        $resultSelect->execute($dataSelect);
+                                    } catch (PDOException $e) {
                                     }
-                                    echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".htmlPrep($rowSelect['name']).' - '.formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
+                            while ($rowSelect = $resultSelect->fetch()) {
+                                $selected = '';
+                                if ($rowSelect['gibbonPersonID'] == $gibbonPersonID) {
+                                    $selected = 'selected';
                                 }
-                                ?>
-									</optgroup>
-									<optgroup label='--<?php echo __($guid, 'All Users by Name', 'Free Learning') ?>--'>
-										<?php
-                                        try {
-                                            $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                            $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE status='Full' AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
-                                            $resultSelect = $connection2->prepare($sqlSelect);
-                                            $resultSelect->execute($dataSelect);
-                                        } catch (PDOException $e) {
-                                        }
-                                while ($rowSelect = $resultSelect->fetch()) {
-                                    $selected = '';
-                                    if ($rowSelect['gibbonPersonID'] == $gibbonPersonID AND $rowSelect['name'] == '') {
-                                        $selected = 'selected';
-                                    }
-                                    echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true);
-                                    if ($rowSelect['name'] != '')
-                                        echo ' ('.htmlPrep($rowSelect['name']).')';
-                                    echo '</option>';
-                                }
-                                ?>
-									</optgroup>
-								</select>
-								<?php
-
-                            } else {
-                                ?>
-								<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
-									<option></option>
-									<?php
-                                        try {
-                                            $dataSelect = array();
-                                            $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname, username FROM gibbonPerson LEFT JOIN gibbonRole ON (gibbonRole.gibbonRoleID LIKE concat( '%', gibbonPerson.gibbonRoleIDAll, '%' ) AND category='Student') WHERE status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
-                                            $resultSelect = $connection2->prepare($sqlSelect);
-                                            $resultSelect->execute($dataSelect);
-                                        } catch (PDOException $e) {
-                                        }
-                                while ($rowSelect = $resultSelect->fetch()) {
-                                    $selected = '';
-                                    if ($rowSelect['gibbonPersonID'] == $gibbonPersonID) {
-                                        $selected = 'selected';
-                                    }
-                                    echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.$rowSelect['username'].')</option>';
-                                }
-                                ?>
-								</select>
-								<?php
-
+                                echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".htmlPrep($rowSelect['name']).' - '.formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
                             }
+                            ?>
+                                </optgroup>
+                                <optgroup label='--<?php echo __($guid, 'All Users by Name', 'Free Learning') ?>--'>
+                                    <?php
+                                    try {
+                                        $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE status='Full' AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
+                                        $resultSelect = $connection2->prepare($sqlSelect);
+                                        $resultSelect->execute($dataSelect);
+                                    } catch (PDOException $e) {
+                                    }
+                            while ($rowSelect = $resultSelect->fetch()) {
+                                $selected = '';
+                                if ($rowSelect['gibbonPersonID'] == $gibbonPersonID AND $rowSelect['name'] == '') {
+                                    $selected = 'selected';
+                                }
+                                echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true);
+                                if ($rowSelect['name'] != '')
+                                    echo ' ('.htmlPrep($rowSelect['name']).')';
+                                echo '</option>';
+                            }
+                            ?>
+                                </optgroup>
+                            </select>
+                            <?php
                         }
        					?>
 					</td>

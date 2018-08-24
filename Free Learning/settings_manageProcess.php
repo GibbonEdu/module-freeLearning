@@ -42,7 +42,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     header("Location: {$URL}");
 } else {
     //Proceed!
-    $schoolType = $_POST['schoolType'];
     $difficultyOptions = $_POST['difficultyOptions'];
     $publicUnits = $_POST['publicUnits'];
     $unitOutlineTemplate = $_POST['unitOutlineTemplate'];
@@ -59,15 +58,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     } else {
         //Write to database
         $fail = false;
-
-        try {
-            $data = array('schoolType' => $schoolType);
-            $sql = "UPDATE gibbonSetting SET value=:schoolType WHERE scope='Free Learning' AND name='schoolType'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
 
         try {
             $data = array('difficultyOptions' => $difficultyOptions);

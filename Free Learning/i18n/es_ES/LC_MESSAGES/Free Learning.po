@@ -249,9 +249,6 @@ msgstr ""
 msgid "School Type"
 msgstr ""
 
-#: manifest.php:432 manifest.php:432
-msgid "Physical"
-msgstr ""
 
 #: manifest.php:433 manifest.php:433
 msgid "Learning Area Restriction"
@@ -890,10 +887,6 @@ msgstr ""
 
 #: units_browse.php:166 units_browse.php:166
 msgid "Show Inactive Units?"
-msgstr ""
-
-#: units_browse.php:188 units_browse.php:188
-msgid "Apply Access Controls?"
 msgstr ""
 
 #: units_browse.php:189 units_browse.php:189

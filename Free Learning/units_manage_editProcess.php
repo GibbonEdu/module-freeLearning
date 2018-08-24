@@ -48,8 +48,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $URL .= "&return=error0$params";
         header("Location: {$URL}");
     } else {
-        $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
-
         if (empty($_POST)) {
             $URL .= '&return=error5';
             header("Location: {$URL}");
@@ -87,41 +85,37 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             }
             $active = $_POST['active'];
             $gibbonYearGroupIDMinimum = null;
-            if ($schoolType == 'Physical') {
-                if ($_POST['gibbonYearGroupIDMinimum'] != '') {
-                    $gibbonYearGroupIDMinimum = $_POST['gibbonYearGroupIDMinimum'];
-                }
+            if ($_POST['gibbonYearGroupIDMinimum'] != '') {
+                $gibbonYearGroupIDMinimum = $_POST['gibbonYearGroupIDMinimum'];
             }
             $grouping = '';
-            if ($schoolType == 'Physical') {
-                if (isset($_POST['Individual'])) {
-                    if ($_POST['Individual'] == 'on') {
-                        $grouping .= 'Individual,';
-                    }
+            if (isset($_POST['Individual'])) {
+                if ($_POST['Individual'] == 'on') {
+                    $grouping .= 'Individual,';
                 }
-                if (isset($_POST['Pairs'])) {
-                    if ($_POST['Pairs'] == 'on') {
-                        $grouping .= 'Pairs,';
-                    }
+            }
+            if (isset($_POST['Pairs'])) {
+                if ($_POST['Pairs'] == 'on') {
+                    $grouping .= 'Pairs,';
                 }
-                if (isset($_POST['Threes'])) {
-                    if ($_POST['Threes'] == 'on') {
-                        $grouping .= 'Threes,';
-                    }
+            }
+            if (isset($_POST['Threes'])) {
+                if ($_POST['Threes'] == 'on') {
+                    $grouping .= 'Threes,';
                 }
-                if (isset($_POST['Fours'])) {
-                    if ($_POST['Fours'] == 'on') {
-                        $grouping .= 'Fours,';
-                    }
+            }
+            if (isset($_POST['Fours'])) {
+                if ($_POST['Fours'] == 'on') {
+                    $grouping .= 'Fours,';
                 }
-                if (isset($_POST['Fives'])) {
-                    if ($_POST['Fives'] == 'on') {
-                        $grouping .= 'Fives,';
-                    }
+            }
+            if (isset($_POST['Fives'])) {
+                if ($_POST['Fives'] == 'on') {
+                    $grouping .= 'Fives,';
                 }
-                if (substr($grouping, -1) == ',') {
-                    $grouping = substr($grouping, 0, -1);
-                }
+            }
+            if (substr($grouping, -1) == ',') {
+                $grouping = substr($grouping, 0, -1);
             }
             $freeLearningUnitIDPrerequisiteList = null;
             if (isset($_POST['prerequisites'])) {

@@ -23,7 +23,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
-$schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
 $browseAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php', 'Browse Units_all');
 
@@ -57,10 +56,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if ($canManage and isset($_GET['showInactive'])) {
             $showInactive = $_GET['showInactive'];
         }
-        $applyAccessControls = 'Y';
-        if ($canManage and isset($_GET['applyAccessControls'])) {
-            $applyAccessControls = $_GET['applyAccessControls'];
-        }
         $gibbonDepartmentID = '';
         if (isset($_GET['gibbonDepartmentID'])) {
             $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
@@ -88,10 +83,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
 
         echo "<div class='trail'>";
-        if ($publicUnits == 'Y') {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
+        if ($publicUnits == 'Y' & empty($_SESSION[$guid]['username'])) {
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
         } else {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Free Learning', 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
         }
         echo '</div>';
 
@@ -105,7 +100,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             echo '</div>';
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, $schoolType, null, null, null, $showInactive, $applyAccessControls, $publicUnits, $freeLearningUnitID, null);
+                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
@@ -122,12 +117,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $row = $result->fetch();
                 if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
+                    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
                     echo '</div>';
                 }
 
                 $proceed = false;
-                if ($highestAction == 'Browse Units_all' or $schoolType == 'Online') {
+                if ($highestAction == 'Browse Units_all') {
                     $proceed = true;
                 } elseif ($highestAction == 'Browse Units_prerequisites') {
                     if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
@@ -150,7 +145,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if ($canManage || $browseAll) {
                         echo "<div class='linkTop'>";
                         if ($canManage) {
-                            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a>";
+                            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a>";
                         }
                         if ($canManage & $browseAll) {
                             echo " | ";
@@ -258,34 +253,32 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo '</td>';
                     echo '</tr>';
-                    if ($schoolType == 'Physical') {
-                        echo '<tr>';
-                        echo "<td style='vertical-align: top'>";
-                        echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Groupings', 'Free Learning').'</span><br/>';
-                        if ($row['grouping'] != '') {
-                            $groupings = explode(',', $row['grouping']);
-                            foreach ($groupings as $grouping) {
-                                echo ucwords($grouping).'<br/>';
-                            }
+                    echo '<tr>';
+                    echo "<td style='vertical-align: top'>";
+                    echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Groupings', 'Free Learning').'</span><br/>';
+                    if ($row['grouping'] != '') {
+                        $groupings = explode(',', $row['grouping']);
+                        foreach ($groupings as $grouping) {
+                            echo ucwords($grouping).'<br/>';
                         }
-                        echo '</td>';
-                        echo "<td style='vertical-align: top'>";
-                        if ($rowEnrol != null) {
-                            if ($rowEnrol['enrolmentMethod'] == 'schoolMentor' or $rowEnrol['enrolmentMethod'] == 'externalMentor') {
-                                echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Mentor Contacts', 'Free Learning').'</span><br/>';
-                                if ($rowEnrol['enrolmentMethod'] == 'schoolMentor') {
-                                    echo "<i>".formatName('', $rowEnrol['preferredName'], $rowEnrol['surname'], 'Student').'</i><br/>';
-                                    echo "<i><a href='mailto:".$rowEnrol['email']."'>".$rowEnrol['email'].'</a></i><br/>';
-                                }
-                                else if ($rowEnrol['enrolmentMethod'] == 'externalMentor') {
-                                    echo "<i>".$rowEnrol['nameExternalMentor'].'</i><br/>';
-                                    echo "<i><a href='mailto:".$rowEnrol['emailExternalMentor']."'>".$rowEnrol['emailExternalMentor'].'</a></i><br/>';
-                                }
-                            }
-                        }
-                        echo '</td>';
-                        echo '</tr>';
                     }
+                    echo '</td>';
+                    echo "<td style='vertical-align: top'>";
+                    if ($rowEnrol != null) {
+                        if ($rowEnrol['enrolmentMethod'] == 'schoolMentor' or $rowEnrol['enrolmentMethod'] == 'externalMentor') {
+                            echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Mentor Contacts', 'Free Learning').'</span><br/>';
+                            if ($rowEnrol['enrolmentMethod'] == 'schoolMentor') {
+                                echo "<i>".formatName('', $rowEnrol['preferredName'], $rowEnrol['surname'], 'Student').'</i><br/>';
+                                echo "<i><a href='mailto:".$rowEnrol['email']."'>".$rowEnrol['email'].'</a></i><br/>';
+                            }
+                            else if ($rowEnrol['enrolmentMethod'] == 'externalMentor') {
+                                echo "<i>".$rowEnrol['nameExternalMentor'].'</i><br/>';
+                                echo "<i><a href='mailto:".$rowEnrol['emailExternalMentor']."'>".$rowEnrol['emailExternalMentor'].'</a></i><br/>';
+                            }
+                        }
+                    }
+                    echo '</td>';
+                    echo '</tr>';
                     echo '</table>';
 
                     $defaultTab = 3;
@@ -378,30 +371,25 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
                             if ($enrolmentType == 'staffEdit') {
                                 echo "<div class='linkTop'>";
-                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Add Multiple')."<img style='margin: 0 0 -4px 5px' title='".__($guid, 'Add Multiple')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new_multi.png'/></a>";
+                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Add Multiple')."<img style='margin: 0 0 -4px 5px' title='".__($guid, 'Add Multiple')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new_multi.png'/></a>";
                                 echo '</div>';
                             }
 
                             //List students whose status is Current or Complete - Pending
                             try {
-                                if ($schoolType == 'Physical') {
-                                    $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                    $sqlClass = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.email, gibbonPerson.surname, gibbonPerson.preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName
-                                        FROM freeLearningUnitStudent
-                                            INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
-                                            LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
-                                            LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
-                                            LEFT JOIN gibbonPerson AS mentor ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID)
-                                        WHERE freeLearningUnitID=:freeLearningUnitID
-                                            AND gibbonPerson.status='Full'
-                                            AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='".date('Y-m-d')."')
-                                            AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='".date('Y-m-d')."')
-                                            AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
-                                        ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
-                                } else {
-                                    $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID']);
-                                    $sqlClass = "SELECT gibbonPersonID, email, surname, preferredName, freeLearningUnitStudent.* FROM freeLearningUnitStudent INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL OR dateEnd>='".date('Y-m-d')."') ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
-                                }
+                                $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                $sqlClass = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.email, gibbonPerson.surname, gibbonPerson.preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName
+                                    FROM freeLearningUnitStudent
+                                        INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
+                                        LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+                                        LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
+                                        LEFT JOIN gibbonPerson AS mentor ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID)
+                                    WHERE freeLearningUnitID=:freeLearningUnitID
+                                        AND gibbonPerson.status='Full'
+                                        AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='".date('Y-m-d')."')
+                                        AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='".date('Y-m-d')."')
+                                        AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
+                                    ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
                                 $resultClass = $connection2->prepare($sqlClass);
                                 $resultClass->execute($dataClass);
                             } catch (PDOException $e) {
@@ -426,15 +414,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Enrolment Method', 'Free Learning').'</span>';
                                             ?>
                                         </th>
-                                        <?php
-                                        if ($schoolType == 'Physical') {
-                                            ?>
-                                            <th>
-                                                <?php echo __($guid, 'Class/Mentor', 'Free Learning') ?><br/>
-                                            </th>
-                                            <?php
-                                        }
-                                        ?>
+                                       <th>
+                                            <?php echo __($guid, 'Class/Mentor', 'Free Learning') ?><br/>
+                                        </th>
                                         <th>
                                             <?php echo __($guid, 'View') ?><br/>
                                         </th>
@@ -488,23 +470,21 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                 ?>
                                             </td>
                                             <?php
-                                            if ($schoolType == 'Physical') {
-                                                echo '<td>';
-                                                    if ($rowClass['enrolmentMethod'] == 'class') {
-                                                        if ($rowClass['course'] != '' and $rowClass['class'] != '') {
-                                                            echo $rowClass['course'].'.'.$rowClass['class'];
-                                                        } else {
-                                                            echo '<i>'.__($guid, 'N/A').'</i>';
-                                                        }
+                                            echo '<td>';
+                                                if ($rowClass['enrolmentMethod'] == 'class') {
+                                                    if ($rowClass['course'] != '' and $rowClass['class'] != '') {
+                                                        echo $rowClass['course'].'.'.$rowClass['class'];
+                                                    } else {
+                                                        echo '<i>'.__($guid, 'N/A').'</i>';
                                                     }
-                                                    else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {
-                                                        echo formatName('', $rowClass['mentorpreferredName'], $rowClass['mentorsurname'], 'Student', false);
-                                                    }
-                                                    else if ($rowClass['enrolmentMethod'] == 'externalMentor') {
-                                                        echo $rowClass['nameExternalMentor'];
-                                                    }
-                                                echo '</td>';
-                                            }
+                                                }
+                                                else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {
+                                                    echo formatName('', $rowClass['mentorpreferredName'], $rowClass['mentorsurname'], 'Student', false);
+                                                }
+                                                else if ($rowClass['enrolmentMethod'] == 'externalMentor') {
+                                                    echo $rowClass['nameExternalMentor'];
+                                                }
+                                            echo '</td>';
                                             ?>
                                             <td>
                                                 <?php
@@ -540,15 +520,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                 //Layout the actions
                                                 if ($enrolmentType == 'staffEdit' || $editEnrolment) {
                                                     if ($editEnrolment && ($rowClass['status'] == 'Complete - Pending' or $rowClass['status'] == 'Complete - Approved' or $rowClass['status'] == 'Evidence Not Yet Approved')) {
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
+                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
                                                     }
                                                     if ($editEnrolment) {
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/></a> ";
+                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/></a> ";
                                                     }
                                                 }
                                                 if ($editEnrolment && $rowClass['status'] == 'Current - Pending' && $rowClass['enrolmentMethod'] == 'schoolMentor') {
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Approve', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconTick.png'/><a/> ";
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=$applyAccessControls&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Reject', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconCross.png'/><a/>";
+                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Approve', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconTick.png'/><a/> ";
+                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Reject', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconCross.png'/><a/>";
                                                 }
                                                 if ($rowClass['commentStudent'] != '' or $rowClass['commentApproval'] != '') {
                                                     echo "<script type='text/javascript'>";

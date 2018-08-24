@@ -34,8 +34,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
-        $schoolType = getSettingByScope($connection2, 'Free Learning', 'schoolType');
-
         $freeLearningUnitID = $_GET['freeLearningUnitID'];
         $canManage = false;
         if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and getHighestGroupedAction($guid, '/modules/Free Learning/units_browse.php', $connection2) == 'Browse Units_all') {
@@ -116,7 +114,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
             if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php')) {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&applyAccessControls=N&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a>";
+                echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a>";
                 echo '</div>';
             }
 
@@ -384,73 +382,69 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 							</select>
 						</td>
 					</tr>
-					<?php
-                    if ($schoolType == 'Physical') {
-                        ?>
-						<tr>
-							<td style='width: 275px'>
-								<b><?php echo __($guid, 'Minimum Year Group', 'Free Learning') ?></b><br/>
-								<span style="font-size: 90%"><i><?php echo __($guid, 'Lowest age group allowed to view unit.', 'Free Learning').'<br/>'.__($guid, 'Public sharing disabled if set.', 'Free Learning') ?></i></span>
-							</td>
-							<td class="right">
-								<select name="gibbonYearGroupIDMinimum" id="gibbonYearGroupIDMinimum" style="width: 302px">
-									<?php
-                                    echo "<option value=''></option>";
-									try {
-										$dataSelect = array();
-										$sqlSelect = 'SELECT gibbonYearGroupID, name FROM gibbonYearGroup ORDER BY sequenceNumber';
-										$resultSelect = $connection2->prepare($sqlSelect);
-										$resultSelect->execute($dataSelect);
-									} catch (PDOException $e) {
-									}
-									while ($rowSelect = $resultSelect->fetch()) {
-										$selected = '';
-										if ($rowSelect['gibbonYearGroupID'] == $row['gibbonYearGroupIDMinimum']) {
-											$selected = 'selected';
-										}
-										echo "<option $selected value='".$rowSelect['gibbonYearGroupID']."'>".htmlPrep(__($guid, $rowSelect['name'])).'</option>';
-									}
-									?>
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<td style='width: 275px'>
-								<b><?php echo __($guid, 'Grouping', 'Free Learning') ?></b><br/>
-								<span style="font-size: 90%"><i><?php echo __($guid, 'How should students work during this unit?', 'Free Learning') ?></i></span>
-							</td>
-							<td class="right">
+					<tr>
+						<td style='width: 275px'>
+							<b><?php echo __($guid, 'Minimum Year Group', 'Free Learning') ?></b><br/>
+							<span style="font-size: 90%"><i><?php echo __($guid, 'Lowest age group allowed to view unit.', 'Free Learning').'<br/>'.__($guid, 'Public sharing disabled if set.', 'Free Learning') ?></i></span>
+						</td>
+						<td class="right">
+							<select name="gibbonYearGroupIDMinimum" id="gibbonYearGroupIDMinimum" style="width: 302px">
 								<?php
-                                $checked = '';
-								if (strpos($row['grouping'], 'Individual') !== false) {
-									$checked = 'checked';
+								echo "<option value=''></option>";
+								try {
+									$dataSelect = array();
+									$sqlSelect = 'SELECT gibbonYearGroupID, name FROM gibbonYearGroup ORDER BY sequenceNumber';
+									$resultSelect = $connection2->prepare($sqlSelect);
+									$resultSelect->execute($dataSelect);
+								} catch (PDOException $e) {
 								}
-								echo __($guid, 'Individual', 'Free Learning')."<input $checked type='checkbox' name='Individual'><br/>";
-								$checked = '';
-								if (strpos($row['grouping'], 'Pairs') !== false) {
-									$checked = 'checked';
+								while ($rowSelect = $resultSelect->fetch()) {
+									$selected = '';
+									if ($rowSelect['gibbonYearGroupID'] == $row['gibbonYearGroupIDMinimum']) {
+										$selected = 'selected';
+									}
+									echo "<option $selected value='".$rowSelect['gibbonYearGroupID']."'>".htmlPrep(__($guid, $rowSelect['name'])).'</option>';
 								}
-								echo __($guid, 'Pairs', 'Free Learning')."<input $checked type='checkbox' name='Pairs'><br/>";
-								$checked = '';
-								if (strpos($row['grouping'], 'Threes') !== false) {
-									$checked = 'checked';
-								}
-								echo __($guid, 'Threes', 'Free Learning')."<input $checked type='checkbox' name='Threes'><br/>";
-								$checked = '';
-								if (strpos($row['grouping'], 'Fours') !== false) {
-									$checked = 'checked';
-								}
-								echo __($guid, 'Fours', 'Free Learning')."<input $checked type='checkbox' name='Fours'><br/>";
-								$checked = '';
-								if (strpos($row['grouping'], 'Fives') !== false) {
-									$checked = 'checked';
-								}
-								echo __($guid, 'Fives', 'Free Learning')."<input $checked type='checkbox' name='Fives'><br/>";
 								?>
-							</td>
-						</tr>
-						<?php
-					}
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td style='width: 275px'>
+							<b><?php echo __($guid, 'Grouping', 'Free Learning') ?></b><br/>
+							<span style="font-size: 90%"><i><?php echo __($guid, 'How should students work during this unit?', 'Free Learning') ?></i></span>
+						</td>
+						<td class="right">
+							<?php
+							$checked = '';
+							if (strpos($row['grouping'], 'Individual') !== false) {
+								$checked = 'checked';
+							}
+							echo __($guid, 'Individual', 'Free Learning')."<input $checked type='checkbox' name='Individual'><br/>";
+							$checked = '';
+							if (strpos($row['grouping'], 'Pairs') !== false) {
+								$checked = 'checked';
+							}
+							echo __($guid, 'Pairs', 'Free Learning')."<input $checked type='checkbox' name='Pairs'><br/>";
+							$checked = '';
+							if (strpos($row['grouping'], 'Threes') !== false) {
+								$checked = 'checked';
+							}
+							echo __($guid, 'Threes', 'Free Learning')."<input $checked type='checkbox' name='Threes'><br/>";
+							$checked = '';
+							if (strpos($row['grouping'], 'Fours') !== false) {
+								$checked = 'checked';
+							}
+							echo __($guid, 'Fours', 'Free Learning')."<input $checked type='checkbox' name='Fours'><br/>";
+							$checked = '';
+							if (strpos($row['grouping'], 'Fives') !== false) {
+								$checked = 'checked';
+							}
+							echo __($guid, 'Fives', 'Free Learning')."<input $checked type='checkbox' name='Fives'><br/>";
+							?>
+						</td>
+					</tr>
+					<?php
 
                     $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
     				if ($enableSchoolMentorEnrolment == 'Y') {
