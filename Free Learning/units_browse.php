@@ -692,7 +692,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 					//CLICK LISTENER
 					network.on( 'click', function(properties) {
 						var nodeNo = properties.nodes ;
-						window.location = '<?php echo $_SESSION[$guid]['absoluteURL'] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
+                        if (nodeNo != '') {
+						    window.location = '<?php echo $_SESSION[$guid]['absoluteURL'] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
+                        }
 					});
 				</script>
 				<?php

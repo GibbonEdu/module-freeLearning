@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.3.01
+-------
+Fixed map-click bug (at last!)
+
 v5.3.00
 -------
 Removed defunct options (e.g. School Type, Apply Access Controls)

@@ -820,6 +820,11 @@ $sql[$count][1] = "
 DELETE FROM gibbonSetting WHERE scope='Free Learning' AND name='schoolType';end
 ";
 
+//v5.3.01
+++$count;
+$sql[$count][0] = '5.3.01';
+$sql[$count][1] = "";
+
 
 
 
