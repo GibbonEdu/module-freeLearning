@@ -825,6 +825,11 @@ DELETE FROM gibbonSetting WHERE scope='Free Learning' AND name='schoolType';end
 $sql[$count][0] = '5.3.01';
 $sql[$count][1] = "";
 
+//v5.3.02
+++$count;
+$sql[$count][0] = '5.3.02';
+$sql[$count][1] = "";
+
 
 
 
