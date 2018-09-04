@@ -378,7 +378,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             //List students whose status is Current or Complete - Pending
                             try {
                                 $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                $sqlClass = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.email, gibbonPerson.surname, gibbonPerson.preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName
+                                $sqlClass = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.email, gibbonPerson.surname, gibbonPerson.preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName, gibbonPerson.fields
                                     FROM freeLearningUnitStudent
                                         INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
                                         LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
@@ -441,6 +441,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         }
                                     }
 
+                                    //Check for custom field
+                                    $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+
                                     //Start looping through enrolments
                                     while ($rowClass = $resultClass->fetch()) {
                                         if ($count % 2 == 0) {
@@ -460,6 +463,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                     else {
                                                         echo formatName('', $rowClass['preferredName'], $rowClass['surname'], 'Student', true).'<br/>';
                                                         echo "<a href='mailto:".$rowClass['email']."'>".$rowClass['email'].'</a><br/>';
+                                                    }
+                                                    if ($customField != '') {
+                                                        $value = unserialize($rowClass['fields'])[$customField];
+                                                        if ($value != '') {
+                                                            echo "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
+                                                        }
                                                     }
                                                 ?>
                                             </td>

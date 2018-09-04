@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.4.00
+-------
+Custom field integration
+
 v5.3.02
 -------
 Fixed unit access bug

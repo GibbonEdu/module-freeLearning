@@ -46,6 +46,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $publicUnits = $_POST['publicUnits'];
     $unitOutlineTemplate = $_POST['unitOutlineTemplate'];
     $learningAreaRestriction = $_POST['learningAreaRestriction'];
+    $customField = $_POST['customField'];
     $enableClassEnrolment = $_POST['enableClassEnrolment'];
     $enableSchoolMentorEnrolment = $_POST['enableSchoolMentorEnrolment'];
     $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'];
@@ -89,6 +90,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         try {
             $data = array('learningAreaRestriction' => $learningAreaRestriction);
             $sql = "UPDATE gibbonSetting SET value=:learningAreaRestriction WHERE scope='Free Learning' AND name='learningAreaRestriction'";
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            $fail = true;
+        }
+
+        try {
+            $data = array('customField' => $customField);
+            $sql = "UPDATE gibbonSetting SET value=:customField WHERE scope='Free Learning' AND name='customField'";
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) {

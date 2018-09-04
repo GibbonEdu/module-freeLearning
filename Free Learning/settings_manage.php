@@ -155,6 +155,44 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 					<textarea name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" rows=8 style="width: 300px"><?php echo htmlPrep($row['value']) ?></textarea>
 				</td>
 			</tr>
+
+            <tr>
+				<?php
+                try {
+                    $data = array();
+                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='customField'";
+                    $result = $connection2->prepare($sql);
+                    $result->execute($data);
+                } catch (PDOException $e) {
+                    echo "<div class='error'>".$e->getMessage().'</div>';
+                }
+				$row = $result->fetch();
+				?>
+				<td>
+					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?></b><br/>
+					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
+				</td>
+				<td class="right">
+					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
+						<?php
+						try {
+							$dataField = array();
+							$sqlField = "SELECT * FROM gibbonPersonField WHERE active='Y'";
+							$resultField = $connection2->prepare($sqlField);
+							$resultField->execute($dataField);
+						} catch (PDOException $e) { }
+						echo "<option value=''></option>";
+						while ($rowField = $resultField->fetch()) {
+							$selected = '';
+							if ($row['value'] == $rowField['gibbonPersonFieldID']) {
+								$selected = 'selected';
+							}
+							echo "<option $selected value='".$rowField['gibbonPersonFieldID']."'>".$rowField['name'].'</option>';
+						}
+						?>
+					</select>
+				</td>
+			</tr>
             <tr class='break'>
                 <td colspan=2>
                 	<h3><?php echo __($guid, 'Enrolment Settings', 'Free Learning') ?></h3>
