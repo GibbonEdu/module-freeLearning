@@ -837,10 +837,14 @@ $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'customField', 'Custom Field', 'A user custom field to display under student names in Manage Enrolment.', '');end
 ";
 
-
 //v5.4.01
 ++$count;
 $sql[$count][0] = '5.4.01';
+$sql[$count][1] = "";
+
+//v5.4.02
+++$count;
+$sql[$count][0] = '5.4.02';
 $sql[$count][1] = "";
 
 

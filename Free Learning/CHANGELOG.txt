@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.4.02
+-------
+Cleanup duplicate database connections, session_start and timezone_set
+
 v5.4.01
 -------
 Manifest fix
