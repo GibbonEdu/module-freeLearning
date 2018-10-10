@@ -20,16 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 $returnInt = null;
 
 //Only include module include if it is not already included (which it may be been on the index page)
-$included = false;
-$includes = get_included_files();
-foreach ($includes as $include) {
-    if ($include == $_SESSION[$guid]['absolutePath'].'/modules/Free Learning/moduleFunctions.php') {
-        $included = true;
-    }
-}
-if ($included == false) {
-    include './modules/Free Learning/moduleFunctions.php';
-}
+require_once './modules/Free Learning/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_byStudent.php') == false) {
     //Acess denied

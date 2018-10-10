@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 //Module includes
-include './modules/Free Learning/moduleFunctions.php';
+require_once './modules/Free Learning/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_byStudent.php') == false) {
     //Acess denied

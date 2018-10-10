@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.4.03
+-------
+Fixed a file include error in the Parent dashboard
+
 v5.4.02
 -------
 Cleanup duplicate database connections, session_start and timezone_set
