@@ -77,8 +77,8 @@ else {
 	$count=0;
 	$rowNum="odd" ;
 	if ($resultClass->rowCount()<1) {
-		print "<div class='error'>" ;
-			print __($guid, "There are no records to display.") ;
+		print "<div class='success'>" ;
+			print __($guid, "Well done, there is no work left to assess!") ;
 		print "</div>" ;
 	}
 	else {
