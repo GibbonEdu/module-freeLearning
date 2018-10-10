@@ -847,4 +847,7 @@ $sql[$count][1] = "";
 $sql[$count][0] = '5.4.02';
 $sql[$count][1] = "";
 
-
+//v5.4.03
+++$count;
+$sql[$count][0] = '5.4.03';
+$sql[$count][1] = "";
