@@ -286,22 +286,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if (isset($_GET['tab'])) {
                         $defaultTab = $_GET['tab'];
                     }
-                    ?>
-					<script type='text/javascript'>
-						$(function() {
-							$( "#tabs" ).tabs({
-								active: <?php echo $defaultTab ?>,
-								ajaxOptions: {
-									error: function( xhr, status, index, anchor ) {
-										$( anchor.hash ).html(
-											"Couldn't load this tab." );
-									}
-								}
-							});
-						});
-					</script>
-
-					<?php
+                    
                     echo "<div id='tabs' style='margin: 20px 0'>";
                     //Tab links
                     echo '<ul>';
@@ -884,6 +869,18 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo '</div>';
                     echo '</div>';
+
+                    echo "<script type='text/javascript'>
+						$( \"#tabs\" ).tabs({
+								active: $defaultTab,
+								ajaxOptions: {
+									error: function( xhr, status, index, anchor ) {
+										$( anchor.hash ).html(
+											\"Couldn't load this tab.\" );
+									}
+								}
+							});
+					</script>";
                 }
             }
         }

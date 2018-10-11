@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.4.05
+-------
+Cleaner tab load in unit detail screen
+
 v5.4.04
 -------
 Changed Work Pending Approval no records colour to be happier (no assessments left!)
