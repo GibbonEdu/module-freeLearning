@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.4.06
+-------
+Simplified Chinese translation
+
 v5.4.05
 -------
 Cleaner tab load in unit detail screen

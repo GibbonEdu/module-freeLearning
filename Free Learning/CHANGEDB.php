@@ -861,3 +861,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.4.05';
 $sql[$count][1] = "";
+
+//v5.4.06
+++$count;
+$sql[$count][0] = '5.4.06';
+$sql[$count][1] = "";
