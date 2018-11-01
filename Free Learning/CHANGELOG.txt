@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.5.00
+-------
+Added ability to group units by Course
+
 v5.4.06
 -------
 Simplified Chinese translation

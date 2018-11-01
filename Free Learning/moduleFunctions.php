@@ -26,8 +26,14 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
     $sqlWhere = 'AND ';
     //Apply filters
     if ($gibbonDepartmentID != '') {
-        $data['gibbonDepartmentID'] = $gibbonDepartmentID;
-        $sqlWhere .= "gibbonDepartmentIDList LIKE concat('%', :gibbonDepartmentID, '%') AND ";
+        if (is_numeric($gibbonDepartmentID)) {
+            $data['gibbonDepartmentID'] = $gibbonDepartmentID;
+            $sqlWhere .= "gibbonDepartmentIDList LIKE concat('%', :gibbonDepartmentID, '%') AND ";
+        }
+        else {
+            $data['course'] = $gibbonDepartmentID;
+            $sqlWhere .= "course=:course AND ";
+        }
     }
     if ($difficulty != '') {
         $data['difficulty'] = $difficulty;
@@ -932,5 +938,25 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
             }
         }
     }
+}
+
+function getCourses($connection2)
+{
+    $return = false;
+
+    try {
+        $data = array();
+        $sql = 'SELECT DISTINCT course FROM freeLearningUnit WHERE active=\'Y\' AND NOT course IS NULL AND NOT course=\'\' ORDER BY course';
+        $result = $connection2->prepare($sql);
+        $result->execute($data);
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+
+    if ($result->rowCount() > 0) {
+        $return = $result->fetchAll();
+    }
+
+    return $return;
 }
 ?>

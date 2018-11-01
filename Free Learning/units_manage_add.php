@@ -157,6 +157,34 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 				</tr>
 				<tr>
 					<td>
+						<b><?php echo __($guid, 'Course') ?></b><br/>
+						<span style="font-size: 90%"><i><?php echo __($guid, 'Add this unit into an ad hoc course?', 'Free Learning') ?></i></span>
+					</td>
+					<td class="right">
+						<input name="course" id="course" maxlength=50 value="" type="text" style="width: 300px">
+						<script type="text/javascript">
+						$(function() {
+							var availableTags=[
+								<?php
+                                try {
+                                    $dataAuto = array();
+                                    $sqlAuto = 'SELECT DISTINCT course FROM freeLearningUnit WHERE active=\'Y\'  ORDER BY course';
+                                    $resultAuto = $connection2->prepare($sqlAuto);
+                                    $resultAuto->execute($dataAuto);
+                                } catch (PDOException $e) {
+                                }
+								while ($rowAuto = $resultAuto->fetch()) {
+									echo '"'.$rowAuto['course'].'", ';
+								}
+								?>
+							];
+							$( "#course" ).autocomplete({source: availableTags});
+						});
+					</script>
+					</td>
+				</tr>
+				<tr>
+					<td>
 						<b><?php echo __($guid, 'License', 'Free Learning') ?></b><br/>
 						<span style="font-size: 90%"><i><?php echo __($guid, 'Under what conditions can this work be reused?', 'Free Learning'); ?></i></span>
 					</td>

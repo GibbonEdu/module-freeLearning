@@ -102,13 +102,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         ?>
 		<tr>
 			<td>
-				<b><?php echo __($guid, 'Learning Area') ?></b><br/>
+				<b><?php echo __($guid, 'Learning Area & Course') ?></b><br/>
 				<span style="font-size: 90%"><i></i></span>
 			</td>
 			<td class="right">
 				<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
 					<option value=""></option>
 					<?php
+                    echo "<optgroup label='--".__('Learning Area')."--'>";
 					$learningAreas = getLearningAreas($connection2, $guid);
 					for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
 						if ($gibbonDepartmentID == $learningAreas[$i]) {
@@ -116,7 +117,18 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 						} else {
 							echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
 						}
-					}
+                    }
+                    $courses = getCourses($connection2);
+                    if (is_array($courses) && count($courses) > 0) {
+                        echo "<optgroup label='--".__('Course')."--'>";
+                        foreach ($courses as $course) {
+                            if ($gibbonDepartmentID == $course['course']) {
+                                echo "<option selected value='".$course['course']."'>".$course['course'].'</option>';
+                            } else {
+                                echo "<option value='".$course['course']."'>".$course['course'].'</option>';
+                            }
+                        }
+                    }
 					?>
 				</select>
 			</td>

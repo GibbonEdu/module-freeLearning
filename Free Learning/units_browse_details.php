@@ -115,7 +115,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $row = $result->fetch();
                 if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
+                    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
                     echo '</div>';
                 }
 

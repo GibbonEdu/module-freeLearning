@@ -212,6 +212,34 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 							<input type="hidden" name="count" value="<?php echo(count($learningAreas)) / 2 ?>">
 						</td>
 					</tr>
+				<tr>
+					<td>
+						<b><?php echo __($guid, 'Course') ?></b><br/>
+						<span style="font-size: 90%"><i><?php echo __($guid, 'Add this unit into an ad hoc course?', 'Free Learning') ?></i></span>
+					</td>
+					<td class="right">
+						<input name="course" id="course" maxlength=50 value="<?php echo $row['course'] ?>" type="text" style="width: 300px">
+						<script type="text/javascript">
+						$(function() {
+							var availableTags=[
+								<?php
+                                try {
+                                    $dataAuto = array();
+                                    $sqlAuto = 'SELECT DISTINCT course FROM freeLearningUnit WHERE active=\'Y\'  ORDER BY course';
+                                    $resultAuto = $connection2->prepare($sqlAuto);
+                                    $resultAuto->execute($dataAuto);
+                                } catch (PDOException $e) {
+                                }
+								while ($rowAuto = $resultAuto->fetch()) {
+									echo '"'.$rowAuto['course'].'", ';
+								}
+								?>
+							];
+							$( "#course" ).autocomplete({source: availableTags});
+						});
+					</script>
+					</td>
+				</tr>
 					<tr>
 						<td>
 							<b><?php echo __($guid, 'License', 'Free Learning') ?></b><br/>
@@ -645,7 +673,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                                         $categories = array_unique($categories);
                                                     $categories = msort($categories);
                                                     foreach ($categories as $category) {
-                                                        echo "<option value='$category'>$categor<?php echo ynExpander($guid, 'Y') ;?></option>";
+                                                        echo "<option value='$category'>$category<?php echo ynExpander($guid, 'Y') ;?></option>";
                                                     }
                                                     ?>
 													</select>

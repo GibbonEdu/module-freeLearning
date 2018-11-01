@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.4.06';
+$version = '5.5.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -33,6 +33,7 @@ $url = 'http://rossparker.org/free-learning';
 $moduleTables[0] = "CREATE TABLE `freeLearningUnit` (
 `freeLearningUnitID` int(10) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `gibbonDepartmentIDList` text,
+  `course` VARCHAR(50) NULL DEFAULT NULL,
   `name` varchar(40) NOT NULL,
   `logo` text,
   `active` enum('Y','N') DEFAULT 'Y',
