@@ -873,3 +873,8 @@ $sql[$count][0] = '5.5.00';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnit` ADD `course` VARCHAR(50) NULL DEFAULT NULL AFTER `gibbonDepartmentIDList`;end
 ";
+
+//v5.5.01
+++$count;
+$sql[$count][0] = '5.5.01';
+$sql[$count][1] = "";
