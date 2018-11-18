@@ -21,8 +21,12 @@ include '../../gibbon.php';
 
 include './moduleFunctions.php';
 
-$output = '';
+$tcpdfFile = '../../lib/tcpdf/tcpdf.php';
+if (is_file($tcpdfFile)) {
+    include $tcpdfFile;
+}
 
+$output = '';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
@@ -85,12 +89,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     }
 }
 
-//Setup for PDF
-include "../../lib/tcpdf/tcpdf.php";
-
 //Create PDF objects
 $pdf = new TCPDF ('P', 'mm', 'A4', true, 'UTF-8', false);
-$pdf->addTTFfont('DroidSansFallback');
+
+$fontFile = $_SESSION[$guid]['absolutePath']. '/resources/assets/fonts/DroidSansFallback.ttf';
+if (is_file($fontFile)) {
+    $pdf->addTTFfont($fontFile, 'TrueTypeUnicode', '', 32);
+} else {
+    $pdf->addTTFfont('DroidSansFallback');
+}
 
 $pdf->SetCreator($_SESSION[$guid]['organisationName']);
 $pdf->SetAuthor($_SESSION[$guid]['organisationName']);
