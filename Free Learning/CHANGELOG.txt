@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.5.02
+-------
+Replaced getGibbonMailer function calls with Mailer class
+
 v5.5.01
 -------
 Updated TCPDF file include and font handling

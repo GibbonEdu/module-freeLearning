@@ -878,3 +878,8 @@ ALTER TABLE `freeLearningUnit` ADD `course` VARCHAR(50) NULL DEFAULT NULL AFTER 
 ++$count;
 $sql[$count][0] = '5.5.01';
 $sql[$count][1] = "";
+
+//v5.5.02
+++$count;
+$sql[$count][0] = '5.5.02';
+$sql[$count][1] = "";
