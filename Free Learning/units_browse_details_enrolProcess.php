@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Contracts\Comms\Mailer;
+
 include '../../gibbon.php';
 
 include './moduleFunctions.php';
@@ -416,7 +418,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     $body .= '</p>';
                                     $bodyPlain = emailBodyConvert($body);
 
-                                    $mail = getGibbonMailer($guid);
+                                    $mail = $container->get(Mailer::class);
                                     $mail->IsSMTP();
                                     $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
                                     $mail->AddReplyTo($students[0][1], $students[0][0]);
