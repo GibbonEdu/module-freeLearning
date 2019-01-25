@@ -320,12 +320,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo "<th style='min-width: 150px'>";
                 echo __($guid, 'Prerequisites', 'Free Learning').'</br>';
                 echo '</th>';
-                if (isset($_SESSION[$guid]['username'])) { //Likes only if logged in!
-                            echo "<th style='min-width: 50px'>";
-                    echo __($guid, 'Like');
-                    echo '</th>';
-                }
-                echo "<th style='min-width: 50px'>";
+                echo '<th>';
                 echo __($guid, 'Actions');
                 echo '</th>';
                 echo '</tr>';
@@ -444,43 +439,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';
                     }
                     echo '</td>';
-                    if (isset($_SESSION[$guid]['username'])) { //Likes only if logged in!
-						echo '<td>';
-							//DEAL WITH LIKES
-							if ($amAuthor) { //I am one of the authors, so cannot like
-								echo countLikesByContextAndRecipient($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
-							} else { //I am not one of the authors, and so can like
-								echo "<div id='star".$row['freeLearningUnitID']."'>";
-								$likesGiven = countLikesByContextAndGiver($connection2, 'Free Learning', 'freeLearningUnitID', $row['freeLearningUnitID'], $_SESSION[$guid]['gibbonPersonID']);
-								$comment = addSlashes($row['name']);
-								$authorList = '';
-								foreach ($authors as $author) {
-									if ($author[0] == $row['freeLearningUnitID']) {
-										$authorList .= $author[2].',';
-									}
-								}
-								if ($authorList != '') {
-									$authorList = substr($authorList, 0, -1);
-								}
-								echo '<script type="text/javascript">';
-								echo '$(document).ready(function(){';
-								echo '$("#starAdd'.$row['freeLearningUnitID'].'").click(function(){';
-								echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "add", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
-								echo '});';
-								echo '$("#starRemove'.$row['freeLearningUnitID'].'").click(function(){';
-								echo '$("#star'.$row['freeLearningUnitID'].'").load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_browse_starAjax.php",{"freeLearningUnitID": "'.$row['freeLearningUnitID'].'", "mode": "remove", "comment": "'.$comment.'", "authorList": "'.$authorList.'"});';
-								echo '});';
-								echo '});';
-								echo '</script>';
-								if ($likesGiven < 1) {
-									echo "<a id='starAdd".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_off.png'></a>";
-								} else {
-									echo "<a id='starRemove".$row['freeLearningUnitID']."' onclick='return false;' href='#'><img src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/like_on.png'></a>";
-								}
-							}
-                        echo '</div>';
-                        echo '</td>';
-                    }
                     echo '<td>';
                     if ($highestAction == 'Browse Units_all') {
                         echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img style='padding-left: 5px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.6.00
+-------
+Removed star/like feature
+
 v5.5.02
 -------
 Replaced getGibbonMailer function calls with Mailer class

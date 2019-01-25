@@ -202,12 +202,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 exit;
                             }
 
-                            //Attempt to notify the student, issue like and grant awards
+                            //Attempt to notify the student and grant awards
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { //Only if status or comment has changed.
                                 $text = sprintf(__($guid, 'A teacher has approved your request for unit completion (%1$s).', 'Free Learning'), $name);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
-                                setLike($connection2, 'Free Learning', $_SESSION[$guid]['gibbonSchoolYearID'], 'freeLearningUnitStudentID', $freeLearningUnitStudentID, $_SESSION[$guid]['gibbonPersonID'], $gibbonPersonIDStudent, 'Unit Approval', '');
                                 if (isActionAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
                                     grantBadges($connection2, $guid, $gibbonPersonIDStudent);
                                 }

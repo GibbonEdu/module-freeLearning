@@ -1047,10 +1047,6 @@ msgstr ""
 msgid "Recommended"
 msgstr ""
 
-#: units_browse.php:295 units_browse.php:295 units_browse.php:313
-msgid "Like"
-msgstr ""
-
 #: units_browse.php:382 units_browse_details.php:189
 #: units_browse_details.php:458 units_browse.php:382
 #: units_browse_details.php:189 units_browse_details.php:458
