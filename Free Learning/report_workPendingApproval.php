@@ -32,6 +32,9 @@ else {
 	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"]), 'Free Learning') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Work Pending Approval', 'Free Learning') . "</div>" ;
 	print "</div>" ;
 
+	//Check for custom field
+	$customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+
 	print "<p>" ;
 		print __($guid, 'This report shows all work that is complete, but pending approval, in all of your classes.', 'Free Learning') ;
 	print "<p>" ;
@@ -39,7 +42,7 @@ else {
 	//List students whose status is Current or Complete - Pending
 	try {
 		$dataClass=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID2"=>$_SESSION[$guid]["gibbonPersonID"]);
-		$sqlClass="(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonRole.category, NULL AS mentorsurname, NULL AS mentorpreferredName
+		$sqlClass="(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonRole.category, NULL AS mentorsurname, NULL AS mentorpreferredName, gibbonPerson.fields
 			FROM freeLearningUnit
 				JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
 				INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
@@ -55,7 +58,7 @@ else {
 				AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='" . date("Y-m-d") . "')
 				AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)
 			UNION
-			(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, null AS course, null AS class, gibbonRole.category, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName
+			(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, null AS course, null AS class, gibbonRole.category, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName, gibbonPerson.fields
 				FROM freeLearningUnit
 					JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
 					INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
@@ -144,11 +147,21 @@ else {
 					</td>
 					<td>
 						<?php
-						if ($rowClass['category'] == 'Student')
+						if ($rowClass['category'] == 'Student') {
 							print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["studentpreferredName"], $rowClass["studentsurname"], "Student", true) . "</a>";
-						else
+						}
+						else {
 							print formatName("", $rowClass["studentpreferredName"], $rowClass["studentsurname"], "Student", true);
-						?><br/>
+						}
+						echo "<br/>";
+						$fields = unserialize($rowClass['fields']);
+						if (!empty($fields[$customField])) {
+						    $value = $fields[$customField];
+						    if ($value != '') {
+						        echo "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
+						    }
+						}
+						?>
 					</td>
 					<td>
 						<?php print $rowClass["status"] ?><br/>

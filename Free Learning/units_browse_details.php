@@ -286,7 +286,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if (isset($_GET['tab'])) {
                         $defaultTab = $_GET['tab'];
                     }
-                    
+
                     echo "<div id='tabs' style='margin: 20px 0'>";
                     //Tab links
                     echo '<ul>';
@@ -447,8 +447,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                         echo formatName('', $rowClass['preferredName'], $rowClass['surname'], 'Student', true).'<br/>';
                                                         echo "<a href='mailto:".$rowClass['email']."'>".$rowClass['email'].'</a><br/>';
                                                     }
-                                                    if ($customField != '') {
-                                                        $value = unserialize($rowClass['fields'])[$customField];
+                                                    $fields = unserialize($rowClass['fields']);
+                                                    if (!empty($fields[$customField])) {
+                                                        $value = $fields[$customField];
                                                         if ($value != '') {
                                                             echo "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
                                                         }

@@ -884,7 +884,12 @@ $sql[$count][1] = "";
 $sql[$count][0] = '5.5.02';
 $sql[$count][1] = "";
 
-//v5.5.06
+//v5.6.00
 ++$count;
-$sql[$count][0] = '5.5.06';
+$sql[$count][0] = '5.6.00';
+$sql[$count][1] = "";
+
+//v5.6.01
+++$count;
+$sql[$count][0] = '5.6.01';
 $sql[$count][1] = "";

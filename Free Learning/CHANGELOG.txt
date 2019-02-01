@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.6.01
+-------
+Extended custom field display across module
+
 v5.6.00
 -------
 Removed star/like feature
