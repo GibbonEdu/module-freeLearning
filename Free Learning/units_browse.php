@@ -574,8 +574,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
-                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Evidence Not Yet Approved' or $row['status'] == 'Complete - Pending') {
+                    } elseif ($row['status'] == 'Current') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
+                    } elseif ($row['status'] == 'Evidence Not Yet Approved') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#FF0000', background:'#FF8485'}, borderWidth: 2},";
+                    } elseif ($row['status'] == 'Complete - Pending') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#CA4AFF', background:'#F8A3FF'}, borderWidth: 2},";
                     }
                     else {
                         if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
