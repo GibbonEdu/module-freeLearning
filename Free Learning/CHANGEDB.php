@@ -898,3 +898,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.7.00';
 $sql[$count][1] = "";
+
+//v5.8.00
+++$count;
+$sql[$count][0] = '5.8.00';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnit` ADD `schoolMentorCustomRole` int(3) unsigned zerofill NULL DEFAULT NULL AFTER `schoolMentorCustom`;end
+";

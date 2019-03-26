@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.8.00
+-------
+Added custom mentors based on role
+
 v5.7.00
 -------
 Improved colour coding of map view to reflect student status more clearly

@@ -80,7 +80,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         header("Location: {$URL}");
     } else {
         $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
-        
+
         $freeLearningUnitID = $_POST['freeLearningUnitID'];
 
         if ($freeLearningUnitID == '') {
@@ -103,7 +103,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             if ($result->rowCount() != 1) {
                 //Fail 2
-                print $result->rowCount() ; exit();
                 $URL .= '&return=error2';
                 header("Location: {$URL}");
                 exit();
@@ -189,6 +188,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                             AND status='Full')";
                                     $staffCount ++;
                                 }
+                            }
+                            if ($row['schoolMentorCustomRole'] != '') {
+                                $dataInternal["gibbonRoleID"] = $row['schoolMentorCustomRole'];
+                                $dataInternal["gibbonPersonIDSchoolMentor"] = $gibbonPersonIDSchoolMentor;
+                                $sqlInternal .= " UNION DISTINCT
+                                (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                    FROM gibbonPerson
+                                        JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
+                                    WHERE gibbonRoleID=:gibbonRoleID
+                                        AND gibbonPersonID=:gibbonPersonIDSchoolMentor
+                                        AND status='Full')";
                             }
                             $sqlInternal .= " ORDER BY surname, preferredName";
                             $resultInternal = $connection2->prepare($sqlInternal);
@@ -389,7 +399,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     if (is_file($mailFile)) {
                                         include $mailFile;
                                     }
-                                    
+
                                     //Attempt email send
                                     $subject = sprintf(__($guid, 'Request For Mentorship via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
                                     $body = __($guid, 'To whom it may concern,', 'Free Learning').'<br/><br/>';

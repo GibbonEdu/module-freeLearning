@@ -234,6 +234,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                                     $staffCount ++;
                                                 }
                                             }
+                                            if ($row['schoolMentorCustomRole'] != '') {
+                                                $dataSelect["gibbonRoleID"] = $row['schoolMentorCustomRole'];
+                                                $sqlSelect .= " UNION DISTINCT
+                                                (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
+                                                    FROM gibbonPerson
+                                                        JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
+                                                    WHERE gibbonRoleID=:gibbonRoleID
+                                                        AND status='Full')";
+                                            }
                                             $sqlSelect .= " ORDER BY surname, preferredName";
                                             $resultSelect = $connection2->prepare($sqlSelect);
                                             $resultSelect->execute($dataSelect);

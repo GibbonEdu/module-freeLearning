@@ -520,6 +520,30 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 				</select>
                 			</td>
     					</tr>
+                        <tr>
+    						<td>
+    							<b><?php echo __($guid, 'Specific Role', 'Free Learning') ?> </b><br/>
+    							<span style="font-size: 90%"><i><?php echo __($guid, 'Choose a specific user role, members of whom can act as mentors.', 'Free Learning'); ?></i></span>
+    						</td>
+                			<td class="right">
+                				<select name="schoolMentorCustomRole" id="schoolMentorCustomRole" class='standardWidth'>
+                					<?php
+                                    try {
+                						$dataSelect = array();
+                						$sqlSelect = "SELECT gibbonRoleID, name FROM gibbonRole ORDER BY name";
+                						$resultSelect = $connection2->prepare($sqlSelect);
+                						$resultSelect->execute($dataSelect);
+                					} catch (PDOException $e) {
+                					}
+                                    echo "<option value=''></option>";
+                					while ($rowSelect = $resultSelect->fetch()) {
+                                        $selected = ($rowSelect['gibbonRoleID'] == $row['schoolMentorCustomRole']) ? 'selected' : '';
+                                        echo "<option $selected value='".$rowSelect['gibbonRoleID']."'>".htmlPrep($rowSelect['name'])."</option>";
+                					}
+                                    ?>
+                				</select>
+                			</td>
+    					</tr>
                         <?php
                     }
                     ?>

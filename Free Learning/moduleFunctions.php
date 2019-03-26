@@ -755,7 +755,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
         ";
         $result = $connection2->prepare($sql);
         $result->execute($data);
-    } catch (PDOException $e) { print $e->getMessage();}
+    } catch (PDOException $e) { }
 
     while ($row = $result->fetch()) {
         if (is_null($row['gibbonPersonID'])) { //Only work on awards not yet given to this person
