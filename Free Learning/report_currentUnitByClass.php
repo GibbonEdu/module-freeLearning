@@ -27,9 +27,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
     echo '</div>';
 } else {
     //Proceed!
-    echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Current Unit By Class', 'Free Learning').'</div>';
-    echo '</div>';
+    $page->breadcrumbs
+         ->add(__('Current Unit by Class'));
 
     echo '<h2>';
     echo __($guid, 'Choose Class', 'Free Learning');
