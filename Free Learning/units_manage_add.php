@@ -50,9 +50,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         }
 
         //Proceed!
-        echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>".__($guid, 'Manage Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Add Unit', 'Free Learning').'</div>';
-        echo '</div>';
+        $page->breadcrumbs
+    		 ->add(__('Manage Units'), 'units_manage.php')
+    		 ->add(__('Add Unit'));
 
         $returns = array();
         $editLink = '';
