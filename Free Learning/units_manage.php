@@ -34,10 +34,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     } else {
     	//Breadcrumbb
     	$page->breadcrumbs
-    	->add(__('Manage Units'));
+    	     ->add(__m('Manage Units'));
     	
-
-
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);
         }

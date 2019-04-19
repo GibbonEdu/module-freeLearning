@@ -75,11 +75,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
 
         //Get action with highest precendence
-        $urlParamas = compact('$roleCategory','$freeLearningUnitID','$canManage','$showInactive','$gibbonDepartmentID','$difficulty','$name','$view','$gibbonPersonID')
+        $urlParamas = compact('$roleCategory','$freeLearningUnitID','$canManage','$showInactive','$gibbonDepartmentID','$difficulty','$name','$view','$gibbonPersonID');
+
         $page->breadcrumbs
-   			 ->add(__('Browse Units'), 'units_browse.php', $urlParamas)
-   			 ->add(__('Unit Details'), 'units_browse_details.php', $urlParamas)
-   			 ->add(__('Add Multiple7'));
+   			 ->add(__m('Browse Units'), 'units_browse.php', $urlParamas)
+   			 ->add(__m('Unit Details'), 'units_browse_details.php', $urlParamas)
+   			 ->add(__m('Add Multiple'));
 
         if ($freeLearningUnitID == '') {
             echo "<div class='error'>";

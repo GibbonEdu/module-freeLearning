@@ -75,11 +75,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $gibbonPersonID = $_GET['gibbonPersonID'];
             }
         }
-		$urlPramas = compact('$roleCategory','$freeLearningUnitStudentID','$canManage','$showInactive','$gibbonDepartmentID','$difficulty','$name','$view','$gibbonPersonID')
+        $urlPramas = compact('$roleCategory','$freeLearningUnitStudentID','$canManage','$showInactive','$gibbonDepartmentID','$difficulty','$name','$view','$gibbonPersonID');
+        
         $page->breadcrumbs
-   			 ->add(__('Browse Units'), 'units_browse.php', $urlPramas)
-   			 ->add(__('Unit Details'), 'units_browse_details.php')
-   			 ->add(__('Approval'));
+   			 ->add(__m('Browse Units'), 'units_browse.php', $urlPramas)
+   			 ->add(__m('Unit Details'), 'units_browse_details.php')
+   			 ->add(__m('Approval'));
 
         if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
             echo "<div class='error'>";

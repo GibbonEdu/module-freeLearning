@@ -28,7 +28,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 } else {
     //Proceed!
     $page->breadcrumbs
-         ->add(__('Current Unit by Class'));
+         ->add(__m('Current Unit by Class'));
 
     echo '<h2>';
     echo __($guid, 'Choose Class', 'Free Learning');

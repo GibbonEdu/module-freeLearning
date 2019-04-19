@@ -27,7 +27,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     echo '</div>';
 } else {
     $page->breadcrumbs
-    ->add(__('Manage Badges'));
+         ->add(__m('Manage Badges'));
+
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";

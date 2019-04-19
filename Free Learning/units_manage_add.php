@@ -52,8 +52,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         //Proceed!
         $urlPrama = compact('$gibbonDepartmentID', '$difficulty', '$name', '$view')
         $page->breadcrumbs
-    		 ->add(__('Manage Units'), 'units_manage.php', $urlPrama)
-    		 ->add(__('Add Unit'));
+    		 ->add(__m('Manage Units'), 'units_manage.php', $urlPrama)
+    		 ->add(__m('Add Unit'));
 
         $returns = array();
         $editLink = '';

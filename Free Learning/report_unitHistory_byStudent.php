@@ -34,7 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     } else {
         //Proceed!
         $page->breadcrumbs
-    	 	 ->add(__('Unit History By Student'));
+    	 	 ->add(__m('Unit History By Student'));
     	 	 
         echo '<h2>';
         echo __($guid, 'Choose Student', 'Free Learning');

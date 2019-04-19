@@ -32,7 +32,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
 } else {
 	//Beadcrumbs
 	$page->breadcrumbs
-    ->add(__('Free Learning Showcase'));
+         ->add(__m('Free Learning Showcase'));
 
     //Set pagination variable
     $page = 1;

@@ -28,7 +28,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 } else {
     //Proceed!
     $page->breadcrumbs
-    	 ->add(__('Outcomes by Student'));
+    	 ->add(__m('Outcomes by Student'));
     	 
     echo '<h2>';
     echo __($guid, 'Choose Student', 'Free Learning');

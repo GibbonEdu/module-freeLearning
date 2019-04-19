@@ -28,7 +28,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 } else {
     //Proceed!
     $page->breadcrumbs
-    ->add(__('Manage Settings'));
+         ->add(__m('Manage Settings'));
     
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], null, null);

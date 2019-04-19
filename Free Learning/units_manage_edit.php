@@ -61,8 +61,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         //Proceed!
         $urlPrama = compact('$view ', '$name', '$difficulty', '$gibbonDepartmentID', '$showInactive', '$canManage', '$freeLearningUnitID')
         $page->breadcrumbs
-    		 ->add(__('Manage Units'), 'units_manage.php', $urlPrama)
-    		 ->add(__('Edit Unit'));
+    		 ->add(__m('Manage Units'), 'units_manage.php', $urlPrama)
+    		 ->add(__m('Edit Unit'));
 
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);

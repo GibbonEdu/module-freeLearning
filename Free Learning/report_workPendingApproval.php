@@ -29,7 +29,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workP
 else {
 	//Proceed!
 	$page->breadcrumbs
-    	 ->add(__('Work Pending Approval'));
+    	 ->add(__m('Work Pending Approval'));
 
 	//Check for custom field
 	$customField = getSettingByScope($connection2, 'Free Learning', 'customField');

@@ -42,7 +42,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
     } else {
     	//Breadcrumbs
     	$page->breadcrumbs
-    		 ->add(__('Browse Units'));
+    		 ->add(__m('Browse Units'));
     	
         if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
             echo "<div class='linkTop'>";

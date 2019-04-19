@@ -26,8 +26,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
     echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
-    	$page->breadcrumbs
-        ->add(__('View Badges'));
+    $page->breadcrumbs
+         ->add(__m('View Badges'));
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied

@@ -34,7 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     } else {
         //Proceed!
 		$page->breadcrumbs
-        	 ->add(__('Unit History by Student'));
+        	 ->add(__m('Unit History by Student'));
 
         $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
 

@@ -29,7 +29,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 else {
 	//Proceed!
 	$page->breadcrumbs
-    	 ->add(__('Learning Activity'));
+    	 ->add(__m('Learning Activity'));
 
 	echo '<h2>';
     echo __($guid, 'Choose Time Frame', 'Free Learning');
