@@ -34,8 +34,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     } else {
         //Proceed!
         $page->breadcrumbs
-    	 	 ->add(__m('Unit History By Student'));
-    	 	 
+             ->add(__m('Unit History By Student'));
+              
         echo '<h2>';
         echo __($guid, 'Choose Student', 'Free Learning');
         echo '</h2>';
@@ -46,19 +46,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         }
         ?>
 
-		<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
-			<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-				<tr>
-					<td style='width: 275px'>
-						<b><?php echo __($guid, 'Student') ?> *</b><br/>
-					</td>
-					<td class="right">
-						<?php
+        <form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
+            <table class='smallIntBorder' cellspacing='0' style="width: 100%">
+                <tr>
+                    <td style='width: 275px'>
+                        <b><?php echo __($guid, 'Student') ?> *</b><br/>
+                    </td>
+                    <td class="right">
+                        <?php
                         if ($highestAction == 'Unit History By Student_myChildren') {
                             ?>
-							<select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
-								<option></option>
-								<?php
+                            <select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
+                                <option></option>
+                                <?php
                                 try {
                                     $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
                                     $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonStudentEnrolmentID, surname, preferredName, gibbonYearGroup.nameShort AS yearGroup, gibbonRollGroup.nameShort AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonYearGroup ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) JOIN gibbonFamilyChild ON (gibbonPerson.gibbonPersonID=gibbonFamilyChild.gibbonPersonID) JOIN gibbonFamily ON (gibbonFamilyChild.gibbonFamilyID=gibbonFamily.gibbonFamilyID) JOIN gibbonFamilyAdult ON (gibbonFamilyAdult.gibbonFamilyID=gibbonFamily.gibbonFamilyID AND childDataAccess='Y') WHERE gibbonFamilyAdult.gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
@@ -74,8 +74,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                                 echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
                             }
                             ?>
-							</select>
-							<?php
+                            </select>
+                            <?php
 
                         } else {
                             ?>
@@ -123,18 +123,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                             </select>
                             <?php
                         }
-       					?>
-					</td>
-				</tr>
-				<tr>
-					<td colspan=2 class="right">
-						<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_unitHistory_byStudent.php">
-						<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
-					</td>
-				</tr>
-			</table>
-		</form>
-		<?php
+                           ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan=2 class="right">
+                        <input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_unitHistory_byStudent.php">
+                        <input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <?php
 
         if ($gibbonPersonID != '') {
             $output = '';

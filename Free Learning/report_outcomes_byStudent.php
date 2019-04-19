@@ -28,8 +28,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 } else {
     //Proceed!
     $page->breadcrumbs
-    	 ->add(__m('Outcomes by Student'));
-    	 
+         ->add(__m('Outcomes by Student'));
+         
     echo '<h2>';
     echo __($guid, 'Choose Student', 'Free Learning');
     echo '</h2>';
@@ -40,13 +40,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
     }
     ?>
 
-	<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
-		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-			<tr>
-				<td style='width: 275px'>
-					<b><?php echo __($guid, 'Student') ?> *</b><br/>
-				</td>
-				<td class="right">
+    <form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
+        <table class='smallIntBorder' cellspacing='0' style="width: 100%">
+            <tr>
+                <td style='width: 275px'>
+                    <b><?php echo __($guid, 'Student') ?> *</b><br/>
+                </td>
+                <td class="right">
                     <select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
                         <option></option>
                         <optgroup label='--<?php echo __($guid, 'Students by Roll Group') ?>--'>
@@ -82,17 +82,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     ?>
                         </optgroup>
                     </select>
-				</td>
-			</tr>
-			<tr>
-				<td colspan=2 class="right">
-					<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_outcomes_byStudent.php">
-					<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
-				</td>
-			</tr>
-		</table>
-	</form>
-	<?php
+                </td>
+            </tr>
+            <tr>
+                <td colspan=2 class="right">
+                    <input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_outcomes_byStudent.php">
+                    <input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <?php
 
     if ($gibbonPersonID != '') {
         $output = '';
@@ -130,10 +130,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
             try {
                 $dataFreeLearning = array('gibbonPersonIDStudent' => $gibbonPersonID);
                 $sqlFreeLearning = "SELECT gibbonOutcomeID, freeLearningUnit.name FROM freeLearningUnit
-					JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-					JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-					WHERE (status='Complete - Approved' OR status='Exempt') AND gibbonPersonIDStudent=:gibbonPersonIDStudent
-					ORDER BY gibbonOutcomeID";
+                    JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                    JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                    WHERE (status='Complete - Approved' OR status='Exempt') AND gibbonPersonIDStudent=:gibbonPersonIDStudent
+                    ORDER BY gibbonOutcomeID";
                 $resultFreeLearning = $connection2->prepare($sqlFreeLearning);
                 $resultFreeLearning->execute($dataFreeLearning);
             } catch (PDOException $e) {
@@ -237,14 +237,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $dataRecommend['gibbonPersonID2'] = $gibbonPersonID;
                     $dataRecommend['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
                     $sqlRecommend = "SELECT DISTINCT freeLearningUnitStudent.status, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
-						FROM freeLearningUnit
-						JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-						LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
-						LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID)
-						JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
-						JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
-						WHERE $outcomesNotMetWhere AND (status IS NULL OR NOT status='Current') AND active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber)
-						ORDER BY RAND() LIMIT 0, 3";
+                        FROM freeLearningUnit
+                        JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                        LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
+                        LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID)
+                        JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
+                        JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
+                        WHERE $outcomesNotMetWhere AND (status IS NULL OR NOT status='Current') AND active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber)
+                        ORDER BY RAND() LIMIT 0, 3";
                     $resultRecommend = $connection2->prepare($sqlRecommend);
                     $resultRecommend->execute($dataRecommend);
                 } catch (PDOException $e) {

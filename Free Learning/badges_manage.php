@@ -62,30 +62,30 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         echo __($guid, 'Search');
         echo '</h2>';
         ?>
-    	<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
-    		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-    			<tr>
-    				<td>
-    					<b><?php echo __($guid, 'Search For'); ?></b><br/>
-    					<span style="font-size: 90%"><i><?php echo __($guid, 'Name, Category') ?></i></span>
-    				</td>
-    				<td class="right">
-    					<input name="search" id="search" maxlength=20 value="<?php echo $search ?>" type="text" style="width: 300px">
-    				</td>
-    			</tr>
-    			<tr>
-    				<td colspan=2 class="right">
-    					<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/badges_manage.php">
-    					<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-    					<?php
+        <form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
+            <table class='smallIntBorder' cellspacing='0' style="width: 100%">
+                <tr>
+                    <td>
+                        <b><?php echo __($guid, 'Search For'); ?></b><br/>
+                        <span style="font-size: 90%"><i><?php echo __($guid, 'Name, Category') ?></i></span>
+                    </td>
+                    <td class="right">
+                        <input name="search" id="search" maxlength=20 value="<?php echo $search ?>" type="text" style="width: 300px">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan=2 class="right">
+                        <input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/badges_manage.php">
+                        <input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
+                        <?php
                         echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/badges_manage.php'>Clear Search</a> "; ?>
-    					<input type="submit" value="Submit">
-    				</td>
-    			</tr>
-    		</table>
-    	</form>
+                        <input type="submit" value="Submit">
+                    </td>
+                </tr>
+            </table>
+        </form>
 
-    	<?php
+        <?php
         echo "<h2 class='top'>";
         echo __($guid, 'View');
         echo '</h2>';
@@ -158,8 +158,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                     $rowNum = 'error';
                 }
 
-    			//COLOR ROW BY STATUS!
-    			echo "<tr class=$rowNum>";
+                //COLOR ROW BY STATUS!
+                echo "<tr class=$rowNum>";
                 echo '<td>';
                 if ($row['logo'] != '') {
                     echo "<img class='user' style='max-width: 150px' src='".$_SESSION[$guid]['absoluteURL'].'/'.$row['logo']."'/>";

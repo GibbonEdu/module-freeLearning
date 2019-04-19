@@ -28,8 +28,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 } else {
     //Proceed!
     $page->breadcrumbs
-   		 ->add(__m('Manage Badges'), 'badges_manage.php')
-   		 ->add(__m('Edit Badges'));
+         ->add(__m('Manage Badges'), 'badges_manage.php')
+         ->add(__m('Edit Badges'));
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
@@ -49,7 +49,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         //Check if school year specified
         $freeLearningBadgeID = $_GET['freeLearningBadgeID'];
         if ($freeLearningBadgeID == '') {
-        	echo "<div class='error'>";
+            echo "<div class='error'>";
             echo __($guid, 'You have not specified one or more required parameters.');
             echo '</div>';
         } else {
@@ -79,15 +79,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                     echo '</div>';
                 }
                 ?>
-    			<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL']."/modules/Free Learning/badges_manage_editProcess.php?freeLearningBadgeID=$freeLearningBadgeID&search=".$_GET['search'] ?>" enctype="multipart/form-data">
-    				<table class='smallIntBorder' cellspacing='0' style="width: 100%">
+                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL']."/modules/Free Learning/badges_manage_editProcess.php?freeLearningBadgeID=$freeLearningBadgeID&search=".$_GET['search'] ?>" enctype="multipart/form-data">
+                    <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                         <tr>
-            				<td>
-            					<b><?php echo __($guid, 'Badge', 'Free Learning') ?></b><br/>
-            					<span style="font-size: 90%"><i></i></span>
-            				</td>
-            				<td class="right">
-            					<?php
+                            <td>
+                                <b><?php echo __($guid, 'Badge', 'Free Learning') ?></b><br/>
+                                <span style="font-size: 90%"><i></i></span>
+                            </td>
+                            <td class="right">
+                                <?php
                                 try {
                                     $dataPurpose = array();
                                     $sqlPurpose = 'SELECT * FROM badgesBadge WHERE active=\'Y\' ORDER BY category, name';
@@ -96,40 +96,40 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                                 } catch (PDOException $e) {
                                 }
 
-            					echo "<select name='badgesBadgeID' id='badgesBadgeID' style='width: 302px'>";
-            					echo "<option value='Please select...'>Please select...</option>";
-            					$lastCategory = '';
-            					while ($rowPurpose = $resultPurpose->fetch()) {
-            						$currentCategory = $rowPurpose['category'];
-            						if ($currentCategory != $lastCategory) {
-            							echo "<optgroup label='--".$currentCategory."--'>";
-            						}
+                                echo "<select name='badgesBadgeID' id='badgesBadgeID' style='width: 302px'>";
+                                echo "<option value='Please select...'>Please select...</option>";
+                                $lastCategory = '';
+                                while ($rowPurpose = $resultPurpose->fetch()) {
+                                    $currentCategory = $rowPurpose['category'];
+                                    if ($currentCategory != $lastCategory) {
+                                        echo "<optgroup label='--".$currentCategory."--'>";
+                                    }
                                     $selected = '';
                                     if ($row['badgesBadgeID'] == $rowPurpose['badgesBadgeID'])
                                         $selected = 'selected';
                                     echo "<option $selected value='".$rowPurpose['badgesBadgeID']."'>".$rowPurpose['name'].'</option>';
-            						$lastCategory = $currentCategory;
-            					}
-            					echo '</select>';
-            					?>
-            					<script type="text/javascript">
-            						var badgesBadgeID=new LiveValidation('badgesBadgeID');
-            						badgesBadgeID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
-            					</script>
-            				</td>
-            			</tr>
-            			<tr>
-            				<td>
-            					<b><?php echo __($guid, 'Active') ;?></b><br/>
-            					<span style="font-size: 90%"><i></i></span>
-            				</td>
-            				<td class="right">
-            					<select name="active" id="active" style="width: 302px">
-            						<option <?php if ($row['active'] == 'Y') { echo 'selected '; } ?>value="Y"><?php echo ynExpander($guid, 'Y') ;?></option>
-            						<option <?php if ($row['active'] == 'N') { echo 'selected '; } ?>value="N"><?php echo ynExpander($guid, 'N') ;?></option>
-            					</select>
-            				</td>
-            			</tr>
+                                    $lastCategory = $currentCategory;
+                                }
+                                echo '</select>';
+                                ?>
+                                <script type="text/javascript">
+                                    var badgesBadgeID=new LiveValidation('badgesBadgeID');
+                                    badgesBadgeID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
+                                </script>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b><?php echo __($guid, 'Active') ;?></b><br/>
+                                <span style="font-size: 90%"><i></i></span>
+                            </td>
+                            <td class="right">
+                                <select name="active" id="active" style="width: 302px">
+                                    <option <?php if ($row['active'] == 'Y') { echo 'selected '; } ?>value="Y"><?php echo ynExpander($guid, 'Y') ;?></option>
+                                    <option <?php if ($row['active'] == 'N') { echo 'selected '; } ?>value="N"><?php echo ynExpander($guid, 'N') ;?></option>
+                                </select>
+                            </td>
+                        </tr>
                         <tr class='break'>
                             <td colspan=2>
                                 <h3><?php echo __($guid, 'Conditions', 'Free Learning') ?></h3>
@@ -137,94 +137,94 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                             </td>
                         </tr>
                         <tr>
-        					<td>
-        						<b><?php echo __($guid, 'Units Completed - Total', 'Free Learning') ?></b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-        					</td>
-        					<td class="right">
-        						<input name="unitsCompleteTotal" ID="unitsCompleteTotal" value="<?php echo $row['unitsCompleteTotal'] ?>" maxlength=2 type="text" class="standardWidth">
-        						<script type="text/javascript">
-        							var unitsCompleteTotal=new LiveValidation('unitsCompleteTotal');
-        							unitsCompleteTotal.add(Validate.Numericality, { minimum: 0 } );
-        						</script>
-        					</td>
-        				</tr>
+                            <td>
+                                <b><?php echo __($guid, 'Units Completed - Total', 'Free Learning') ?></b><br/>
+                                <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
+                            </td>
+                            <td class="right">
+                                <input name="unitsCompleteTotal" ID="unitsCompleteTotal" value="<?php echo $row['unitsCompleteTotal'] ?>" maxlength=2 type="text" class="standardWidth">
+                                <script type="text/javascript">
+                                    var unitsCompleteTotal=new LiveValidation('unitsCompleteTotal');
+                                    unitsCompleteTotal.add(Validate.Numericality, { minimum: 0 } );
+                                </script>
+                            </td>
+                        </tr>
                         <tr>
-        					<td>
-        						<b><?php echo __($guid, 'Units Completed - This Year', 'Free Learning') ?></b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-        					</td>
-        					<td class="right">
-        						<input name="unitsCompleteThisYear" ID="unitsCompleteThisYear" value="<?php echo $row['unitsCompleteThisYear'] ?>" maxlength=2 type="text" class="standardWidth">
-        						<script type="text/javascript">
-        							var unitsCompleteThisYear=new LiveValidation('unitsCompleteThisYear');
-        							unitsCompleteThisYear.add(Validate.Numericality, { minimum: 0 } );
-        						</script>
-        					</td>
-        				</tr>
+                            <td>
+                                <b><?php echo __($guid, 'Units Completed - This Year', 'Free Learning') ?></b><br/>
+                                <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
+                            </td>
+                            <td class="right">
+                                <input name="unitsCompleteThisYear" ID="unitsCompleteThisYear" value="<?php echo $row['unitsCompleteThisYear'] ?>" maxlength=2 type="text" class="standardWidth">
+                                <script type="text/javascript">
+                                    var unitsCompleteThisYear=new LiveValidation('unitsCompleteThisYear');
+                                    unitsCompleteThisYear.add(Validate.Numericality, { minimum: 0 } );
+                                </script>
+                            </td>
+                        </tr>
                         <tr>
-        					<td>
-        						<b><?php echo __($guid, 'Units Completed - Department Spread', 'Free Learning') ?></b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-        					</td>
-        					<td class="right">
-        						<input name="unitsCompleteDepartmentCount" ID="unitsCompleteDepartmentCount" value="<?php echo $row['unitsCompleteDepartmentCount'] ?>" maxlength=2 type="text" class="standardWidth">
-        						<script type="text/javascript">
-        							var unitsCompleteDepartmentCount=new LiveValidation('unitsCompleteDepartmentCount');
-        							unitsCompleteDepartmentCount.add(Validate.Numericality, { minimum: 0 } );
-        						</script>
-        					</td>
-        				</tr>
+                            <td>
+                                <b><?php echo __($guid, 'Units Completed - Department Spread', 'Free Learning') ?></b><br/>
+                                <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
+                            </td>
+                            <td class="right">
+                                <input name="unitsCompleteDepartmentCount" ID="unitsCompleteDepartmentCount" value="<?php echo $row['unitsCompleteDepartmentCount'] ?>" maxlength=2 type="text" class="standardWidth">
+                                <script type="text/javascript">
+                                    var unitsCompleteDepartmentCount=new LiveValidation('unitsCompleteDepartmentCount');
+                                    unitsCompleteDepartmentCount.add(Validate.Numericality, { minimum: 0 } );
+                                </script>
+                            </td>
+                        </tr>
                         <tr>
-        					<td>
-        						<b><?php echo __($guid, 'Units Completed - Individual', 'Free Learning') ?></b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-        					</td>
-        					<td class="right">
-        						<input name="unitsCompleteIndividual" ID="unitsCompleteIndividual" value="<?php echo $row['unitsCompleteIndividual'] ?>" maxlength=2 type="text" class="standardWidth">
-        						<script type="text/javascript">
-        							var unitsCompleteIndividual=new LiveValidation('unitsCompleteIndividual');
-        							unitsCompleteIndividual.add(Validate.Numericality, { minimum: 0 } );
-        						</script>
-        					</td>
-        				</tr>
+                            <td>
+                                <b><?php echo __($guid, 'Units Completed - Individual', 'Free Learning') ?></b><br/>
+                                <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
+                            </td>
+                            <td class="right">
+                                <input name="unitsCompleteIndividual" ID="unitsCompleteIndividual" value="<?php echo $row['unitsCompleteIndividual'] ?>" maxlength=2 type="text" class="standardWidth">
+                                <script type="text/javascript">
+                                    var unitsCompleteIndividual=new LiveValidation('unitsCompleteIndividual');
+                                    unitsCompleteIndividual.add(Validate.Numericality, { minimum: 0 } );
+                                </script>
+                            </td>
+                        </tr>
                         <tr>
-        					<td>
-        						<b><?php echo __($guid, 'Units Completed - Group', 'Free Learning') ?></b><br/>
-        						<span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-        					</td>
-        					<td class="right">
-        						<input name="unitsCompleteGroup" ID="unitsCompleteGroup" value="<?php echo $row['unitsCompleteGroup'] ?>" maxlength=2 type="text" class="standardWidth">
-        						<script type="text/javascript">
-        							var unitsCompleteGroup=new LiveValidation('unitsCompleteGroup');
-        							unitsCompleteGroup.add(Validate.Numericality, { minimum: 0 } );
-        						</script>
-        					</td>
-        				</tr>
+                            <td>
+                                <b><?php echo __($guid, 'Units Completed - Group', 'Free Learning') ?></b><br/>
+                                <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
+                            </td>
+                            <td class="right">
+                                <input name="unitsCompleteGroup" ID="unitsCompleteGroup" value="<?php echo $row['unitsCompleteGroup'] ?>" maxlength=2 type="text" class="standardWidth">
+                                <script type="text/javascript">
+                                    var unitsCompleteGroup=new LiveValidation('unitsCompleteGroup');
+                                    unitsCompleteGroup.add(Validate.Numericality, { minimum: 0 } );
+                                </script>
+                            </td>
+                        </tr>
                         <?php
                         $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-        				if ($difficulties != false) {
-        					$difficulties = explode(',', $difficulties);
-        					?>
-        					<tr>
-        						<td>
-        							<b><?php echo __($guid, 'Difficulty Level Threshold', 'Free Learning') ?></b><br/>
-        							<span style="font-size: 90%"><i></i></span>
-        						</td>
-        						<td class="right">
-        							<select name="difficultyLevelMaxAchieved" id="difficultyLevelMaxAchieved" style="width: 302px">
-        								<option value=""></option>
-        								<?php
+                        if ($difficulties != false) {
+                            $difficulties = explode(',', $difficulties);
+                            ?>
+                            <tr>
+                                <td>
+                                    <b><?php echo __($guid, 'Difficulty Level Threshold', 'Free Learning') ?></b><br/>
+                                    <span style="font-size: 90%"><i></i></span>
+                                </td>
+                                <td class="right">
+                                    <select name="difficultyLevelMaxAchieved" id="difficultyLevelMaxAchieved" style="width: 302px">
+                                        <option value=""></option>
+                                        <?php
                                         for ($i = 0; $i < count($difficulties); ++$i) {
                                             $selected = '';
                                             if ($row['difficultyLevelMaxAchieved'] == trim($difficulties[$i]))
                                                 $selected = 'selected';
                                             echo "<option $selected value='".trim($difficulties[$i])."'>".trim($difficulties[$i])."</option>";
                                         }
-                    					?>
-        							</select>
-        						</td>
-        					</tr>
+                                        ?>
+                                    </select>
+                                </td>
+                            </tr>
                             <tr>
                                 <td style='width: 275px'>
                                     <b><?php echo __($guid, 'Specific Unit Completion', 'Free Learning') ?></b><br/>
@@ -242,9 +242,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                                         }
                                         while ($rowSelect = $resultSelect->fetch()) {
                                             $selected = '';
-        									if (is_numeric(strpos($row['specificUnitsComplete'], str_pad($rowSelect['freeLearningUnitID'], 10, '0', STR_PAD_LEFT)))) {
-        										$selected = 'selected';
-        									}
+                                            if (is_numeric(strpos($row['specificUnitsComplete'], str_pad($rowSelect['freeLearningUnitID'], 10, '0', STR_PAD_LEFT)))) {
+                                                $selected = 'selected';
+                                            }
                                             echo "<option $selected value='".$rowSelect['freeLearningUnitID']."'>".$rowSelect['name'].'</option>';
                                         }
                                         ?>
@@ -252,22 +252,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                                     </select>
                                 </td>
                             </tr>
-        					<?php
+                            <?php
 
-        				}
-        				?>
-    					<tr>
-    						<td>
-    							<span style="font-size: 90%"><i><?php echo __($guid, '* denotes a required field'); ?></i></span>
-    						</td>
-    						<td class="right">
-    							<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-    							<input type="submit" value="Submit">
-    						</td>
-    					</tr>
-    				</table>
-    			</form>
-    			<?php
+                        }
+                        ?>
+                        <tr>
+                            <td>
+                                <span style="font-size: 90%"><i><?php echo __($guid, '* denotes a required field'); ?></i></span>
+                            </td>
+                            <td class="right">
+                                <input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
+                                <input type="submit" value="Submit">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+                <?php
 
             }
         }

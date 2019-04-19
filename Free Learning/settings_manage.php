@@ -28,7 +28,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 } else {
     //Proceed!
     $page->breadcrumbs
-         ->add(__m('Manage Settings'));
+         ->add(__('Manage Settings'));
     
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], null, null);
@@ -124,7 +124,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
 					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
 				</td>
-				<td stclass="right">
+				<td class="right">
 					<input name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" maxlength=50 value="<?php echo htmlPrep($row['value']) ?>" type="text" style="width: 300px">
 					<script type="text/javascript">
 						var <?php echo $row['name'] ?>=new LiveValidation('<?php echo $row['name'] ?>');

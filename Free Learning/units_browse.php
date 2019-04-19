@@ -40,10 +40,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
-    	//Breadcrumbs
-    	$page->breadcrumbs
-    		 ->add(__m('Browse Units'));
-    	
+        //Breadcrumbs
+        $page->breadcrumbs
+             ->add(__m('Browse Units'));
+        
         if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
             echo "<div class='linkTop'>";
                 echo "<a class='button' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>".__($guid, 'View Our Free Learning Showcase', 'Free Learning')."</a>";
@@ -96,23 +96,23 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo "<form method='get' action='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php'>";
         echo "<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
         ?>
-		<tr>
-			<td>
-				<b><?php echo __($guid, 'Learning Area & Course') ?></b><br/>
-				<span style="font-size: 90%"><i></i></span>
-			</td>
-			<td class="right">
-				<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
-					<option value=""></option>
-					<?php
+        <tr>
+            <td>
+                <b><?php echo __($guid, 'Learning Area & Course') ?></b><br/>
+                <span style="font-size: 90%"><i></i></span>
+            </td>
+            <td class="right">
+                <select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
+                    <option value=""></option>
+                    <?php
                     echo "<optgroup label='--".__('Learning Area')."--'>";
-					$learningAreas = getLearningAreas($connection2, $guid);
-					for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-						if ($gibbonDepartmentID == $learningAreas[$i]) {
-							echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-						} else {
-							echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-						}
+                    $learningAreas = getLearningAreas($connection2, $guid);
+                    for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+                        if ($gibbonDepartmentID == $learningAreas[$i]) {
+                            echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+                        } else {
+                            echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
+                        }
                     }
                     $courses = getCourses($connection2);
                     if (is_array($courses) && count($courses) > 0) {
@@ -125,68 +125,68 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
                         }
                     }
-					?>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b><?php echo __($guid, 'Difficulty', 'Free Learning') ?></b><br/>
-				<span style="font-size: 90%"><i></i></span>
-			</td>
-			<td class="right">
-				<?php
-				$difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-				echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
-				echo "<option value=''></option>";
-				$difficultiesList = explode(',', $difficulties);
-				foreach ($difficultiesList as $difficultyOption) {
-					$selected = '';
-					if ($difficulty == $difficultyOption) {
-						$selected = 'selected';
-					}
-					echo "<option $selected value='".__($guid, $difficultyOption, 'Free Learning')."'>".__($guid, $difficultyOption, 'Free Learning').'</option>';
-				}
-				echo '</select>';
-				?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b><?php echo __($guid, 'Name') ?></b><br/>
-				<span style="font-size: 90%"><i></i></span>
-			</td>
-			<td class="right">
-				<?php
-				echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
-        		?>
-			</td>
-		</tr>
-		<?php
-		if ($canManage) {
-			?>
-			<tr>
-				<td>
-					<b><?php echo __($guid, 'Show Inactive Units?', 'Free Learning') ?></b><br/>
-					<span style="font-size: 90%"><i></i></span>
-				</td>
-				<td class="right">
-					<select name="showInactive" id="showInactive" style="width: 302px">
-						<?php
-						$selected = '';
-						if ($showInactive == 'N') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-						$selected = '';
-						if ($showInactive == 'Y') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-						?>
-					</select>
-				</td>
-			</tr>
+                    ?>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b><?php echo __($guid, 'Difficulty', 'Free Learning') ?></b><br/>
+                <span style="font-size: 90%"><i></i></span>
+            </td>
+            <td class="right">
+                <?php
+                $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+                echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
+                echo "<option value=''></option>";
+                $difficultiesList = explode(',', $difficulties);
+                foreach ($difficultiesList as $difficultyOption) {
+                    $selected = '';
+                    if ($difficulty == $difficultyOption) {
+                        $selected = 'selected';
+                    }
+                    echo "<option $selected value='".__($guid, $difficultyOption, 'Free Learning')."'>".__($guid, $difficultyOption, 'Free Learning').'</option>';
+                }
+                echo '</select>';
+                ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <b><?php echo __($guid, 'Name') ?></b><br/>
+                <span style="font-size: 90%"><i></i></span>
+            </td>
+            <td class="right">
+                <?php
+                echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
+                ?>
+            </td>
+        </tr>
+        <?php
+        if ($canManage) {
+            ?>
+            <tr>
+                <td>
+                    <b><?php echo __($guid, 'Show Inactive Units?', 'Free Learning') ?></b><br/>
+                    <span style="font-size: 90%"><i></i></span>
+                </td>
+                <td class="right">
+                    <select name="showInactive" id="showInactive" style="width: 302px">
+                        <?php
+                        $selected = '';
+                        if ($showInactive == 'N') {
+                            $selected = 'selected';
+                        }
+                        echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
+                        $selected = '';
+                        if ($showInactive == 'Y') {
+                            $selected = 'selected';
+                        }
+                        echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
+                        ?>
+                    </select>
+                </td>
+            </tr>
             <tr>
                 <td style='width: 275px'>
                     <b><?php echo __($guid, 'View As') ?> *</b><br/>
@@ -236,9 +236,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     </select>
                 </td>
             </tr>
-			<?php
+            <?php
 
-		}
+        }
 
         echo '<tr>';
         echo "<td class='right' colspan=2>";
@@ -342,8 +342,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     ++$count;
 
-					//COLOR ROW BY STATUS!
-					echo "<tr class=$rowNum>";
+                    //COLOR ROW BY STATUS!
+                    echo "<tr class=$rowNum>";
                     echo "<td style='text-align: center; font-size: 125%'>";
                     echo "<div style='font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>".$row['name'].'</div><br/>';
                     if ($row['logo'] == null) {
@@ -365,9 +365,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 echo "<a target='_blank' href='".$author[3]."'>".$author[1].'</a><br/>';
                             }
                             if (isset($_SESSION[$guid]['username'])) { //Am author chekc only if logged in!
-								if ($author[2] == $_SESSION[$guid]['gibbonPersonID']) { // Check to see if I am one of the authors
-									$amAuthor = true;
-								}
+                                if ($author[2] == $_SESSION[$guid]['gibbonPersonID']) { // Check to see if I am one of the authors
+                                    $amAuthor = true;
+                                }
                             }
                         }
                     }
@@ -463,12 +463,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $rowNum = 'odd';
                 while ($row = $result->fetch()) {
                     //Row header if needed
-					if ($count % $columns == 0) {
-						echo "<tr class='odd'>";
-					}
+                    if ($count % $columns == 0) {
+                        echo "<tr class='odd'>";
+                    }
 
-					//Cell style
-					$cellClass = '';
+                    //Cell style
+                    $cellClass = '';
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
                         $cellClass = 'current';
                     } elseif ($row['status'] == 'Current' or $row['status'] == 'Complete - Pending') {
@@ -484,8 +484,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo "<img title='".htmlPrep($title)."' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$row['logo']."'/><br/>";
                     }
 
-					//Actions
-					$prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
+                    //Actions
+                    $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
                     if ($prerequisitesActive != false) {
                         $prerequisites = explode(',', $prerequisitesActive);
                         $units = getUnitsArray($connection2);
@@ -526,22 +526,22 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '<p>';
                 echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.', 'Free Learning');
                 echo '</p>'; ?>
-				<script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
-				<link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+                <script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
+                <link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 
-				<style type="text/css">
-					div#map {
-						width: 100%;
-						height: 800px;
-						border: 1px solid #000;
-						background-color: #ddd;
-						margin-bottom: 20px ;
-					}
-				</style>
+                <style type="text/css">
+                    div#map {
+                        width: 100%;
+                        height: 800px;
+                        border: 1px solid #000;
+                        background-color: #ddd;
+                        margin-bottom: 20px ;
+                    }
+                </style>
 
-				<div id="map"></div>
+                <div id="map"></div>
 
-				<?php
+                <?php
                 //PREP NODE AND EDGE ARRAYS DATA
                 $nodeArray = array();
                 $edgeArray = array();
@@ -615,57 +615,57 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 }
 
                 ?>
-				<script type="text/javascript">
-					//CREATE NODE ARRAY
-					var nodes = new vis.DataSet([<?php echo $nodeList; ?>]);
+                <script type="text/javascript">
+                    //CREATE NODE ARRAY
+                    var nodes = new vis.DataSet([<?php echo $nodeList; ?>]);
 
-					//CREATE EDGE ARRAY
-					var edges = new vis.DataSet([<?php echo $edgeList ?>]);
+                    //CREATE EDGE ARRAY
+                    var edges = new vis.DataSet([<?php echo $edgeList ?>]);
 
-					//CREATE NODE TO freeLearningUnitID ARRAY
-					var ids = new Array(<?php echo $idList ?>);
+                    //CREATE NODE TO freeLearningUnitID ARRAY
+                    var ids = new Array(<?php echo $idList ?>);
 
-					//CREATE NETWORK
-					var container = document.getElementById('map');
-					var data = {
-					nodes: nodes,
-					edges: edges
-					};
-					var options = {
-						nodes: {
-							borderWidth:4,
-							size:30,
-							color: {
-								border: '#222222',
-								background: '#999999'
-							},
-							font:{color:'#333'},
-            				shadow:true
-						},
-						edges: {
-							color: '#333',
-            				shadow:true
-						},
-					  	interaction:{
-							navigationButtons: true,
-    						zoomView: false
-						},
-						layout: {
-							randomSeed: 0.5,
-							improvedLayout:true
-						}
-					};
-					var network = new vis.Network(container, data, options);
-
-					//CLICK LISTENER
-					network.on( 'click', function(properties) {
-						var nodeNo = properties.nodes ;
-                        if (nodeNo != '') {
-						    window.location = '<?php echo $_SESSION[$guid]['absoluteURL'] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
+                    //CREATE NETWORK
+                    var container = document.getElementById('map');
+                    var data = {
+                    nodes: nodes,
+                    edges: edges
+                    };
+                    var options = {
+                        nodes: {
+                            borderWidth:4,
+                            size:30,
+                            color: {
+                                border: '#222222',
+                                background: '#999999'
+                            },
+                            font:{color:'#333'},
+                            shadow:true
+                        },
+                        edges: {
+                            color: '#333',
+                            shadow:true
+                        },
+                          interaction:{
+                            navigationButtons: true,
+                            zoomView: false
+                        },
+                        layout: {
+                            randomSeed: 0.5,
+                            improvedLayout:true
                         }
-					});
-				</script>
-				<?php
+                    };
+                    var network = new vis.Network(container, data, options);
+
+                    //CLICK LISTENER
+                    network.on( 'click', function(properties) {
+                        var nodeNo = properties.nodes ;
+                        if (nodeNo != '') {
+                            window.location = '<?php echo $_SESSION[$guid]['absoluteURL'] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
+                        }
+                    });
+                </script>
+                <?php
 
             }
         }

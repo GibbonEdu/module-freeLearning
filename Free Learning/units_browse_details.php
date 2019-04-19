@@ -82,10 +82,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
 
-		//Breadcrumbs
-		$page->breadcrumbs
-    		 ->add(__m('Browse Units'), 'units_browse.php', $urlParams)
-    		 ->add(__m('Unit Details'));
+        //Breadcrumbs
+        $page->breadcrumbs
+             ->add(__m('Browse Units'), 'units_browse.php', $urlParams)
+             ->add(__m('Unit Details'));
 
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);
@@ -300,8 +300,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo "<li><a href='#tabs6'>".__($guid, 'Exemplar Work', 'Free Learning').'</a></li>';
                     echo '</ul>';
 
-					//Tabs
-					echo "<div id='tabs0'>";
+                    //Tabs
+                    echo "<div id='tabs0'>";
                     echo '<h3>';
                     echo __($guid, 'Blurb', 'Free Learning');
                     echo '</h3>';
@@ -585,11 +585,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                     echo '</div>';
                     echo "<div id='tabs4'>";
-					//Resources
-					$noReosurces = true;
+                    //Resources
+                    $noReosurces = true;
 
-					//Links
-					$links = '';
+                    //Links
+                    $links = '';
                     $linksArray = array();
                     $linksCount = 0;
                     $dom = new DOMDocument();
@@ -618,8 +618,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $noReosurces = false;
                     }
 
-					//Images
-					$images = '';
+                    //Images
+                    $images = '';
                     $imagesArray = array();
                     $imagesCount = 0;
                     $dom2 = new DOMDocument();
@@ -646,8 +646,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $noReosurces = false;
                     }
 
-					//Embeds
-					$embeds = '';
+                    //Embeds
+                    $embeds = '';
                     $embedsArray = array();
                     $embedsCount = 0;
                     $dom2 = new DOMDocument();
@@ -674,23 +674,23 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $noReosurces = false;
                     }
 
-					//No resources!
-					if ($noReosurces) {
-						echo "<div class='error'>";
-						echo __($guid, 'There are no records to display.');
-						echo '</div>';
-					}
+                    //No resources!
+                    if ($noReosurces) {
+                        echo "<div class='error'>";
+                        echo __($guid, 'There are no records to display.');
+                        echo '</div>';
+                    }
                     echo '</div>';
                     echo "<div id='tabs5'>";
-						//Spit out outcomes
-						try {
-							$dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
-							$sqlBlocks = "SELECT freeLearningUnitOutcome.*, scope, name, nameShort, category, gibbonYearGroupIDList FROM freeLearningUnitOutcome JOIN gibbonOutcome ON (freeLearningUnitOutcome.gibbonOutcomeID=gibbonOutcome.gibbonOutcomeID) WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y' ORDER BY sequenceNumber";
-							$resultBlocks = $connection2->prepare($sqlBlocks);
-							$resultBlocks->execute($dataBlocks);
-						} catch (PDOException $e) {
-							echo "<div class='error'>".$e->getMessage().'</div>';
-						}
+                        //Spit out outcomes
+                        try {
+                            $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
+                            $sqlBlocks = "SELECT freeLearningUnitOutcome.*, scope, name, nameShort, category, gibbonYearGroupIDList FROM freeLearningUnitOutcome JOIN gibbonOutcome ON (freeLearningUnitOutcome.gibbonOutcomeID=gibbonOutcome.gibbonOutcomeID) WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y' ORDER BY sequenceNumber";
+                            $resultBlocks = $connection2->prepare($sqlBlocks);
+                            $resultBlocks->execute($dataBlocks);
+                        } catch (PDOException $e) {
+                            echo "<div class='error'>".$e->getMessage().'</div>';
+                        }
                     if ($resultBlocks->rowCount() < 1) {
                         echo "<div class='error'>";
                         echo __($guid, 'There are no records to display.');
@@ -724,8 +724,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 $rowNum = 'odd';
                             }
 
-							//COLOR ROW BY STATUS!
-							echo "<tr class=$rowNum>";
+                            //COLOR ROW BY STATUS!
+                            echo "<tr class=$rowNum>";
                             echo '<td>';
                             echo '<b>'.$rowBlocks['scope'].'</b><br/>';
                             if ($rowBlocks['scope'] == 'Learning Area' and @$rowBlocks['gibbonDepartmentID'] != '') {
@@ -784,15 +784,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     echo '</div>';
                     echo "<div id='tabs6'>";
-						//Spit out exemplar work
-						try {
-							$dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
-							$sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
-							$resultWork = $connection2->prepare($sqlWork);
-							$resultWork->execute($dataWork);
-						} catch (PDOException $e) {
-							echo "<div class='error'>".$e->getMessage().'</div>';
-						}
+                        //Spit out exemplar work
+                        try {
+                            $dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
+                            $sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
+                            $resultWork = $connection2->prepare($sqlWork);
+                            $resultWork->execute($dataWork);
+                        } catch (PDOException $e) {
+                            echo "<div class='error'>".$e->getMessage().'</div>';
+                        }
                     if ($resultWork->rowCount() < 1) {
                         echo "<div class='error'>";
                         echo __($guid, 'There are no records to display.');
@@ -871,16 +871,16 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '</div>';
 
                     echo "<script type='text/javascript'>
-						$( \"#tabs\" ).tabs({
-								active: $defaultTab,
-								ajaxOptions: {
-									error: function( xhr, status, index, anchor ) {
-										$( anchor.hash ).html(
-											\"Couldn't load this tab.\" );
-									}
-								}
-							});
-					</script>";
+                        $( \"#tabs\" ).tabs({
+                                active: $defaultTab,
+                                ajaxOptions: {
+                                    error: function( xhr, status, index, anchor ) {
+                                        $( anchor.hash ).html(
+                                            \"Couldn't load this tab.\" );
+                                    }
+                                }
+                            });
+                    </script>";
                 }
             }
         }

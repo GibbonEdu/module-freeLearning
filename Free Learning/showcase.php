@@ -30,8 +30,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
     echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
-	//Beadcrumbs
-	$page->breadcrumbs
+    //Beadcrumbs
+    $page->breadcrumbs
          ->add(__m('Free Learning Showcase'));
 
     //Set pagination variable
