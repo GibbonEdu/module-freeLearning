@@ -79,6 +79,8 @@ $confirmationKey = null;
 if (isset($_GET['confirmationKey'])) {
     $confirmationKey = $_GET['confirmationKey'];
 }
+//Compact Prama:
+$urlPrama = compact('$confirmationKey', '$mode', '$freeLearningUnitID', '$view', '$name', '$difficulty', '$gibbonDepartmentID', '$showInactive', '$freeLearningUnitID')
 
 if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
     //Check unit
@@ -98,8 +100,8 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
     } else {
         $row = $result->fetch();
 		$page->breadcrumbs
-   			 ->add(__('Browse Units'), 'units_browse.php')
-   			 ->add(__('Unit Details'), 'units_browse_details.php')
+   			 ->add(__('Browse Units'), 'units_browse.php', $urlPrama)
+   			 ->add(__('Unit Details'), 'units_browse_details.php', $urlPrama)
    			 ->add(__('Approval'));
 
         //Show choice for school mentor
