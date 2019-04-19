@@ -75,9 +75,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $gibbonPersonID = $_GET['gibbonPersonID'];
             }
         }
-
+		$urlPramas = compact('$roleCategory','$freeLearningUnitStudentID','$canManage','$showInactive','$gibbonDepartmentID','$difficulty','$name','$view','$gibbonPersonID')
         $page->breadcrumbs
-   			 ->add(__('Browse Units'), 'units_browse.php')
+   			 ->add(__('Browse Units'), 'units_browse.php', $urlPramas)
    			 ->add(__('Unit Details'), 'units_browse_details.php')
    			 ->add(__('Approval'));
 
