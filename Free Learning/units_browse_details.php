@@ -81,7 +81,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
 		//Breadcrumbs
 		$page->breadcrumbs
-    		 ->add(__('Manage Units'), 'units_manage.php')
+    		 ->add(__('Browse Units'), 'units_browse.php')
     		 ->add(__('Unit Details'));
 
         if (isset($_GET['return'])) {

@@ -25,9 +25,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     echo "<div class='error'>";
     echo __($guid, 'You do not have access to this action.');
     echo '</div>';
-} else {]
+} else {
 	$page->breadcrumbs
-        ->add(__('Add Badges'));
+	     ->add(__('Manage Badges'), 'badges_manage.php')
+             ->add(__('Add Badges'));
 
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
@@ -40,7 +41,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         echo "<div class='success'>";
         echo __($guid, 'The Badges module is installed, active and available, so you can access this functionality.', 'Free Learning');
         echo '</div>';
-
+	    
         $returns = array();
         $editLink = '';
         if (isset($_GET['editID'])) {
