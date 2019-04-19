@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.8.01
+-------
+Refactored breadcrumbs
+
 v5.8.00
 -------
 Added custom mentors based on role

@@ -905,3 +905,8 @@ $sql[$count][0] = '5.8.00';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnit` ADD `schoolMentorCustomRole` int(3) unsigned zerofill NULL DEFAULT NULL AFTER `schoolMentorCustom`;end
 ";
+
+//v5.8.01
+++$count;
+$sql[$count][0] = '5.8.01';
+$sql[$count][1] = "";
