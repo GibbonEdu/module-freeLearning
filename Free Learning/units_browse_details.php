@@ -79,9 +79,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $gibbonPersonID = $_GET['gibbonPersonID'];
             }
         }
+
+        $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
+
 		//Breadcrumbs
 		$page->breadcrumbs
-    		 ->add(__('Browse Units'), 'units_browse.php')
+    		 ->add(__('Browse Units'), 'units_browse.php', $urlParams)
     		 ->add(__('Unit Details'));
 
         if (isset($_GET['return'])) {
