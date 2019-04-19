@@ -80,13 +80,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             }
         }
 
-        echo "<div class='trail'>";
-        if ($publicUnits == 'Y' & empty($_SESSION[$guid]['username'])) {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
-        } else {
-            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Free Learning', 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Browse Units', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Unit Details', 'Free Learning').'</div>';
-        }
-        echo '</div>';
+        $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
+
+		//Breadcrumbs
+		$page->breadcrumbs
+    		 ->add(__('Browse Units'), 'units_browse.php', $urlParams)
+    		 ->add(__('Unit Details'));
 
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);

@@ -30,12 +30,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
     echo __($guid, 'You do not have access to this action.');
     echo '</div>';
 } else {
-    echo "<div class='trail'>";
-    if ($publicUnits == 'Y') { echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase', 'Free Learning').'</div>';
-    } else {
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Showcase', 'Free Learning').'</div>';
-    }
-    echo '</div>';
+	//Beadcrumbs
+	$page->breadcrumbs
+    ->add(__('Free Learning Showcase'));
 
     //Set pagination variable
     $page = 1;

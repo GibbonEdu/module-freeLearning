@@ -27,9 +27,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     echo '</div>';
 } else {
     //Proceed!
-    echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid,'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/badges_manage.php'>".__($guid, 'Manage Badges', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Badges', 'Free Learning').'</div>';
-    echo '</div>';
+    $page->breadcrumbs
+   		 ->add(__('Manage Badges'), 'badges_manage.php')
+   		 ->add(__('Edit Badges'));
 
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied

@@ -75,9 +75,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
 
         //Get action with highest precendence
-        echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse.php&freeLearningUnitID='.$_GET['freeLearningUnitID']."'>".__($guid, 'Browse Units', 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&tab=2&view=$view'>".__($guid, 'Unit Details', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Add Multiple', 'Free Learning').'</div>';
-        echo '</div>';
+        $urlParamas = compact('$roleCategory','$freeLearningUnitID','$canManage','$showInactive','$gibbonDepartmentID','$difficulty','$name','$view','$gibbonPersonID')
+        $page->breadcrumbs
+   			 ->add(__('Browse Units'), 'units_browse.php', $urlParamas)
+   			 ->add(__('Unit Details'), 'units_browse_details.php', $urlParamas)
+   			 ->add(__('Add Multiple7'));
 
         if ($freeLearningUnitID == '') {
             echo "<div class='error'>";

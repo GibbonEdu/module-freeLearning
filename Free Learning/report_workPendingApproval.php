@@ -28,9 +28,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workP
 }
 else {
 	//Proceed!
-	print "<div class='trail'>" ;
-	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"]), 'Free Learning') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Work Pending Approval', 'Free Learning') . "</div>" ;
-	print "</div>" ;
+	$page->breadcrumbs
+    	 ->add(__('Work Pending Approval'));
 
 	//Check for custom field
 	$customField = getSettingByScope($connection2, 'Free Learning', 'customField');

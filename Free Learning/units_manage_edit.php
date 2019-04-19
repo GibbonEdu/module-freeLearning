@@ -59,9 +59,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         }
 
         //Proceed!
-        echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_manage.php'>".__($guid, 'Manage Units')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Unit', 'Free Learning').'</div>';
-        echo '</div>';
+        $urlPrama = compact('$view ', '$name', '$difficulty', '$gibbonDepartmentID', '$showInactive', '$canManage', '$freeLearningUnitID')
+        $page->breadcrumbs
+    		 ->add(__('Manage Units'), 'units_manage.php', $urlPrama)
+    		 ->add(__('Edit Unit'));
 
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);

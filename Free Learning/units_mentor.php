@@ -79,6 +79,8 @@ $confirmationKey = null;
 if (isset($_GET['confirmationKey'])) {
     $confirmationKey = $_GET['confirmationKey'];
 }
+//Compact Prama:
+$urlPrama = compact('$confirmationKey', '$mode', '$freeLearningUnitID', '$view', '$name', '$difficulty', '$gibbonDepartmentID', '$showInactive', '$freeLearningUnitID')
 
 if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
     //Check unit
@@ -97,9 +99,10 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
         echo '</div>';
     } else {
         $row = $result->fetch();
-        echo "<div class='trail'>";
-        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php)'>".__($guid, getModuleName($_GET['q']), 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, 'Browse Units', 'Free Learning')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&sidebar=true&tab=2&view=$view'>".__($guid, 'Unit Details', 'Free Learning')."</a> > </div><div class='trailEnd'>".__($guid, 'Approval', 'Free Learning').'</div>';
-        echo '</div>';
+		$page->breadcrumbs
+   			 ->add(__('Browse Units'), 'units_browse.php', $urlPrama)
+   			 ->add(__('Unit Details'), 'units_browse_details.php', $urlPrama)
+   			 ->add(__('Approval'));
 
         //Show choice for school mentor
         if ($mode == "internal" && $confirmationKey != '') {
@@ -143,10 +146,8 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
     }
 }
 else {
-    echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Mentor Confirmation', 'Free Learning').'</div>';
-    echo '</div>';
-}
+   $page->breadcrumbs
+    ->add(__('Free Learning Mentor Confirmation'));
 
 if (isset($_GET['return'])) {
     returnProcess($guid, $_GET['return'], null, array('success0' => __($guid, 'Your request was completed successfully. Thank you for your time.', 'Free Learning'), 'success1' => __($guid, 'Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.', 'Free Learning')));
