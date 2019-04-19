@@ -20,9 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //Module includes
 include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
-echo "<div class='trail'>";
-echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > </div><div class='trailEnd'>".__($guid, 'Free Learning Mentor Feedback', 'Free Learning').'</div>';
-echo '</div>';
+$page->breadcrumbs
+   	 ->add(__('Free Learning Mentor Feedback'));
 
 $block = false;
 if (isset($_GET['return'])) {
