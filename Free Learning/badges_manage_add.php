@@ -25,9 +25,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     echo "<div class='error'>";
     echo __($guid, 'You do not have access to this action.');
     echo '</div>';
-} else {]
+} else {
 	$page->breadcrumbs
-	     ->add(__('Manage Badge'), 'badges_manage.php')
+	     ->add(__('Manage Badges'), 'badges_manage.php')
              ->add(__('Add Badges'));
 
 
