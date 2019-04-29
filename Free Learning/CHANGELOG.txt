@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.8.02
+-------
+Post refactor tweak
+
 v5.8.01
 -------
 Refactored breadcrumbs

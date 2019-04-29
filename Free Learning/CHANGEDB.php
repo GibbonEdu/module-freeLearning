@@ -910,3 +910,8 @@ ALTER TABLE `freeLearningUnit` ADD `schoolMentorCustomRole` int(3) unsigned zero
 ++$count;
 $sql[$count][0] = '5.8.01';
 $sql[$count][1] = "";
+
+//v5.8.02
+++$count;
+$sql[$count][0] = '5.8.02';
+$sql[$count][1] = "";
