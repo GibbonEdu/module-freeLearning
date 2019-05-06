@@ -21,6 +21,7 @@ include '../../gibbon.php';
 
 include './moduleFunctions.php';
 
+$page = $container->get('page');
 
 $id = $_GET['id'];
 $mode = null;

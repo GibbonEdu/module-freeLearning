@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.8.03
+-------
+v18 Compatibility
+
 v5.8.02
 -------
 Post refactor tweak

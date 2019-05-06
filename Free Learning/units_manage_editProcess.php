@@ -296,7 +296,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                         $resultBlock = $connection2->prepare($sqlBlock);
                                         $resultBlock->execute($dataBlock);
                                     } catch (PDOException $e) {
-                                        echo $e->getMessage();
                                         $partialFail = true;
                                     }
                                     $dataRemove["freeLearningUnitBlockID$sequenceNumber"] = $connection2->lastInsertId();
