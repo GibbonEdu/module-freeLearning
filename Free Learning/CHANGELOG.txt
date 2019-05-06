@@ -2,6 +2,10 @@ CHANGELOG
 =========
 v5.8.03
 -------
+Breadcrumb tweaks
+
+v5.8.03
+-------
 v18 Compatibility
 
 v5.8.02

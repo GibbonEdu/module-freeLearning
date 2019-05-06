@@ -76,10 +76,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         //Get action with highest precendence
         $urlParams = compact('freeLearningUnitID', 'showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
-        
+
         $page->breadcrumbs
-             ->add(__m('Browse Units'), 'units_browse.php', $urlParams)
-             ->add(__m('Unit Details'), 'units_browse_details.php', $urlParams)
+             ->add(__m('Browse Units'), 'units_browse.php', $urlParams);
+
+        $urlParams["sidebar"] = "true";
+        $page->breadcrumbs->add(__m('Unit Details'), 'units_browse_details.php', $urlParams)
              ->add(__m('Add Multiple'));
 
         if ($freeLearningUnitID == '') {

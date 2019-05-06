@@ -101,9 +101,11 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
         $urlParams = compact('view ', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
 
         $page->breadcrumbs
-                ->add(__m('Browse Units'), 'units_browse.php', $urlParams)
-                ->add(__m('Unit Details'), 'units_browse_details.php', $urlParams)
-                ->add(__m('Approval'));
+            ->add(__m('Browse Units'), 'units_browse.php', $urlParams);
+
+        $urlParams["sidebar"] = "true";
+        $page->breadcrumbs->add(__m('Unit Details'), 'units_browse_details.php', $urlParams)
+            ->add(__m('Approval'));
 
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, array('success0' => __($guid, 'Your request was completed successfully. Thank you for your time.', 'Free Learning'), 'success1' => __($guid, 'Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.', 'Free Learning')));
