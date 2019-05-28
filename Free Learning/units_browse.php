@@ -43,7 +43,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         //Breadcrumbs
         $page->breadcrumbs
              ->add(__m('Browse Units'));
-        
+
         if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
             echo "<div class='linkTop'>";
                 echo "<a class='button' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>".__($guid, 'View Our Free Learning Showcase', 'Free Learning')."</a>";

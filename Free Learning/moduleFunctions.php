@@ -719,7 +719,7 @@ function displayBlockContent($guid, $connection2, $title, $type, $length, $conte
         $return .= '</div>';
     }
     if ($contents != '') {
-        $return .= "<div style='margin-top:20px; padding: 15px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>".$contents.'</div>';
+        $return .= "<div style='margin-top:20px; padding: 25px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>".$contents.'</div>';
     }
     if (isset($_SESSION[$guid]['username'])) {
         if ($roleCategory == 'Staff') {

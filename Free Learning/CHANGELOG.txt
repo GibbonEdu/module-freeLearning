@@ -1,6 +1,10 @@
 CHANGELOG
 =========
-v5.8.03
+v5.8.05
+-------
+Safari block display fix
+
+v5.8.04
 -------
 Breadcrumb tweaks
 
