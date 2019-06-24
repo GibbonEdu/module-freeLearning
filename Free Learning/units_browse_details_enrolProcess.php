@@ -19,9 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Contracts\Comms\Mailer;
 
-include '../../gibbon.php';
+require_once '../../gibbon.php';
 
-include './moduleFunctions.php';
+require_once  './moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 

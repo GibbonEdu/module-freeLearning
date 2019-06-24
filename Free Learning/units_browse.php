@@ -23,10 +23,8 @@ include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
 if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false))) {
-    //Acess denied
-    echo "<div class='error'>";
-    echo __($guid, 'You do not have access to this action.');
-    echo '</div>';
+    // Access denied
+    $page->addError(__('You do not have access to this action.'));
 } else {
     //Get action with highest precendence
     if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
