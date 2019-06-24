@@ -38,28 +38,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $canManage = true;
         }
         $showInactive = 'N';
-        if ($canManage and isset($_GET['showInactive'])) {
+        if ($canManage and !empty($_GET['showInactive'])) {
             $showInactive = $_GET['showInactive'];
         }
-        $gibbonDepartmentID = '';
-        if (isset($_GET['gibbonDepartmentID'])) {
-            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-        }
-        $difficulty = '';
-        if (isset($_GET['difficulty'])) {
-            $difficulty = $_GET['difficulty'];
-        }
-        $name = '';
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
-        }
-        $view = '';
-        if (isset($_GET['view'])) {
-            $view = $_GET['view'];
-        }
+
+        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $difficulty = $_GET['difficulty'] ?? '';
+        $name = $_GET['name'] ?? '';
+        $view = $_GET['view'] ?? '';
 
         //Proceed!
-        $urlParams = compact('view ', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
+        $urlParams = compact('view', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
 
         $page->breadcrumbs
              ->add(__m('Manage Units'), 'units_manage.php', $urlParams)

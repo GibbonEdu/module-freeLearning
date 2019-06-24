@@ -98,7 +98,7 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
     } else {
         $row = $result->fetch();
 
-        $urlParams = compact('view ', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
+        $urlParams = compact('view', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
 
         $page->breadcrumbs
             ->add(__m('Browse Units'), 'units_browse.php', $urlParams);
