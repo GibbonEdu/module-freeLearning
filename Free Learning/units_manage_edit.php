@@ -26,9 +26,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) { echo "<div class='error'>";
-        echo __($guid, 'The highest grouped action cannot be determined.');
-        echo '</div>';
+    if ($highestAction == false) {
+        $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         $freeLearningUnitID = $_GET['freeLearningUnitID'];
         $canManage = false;

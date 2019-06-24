@@ -72,9 +72,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $page->addError(__('You do not have access to this action.'));
 } else {
     //Get action with highest precendence
-    if ($highestAction == false) { echo "<div class='error'>";
-        echo __($guid, 'The highest grouped action cannot be determined.');
-        echo '</div>';
+    if ($highestAction == false) {
+        $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
 

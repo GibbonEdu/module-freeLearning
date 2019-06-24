@@ -36,9 +36,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
         $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
     }
-    if ($highestAction == false) { echo "<div class='error'>";
-        echo __($guid, 'The highest grouped action cannot be determined.');
-        echo '</div>';
+    if ($highestAction == false) {
+        $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         //Get params
         $freeLearningUnitID = '';
