@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
+use Gibbon\Forms\DatabaseFormFactory;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -52,10 +56,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
             $canManage = true;
         }
-        $showInactive = 'N';
-        if ($canManage and isset($_GET['showInactive'])) {
-            $showInactive = $_GET['showInactive'] ?? 'N';
-        }
+        $showInactive = $canManage && isset($_GET['showInactive'])
+            ? $_GET['showInactive']
+            : 'N';
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
@@ -74,166 +77,58 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $authors = getAuthorsArray($connection2);
         $blocks = getBlocksArray($connection2);
 
-        echo '<h3>';
-        echo __($guid, 'Filter');
-        echo '</h3>';
-        echo "<form method='get' action='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php'>";
-        echo "<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
-        ?>
-        <tr>
-            <td>
-                <b><?php echo __($guid, 'Learning Area & Course') ?></b><br/>
-                <span style="font-size: 90%"><i></i></span>
-            </td>
-            <td class="right">
-                <select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
-                    <option value=""></option>
-                    <?php
-                    echo "<optgroup label='--".__('Learning Area')."--'>";
-                    $learningAreas = getLearningAreas($connection2, $guid);
-                    for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                        if ($gibbonDepartmentID == $learningAreas[$i]) {
-                            echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-                        } else {
-                            echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-                        }
-                    }
-                    $courses = getCourses($connection2);
-                    if (is_array($courses) && count($courses) > 0) {
-                        echo "<optgroup label='--".__('Course')."--'>";
-                        foreach ($courses as $course) {
-                            if ($gibbonDepartmentID == $course['course']) {
-                                echo "<option selected value='".$course['course']."'>".$course['course'].'</option>';
-                            } else {
-                                echo "<option value='".$course['course']."'>".$course['course'].'</option>';
-                            }
-                        }
-                    }
-                    ?>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <b><?php echo __($guid, 'Difficulty', 'Free Learning') ?></b><br/>
-                <span style="font-size: 90%"><i></i></span>
-            </td>
-            <td class="right">
-                <?php
-                $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-                echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
-                echo "<option value=''></option>";
-                $difficultiesList = explode(',', $difficulties);
-                foreach ($difficultiesList as $difficultyOption) {
-                    $selected = '';
-                    if ($difficulty == $difficultyOption) {
-                        $selected = 'selected';
-                    }
-                    echo "<option $selected value='".__($guid, $difficultyOption, 'Free Learning')."'>".__($guid, $difficultyOption, 'Free Learning').'</option>';
-                }
-                echo '</select>';
-                ?>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <b><?php echo __($guid, 'Name') ?></b><br/>
-                <span style="font-size: 90%"><i></i></span>
-            </td>
-            <td class="right">
-                <?php
-                echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
-                ?>
-            </td>
-        </tr>
-        <?php
-        if ($canManage) {
-            ?>
-            <tr>
-                <td>
-                    <b><?php echo __($guid, 'Show Inactive Units?', 'Free Learning') ?></b><br/>
-                    <span style="font-size: 90%"><i></i></span>
-                </td>
-                <td class="right">
-                    <select name="showInactive" id="showInactive" style="width: 302px">
-                        <?php
-                        $selected = '';
-                        if ($showInactive == 'N') {
-                            $selected = 'selected';
-                        }
-                        echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-                        $selected = '';
-                        if ($showInactive == 'Y') {
-                            $selected = 'selected';
-                        }
-                        echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-                        ?>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td style='width: 275px'>
-                    <b><?php echo __($guid, 'View As') ?> *</b><br/>
-                </td>
-                <td class="right">
-                    <select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
-                        <option></option>
-                        <optgroup label='--<?php echo __($guid, 'Students by Roll Group', 'Free Learning') ?>--'>
-                            <?php
-                            try {
-                                $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName";
-                                $resultSelect = $connection2->prepare($sqlSelect);
-                                $resultSelect->execute($dataSelect);
-                            } catch (PDOException $e) {
-                            }
-                    while ($rowSelect = $resultSelect->fetch()) {
-                        $selected = '';
-                        if ($rowSelect['gibbonPersonID'] == $gibbonPersonID) {
-                            $selected = 'selected';
-                        }
-                        echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".htmlPrep($rowSelect['name']).' - '.formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                    }
-                    ?>
-                        </optgroup>
-                        <optgroup label='--<?php echo __($guid, 'All Users by Name', 'Free Learning') ?>--'>
-                            <?php
-                            try {
-                                $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE status='Full' AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') ORDER BY surname, preferredName";
-                                $resultSelect = $connection2->prepare($sqlSelect);
-                                $resultSelect->execute($dataSelect);
-                            } catch (PDOException $e) {
-                            }
-                    while ($rowSelect = $resultSelect->fetch()) {
-                        $selected = '';
-                        if ($rowSelect['gibbonPersonID'] == $gibbonPersonID AND $rowSelect['name'] == '') {
-                            $selected = 'selected';
-                        }
-                        echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true);
-                        if ($rowSelect['name'] != '')
-                            echo ' ('.htmlPrep($rowSelect['name']).')';
-                        echo '</option>';
-                    }
-                    ?>
-                        </optgroup>
-                    </select>
-                </td>
-            </tr>
-            <?php
+        // QUERY
+        $unitGateway = $container->get(UnitGateway::class);
+        $criteria = $unitGateway->newQueryCriteria()
+            ->searchBy($unitGateway->getSearchableColumns(), $name)
+            ->sortBy('name')
+            ->filterBy('department', $gibbonDepartmentID)
+            ->filterBy('difficulty', $difficulty)
+            ->fromPOST();
 
+        // FORM
+        $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form->setTitle(__('Filter'));
+        $form->setFactory(DatabaseFormFactory::create($pdo));
+
+        $form->setClass('noIntBorder fullWidth');
+        $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
+    
+        $learningAreas = $unitGateway->selectLearningAreasAndCourses();
+        $row = $form->addRow();
+            $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
+            $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
+
+        $difficulties = array_map('trim', explode(',', getSettingByScope($connection2, 'Free Learning', 'difficultyOptions')));
+        $row = $form->addRow();
+            $row->addLabel('difficulty', __('Difficulty'));
+            $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
+
+        $row = $form->addRow();
+            $row->addLabel('name', __('Name'));
+            $row->addTextField('name')->setValue($criteria->getSearchText());
+
+        if ($canManage) {
+            $row = $form->addRow();
+                $row->addLabel('showInactive', __m('Show Inactive Units?'));
+                $row->addYesNo('showInactive')->selected($showInactive);
+
+            $row = $form->addRow();
+                $row->addLabel('gibbonPersonID', __m('View As'));
+                $row->addSelectUsers('gibbonPersonID', $_SESSION[$guid]['gibbonSchoolYearID'], ['includeStudents' => true])->selected($gibbonPersonID);
         }
 
-        echo '<tr>';
-        echo "<td class='right' colspan=2>";
-        echo "<input type='hidden' name='q' value='".$_GET['q']."'>";
-        echo "<input type='hidden' name='view' value='$view'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php&view=$view'>".__($guid, 'Clear Filters').'</a> ';
-        echo "<input type='submit' value='".__($guid, 'Go')."'>";
-        echo '</td>';
-        echo '</tr>';
-        echo '</table>';
-        echo '</form>';
+        $row = $form->addRow();
+            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+        
+        echo $form->getOutput();
+
+        
+
+        $learningAreas = getLearningAreas($connection2, $guid);
+        $courses = getCourses($connection2);
+        $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+             
 
         echo "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>";
         echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=list'>".__($guid, 'List', 'Free Learning')." <img style='margin-bottom: -5px' title='".__($guid, 'List', 'Free Learning')."' src='./modules/Free Learning/img/iconList.png'/></a> ";

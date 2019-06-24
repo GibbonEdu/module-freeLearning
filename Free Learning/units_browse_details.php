@@ -40,42 +40,23 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         //Get params
-        $freeLearningUnitID = '';
-        if (isset($_GET['freeLearningUnitID'])) {
-            $freeLearningUnitID = $_GET['freeLearningUnitID'];
-        }
-        if ($canManage and $highestAction == 'Browse Units_all') {
-            $canManage = true;
-        }
-        $showInactive = 'N';
-        if ($canManage and isset($_GET['showInactive'])) {
-            $showInactive = $_GET['showInactive'];
-        }
-        $gibbonDepartmentID = '';
-        if (isset($_GET['gibbonDepartmentID'])) {
-            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-        }
-        $difficulty = '';
-        if (isset($_GET['difficulty'])) {
-            $difficulty = $_GET['difficulty'];
-        }
-        $name = '';
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
-        }
-        $view = '';
-        if (isset($_GET['view'])) {
-            $view = $_GET['view'];
-        }
+        $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
+
+        $showInactive = $canManage && isset($_GET['showInactive'])
+            ? $_GET['showInactive']
+            : 'N';
+        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $difficulty = $_GET['difficulty'] ?? '';
+        $name = $_GET['name'] ?? '';
+
+        $view = $_GET['view'] ?? 'list';
         if ($view != 'grid' and $view != 'map') {
             $view = 'list';
         }
-        $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
-        if ($canManage) {
-            if (isset($_GET['gibbonPersonID'])) {
-                $gibbonPersonID = $_GET['gibbonPersonID'];
-            }
-        }
+
+        $gibbonPersonID = ($canManage)
+            ? ($_GET['gibbonPersonID'] ?? $_SESSION[$guid]['gibbonPersonID'])
+            : $_SESSION[$guid]['gibbonPersonID'];
 
         $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
 

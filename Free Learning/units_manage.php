@@ -55,7 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         // FORM
         $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
-        $form->setTitle(__('Filters'));
+        $form->setTitle(__('Filter'));
 
         $form->setClass('noIntBorder fullWidth');
         $form->addHiddenValue('q', '/modules/Free Learning/units_manage.php');
