@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Module includes
-include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
+// Module includes
+require_once __DIR__ . '/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
@@ -54,33 +54,20 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
         $showInactive = 'N';
         if ($canManage and isset($_GET['showInactive'])) {
-            $showInactive = $_GET['showInactive'];
+            $showInactive = $_GET['showInactive'] ?? 'N';
         }
-        $gibbonDepartmentID = null;
-        if (isset($_GET['gibbonDepartmentID'])) {
-            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-        }
-        $difficulty = null;
-        if (isset($_GET['difficulty'])) {
-            $difficulty = $_GET['difficulty'];
-        }
-        $name = null;
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
-        }
-        $view = null;
-        if (isset($_GET['view'])) {
-            $view = $_GET['view'];
-        }
+        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $difficulty = $_GET['difficulty'] ?? '';
+        $name = $_GET['name'] ?? '';
+
+        $view = $_GET['view'] ?? 'list';
         if ($view != 'grid' and $view != 'map') {
             $view = 'list';
         }
-        $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
-        if ($canManage) {
-            if (isset($_GET['gibbonPersonID'])) {
-                $gibbonPersonID = $_GET['gibbonPersonID'];
-            }
-        }
+
+        $gibbonPersonID = ($canManage)
+            ? ($_GET['gibbonPersonID'] ?? $_SESSION[$guid]['gibbonPersonID'])
+            : $_SESSION[$guid]['gibbonPersonID'];
 
         //Get data on learning areas, authors and blocks in an efficient manner
         $learningAreaArray = getLearningAreaArray($connection2);

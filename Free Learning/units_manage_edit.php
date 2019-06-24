@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Module includes
-include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
+// Module includes
+require_once __DIR__ . '/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_edit.php') == false) {
     // Access denied
@@ -55,11 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             returnProcess($guid, $_GET['return'], null, null);
         }
 
-        if (isset($_GET['addReturn'])) {
-            $addReturn = $_GET['addReturn'];
-        } else {
-            $addReturn = '';
-        }
+        $addReturn = $_GET['addReturn'] ?? '';
         $addReturnMessage = '';
         $class = 'error';
         if (!($addReturn == '')) {

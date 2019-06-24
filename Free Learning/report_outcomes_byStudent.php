@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Module includes
-include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
+// Module includes
+require_once __DIR__ . '/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outcomes_byStudent.php') == false) {
     // Access denied
