@@ -72,10 +72,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $view = 'list';
         }
 
-        $gibbonPersonID = ($canManage)
-            ? ($_GET['gibbonPersonID'] ?? $_SESSION[$guid]['gibbonPersonID'])
-            : $_SESSION[$guid]['gibbonPersonID'];
-
+        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+        
+        if ($canManage && !empty($_GET['gibbonPersonID'])) {
+            $gibbonPersonID = $_GET['gibbonPersonID'];
+            $canManage = false;
+        }
+        
         //Get data on learning areas, authors and blocks in an efficient manner
         $learningAreaArray = getLearningAreaArray($connection2);
         $authors = getAuthorsArray($connection2);
@@ -89,7 +92,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ->filterBy('showInactive', $showInactive)
             ->filterBy('department', $gibbonDepartmentID)
             ->filterBy('difficulty', $difficulty)
-            ->pageSize($view == 'grid' ? 0 : 25)
+            ->pageSize($view == 'list' ? 25 : 0)
             ->fromPOST();
 
         // FORM
@@ -145,10 +148,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo '</div>';
 
         // QUERY
-        if ($highestAction == 'Browse Units_all') {
-            $units = $unitGateway->queryAllUnits($criteria, $gibbon->session->get('gibbonPersonID'), $publicUnits);
+        if ($highestAction == 'Browse Units_all' && $gibbonPersonID == $gibbon->session->get('gibbonPersonID')) {
+            $units = $unitGateway->queryAllUnits($criteria, $gibbonPersonID, $publicUnits);
         } else {
-            $units = $unitGateway->queryUnitsByPrerequisites($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'), $roleCategory);
+            $units = $unitGateway->queryUnitsByPrerequisites($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbonPersonID, $roleCategory);
         }
 
         // Join a set of author data per unit
@@ -156,7 +159,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $units->joinColumn('freeLearningUnitID', 'authors', $unitAuthors);
 
         // Join a set of prerequisite data per unit
-        $unitPrereq = $unitGateway->selectUnitPrerequisitesByPerson($gibbon->session->get('gibbonPersonID'))->fetchGrouped();
+        $unitPrereq = $unitGateway->selectUnitPrerequisitesByPerson($gibbonPersonID)->fetchGrouped();
         $units->joinColumn('freeLearningUnitID', 'prerequisites', $unitPrereq);
 
         if ($highestAction == 'Browse Units_prerequisites') {
@@ -189,16 +192,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             echo "<div class='error'>".$e->getMessage().'</div>';
         }
         $sqlPage = $sql.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($pagination - 1) * $_SESSION[$guid]['pagination']);
-
-
         $defaultImage = $gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName').'/img/anonymous_125.jpg';
 
         $viewUnitURL = "./index.php?q=/modules/Free Learning/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view&sidebar=true";
 
-        if ($result->rowCount() < 1) {
-            echo "<div class='error'>";
-            echo __($guid, 'There are no records to display.');
-            echo '</div>';
+        if ($units->getResultCount() == 0) {
+            echo Format::alert(__('There are no records to display.'), 'error');
         } else {
             if ($view == 'list') {
 
@@ -345,73 +344,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 echo $table->render($units);
 
-
-                echo "<table cellspacing='0' style='width: 100%'>";
-                $count = 0;
-                $columns = 4;
-
-                $rowNum = 'odd';
-                while ($row = $result->fetch()) {
-                    //Row header if needed
-                    if ($count % $columns == 0) {
-                        echo "<tr class='odd'>";
-                    }
-
-                    //Cell style
-                    $cellClass = '';
-                    if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
-                        $cellClass = 'current';
-                    } elseif ($row['status'] == 'Current' or $row['status'] == 'Complete - Pending') {
-                        $cellClass = 'warning';
-                    }
-                    echo "<td class='$cellClass' style='vertical-align: top ; text-align: center; font-size: 125%; width: ".(100 / $columns)."%'>";
-                    echo "<div style='height: 40px; font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>".$row['name'].'</div><br/>';
-                    $title = 'Difficulty: '.$row['difficulty'].'.';
-                    $title .= ' '.$row['blurb'];
-                    if ($row['logo'] == null) {
-                        echo "<img title='".htmlPrep($title)."' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_125.jpg'/><br/>";
-                    } else {
-                        echo "<img title='".htmlPrep($title)."' style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$row['logo']."'/><br/>";
-                    }
-
-                    //Actions
-                    $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
-                    if ($prerequisitesActive != false) {
-                        $prerequisites = explode(',', $prerequisitesActive);
-                        $units = getUnitsArray($connection2);
-                    }
-                    if ($highestAction == 'Browse Units_prerequisites') {
-                        if ($prerequisitesActive != false) {
-                            $prerequisitesMet = prerequisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
-                        }
-                    }
-                    if ($highestAction == 'Browse Units_all') {
-                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
-                    } elseif ($highestAction == 'Browse Units_prerequisites') {
-                        if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
-                            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
-                        } else {
-                            if ($prerequisitesMet) {
-                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
-                            }
-                        }
-                    }
-                    echo '</td>';
-
-                    if ($count % $columns == ($columns - 1)) {
-                        echo '</tr>';
-                    }
-                    ++$count;
-                }
-
-                for ($i = 0;$i < $columns - ($count % $columns);++$i) {
-                    echo '<td></td>';
-                }
-
-                if ($count % $columns != 0) {
-                    echo '</tr>';
-                }
-                echo '</table>';
             } elseif ($view == 'map') {
                 echo '<p>';
                 echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.', 'Free Learning');
@@ -421,15 +353,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 <style type="text/css">
                     div#map {
-                        width: 100%;
                         height: 800px;
-                        border: 1px solid #000;
-                        background-color: #ddd;
-                        margin-bottom: 20px ;
+                        /* background-color: #ddd; */
                     }
                 </style>
 
-                <div id="map"></div>
+                <div id="map" class="w-full border rounded shadow-inner mb-4"></div>
 
                 <?php
                 //PREP NODE AND EDGE ARRAYS DATA
@@ -439,8 +368,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $edgeList = '';
                 $idList = '';
                 $countNodes = 0;
-                while ($row = $result->fetch()) {
-                    if ($result->rowCount() <= 125) {
+                foreach ($units as $row) {
+                    if ($units->getResultCount() <= 125) {
                         if ($row['logo'] != '') {
                             $image = $row['logo'];
                         } else {
@@ -451,11 +380,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $image = 'undefined';
                     }
                     $titleTemp = $string = trim(preg_replace('/\s\s+/', ' ', $row['blurb']));
-                    $title = addSlashes($row['name']);
-                    if (strlen($row['blurb']) > 90) {
-                        $title .= ': '.addSlashes(substr($titleTemp, 0, 90)).'...';
+                    $title = '<div class="text-base font-bold">'.addSlashes($row['name']).'</div>';
+                    $title .= '<div class="text-xs text-gray-600 italic mb-2">'.addSlashes($row['difficulty']).'</div>';
+
+                    if (strlen($row['blurb']) > 250) {
+                        $title .= addSlashes(substr($titleTemp, 0, 250)).'...';
                     } else {
-                        $title .= ': '.addSlashes($titleTemp);
+                        $title .= addSlashes($titleTemp);
                     }
 
                     if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
@@ -469,9 +400,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     else {
                         if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
-                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'blue'}, borderWidth: 7},";
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'blue'}, borderWidth: 7},"; //#2b7ce9
                         } else {
-                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', borderWidth: 2},";
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#555555'}, borderWidth: 3},";
                         }
                     }
 
@@ -527,16 +458,31 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             size:30,
                             color: {
                                 border: '#222222',
-                                background: '#999999'
+                                background: '#eeeeee'
                             },
-                            font:{color:'#333'},
+                            font:{
+                                color:'#333',
+                                // size: 14,
+                            },
                             shadow:true
                         },
                         edges: {
-                            color: '#333',
-                            shadow:true
+                            width:3,
+                            selectionWidth: 3,
+                            color: {
+                                color: '#bbbbbb',
+                                inherit: false
+                            },
+                            shadow:false,
+                            arrows: {
+                                from: {
+                                    enabled: true,
+                                    scaleFactor: 0.6
+                                }
+                            },
                         },
-                          interaction:{
+                        
+                        interaction:{
                             navigationButtons: true,
                             zoomView: false
                         },

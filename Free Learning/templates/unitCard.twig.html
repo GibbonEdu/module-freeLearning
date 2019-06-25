@@ -12,9 +12,11 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
 
 {% if status in ['Complete - Approved','Exempt'] %}
     {% set statusClass = 'success' %}
-{% elseif status in ['Current','Evidence Not Yet Approved','Complete - Pending'] %}
+{% elseif status in ['Complete - Pending'] %}
+    {% set statusClass = 'pending' %}
+{% elseif status in ['Current','Complete - Pending'] %}
     {% set statusClass = 'warning' %}
-{% elseif active != 'Y' %}
+{% elseif active != 'Y' or status in ['Evidence Not Yet Approved'] %}
     {% set statusClass = 'error' %}
 {% endif %}
 
@@ -24,21 +26,13 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
     <a class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 {{ statusClass|default('bg-gray-100') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
 {% endif %}
 
-
     <!-- {% if prerequisitesMet != "Y" %}
         <img class="block absolute left-0 bottom-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/key.png" title="{{ __('Not Met') }}">
     {% endif %} -->
-
-    {% if status in ['Complete - Approved','Exempt'] %}
-        <img class="block absolute left-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/iconTick_double.png" title="{{ status }}">
-    {% elseif status in ['Complete - Pending'] %}
-        <img class="block absolute left-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/iconTick_light.png" title="{{ status }}">
-    {% elseif status in ['Evidence Not Yet Approved'] %}
-        <img class="block absolute left-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/iconCross.png" title="{{ status }}">
-    {% endif %}
     
-    
-    {% if status %}
+    {% if active != "Y" %}
+        <span class="z-10 tag error block absolute right-0 mt-1 mr-1">{{ __('Not Active') }}</span>
+    {% elseif status %}
         <span class="z-10 tag {{ statusClass }} block absolute right-0 mt-1 mr-1">{{ status|replace({'Complete - Approved': 'Complete','Exempt': 'Complete'}) }}</span>
     {% elseif prerequisitesMet == "N" %}
         <span class="z-10 tag dull block absolute right-0 mt-1 mr-1">{{ __('Not Met') }}</span>
