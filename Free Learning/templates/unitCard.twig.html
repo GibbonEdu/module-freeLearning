@@ -1,0 +1,56 @@
+{#<!--
+Gibbon, Flexible & Open School System
+Copyright (C) 2010, Ross Parker
+
+This is a Gibbon template file, written in HTML and Twig syntax.
+For info about editing, see: https://twig.symfony.com/doc/2.x/
+
+{% elseif prerequisitesMet != 'Y' %}
+    {% set statusClass = 'dull' %} 
+
+-->#}
+
+{% if status in ['Complete - Approved','Exempt'] %}
+    {% set statusClass = 'success' %}
+{% elseif status in ['Current','Evidence Not Yet Approved','Complete - Pending'] %}
+    {% set statusClass = 'warning' %}
+{% elseif active != 'Y' %}
+    {% set statusClass = 'error' %}
+{% endif %}
+
+{% if prerequisitesMet != 'N' %} 
+    <a href="{{ viewUnitURL }}&freeLearningUnitID={{ freeLearningUnitID }}"  class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 hover:shadow-lg {{ statusClass|default('bg-gray-100 hover:bg-white hover:border-blue-500 hover:text-blue-500') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
+{% else %}
+    <a class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 {{ statusClass|default('bg-gray-100') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
+{% endif %}
+
+
+    <!-- {% if prerequisitesMet != "Y" %}
+        <img class="block absolute left-0 bottom-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/key.png" title="{{ __('Not Met') }}">
+    {% endif %} -->
+
+    {% if status in ['Complete - Approved','Exempt'] %}
+        <img class="block absolute left-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/iconTick_double.png" title="{{ status }}">
+    {% elseif status in ['Complete - Pending'] %}
+        <img class="block absolute left-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/iconTick_light.png" title="{{ status }}">
+    {% elseif status in ['Evidence Not Yet Approved'] %}
+        <img class="block absolute left-0 mt-2 ml-1" src="themes/{{ gibbonThemeName }}/img/iconCross.png" title="{{ status }}">
+    {% endif %}
+    
+    
+    {% if status %}
+        <span class="z-10 tag {{ statusClass }} block absolute right-0 mt-1 mr-1">{{ status|replace({'Complete - Approved': 'Complete','Exempt': 'Complete'}) }}</span>
+    {% elseif prerequisitesMet == "N" %}
+        <span class="z-10 tag dull block absolute right-0 mt-1 mr-1">{{ __('Not Met') }}</span>
+    {% elseif prerequisitesMet == "Y" %}
+        <span class="z-10 tag success block absolute right-0 mt-1 mr-1">{{ __('Ok!') }}</span>
+    {% endif %}
+
+    <div class="w-48 h-48 overflow-hidden {{ prerequisitesMet == 'N' ? 'opacity-25' }}" style="background: url({{ logo|default(defaultImage) }}) no-repeat center center; background-size: cover;">
+    </div>
+
+    <div class="flex-1 flex justify-center items-center text-sm sm:text-sm text-center {{ prerequisitesMet == 'N' ? 'text-gray-500' : 'text-gray-700' }} font-bold py-4 px-1">
+        {{ name }}
+    </div>
+
+</a>

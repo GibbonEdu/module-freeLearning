@@ -35,22 +35,84 @@ class UnitGateway extends QueryableGateway
      * @param QueryCriteria $criteria
      * @return DataSet
      */
-    public function queryAllUnits(QueryCriteria $criteria)
+    public function queryAllUnits(QueryCriteria $criteria, $gibbonPersonID, $publicUnits = null)
     {
         $query = $this
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea"])
+            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status', 
+                "(SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length",
+                "FIND_IN_SET(freeLearningUnit.difficulty, :difficultyOptions) as difficultyOrder"])
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
+            ->leftJoin('freeLearningUnitStudent', "freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID")
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->groupBy(['freeLearningUnit.freeLearningUnitID']);
+
+        $difficultyOptions = $this->db()->selectOne("SELECT value FROM gibbonSetting WHERE scope='Free Learning' AND name='difficultyOptions'");
+        $query->bindValue('difficultyOptions', $difficultyOptions);
+
+        if ($publicUnits == 'Y') {
+            $query->where("freeLearningUnit.sharedPublic='Y'")
+                  ->where("freeLearningUnit.gibbonYearGroupIDMinimum IS NULL")
+                  ->where("freeLearningUnit.active='Y'");
+        }
 
         $criteria->addFilterRules($this->getSharedFilterRules());
 
         return $this->runQuery($query, $criteria);
     }
 
-    public function queryUnitsByLearningArea(QueryCriteria $criteria, $gibbonPersonID)
+    public function queryUnitsByPrerequisites(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID, $roleCategory = null)
+    {
+        $query = $this
+            ->newQuery()
+            ->distinct()
+            ->from($this->getTableName())
+            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status', 
+                "(SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length",
+                "FIND_IN_SET(freeLearningUnit.difficulty, :difficultyOptions) as difficultyOrder"])
+            ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
+            ->leftJoin('freeLearningUnitStudent', "(freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID)")
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->groupBy(['freeLearningUnit.freeLearningUnitID']);
+
+        $difficultyOptions = $this->db()->selectOne("SELECT value FROM gibbonSetting WHERE scope='Free Learning' AND name='difficultyOptions'");
+        $query->bindValue('difficultyOptions', $difficultyOptions);
+
+        switch ($roleCategory) {
+            case 'Student':
+                $query->innerJoin('gibbonStudentEnrolment', 'gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID')
+                      ->innerJoin('gibbonYearGroup as studentYearGroup', 'gibbonStudentEnrolment.gibbonYearGroupID=studentYearGroup.gibbonYearGroupID')
+                      ->leftJoin('gibbonYearGroup as minimumYearGroup', 'freeLearningUnit.gibbonYearGroupIDMinimum=minimumYearGroup.gibbonYearGroupID')
+                      ->where('(minimumYearGroup.sequenceNumber IS NULL OR minimumYearGroup.sequenceNumber<=studentYearGroup.sequenceNumber)')
+                      ->where("freeLearningUnit.active='Y'")
+                      ->where("freeLearningUnit.availableStudents='Y'")
+                      ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
+                break;
+
+            case 'Parent':
+                $query->where("freeLearningUnit.active='Y'")
+                      ->where("freeLearningUnit.availableParents='Y'");
+                break;
+
+            case 'Staff':
+                $query->where("freeLearningUnit.active='Y'")
+                      ->where("freeLearningUnit.availableStaff='Y'");
+                break;
+
+            case 'Other':
+                $query->where("freeLearningUnit.active='Y'")
+                      ->where("freeLearningUnit.availableOther='Y'");
+                break;
+        }
+
+        $criteria->addFilterRules($this->getSharedFilterRules());
+
+        return $this->runQuery($query, $criteria);
+    }
+
+    public function queryUnitsByLearningAreaStaff(QueryCriteria $criteria, $gibbonPersonID)
     {
         $query = $this
             ->newQuery()
@@ -67,6 +129,31 @@ class UnitGateway extends QueryableGateway
         $criteria->addFilterRules($this->getSharedFilterRules());
 
         return $this->runQuery($query, $criteria);
+    }
+
+    public function selectUnitPrerequisitesByPerson($gibbonPersonID)
+    {
+        $data = ['gibbonPersonID' => $gibbonPersonID];
+        $sql = "SELECT freeLearningUnit.freeLearningUnitID as groupBy, prerequisite.name, freeLearningUnitStudent.status, 
+                (CASE WHEN status='Complete - Approved' OR status='Complete - Pending' OR status='Exempt' THEN 'Y' ELSE 'N' END) as complete
+                FROM freeLearningUnit
+                JOIN freeLearningUnit as prerequisite ON (FIND_IN_SET(prerequisite.freeLearningUnitID, freeLearningUnit.freeLearningUnitIDPrerequisiteList))
+                LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=prerequisite.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID)
+                WHERE prerequisite.active='Y'
+                ORDER BY prerequisite.name";
+        return $this->db()->select($sql, $data);
+    }
+
+    public function selectUnitAuthors()
+    {
+        $sql = "SELECT freeLearningUnitID as groupBy, freeLearningUnitID,
+                (CASE WHEN gibbonPerson.surname IS NOT NULL THEN gibbonPerson.surname ELSE freeLearningUnitAuthor.surname END) as surname, 
+                (CASE WHEN gibbonPerson.preferredName IS NOT NULL THEN gibbonPerson.preferredName ELSE freeLearningUnitAuthor.preferredName END) as preferredName,
+                (CASE WHEN gibbonPerson.gibbonPersonID IS NULL THEN freeLearningUnitAuthor.website END) as website
+                FROM freeLearningUnitAuthor 
+                LEFT JOIN gibbonPerson ON (gibbonPerson.gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID)
+                ORDER BY surname, preferredName";
+        return $this->db()->select($sql);
     }
 
     public function selectLearningAreasAndCourses($gibbonPersonID = null)

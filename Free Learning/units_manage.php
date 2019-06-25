@@ -65,7 +65,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
             $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
 
-        $difficulties = array_map('trim', explode(',', getSettingByScope($connection2, 'Free Learning', 'difficultyOptions')));     
+        $difficulties = array_map('trim', explode(',', getSettingByScope($connection2, 'Free Learning', 'difficultyOptions')));
         $row = $form->addRow();
             $row->addLabel('difficulty', __('Difficulty'));
             $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
@@ -81,9 +81,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 
         if ($highestAction == 'Manage Units_all') {
-            $units = $unitGateway->queryAllUnits($criteria);
+            $units = $unitGateway->queryAllUnits($criteria, $gibbon->session->get('gibbonPersonID'));
         } else {
-            $units = $unitGateway->queryUnitsByLearningArea($criteria, $gibbon->session->get('gibbonPersonID'));
+            $units = $unitGateway->queryUnitsByLearningAreaStaff($criteria, $gibbon->session->get('gibbonPersonID'));
         }
 
         // DATA TABLE
@@ -97,8 +97,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->setURL('/modules/Free Learning/units_manage_add.php')
             ->displayLabel();
             
-        $table->modifyRows(function ($committee, $row) {
-            if ($committee['active'] != 'Y') $row->addClass('error');
+        $table->modifyRows(function ($unit, $row) {
+            if ($unit['active'] != 'Y') $row->addClass('error');
             return $row;
         });
 
@@ -112,8 +112,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         ]);
 
         $table->addColumn('name', __('Name'));
-        $table->addColumn('difficulty', __('Difficulty'));
-        $table->addColumn('learningArea', __('Learning Area'))
+        $table->addColumn('difficulty', __m('Difficulty'));
+        $table->addColumn('learningArea', __m('Learning Areas'))
             ->format(function ($unit) {
                 return !empty($unit['learningArea'])
                     ? $unit['learningArea']
