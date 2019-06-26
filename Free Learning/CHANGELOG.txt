@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.9.00
+-------
+Lots of visual updates to Browse Units
+Manage Units and Browse Units ooification
+
 v5.8.05
 -------
 Safari block display fix
