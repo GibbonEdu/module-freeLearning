@@ -55,15 +55,21 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
 
         $gibbonPersonID = ($canManage)
-            ? ($_GET['gibbonPersonID'] ?? $_SESSION[$guid]['gibbonPersonID'])
-            : $_SESSION[$guid]['gibbonPersonID'];
+            ? ($_GET['gibbonPersonID'] ?? $_SESSION[$guid]['gibbonPersonID'] ?? null)
+            : $_SESSION[$guid]['gibbonPersonID'] ?? null;
 
         $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
 
         //Breadcrumbs
-        $page->breadcrumbs
-             ->add(__m('Browse Units'), 'units_browse.php', $urlParams)
-             ->add(__m('Unit Details'));
+        if ($roleCategory == null) {
+            $page->breadcrumbs
+                ->add(__m('Browse Units'), '/modules/Free Learning/units_browse.php', $urlParams)
+                ->add(__m('Unit Details'));
+        } else {
+            $page->breadcrumbs
+                ->add(__m('Browse Units'), 'units_browse.php', $urlParams)
+                ->add(__m('Unit Details'));
+        }
 
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);
@@ -75,7 +81,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             echo '</div>';
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
+                $unitList = getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
@@ -104,7 +110,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $proceed = true;
                     } else {
                         $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
-                        $prerequisitesMet = prerequisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive);
+                        $prerequisitesMet = prerequisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
                         if ($prerequisitesMet) {
                             $proceed = true;
                         }
@@ -133,7 +139,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     //Get enrolment Details
                     try {
-                        $dataEnrol = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                        $dataEnrol = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbonPersonID);
                         $sqlEnrol = 'SELECT freeLearningUnitStudent.*, gibbonPerson.surname, gibbonPerson.email, gibbonPerson.preferredName
                             FROM freeLearningUnitStudent
                             LEFT JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID)
@@ -303,10 +309,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo '</p>';
                     }
                     echo '</div>';
+
                     echo "<div id='tabs1'>";
                         //Enrolment screen spun into separate file for ease of coding
                         include './modules/Free Learning/units_browse_details_enrol.php';
                     echo '</div>';
+
                     if ($canManage) {
                         echo "<div id='tabs2'>";
                             echo '<p>';

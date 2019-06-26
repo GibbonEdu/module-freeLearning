@@ -45,24 +45,17 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
-        //Breadcrumbs
-        $page->breadcrumbs
-             ->add(__m('Browse Units'));
+        // Breadcrumbs
+        $page->breadcrumbs->add(__m('Browse Units'));
 
-        if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
-            echo "<div class='linkTop'>";
-                echo "<a class='button' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/showcase.php&sidebar=false'>".__($guid, 'View Our Free Learning Showcase', 'Free Learning')."</a>";
-            echo '</div>';
-        }
+        $templateView = new View($container->get('twig'));
 
-        //Get params
-        $canManage = false;
-        if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
-            $canManage = true;
-        }
+        // Get params
+        $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') && $highestAction == 'Browse Units_all';
         $showInactive = $canManage && isset($_GET['showInactive'])
             ? $_GET['showInactive']
             : 'N';
+
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
@@ -72,17 +65,21 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $view = 'list';
         }
 
+        // View the current user by default
         $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
-        
-        if ($canManage && !empty($_GET['gibbonPersonID'])) {
+        $viewingAsUser = false;
+
+        if ($canManage && !empty($_GET['gibbonPersonID']) && $_GET['gibbonPersonID'] != $gibbonPersonID) {
             $gibbonPersonID = $_GET['gibbonPersonID'];
-            $canManage = false;
+            $viewingAsUser = true;
         }
-        
-        //Get data on learning areas, authors and blocks in an efficient manner
-        $learningAreaArray = getLearningAreaArray($connection2);
-        $authors = getAuthorsArray($connection2);
-        $blocks = getBlocksArray($connection2);
+
+        // Setup default URLs
+        $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'gibbonPersonID');
+
+        $defaultImage = $gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName').'/img/anonymous_125.jpg';
+        $viewUnitURL = "./index.php?q=/modules/Free Learning/units_browse_details.php&".http_build_query($urlParams)."&view=$view&sidebar=true";
+        $browseUnitsURL = "./index.php?q=/modules/Free Learning/units_browse.php&".http_build_query($urlParams)."&sidebar=false";
 
         // CRITERIA
         $unitGateway = $container->get(UnitGateway::class);
@@ -134,21 +131,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         
         echo $form->getOutput();
 
-        
-
-        $learningAreas = getLearningAreas($connection2, $guid);
-        $courses = getCourses($connection2);
-        $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-             
-
-        echo "<div class='linkTop' style='margin-top: 40px; margin-bottom: -35px'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=list'>".__($guid, 'List', 'Free Learning')." <img style='margin-bottom: -5px' title='".__($guid, 'List', 'Free Learning')."' src='./modules/Free Learning/img/iconList.png'/></a> ";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=grid'>".__($guid, 'Grid', 'Free Learning')." <img style='margin-bottom: -5px' title='".__($guid, 'Grid', 'Free Learning')."' src='./modules/Free Learning/img/iconGrid.png'/></a> ";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=map'>".__($guid, 'Map', 'Free Learning')." <img style='margin-bottom: -5px' title='".__($guid, 'Map', 'Free Learning')."' src='./modules/Free Learning/img/iconMap.png'/></a> ";
-        echo '</div>';
+        // NAVIGATION BUTTONS
+        echo $templateView->fetchFromTemplate('unitButtons.twig.html', [
+            'browseUnitsURL' => $browseUnitsURL,
+            'publicUnits'    => $publicUnits,
+            'gibbonPersonID' => $gibbonPersonID,
+        ]);
 
         // QUERY
-        if ($highestAction == 'Browse Units_all' && $gibbonPersonID == $gibbon->session->get('gibbonPersonID')) {
+        if ($highestAction == 'Browse Units_all' && !$viewingAsUser) {
             $units = $unitGateway->queryAllUnits($criteria, $gibbonPersonID, $publicUnits);
         } else {
             $units = $unitGateway->queryUnitsByPrerequisites($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbonPersonID, $roleCategory);
@@ -162,53 +153,47 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $unitPrereq = $unitGateway->selectUnitPrerequisitesByPerson($gibbonPersonID)->fetchGrouped();
         $units->joinColumn('freeLearningUnitID', 'prerequisites', $unitPrereq);
 
-        if ($highestAction == 'Browse Units_prerequisites') {
-            $units->transform(function (&$unit) {
-                $prerequisitesMet= count(array_filter($unit['prerequisites'] ?? [], function ($prereq) {
+        // Check prerequisites for each unit
+        $units->transform(function (&$unit) use ($highestAction) {
+            if ($highestAction == 'Browse Units_prerequisites') {
+                $prerequisitesMet = count(array_filter($unit['prerequisites'] ?? [], function ($prereq) {
                     return $prereq['complete'] == 'Y';
                 })) >= count($unit['prerequisites']);
+                $unit['prerequisitesMet'] = $prerequisitesMet ? 'Y' : 'N';
+            } else {
+                $unit['prerequisitesMet'] = null;
+            }
 
-                $unit['prerequisitesMet'] = $prerequisitesMet? 'Y' : 'N';
-            });
-        }
-
-        //Set pagination variable
-        $pagination = 1;
-        if (isset($_GET['page'])) {
-            $pagination = $_GET['page'];
-        }
-        if ((!is_numeric($pagination)) or $pagination < 1) {
-            $pagination = 1;
-        }
-
-        //Search with filters applied
-        try {
-            $unitList = getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $gibbonDepartmentID, $difficulty, $name, $showInactive, $publicUnits, null, $difficulties);
-            $data = $unitList[0];
-            $sql = $unitList[1];
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            echo "<div class='error'>".$e->getMessage().'</div>';
-        }
-        $sqlPage = $sql.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($pagination - 1) * $_SESSION[$guid]['pagination']);
-        $defaultImage = $gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName').'/img/anonymous_125.jpg';
-
-        $viewUnitURL = "./index.php?q=/modules/Free Learning/units_browse_details.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view&sidebar=true";
+            switch ($unit['status']) {
+                case 'Complete - Approved':
+                case 'Exempt':
+                    $unit['statusClass'] = 'success';
+                    break;
+                case 'Current':
+                    $unit['statusClass'] = 'warning';
+                    break;
+                case 'Complete - Pending':
+                    $unit['statusClass'] = 'pending';
+                    break;
+                case 'Evidence Not Yet Approved':
+                    $unit['statusClass'] = 'error';
+                    break;
+                default:
+                    $unit['statusClass']  = '';
+            }
+        });
 
         if ($units->getResultCount() == 0) {
             echo Format::alert(__('There are no records to display.'), 'error');
         } else {
             if ($view == 'list') {
-
                 // DATA TABLE
                 $table = DataTable::createPaginated('browseUnitsList', $criteria);
                 $table->setTitle(__('Units'));
 
                 $table->modifyRows(function ($unit, $row) {
                     if ($unit['active'] != 'Y') $row->addClass('error');
-                    if ($unit['status'] == 'Complete - Approved' || $unit['status'] == 'Exempt') $row->addClass('success');
-                    if ($unit['status'] == 'Current' or $unit['status'] == 'Evidence Not Yet Approved' or $unit['status'] == 'Complete - Pending') $row->addClass('warning');
+                    if (!empty($unit['statusClass'])) $row->addClass($unit['statusClass']);
                     return $row;
                 });
 
@@ -323,7 +308,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo $table->render($units);
 
             } elseif ($view == 'grid') {
-
+                // GRID TABLE
                 $gridRenderer = new GridView($container->get('twig'));
                 $table = $container->get(DataTable::class)->setRenderer($gridRenderer);
                 $table->setTitle(__('Units'));
@@ -331,12 +316,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $table->addMetaData('gridClass', 'flex items-stretch -mx-4');
                 $table->addMetaData('gridItemClass', 'foo');
 
-                $cardView = new View($container->get('twig'));
-
                 $table->addColumn('logo')
                     ->setClass('h-full pb-8')
-                    ->format(function ($unit) use (&$cardView, &$defaultImage, &$viewUnitURL) {
-                        return $cardView->fetchFromTemplate(
+                    ->format(function ($unit) use (&$templateView, &$defaultImage, &$viewUnitURL) {
+                        return $templateView->fetchFromTemplate(
                             'unitCard.twig.html',
                             $unit + ['defaultImage' => $defaultImage, 'viewUnitURL' => $viewUnitURL]
                         );
@@ -345,20 +328,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo $table->render($units);
 
             } elseif ($view == 'map') {
+                // VISUAL MAP
                 echo '<p>';
                 echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.', 'Free Learning');
                 echo '</p>'; ?>
                 <script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
                 <link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 
-                <style type="text/css">
-                    div#map {
-                        height: 800px;
-                        /* background-color: #ddd; */
-                    }
-                </style>
-
-                <div id="map" class="w-full border rounded shadow-inner mb-4"></div>
+                <div id="map" class="w-full border rounded shadow-inner mb-4" style="height: 800px;"></div>
 
                 <?php
                 //PREP NODE AND EDGE ARRAYS DATA
@@ -375,8 +352,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         } else {
                             $image = $_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName'].'/img/anonymous_240_square.jpg';
                         }
-                    }
-                    else {
+                    } else {
                         $image = 'undefined';
                     }
                     $titleTemp = $string = trim(preg_replace('/\s\s+/', ' ', $unit['blurb']));
@@ -386,15 +362,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if ($unit['active'] != 'Y') {
                         $title .= '<span class="z-10 tag error block absolute right-0 top-0 mt-2 mr-2">'.__('Not Active').'</span>';
                     } else if (!empty($unit['status'])) {
-                        $statusClass = 'warning';
-                        if ($unit['status'] == 'Evidence Not Yet Approved') $statusClass = 'error';
-                        if ($unit['status'] == 'Complete - Pending') $statusClass = 'pending';
-                        if ($unit['status'] == 'Complete - Approved') $statusClass = 'success';
-                        if ($unit['status'] == 'Exempt') $statusClass = 'success';
-
-                        $title .= '<span class="z-10 tag '.$statusClass.' block absolute right-0 top-0 mt-2 mr-2">'.$unit['status'].'</span>';
-                    }
-                    else if ($highestAction == 'Browse Units_prerequisites') {
+                        $title .= '<span class="z-10 tag '.$unit['statusClass'].' block absolute right-0 top-0 mt-2 mr-2">'.$unit['status'].'</span>';
+                    } else if ($highestAction == 'Browse Units_prerequisites') {
                         if ($unit['prerequisitesMet'] == 'Y') {
                             $title .= '<span class="z-10 tag success block absolute right-0 top-0 mt-2 mr-2">'.__('Ok!').'</span>';
                         } else if ($unit['prerequisitesMet'] == 'N') {
@@ -456,6 +425,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 ?>
                 <script type="text/javascript">
+                    // https://visjs.org/docs/network/
+
                     //CREATE NODE ARRAY
                     var nodes = new vis.DataSet([<?php echo $nodeList; ?>]);
 
@@ -473,26 +444,25 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     };
                     var options = {
                         nodes: {
-                            borderWidth:4,
+                            borderWidth: 4,
                             size:30,
                             color: {
                                 border: '#222222',
-                                background: '#eeeeee'
+                                background: '#dddddd'
                             },
                             font:{
                                 color:'#333',
-                                // size: 14,
                             },
-                            shadow:true
+                            shadow: true
                         },
                         edges: {
-                            width:3,
-                            selectionWidth: 3,
+                            width: 3,
+                            selectionWidth: 0,
                             color: {
                                 color: '#bbbbbb',
                                 inherit: false
                             },
-                            shadow:false,
+                            shadow: false,
                             arrows: {
                                 from: {
                                     enabled: true,

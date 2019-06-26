@@ -51,6 +51,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->sortBy('name')
             ->filterBy('department', $gibbonDepartmentID)
             ->filterBy('difficulty', $difficulty)
+            ->filterBy('showInactive', 'Y')
             ->fromPOST();
 
         // FORM
@@ -103,6 +104,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         });
 
         $table->addMetaData('filterOptions', [
+            'showInactive:Y'  => __('Show Inactive'),
             'active:Y'        => __('Active').': '.__('Yes'),
             'active:N'        => __('Active').': '.__('No'),
             'access:students' => __m('Available To Students'),

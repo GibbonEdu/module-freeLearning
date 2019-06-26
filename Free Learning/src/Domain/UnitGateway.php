@@ -52,13 +52,13 @@ class UnitGateway extends QueryableGateway
         $difficultyOptions = $this->db()->selectOne("SELECT value FROM gibbonSetting WHERE scope='Free Learning' AND name='difficultyOptions'");
         $query->bindValue('difficultyOptions', $difficultyOptions);
 
-        if ($publicUnits == 'Y') {
+        if ($publicUnits == 'Y' && empty($gibbonPersonID)) {
             $query->where("freeLearningUnit.sharedPublic='Y'")
                   ->where("freeLearningUnit.gibbonYearGroupIDMinimum IS NULL")
                   ->where("freeLearningUnit.active='Y'");
         }
 
-        if (!$criteria->hasFilter('showInactive', 'Y')) {
+        if ($criteria->getFilterValue('showInactive') != 'Y') {
             $query->where("freeLearningUnit.active='Y'");
         }
 
@@ -111,7 +111,7 @@ class UnitGateway extends QueryableGateway
                 break;
         }
 
-        if (!$criteria->hasFilter('showInactive', 'Y')) {
+        if ($criteria->getFilterValue('showInactive') != 'Y') {
             $query->where("freeLearningUnit.active='Y'");
         }
 
