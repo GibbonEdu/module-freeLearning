@@ -154,8 +154,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $units->joinColumn('freeLearningUnitID', 'prerequisites', $unitPrereq);
 
         // Check prerequisites for each unit
-        $units->transform(function (&$unit) use ($highestAction) {
-            if ($highestAction == 'Browse Units_prerequisites') {
+        $units->transform(function (&$unit) use ($highestAction, $viewingAsUser) {
+            if ($highestAction == 'Browse Units_prerequisites' || $viewingAsUser) {
                 $prerequisitesMet = count(array_filter($unit['prerequisites'] ?? [], function ($prereq) {
                     return $prereq['complete'] == 'Y';
                 })) >= count($unit['prerequisites']);
@@ -261,17 +261,17 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $table->addColumn('prerequisites', __m('Prerequisites'))
                     ->context('primary')
                     ->sortable('freeLearningUnitIDPrerequisiteList')
-                    ->format(function ($unit) use (&$viewUnitURL, &$highestAction) {
+                    ->format(function ($unit) use (&$viewUnitURL, &$highestAction, $viewingAsUser) {
                         $output = '';
                         $prerequisiteList = array_map(function ($prereq) use (&$unit, &$viewUnitURL) {
                             $url = $viewUnitURL.'&freeLearningUnitID='.$unit['freeLearningUnitID'];
                             return Format::link($url, $prereq['name']);
                         }, $unit['prerequisites'] ?? []);
 
-                        if ($highestAction == 'Browse Units_prerequisites' && !empty($unit['prerequisites'])) {
+                        if (($highestAction == 'Browse Units_prerequisites' || $viewingAsUser) && empty($unit['status']) && !empty($unit['prerequisites'])) {
                             if ($unit['prerequisitesMet'] == 'Y') {
                                 $output = '<span class="tag inline-block success mb-2">'.__m('OK!').'</span><br/>';
-                            } else {
+                            } elseif ($unit['prerequisitesMet'] == 'N') {
                                 $output = '<span class="tag inline-block dull mb-2">'.__m('Not Met').'</span><br/>';
                             }
                         }
@@ -289,15 +289,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     ->addParam('difficulty', $difficulty)
                     ->addParam('name', $name)
                     ->addParam('freeLearningUnitID')
-                    ->format(function ($unit, $actions) use ($highestAction) {
-                        if ($highestAction == 'Browse Units_all') {
+                    ->format(function ($unit, $actions) use ($highestAction, $viewingAsUser) {
+                        if ($highestAction == 'Browse Units_all' && !$viewingAsUser) {
                             $actions->addAction('view', __('View'))
                                 ->addParam('sidebar', 'true')
                                 ->addParam('showInactive', 'Y')
                                 ->setURL('/modules/Free Learning/units_browse_details.php');
                         }
 
-                        if ($highestAction == 'Browse Units_prerequisites' && ($unit['prerequisitesMet'] == 'Y' || empty($unit['prerequisites']))) {
+                        if (($highestAction == 'Browse Units_prerequisites' || $viewingAsUser) && ($unit['prerequisitesMet'] == 'Y' || empty($unit['prerequisites']))) {
                             $actions->addAction('view', __('View'))
                                 ->addParam('sidebar', 'true')
                                 ->addParam('showInactive', 'Y')
@@ -318,10 +318,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 $table->addColumn('logo')
                     ->setClass('h-full pb-8')
-                    ->format(function ($unit) use (&$templateView, &$defaultImage, &$viewUnitURL) {
+                    ->format(function ($unit) use (&$templateView, &$defaultImage, &$viewUnitURL, $viewingAsUser) {
                         return $templateView->fetchFromTemplate(
                             'unitCard.twig.html',
-                            $unit + ['defaultImage' => $defaultImage, 'viewUnitURL' => $viewUnitURL]
+                            $unit + ['defaultImage' => $defaultImage, 'viewUnitURL' => $viewUnitURL, 'viewingAsUser' => $viewingAsUser]
                         );
                     });
 
@@ -363,7 +363,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $title .= '<span class="z-10 tag error block absolute right-0 top-0 mt-2 mr-2">'.__('Not Active').'</span>';
                     } else if (!empty($unit['status'])) {
                         $title .= '<span class="z-10 tag '.$unit['statusClass'].' block absolute right-0 top-0 mt-2 mr-2">'.$unit['status'].'</span>';
-                    } else if ($highestAction == 'Browse Units_prerequisites') {
+                    } else if ($highestAction == 'Browse Units_prerequisites' || $viewingAsUser) {
                         if ($unit['prerequisitesMet'] == 'Y') {
                             $title .= '<span class="z-10 tag success block absolute right-0 top-0 mt-2 mr-2">'.__('Ok!').'</span>';
                         } else if ($unit['prerequisitesMet'] == 'N') {
