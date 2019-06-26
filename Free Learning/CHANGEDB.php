@@ -930,3 +930,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.8.05';
 $sql[$count][1] = "";
+
+//v5.9.00
+++$count;
+$sql[$count][0] = '5.9.00';
+$sql[$count][1] = "";

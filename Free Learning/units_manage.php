@@ -17,254 +17,134 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Module includes
-include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
+use Gibbon\Forms\Form;
+use Gibbon\Tables\DataTable;
+use Gibbon\Services\Format;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
+
+// Module includes
+require_once __DIR__ . '/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') == false) {
-    //Acess denied
-    echo "<div class='error'>";
-    echo __($guid, 'Your request failed because you do not have access to this action.');
-    echo '</div>';
+    // Access denied
+    $page->addError(__('You do not have access to this action.'));
 } else {
-    //Get action with highest precendence
+    // Get action with highest precedence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) { echo "<div class='error'>";
-        echo __($guid, 'The highest grouped action cannot be determined.');
-        echo '</div>';
+    if ($highestAction == false) {
+        $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
-        //Breadcrumbb
-        $page->breadcrumbs
-             ->add(__m('Manage Units'));
+        $page->breadcrumbs->add(__m('Manage Units'));
         
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);
         }
 
-        $gibbonDepartmentID = null;
-        if (isset($_GET['gibbonDepartmentID'])) {
-            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-        }
-        $difficulty = null;
-        if (isset($_GET['difficulty'])) {
-            $difficulty = $_GET['difficulty'];
-        }
-        $name = null;
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
-        }
+        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $difficulty = $_GET['difficulty'] ?? '';
+        $name = $_GET['name'] ?? '';
 
-        echo '<h3>';
-        echo __($guid, 'Filter');
-        echo '</h3>';
-        echo "<form method='get' action='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php'>";
-        echo "<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
-        ?>
-        <tr>
-            <td>
-                <b><?php echo __($guid, 'Learning Area & Course') ?></b><br/>
-                <span style="font-size: 90%"><i></i></span>
-            </td>
-            <td class="right">
-                <select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
-                    <option value=""></option>
-                    <?php
-                    echo "<optgroup label='--".__('Learning Area')."--'>";
-                    $learningAreas = getLearningAreas($connection2, $guid);
-                    for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                        if ($gibbonDepartmentID == $learningAreas[$i]) {
-                            echo "<option selected value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-                        } else {
-                            echo "<option value='".$learningAreas[$i]."'>".__($guid, $learningAreas[($i + 1)]).'</option>';
-                        }
-                    }
-                    $courses = getCourses($connection2);
-                    if (is_array($courses) && count($courses) > 0) {
-                        echo "<optgroup label='--".__('Course')."--'>";
-                        foreach ($courses as $course) {
-                            if ($gibbonDepartmentID == $course['course']) {
-                                echo "<option selected value='".$course['course']."'>".$course['course'].'</option>';
-                            } else {
-                                echo "<option value='".$course['course']."'>".$course['course'].'</option>';
-                            }
-                        }
-                    }
-                    ?>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <b><?php echo __($guid, 'Difficulty', 'Free Learning') ?></b><br/>
-                <span style="font-size: 90%"><i></i></span>
-            </td>
-            <td class="right">
-                <?php
-                $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-                echo "<select name='difficulty' id='difficulty' style='width: 302px'>";
-                echo "<option value=''></option>";
-                $difficultiesList = explode(',', $difficulties);
-                foreach ($difficultiesList as $difficultyOption) {
-                    $selected = '';
-                    if ($difficulty == $difficultyOption) {
-                        $selected = 'selected';
-                    }
-                    echo "<option $selected value='".__($guid, $difficultyOption, 'Free Learning')."'>".__($guid, $difficultyOption, 'Free Learning').'</option>';
-                }
-                echo '</select>';
-                ?>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <b><?php echo __($guid, 'Name') ?></b><br/>
-                <span style="font-size: 90%"><i></i></span>
-            </td>
-            <td class="right">
-                <?php
-                echo "<input name='name' value='".$name."' type='text' style='width: 300px'/>";
-                   ?>
-            </td>
-        </tr>
-        <?php
+        // QUERY
+        $unitGateway = $container->get(UnitGateway::class);
+        $criteria = $unitGateway->newQueryCriteria()
+            ->searchBy($unitGateway->getSearchableColumns(), $name)
+            ->sortBy('name')
+            ->filterBy('department', $gibbonDepartmentID)
+            ->filterBy('difficulty', $difficulty)
+            ->filterBy('showInactive', 'Y')
+            ->fromPOST();
 
-        echo '<tr>';
-        echo "<td class='right' colspan=2>";
-        echo "<input type='hidden' name='q' value='".$_GET['q']."'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php'>".__($guid, 'Clear Filters').'</a> ';
-        echo "<input type='submit' value='".__($guid, 'Go')."'>";
-        echo '</td>';
-        echo '</tr>';
-        echo '</table>';
-        echo '</form>';
+        // FORM
+        $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form->setTitle(__('Filter'));
 
-        //Fetch units
-        $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-        $difficultyOrder = '';
-        if ($difficulties != false) {
-            $difficultyOrder = 'FIELD(difficulty';
-            $difficulties = explode(',', $difficulties);
-            foreach ($difficulties as $difficultyOption) {
-                $difficultyOrder .= ",'".__($guid, $difficultyOption, 'Free Learning')."'";
-            }
-            $difficultyOrder .= '), ';
-        }
-        try {
-            $data = array();
-            $sqlWhere = 'AND ';
-            if ($gibbonDepartmentID != '') {
-                if (is_numeric($gibbonDepartmentID)) {
-                    $data['gibbonDepartmentID'] = $gibbonDepartmentID;
-                    $sqlWhere .= "gibbonDepartmentIDList LIKE concat('%', :gibbonDepartmentID, '%') AND ";
-                }
-                else {
-                    $data['course'] = $gibbonDepartmentID;
-                    $sqlWhere .= "course=:course AND ";
-                }
-            }
-            if ($difficulty != '') {
-                $data['difficulty'] = $difficulty;
-                $sqlWhere .= 'difficulty=:difficulty AND ';
-            }
-            if ($name != '') {
-                $data['name'] = $name;
-                $sqlWhere .= "freeLearningUnit.name LIKE concat('%', :name, '%') AND ";
-            }
-            if ($sqlWhere == 'AND ') {
-                $sqlWhere = '';
-            } else {
-                $sqlWhere = substr($sqlWhere, 0, -5);
-            }
-            if ($highestAction == 'Manage Units_all') {
-                $sql = "SELECT * FROM freeLearningUnit WHERE true $sqlWhere ORDER BY $difficultyOrder name";
-            } elseif ($highestAction == 'Manage Units_learningAreas') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')  $sqlWhere ORDER BY $difficultyOrder name";
-            }
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            echo "<div class='error'>".$e->getMessage().'</div>';
-        }
+        $form->setClass('noIntBorder fullWidth');
+        $form->addHiddenValue('q', '/modules/Free Learning/units_manage.php');
+    
+        $learningAreas = $unitGateway->selectLearningAreasAndCourses();
+        $row = $form->addRow();
+            $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
+            $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
 
-        $learningAreas = getLearningAreaArray($connection2);
+        $difficulties = array_map('trim', explode(',', getSettingByScope($connection2, 'Free Learning', 'difficultyOptions')));
+        $row = $form->addRow();
+            $row->addLabel('difficulty', __('Difficulty'));
+            $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
 
-        echo "<div class='linkTop'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/units_manage_add.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'>".__($guid, 'Add')."<img style='margin-left: 5px' title='".__($guid, 'Add')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new.png'/></a>";
-        echo '</div>';
+        $row = $form->addRow();
+            $row->addLabel('name', __('Name'));
+            $row->addTextField('name')->setValue($criteria->getSearchText());
 
-        if ($result->rowCount() < 1) {
-            echo "<div class='error'>";
-            echo __($guid, 'There are no records to display.');
-            echo '</div>';
+        $row = $form->addRow();
+            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+        
+        echo $form->getOutput();
+
+
+        if ($highestAction == 'Manage Units_all') {
+            $units = $unitGateway->queryAllUnits($criteria, $gibbon->session->get('gibbonPersonID'));
         } else {
-            echo "<table cellspacing='0' style='width: 100%'>";
-            echo "<tr class='head'>";
-            echo '<th>';
-            echo __($guid, 'Name');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Difficulty', 'Free Learning');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Learning Areas');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Active');
-            echo '</th>';
-            echo "<th style='width: 100px'>";
-            echo __($guid, 'Actions');
-            echo '</th>';
-            echo '</tr>';
-
-            $count = 0;
-            $rowNum = 'odd';
-            while ($row = $result->fetch()) {
-                if ($count % 2 == 0) {
-                    $rowNum = 'even';
-                } else {
-                    $rowNum = 'odd';
-                }
-
-                if ($row['active'] == 'N') {
-                    $rowNum = 'error';
-                }
-
-                //COLOR ROW BY STATUS!
-                echo "<tr class=$rowNum>";
-                echo '<td>';
-                echo $row['name'];
-                echo '</td>';
-                echo '<td>';
-                echo $row['difficulty'];
-                echo '</td>';
-                echo "<td style='max-width: 270px'>";
-                if (is_null($row['gibbonDepartmentIDList']) == false) {
-                    $departments = explode(',', $row['gibbonDepartmentIDList']);
-                    foreach ($departments as $department) {
-                        if (isset($learningAreas[$department])) {
-                            echo $learningAreas[$department].'<br/>';
-                        }
-                    }
-                } else {
-                    echo '<i>'.__($guid, 'None', 'Free Learning').'</i>';
-                }
-                echo '</td>';
-                echo '<td>';
-                echo ynExpander($guid, $row['active']);
-                echo '</td>';
-                echo '<td>';
-                if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php')) {
-                    echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=Y'><img title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a> ";
-                }
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_manage_edit.php&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module'].'/units_manage_delete.php&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name'><img title='".__($guid, 'Delete')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/></a> ";
-                echo '</td>';
-                echo '</tr>';
-
-                ++$count;
-            }
-            echo '</table>';
+            $units = $unitGateway->queryUnitsByLearningAreaStaff($criteria, $gibbon->session->get('gibbonPersonID'));
         }
+
+        // DATA TABLE
+        $table = DataTable::createPaginated('units', $criteria);
+        $table->setTitle(__('View'));
+
+        $table->addHeaderAction('add', __('Add'))
+            ->addParam('gibbonDepartmentID', $gibbonDepartmentID)
+            ->addParam('difficulty', $difficulty)
+            ->addParam('name', $name)
+            ->setURL('/modules/Free Learning/units_manage_add.php')
+            ->displayLabel();
+            
+        $table->modifyRows(function ($unit, $row) {
+            if ($unit['active'] != 'Y') $row->addClass('error');
+            return $row;
+        });
+
+        $table->addMetaData('filterOptions', [
+            'showInactive:Y'  => __('Show Inactive'),
+            'active:Y'        => __('Active').': '.__('Yes'),
+            'active:N'        => __('Active').': '.__('No'),
+            'access:students' => __m('Available To Students'),
+            'access:staff'    => __m('Available To Staff'),
+            'access:parents'  => __m('Available To Parents'),
+            'access:other'    => __m('Available To Other'),
+        ]);
+
+        $table->addColumn('name', __('Name'));
+        $table->addColumn('difficulty', __m('Difficulty'));
+        $table->addColumn('learningArea', __m('Learning Areas'))
+            ->format(function ($unit) {
+                return !empty($unit['learningArea'])
+                    ? $unit['learningArea']
+                    : Format::small(__('None'));
+            });
+        $table->addColumn('active', __('Active'))->format(Format::using('yesNo', 'active'));
+
+        // ACTIONS
+        $canBrowseUnits = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
+        $table->addActionColumn()
+            ->addParam('gibbonDepartmentID', $gibbonDepartmentID)
+            ->addParam('difficulty', $difficulty)
+            ->addParam('name', $name)
+            ->addParam('freeLearningUnitID')
+            ->format(function ($unit, $actions) use ($canBrowseUnits) {
+                if ($canBrowseUnits) {
+                    $actions->addAction('view', __('View'))
+                        ->addParam('sidebar', 'true')
+                        ->addParam('showInactive', 'Y')
+                        ->setURL('/modules/Free Learning/units_browse_details.php');
+                }
+
+                $actions->addAction('edit', __('Edit'))
+                        ->setURL('/modules/Free Learning/units_manage_edit.php');
+
+                $actions->addAction('delete', __('Delete'))
+                        ->setURL('/modules/Free Learning/units_manage_delete.php');
+            });
+
+        echo $table->render($units);
     }
 }
-?>

@@ -18,10 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == false) {
-    //Acess denied
+    // Access denied
     echo "<div class='error'>";
-    echo __($guid, 'You do not have access to this action.');
-    echo '</div>';
+    echo __('You do not have access to this action.');
+    echo "</div>";
 } else {
     //Check ability to enrol
     $proceed = false;

@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-include '../../gibbon.php';
+use Gibbon\Domain\System\SettingGateway;
 
+require_once '../../gibbon.php';
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/settings_manage.php';
+$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/settings_manage.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_manage') == false) {
     //Fail 0
@@ -28,106 +29,39 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     header("Location: {$URL}");
 } else {
     //Proceed!
-    $difficultyOptions = $_POST['difficultyOptions'];
-    $publicUnits = $_POST['publicUnits'];
-    $unitOutlineTemplate = $_POST['unitOutlineTemplate'];
-    $learningAreaRestriction = $_POST['learningAreaRestriction'];
-    $customField = $_POST['customField'];
-    $enableClassEnrolment = $_POST['enableClassEnrolment'];
-    $enableSchoolMentorEnrolment = $_POST['enableSchoolMentorEnrolment'];
-    $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'];
+    $difficultyOptions = $_POST['difficultyOptions'] ?? '';
+    $publicUnits = $_POST['publicUnits'] ?? '';
+    $unitOutlineTemplate = $_POST['unitOutlineTemplate'] ?? '';
+    $learningAreaRestriction = $_POST['learningAreaRestriction'] ?? '';
+    $customField = $_POST['customField'] ?? '';
+    $enableClassEnrolment = $_POST['enableClassEnrolment'] ?? '';
+    $enableSchoolMentorEnrolment = $_POST['enableSchoolMentorEnrolment'] ?? '';
+    $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'] ?? '';
+
+    $settingGateway = $container->get(SettingGateway::class);
 
     //Validate Inputs
     if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '') {
         //Fail 3
         $URL .= '&return=error3';
         header("Location: {$URL}");
+        exit;
     } else {
         //Write to database
-        $fail = false;
+        $partialFail = false;
 
-        try {
-            $data = array('difficultyOptions' => $difficultyOptions);
-            $sql = "UPDATE gibbonSetting SET value=:difficultyOptions WHERE scope='Free Learning' AND name='difficultyOptions'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'difficultyOptions', $difficultyOptions);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'publicUnits', $publicUnits);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'unitOutlineTemplate', $unitOutlineTemplate);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'learningAreaRestriction', $learningAreaRestriction);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'customField', $customField);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableClassEnrolment', $enableClassEnrolment);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableSchoolMentorEnrolment', $enableSchoolMentorEnrolment);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableExternalMentorEnrolment', $enableExternalMentorEnrolment);
 
-        try {
-            $data = array('publicUnits' => $publicUnits);
-            $sql = "UPDATE gibbonSetting SET value=:publicUnits WHERE scope='Free Learning' AND name='publicUnits'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
-
-        try {
-            $data = array('unitOutlineTemplate' => $unitOutlineTemplate);
-            $sql = "UPDATE gibbonSetting SET value=:unitOutlineTemplate WHERE scope='Free Learning' AND name='unitOutlineTemplate'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
-
-        try {
-            $data = array('learningAreaRestriction' => $learningAreaRestriction);
-            $sql = "UPDATE gibbonSetting SET value=:learningAreaRestriction WHERE scope='Free Learning' AND name='learningAreaRestriction'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
-
-        try {
-            $data = array('customField' => $customField);
-            $sql = "UPDATE gibbonSetting SET value=:customField WHERE scope='Free Learning' AND name='customField'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
-
-        try {
-            $data = array('enableClassEnrolment' => $enableClassEnrolment);
-            $sql = "UPDATE gibbonSetting SET value=:enableClassEnrolment WHERE scope='Free Learning' AND name='enableClassEnrolment'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
-
-        try {
-            $data = array('enableSchoolMentorEnrolment' => $enableSchoolMentorEnrolment);
-            $sql = "UPDATE gibbonSetting SET value=:enableSchoolMentorEnrolment WHERE scope='Free Learning' AND name='enableSchoolMentorEnrolment'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
-
-        try {
-            $data = array('enableExternalMentorEnrolment' => $enableExternalMentorEnrolment);
-            $sql = "UPDATE gibbonSetting SET value=:enableExternalMentorEnrolment WHERE scope='Free Learning' AND name='enableExternalMentorEnrolment'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
-        }
-
-
-        if ($fail == true) {
-            //Fail 2
-            $URL .= '&return=error2';
-            header("Location: {$URL}");
-        } else {
-            //Success 0
-            getSystemSettings($guid, $connection2);
-            $URL .= '&return=success0';
-            header("Location: {$URL}");
-        }
+        $URL .= $partialFail
+            ? '&return=error2'
+            : '&return=success0';
+        header("Location: {$URL}");
     }
 }

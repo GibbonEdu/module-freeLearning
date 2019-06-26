@@ -17,37 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Module includes
-include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
+use Gibbon\Forms\Form;
+use Gibbon\Forms\DatabaseFormFactory;
+
+// Module includes
+require_once __DIR__ . '/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_add.php') == false) {
-    //Acess denied
-    echo "<div class='error'>";
-    echo __($guid, 'You do not have access to this action.');
-    echo '</div>';
+    // Access denied
+    $page->addError(__('You do not have access to this action.'));
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) { echo "<div class='error'>";
-        echo __($guid, 'The highest grouped action cannot be determined.');
-        echo '</div>';
+    if ($highestAction == false) {
+        $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
-        $gibbonDepartmentID = '';
-        if (isset($_GET['gibbonDepartmentID'])) {
-            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-        }
-        $difficulty = '';
-        if (isset($_GET['difficulty'])) {
-            $difficulty = $_GET['difficulty'];
-        }
-        $name = '';
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
-        }
-        $view = '';
-        if (isset($_GET['view'])) {
-            $view = $_GET['view'];
-        }
+        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $difficulty = $_GET['difficulty'] ?? '';
+        $name = $_GET['name'] ?? '';
+        $view = $_GET['view'] ?? '';
 
         //Proceed!
         $urlParams = compact('gibbonDepartmentID', 'difficulty', 'name', 'view');
@@ -55,6 +43,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $page->breadcrumbs
              ->add(__m('Manage Units'), 'units_manage.php', $urlParams)
              ->add(__m('Add Unit'));
+
+
+        $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module']."/units_manage_addProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+        $form->setFactory(DatabaseFormFactory::create($pdo));
+
+        $form->addHiddenValue('address', $_SESSION[$guid]['address']);
 
         $returns = array();
         $editLink = '';

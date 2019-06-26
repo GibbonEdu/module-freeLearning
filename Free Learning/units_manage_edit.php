@@ -17,20 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Module includes
-include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
+// Module includes
+require_once __DIR__ . '/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_edit.php') == false) {
-    //Acess denied
-    echo "<div class='error'>";
-    echo __($guid, 'You do not have access to this action.');
-    echo '</div>';
+    // Access denied
+    $page->addError(__('You do not have access to this action.'));
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) { echo "<div class='error'>";
-        echo __($guid, 'The highest grouped action cannot be determined.');
-        echo '</div>';
+    if ($highestAction == false) {
+        $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         $freeLearningUnitID = $_GET['freeLearningUnitID'];
         $canManage = false;
@@ -38,28 +35,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $canManage = true;
         }
         $showInactive = 'N';
-        if ($canManage and isset($_GET['showInactive'])) {
+        if ($canManage and !empty($_GET['showInactive'])) {
             $showInactive = $_GET['showInactive'];
         }
-        $gibbonDepartmentID = '';
-        if (isset($_GET['gibbonDepartmentID'])) {
-            $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-        }
-        $difficulty = '';
-        if (isset($_GET['difficulty'])) {
-            $difficulty = $_GET['difficulty'];
-        }
-        $name = '';
-        if (isset($_GET['name'])) {
-            $name = $_GET['name'];
-        }
-        $view = '';
-        if (isset($_GET['view'])) {
-            $view = $_GET['view'];
-        }
+
+        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $difficulty = $_GET['difficulty'] ?? '';
+        $name = $_GET['name'] ?? '';
+        $view = $_GET['view'] ?? '';
 
         //Proceed!
-        $urlParams = compact('view ', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
+        $urlParams = compact('view', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
 
         $page->breadcrumbs
              ->add(__m('Manage Units'), 'units_manage.php', $urlParams)
@@ -69,11 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             returnProcess($guid, $_GET['return'], null, null);
         }
 
-        if (isset($_GET['addReturn'])) {
-            $addReturn = $_GET['addReturn'];
-        } else {
-            $addReturn = '';
-        }
+        $addReturn = $_GET['addReturn'] ?? '';
         $addReturnMessage = '';
         $class = 'error';
         if (!($addReturn == '')) {

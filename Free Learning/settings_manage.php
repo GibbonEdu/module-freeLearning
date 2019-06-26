@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//Module includes
-include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
+use Gibbon\Forms\Form;
+use Gibbon\Domain\System\SettingGateway;
+
+// Module includes
+require_once __DIR__ . '/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_manage') == false) {
-    //Acess denied
-    echo "<div class='error'>";
-    echo __($guid, 'You do not have access to this action.');
-    echo '</div>';
+    // Access denied
+    $page->addError(__('You do not have access to this action.'));
 } else {
     //Proceed!
     $page->breadcrumbs
@@ -33,279 +34,62 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], null, null);
     }
-    ?>
 
-	<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/settings_manageProcess.php' ?>">
-		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-            <tr class='break'>
-                <td colspan=2>
-                	<h3><?php echo __($guid, 'General Settings', 'Free Learning') ?></h3>
-                </td>
-            </tr>
-			<tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='publicUnits'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
-						<?php
-                        $selected = '';
-						if ($row['value'] == 'Y') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-						$selected = '';
-						if ($row['value'] == 'N') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-						?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='learningAreaRestriction'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
-						<?php
-                        $selected = '';
-						if ($row['value'] == 'Y') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-						$selected = '';
-						if ($row['value'] == 'N') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-						?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='difficultyOptions'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td style='width: 275px'>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<input name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" maxlength=50 value="<?php echo htmlPrep($row['value']) ?>" type="text" style="width: 300px">
-					<script type="text/javascript">
-						var <?php echo $row['name'] ?>=new LiveValidation('<?php echo $row['name'] ?>');
-						<?php echo $row['name'] ?>.add(Validate.Presence);
-					</script>
-				</td>
-			</tr>
-			<tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='unitOutlineTemplate'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?></b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<textarea name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" rows=8 style="width: 300px"><?php echo htmlPrep($row['value']) ?></textarea>
-				</td>
-			</tr>
+    $settingGateway = $container->get(SettingGateway::class);
 
-            <tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='customField'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?></b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
-						<?php
-						try {
-							$dataField = array();
-							$sqlField = "SELECT * FROM gibbonPersonField WHERE active='Y'";
-							$resultField = $connection2->prepare($sqlField);
-							$resultField->execute($dataField);
-						} catch (PDOException $e) { }
-						echo "<option value=''></option>";
-						while ($rowField = $resultField->fetch()) {
-							$selected = '';
-							if ($row['value'] == $rowField['gibbonPersonFieldID']) {
-								$selected = 'selected';
-							}
-							echo "<option $selected value='".$rowField['gibbonPersonFieldID']."'>".$rowField['name'].'</option>';
-						}
-						?>
-					</select>
-				</td>
-			</tr>
-            <tr class='break'>
-                <td colspan=2>
-                	<h3><?php echo __($guid, 'Enrolment Settings', 'Free Learning') ?></h3>
-                </td>
-            </tr>
-            <tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='enableClassEnrolment'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
-						<?php
-                        $selected = '';
-						if ($row['value'] == 'Y') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-						$selected = '';
-						if ($row['value'] == 'N') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-						?>
-					</select>
-				</td>
-			</tr>
-            <tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='enableSchoolMentorEnrolment'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
-						<?php
-                        $selected = '';
-						if ($row['value'] == 'Y') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-						$selected = '';
-						if ($row['value'] == 'N') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-						?>
-					</select>
-				</td>
-			</tr>
-            <tr>
-				<?php
-                try {
-                    $data = array();
-                    $sql = "SELECT * FROM gibbonSetting WHERE scope='Free Learning' AND name='enableExternalMentorEnrolment'";
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    echo "<div class='error'>".$e->getMessage().'</div>';
-                }
-				$row = $result->fetch();
-				?>
-				<td>
-					<b><?php echo __($guid, $row['nameDisplay'], 'Free Learning') ?> *</b><br/>
-					<span style="font-size: 90%"><i><?php if ($row['description'] != '') { echo __($guid, $row['description'], 'Free Learning'); } ?></i></span>
-				</td>
-				<td class="right">
-					<select name="<?php echo $row['name'] ?>" id="<?php echo $row['name'] ?>" style="width: 302px">
-						<?php
-                        $selected = '';
-						if ($row['value'] == 'Y') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='Y'>".ynExpander($guid, 'Y').'</option>';
-						$selected = '';
-						if ($row['value'] == 'N') {
-							$selected = 'selected';
-						}
-						echo "<option $selected value='N'>".ynExpander($guid, 'N').'</option>';
-						?>
-					</select>
-				</td>
-			</tr>
-            <tr>
-				<td>
-					<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
-				</td>
-				<td class="right">
-					<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-					<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
-				</td>
-			</tr>
-		</table>
-	</form>
-<?php
+    // FORM
+    $form = Form::create('settings', $gibbon->session->get('absoluteURL').'/modules/Free Learning/settings_manageProcess.php');
 
+    $form->addHiddenValue('address', $gibbon->session->get('address'));
+
+    $form->addRow()->addHeading(__m('General Settings'));
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'publicUnits', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'learningAreaRestriction', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'difficultyOptions', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addTextField($setting['name'])->required()->setValue($setting['value'])->maxLength(50);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'unitOutlineTemplate', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addTextArea($setting['name'])->setValue($setting['value'])->setRows(8);
+        
+    $sql = "SELECT gibbonPersonFieldID as value, name FROM gibbonPersonField WHERE active='Y'";
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'customField', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addSelect($setting['name'])->fromQuery($pdo, $sql)->selected($setting['value']);
+
+    $form->addRow()->addHeading(__m('Enrolment Settings'));
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'enableClassEnrolment', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'enableSchoolMentorEnrolment', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'enableExternalMentorEnrolment', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $row = $form->addRow();
+        $row->addFooter();
+        $row->addSubmit();
+
+    echo $form->getOutput();
 }
-?>
