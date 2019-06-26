@@ -287,7 +287,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             if ($unit['prerequisitesMet'] == 'Y') {
                                 $output = '<span class="tag inline-block success mb-2">'.__m('OK!').'</span><br/>';
                             } else {
-                                $output = '<span class="tag inline-block error mb-2">'.__m('Not Met').'</span><br/>';
+                                $output = '<span class="tag inline-block dull mb-2">'.__m('Not Met').'</span><br/>';
                             }
                         }
                         
@@ -368,10 +368,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $edgeList = '';
                 $idList = '';
                 $countNodes = 0;
-                foreach ($units as $row) {
+                foreach ($units as $unit) {
                     if ($units->getResultCount() <= 125) {
-                        if ($row['logo'] != '') {
-                            $image = $row['logo'];
+                        if ($unit['logo'] != '') {
+                            $image = $unit['logo'];
                         } else {
                             $image = $_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName'].'/img/anonymous_240_square.jpg';
                         }
@@ -379,37 +379,56 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     else {
                         $image = 'undefined';
                     }
-                    $titleTemp = $string = trim(preg_replace('/\s\s+/', ' ', $row['blurb']));
-                    $title = '<div class="text-base font-bold">'.addSlashes($row['name']).'</div>';
-                    $title .= '<div class="text-xs text-gray-600 italic mb-2">'.addSlashes($row['difficulty']).'</div>';
+                    $titleTemp = $string = trim(preg_replace('/\s\s+/', ' ', $unit['blurb']));
+                    $title = '<div class="text-base font-bold">'.addSlashes($unit['name']).'</div>';
+                    $title .= '<div class="text-xs text-gray-600 italic mb-2">'.addSlashes($unit['difficulty']).'</div>';
 
-                    if (strlen($row['blurb']) > 250) {
+                    if ($unit['active'] != 'Y') {
+                        $title .= '<span class="z-10 tag error block absolute right-0 top-0 mt-2 mr-2">'.__('Not Active').'</span>';
+                    } else if (!empty($unit['status'])) {
+                        $statusClass = 'warning';
+                        if ($unit['status'] == 'Evidence Not Yet Approved') $statusClass = 'error';
+                        if ($unit['status'] == 'Complete - Pending') $statusClass = 'pending';
+                        if ($unit['status'] == 'Complete - Approved') $statusClass = 'success';
+                        if ($unit['status'] == 'Exempt') $statusClass = 'success';
+
+                        $title .= '<span class="z-10 tag '.$statusClass.' block absolute right-0 top-0 mt-2 mr-2">'.$unit['status'].'</span>';
+                    }
+                    else if ($highestAction == 'Browse Units_prerequisites') {
+                        if ($unit['prerequisitesMet'] == 'Y') {
+                            $title .= '<span class="z-10 tag success block absolute right-0 top-0 mt-2 mr-2">'.__('Ok!').'</span>';
+                        } else if ($unit['prerequisitesMet'] == 'N') {
+                            $title .= '<span class="z-10 tag dull block absolute right-0 top-0 mt-2 mr-2">'.__('Not Met').'</span>';
+                        }
+                    }
+
+                    if (strlen($unit['blurb']) > 250) {
                         $title .= addSlashes(substr($titleTemp, 0, 250)).'...';
                     } else {
                         $title .= addSlashes($titleTemp);
                     }
 
-                    if ($row['status'] == 'Complete - Approved' or $row['status'] == 'Exempt') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
-                    } elseif ($row['status'] == 'Current') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
-                    } elseif ($row['status'] == 'Evidence Not Yet Approved') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#FF0000', background:'#FF8485'}, borderWidth: 2},";
-                    } elseif ($row['status'] == 'Complete - Pending') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#CA4AFF', background:'#F8A3FF'}, borderWidth: 2},";
+                    if ($unit['status'] == 'Complete - Approved' or $unit['status'] == 'Exempt') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
+                    } elseif ($unit['status'] == 'Current') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
+                    } elseif ($unit['status'] == 'Evidence Not Yet Approved') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#FF0000', background:'#FF8485'}, borderWidth: 2},";
+                    } elseif ($unit['status'] == 'Complete - Pending') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#CA4AFF', background:'#F8A3FF'}, borderWidth: 2},";
                     }
                     else {
-                        if ($row['freeLearningUnitIDPrerequisiteList'] == '') {
-                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'blue'}, borderWidth: 7},"; //#2b7ce9
+                        if ($unit['freeLearningUnitIDPrerequisiteList'] == '') {
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'blue'}, borderWidth: 7},"; //#2b7ce9
                         } else {
-                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($row['name'])."', title: '".$title."', color: {border:'#555555'}, borderWidth: 3},";
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: '$image', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#555555'}, borderWidth: 3},";
                         }
                     }
 
-                    $nodeArray[$row['freeLearningUnitID']][0] = $countNodes;
-                    $nodeArray[$row['freeLearningUnitID']][1] = $row['freeLearningUnitID'];
-                    $nodeArray[$row['freeLearningUnitID']][2] = $row['freeLearningUnitIDPrerequisiteList'];
-                    $idList .= "'".$row['freeLearningUnitID']."',";
+                    $nodeArray[$unit['freeLearningUnitID']][0] = $countNodes;
+                    $nodeArray[$unit['freeLearningUnitID']][1] = $unit['freeLearningUnitID'];
+                    $nodeArray[$unit['freeLearningUnitID']][2] = $unit['freeLearningUnitIDPrerequisiteList'];
+                    $idList .= "'".$unit['freeLearningUnitID']."',";
                     ++$countNodes;
                 }
                 if ($nodeList != '') {
