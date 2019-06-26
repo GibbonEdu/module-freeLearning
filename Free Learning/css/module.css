@@ -22,3 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     background-color: #FDE2FF;
     color: #9914D1;
 }
+
+.vis-tooltip {
+    margin-top: 4.5rem;
+    margin-left: 0.5rem;
+}
+
+.vis-item {
+    cursor: pointer;
+}
