@@ -568,7 +568,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $blockCount = 0;
                         foreach ($blocks as $block) {
                             echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
-                                'roleCategory' => $roleCategory, 'gibbonPersonID' => $_SESSION[$guid]['username'], 'blockCount' => $blockCount
+                                'roleCategory' => $roleCategory, 'gibbonPersonID' => $_SESSION[$guid]['username'] ?? '', 'blockCount' => $blockCount
                             ]);
                             $resourceContents .= $block['contents'];
                             $blockCount++;
