@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\View\View;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -548,27 +550,31 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
                         echo "</div>";
                     }
-                    echo "<div id='tabs3'>";
-                        try {
-                            $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
-                            $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
-                            $resultBlocks = $connection2->prepare($sqlBlocks);
-                            $resultBlocks->execute($dataBlocks);
-                        } catch (PDOException $e) {
-                            echo "<div class='error'>".$e->getMessage().'</div>';
-                        }
+                    echo '<div id="tabs3" style="border-width: 1px 0px 0px 0px !important; background-color: transparent !important; padding-left: 0; padding-right: 0; overflow: initial;">';
+                        
+                    $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
+                    $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
 
-                        if ($resultBlocks->rowCount() < 1) {
-                            echo "<div class='error'>";
-                            echo __($guid, 'There are no records to display.');
-                            echo '</div>';
-                        } else {
-                            $resourceContents = '';
-                            while ($rowBlocks = $resultBlocks->fetch()) {
-                                echo displayBlockContent($guid, $connection2, $rowBlocks['title'], $rowBlocks['type'], $rowBlocks['length'], $rowBlocks['contents'], $rowBlocks['teachersNotes'], $roleCategory);
-                                $resourceContents .= $rowBlocks['contents'];
-                            }
+                    $blocks = $pdo->select($sqlBlocks, $dataBlocks)->fetchAll();
+
+                    if (empty($blocks)) {
+                        echo "<div class='error'>";
+                        echo __('There are no records to display.');
+                        echo '</div>';
+                    } else {
+                        $templateView = $container->get(View::class);
+                        $resourceContents = '';
+
+                        $blockCount = 0;
+                        foreach ($blocks as $block) {
+                            echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
+                                'roleCategory' => $roleCategory, 'gibbonPersonID' => $_SESSION[$guid]['username'] ?? '', 'blockCount' => $blockCount
+                            ]);
+                            $resourceContents .= $block['contents'];
+                            $blockCount++;
                         }
+                    }
+
                     echo '</div>';
                     echo "<div id='tabs4'>";
                     //Resources
