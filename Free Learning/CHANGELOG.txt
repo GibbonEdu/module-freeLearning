@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.01
+-------
+Improve the font size and display of content blocks in units
+
 v5.9.00
 -------
 Lots of visual updates to Browse Units

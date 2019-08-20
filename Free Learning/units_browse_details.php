@@ -1,6 +1,4 @@
 <?php
-
-use Gibbon\View\View;
 /*
 Gibbon, Flexible & Open School System
 Copyright (C) 2010, Ross Parker
@@ -18,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+
+use Gibbon\View\View;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -562,7 +562,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo __('There are no records to display.');
                         echo '</div>';
                     } else {
-                        $templateView = new View($container->get('twig'));
+                        $templateView = $container->get(View::class);
                         $resourceContents = '';
 
                         $blockCount = 0;
@@ -572,7 +572,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             ]);
                             $resourceContents .= $block['contents'];
                             $blockCount++;
-                            // echo displayBlockContent($guid, $connection2, $block['title'], $block['type'], $block['length'], $block['contents'], $block['teachersNotes'], $roleCategory);
                         }
                     }
 
