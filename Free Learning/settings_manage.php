@@ -68,7 +68,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $setting = $settingGateway->getSettingByScope('Free Learning', 'customField', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
-        $row->addSelect($setting['name'])->fromQuery($pdo, $sql)->selected($setting['value']);
+        $row->addSelect($setting['name'])->fromQuery($pdo, $sql)->selected($setting['value'])->placeholder();
 
     $form->addRow()->addHeading(__m('Enrolment Settings'));
 
