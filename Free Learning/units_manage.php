@@ -61,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $form->setClass('noIntBorder fullWidth');
         $form->addHiddenValue('q', '/modules/Free Learning/units_manage.php');
     
-        $learningAreas = $unitGateway->selectLearningAreasAndCourses();
+        $learningAreas = $unitGateway->selectLearningAreasAndCourses($highestAction != 'Manage Units_all' ? $gibbon->session->get('gibbonPersonID') : null);
         $row = $form->addRow();
             $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
             $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
