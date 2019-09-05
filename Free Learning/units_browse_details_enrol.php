@@ -342,16 +342,38 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $students = array();
                             $studentCount = 0;
                             if ($roleCategory == 'Student') {
+                                $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
+                                $prerequisiteCount = count(explode(',', $prerequisitesActive));
+
                                 try {
-                                    $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                    $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID ORDER BY surname, preferredName";
+                                    $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonYearGroupIDMinimum' => $row['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $row['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount);
+                                    $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup, prerequisites.count
+                                    FROM gibbonPerson 
+                                    JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID) 
+                                    JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) 
+                                    LEFT JOIN (
+                                        SELECT COUNT(*) as count, freeLearningUnitStudent.gibbonPersonIDStudent
+                                        FROM freeLearningUnitStudent 
+                                        JOIN freeLearningUnit ON (freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID)
+                                        WHERE freeLearningUnit.active='Y'
+                                        AND (:prerequisiteList = '' OR FIND_IN_SET(freeLearningUnit.freeLearningUnitID, :prerequisiteList))
+                                        AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt') 
+                                        GROUP BY freeLearningUnitStudent.freeLearningUnitStudentID
+                                    ) AS prerequisites ON (prerequisites.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
+                                    WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID 
+                                    AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID 
+                                    AND (:gibbonYearGroupIDMinimum IS NULL OR gibbonStudentEnrolment.gibbonYearGroupID >= :gibbonYearGroupIDMinimum)
+                                    HAVING (:prerequisiteCount = 0 OR prerequisites.count >= :prerequisiteCount)
+                                    ORDER BY surname, preferredName";
                                     $resultSelect = $connection2->prepare($sqlSelect);
                                     $resultSelect->execute($dataSelect);
-                                } catch (PDOException $e) { }
+                                } catch (PDOException $e) {}
+
                                 while ($rowSelect = $resultSelect->fetch()) {
                                     $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.$rowSelect['rollGroup'].')</option>';
                                     ++$studentCount;
                                 }
+
                             } elseif ($roleCategory == 'Staff') {
                                 try {
                                     $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);

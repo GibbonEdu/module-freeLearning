@@ -82,7 +82,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                                     <?php
                                     try {
                                         $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'today' => date('Y-m-d'));
-                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name 
+                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname, gibbonRollGroup.name AS name 
                                         FROM freeLearningUnitStudent
                                         JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
                                         JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID)
@@ -92,6 +92,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                                         AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) 
                                         AND (gibbonPerson.dateEnd IS NULL  OR gibbonPerson.dateEnd>=:today) 
                                         AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID 
+                                        GROUP BY gibbonPerson.gibbonPersonID, gibbonRollGroup.gibbonRollGroupID
                                         ORDER BY gibbonYearGroup.sequenceNumber, gibbonRollGroup.name, gibbonPerson.surname, gibbonPerson.preferredName";
                                         $resultSelect = $connection2->prepare($sqlSelect);
                                         $resultSelect->execute($dataSelect);
