@@ -50,8 +50,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                         <optgroup label='--<?php echo __($guid, 'Students by Roll Group') ?>--'>
                             <?php
                             try {
-                                $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName";
+                                $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'today' => date('Y-m-d'));
+                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname, gibbonRollGroup.name AS name 
+                                        FROM freeLearningUnitStudent
+                                        JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
+                                        JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID)
+                                        JOIN gibbonYearGroup ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup.gibbonYearGroupID)
+                                        JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
+                                        WHERE gibbonPerson.status='Full' 
+                                        AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) 
+                                        AND (gibbonPerson.dateEnd IS NULL  OR gibbonPerson.dateEnd>=:today) 
+                                        AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID 
+                                        GROUP BY gibbonPerson.gibbonPersonID, gibbonRollGroup.gibbonRollGroupID
+                                        ORDER BY gibbonYearGroup.sequenceNumber, gibbonRollGroup.name, gibbonPerson.surname, gibbonPerson.preferredName";
                                 $resultSelect = $connection2->prepare($sqlSelect);
                                 $resultSelect->execute($dataSelect);
                             } catch (PDOException $e) {
@@ -68,8 +79,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                         <optgroup label='--<?php echo __($guid, 'Students by Name') ?>--'>
                             <?php
                             try {
-                                $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson, gibbonStudentEnrolment, gibbonRollGroup WHERE gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
+                                $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'today' => date('Y-m-d'));
+                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname, gibbonRollGroup.name AS name 
+                                        FROM freeLearningUnitStudent
+                                        JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) 
+                                        LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) 
+                                        LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) 
+                                        WHERE gibbonPerson.status='Full' 
+                                        AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) 
+                                        AND (dateStart IS NULL OR dateStart<=:today) AND (dateEnd IS NULL  OR dateEnd>=:today) 
+                                        GROUP BY gibbonPerson.gibbonPersonID, gibbonRollGroup.gibbonRollGroupID
+                                        ORDER BY gibbonPerson.surname, gibbonPerson.preferredName";
                                 $resultSelect = $connection2->prepare($sqlSelect);
                                 $resultSelect->execute($dataSelect);
                             } catch (PDOException $e) {
