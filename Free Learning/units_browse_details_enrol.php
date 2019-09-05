@@ -165,10 +165,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 <span style="font-size: 90%"><i><?php echo __($guid, 'Which class are you enroling for?', 'Free Learning') ?></i></span>
                             </td>
                             <td class="right">
+                                
                                 <?php
                                 try {
-                                    $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                    $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse, gibbonCourseClass, gibbonCourseClassPerson WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID AND gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND NOT role LIKE '% - Left%' ORDER BY course, class";
+                                    $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonDepartmentIDList' => $row['gibbonDepartmentIDList']);
+                                    $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID 
+                                    FROM gibbonCourse
+                                    JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID)
+                                    JOIN gibbonCourseClassPerson ON (gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID )
+                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID 
+                                    AND FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList)
+                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
+                                    AND NOT role LIKE '% - Left%' 
+                                    ORDER BY course, class";
                                     $resultClasses = $connection2->prepare($sqlClasses);
                                     $resultClasses->execute($dataClasses);
                                 } catch (PDOException $e) {
