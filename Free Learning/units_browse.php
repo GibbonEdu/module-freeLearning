@@ -225,6 +225,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }, $unit['authors'] ?? []);
 
                         $output = !empty($unit['learningArea']) ? '<div class="text-xs mb-2">'.$unit['learningArea'].'</div>' : '';
+                        $output .= !empty($unit['course']) && ($unit['learningArea'] != $unit['course']) ? '<div class="text-xs mb-2">'.$unit['course'].'</div>' : '';
                         $output .= '<div class="text-xxs">'.implode('<br/>', $unit['authors']).'</div>';
                         return $output;
                     });

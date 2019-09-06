@@ -168,24 +168,29 @@ class UnitGateway extends QueryableGateway
     {
         if (!empty($gibbonPersonID)) {
             $data = ['gibbonPersonID' => $gibbonPersonID];
-            $sql = "(SELECT gibbonDepartmentID as value, name, 'Learning Area' as groupBy 
-                    FROM gibbonDepartment 
+            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy 
+                    FROM freeLearningUnit
+                    JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
                     JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) 
-                    WHERE type='Learning Area' AND gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID 
+                    WHERE gibbonDepartment.type='Learning Area' AND gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID 
                     AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')
-                    ORDER BY name)";
+                    GROUP BY gibbonDepartment.gibbonDepartmentID
+                    ORDER BY gibbonDepartment.name)";
         } else {
             $data = [];
-            $sql = "(SELECT gibbonDepartmentID as value, name, 'Learning Area' as groupBy 
-                    FROM gibbonDepartment WHERE type='Learning Area' 
-                    ORDER BY name)";
+            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy 
+                    FROM freeLearningUnit 
+                    JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
+                    WHERE type='Learning Area' 
+                    GROUP BY gibbonDepartment.gibbonDepartmentID
+                    ORDER BY gibbonDepartment.name)";
         }
 
         $sql .= " UNION ALL 
         (SELECT DISTINCT course as value, course as name, 'Course' as groupBy FROM freeLearningUnit WHERE active='Y' AND NOT course IS NULL AND NOT course='' ORDER BY course)
         ORDER BY groupBy DESC, name";
 
-        return $this->db()->select($sql);
+        return $this->db()->select($sql, $data);
     }
 
     protected function getSharedFilterRules()
