@@ -165,10 +165,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 <span style="font-size: 90%"><i><?php echo __($guid, 'Which class are you enroling for?', 'Free Learning') ?></i></span>
                             </td>
                             <td class="right">
-                                
                                 <?php
-                                try {
-                                    $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonDepartmentIDList' => $row['gibbonDepartmentIDList']);
+                                $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonDepartmentIDList' => $row['gibbonDepartmentIDList']);
                                     $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID 
                                     FROM gibbonCourse
                                     JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID)
@@ -178,18 +176,37 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
                                     AND NOT role LIKE '% - Left%' 
                                     ORDER BY course, class";
-                                    $resultClasses = $connection2->prepare($sqlClasses);
-                                    $resultClasses->execute($dataClasses);
-                                } catch (PDOException $e) {
-                                }
+                                $resultClasses = $pdo->select($sqlClasses, $dataClasses);
+
+                                $sqlAllClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID 
+                                    FROM gibbonCourse
+                                    JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID)
+                                    JOIN gibbonCourseClassPerson ON (gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID )
+                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID 
+                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
+                                    AND NOT FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList)
+                                    AND NOT role LIKE '% - Left%' 
+                                    ORDER BY course, class";
+                                $resultAllClasses = $pdo->select($sqlAllClasses, $dataClasses);
                                 ?>
                                 <select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
-                                    <option value="Please select..."><?php echo __($guid, 'Please select...') ?></option>
+                                    <option value="Please select..."><?php echo __('Please select...') ?></option>
+                                    <?php if ($resultClasses->rowCount() > 0) { ?>
+                                        <optgroup label="-- <?php echo __('Learning Area'); ?> --">
+                                        <?php
+                                        while ($rowClasses = $resultClasses->fetch()) {
+                                            echo "<option value='".$rowClasses['gibbonCourseClassID']."'>".$rowClasses['course'].'.'.$rowClasses['class'].'</option>';
+                                        }
+                                        ?>
+                                        </optgroup>
+                                    <?php } ?>
+                                    <optgroup label="-- <?php echo __('My Classes'); ?> --">
                                     <?php
-                                    while ($rowClasses = $resultClasses->fetch()) {
+                                    while ($rowClasses = $resultAllClasses->fetch()) {
                                         echo "<option value='".$rowClasses['gibbonCourseClassID']."'>".$rowClasses['course'].'.'.$rowClasses['class'].'</option>';
                                     }
                                     ?>
+                                    </optgroup>
                                 </select>
                                 <script type="text/javascript">
                                     var gibbonCourseClassID=new LiveValidation('gibbonCourseClassID');

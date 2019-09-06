@@ -4,7 +4,7 @@ v5.9.02
 -------
 Updated filters in Current Unit by Class to have a My Classes section
 Limited Outcomes by Student/Unit History by Student to relevant students
-Filtered student enrolment by class to those in the same Learning Area
+Updated student enrolment by class to list classes in the same Learning Area at the top
 Filtered dropdowns for Learning Area to only those used by Free Learning units
 Added a prerequisite check for students selecting collaborators to enrol with
 Fixed missing placeholder for Custom Field setting
