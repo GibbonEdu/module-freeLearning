@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.9.03
+-------
+Improved filter persistence during submission
+Added link/file field disable on toggle
+
 v5.9.02
 -------
 Updated filters in Current Unit by Class to have a My Classes section

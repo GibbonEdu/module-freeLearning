@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 echo '</h3>';
 
                 ?>
-                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolProcess.php?address='.$_GET['q'] ?>">
+                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolProcess.php?address='.$_GET['q'].'&'.http_build_query($urlParams) ?>">
                     <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                         <?php
                         $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
@@ -167,25 +167,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             <td class="right">
                                 <?php
                                 $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonDepartmentIDList' => $row['gibbonDepartmentIDList']);
-                                    $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID 
+                                    $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID
                                     FROM gibbonCourse
                                     JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID)
                                     JOIN gibbonCourseClassPerson ON (gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID )
-                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID 
+                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID
                                     AND FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList)
-                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
-                                    AND NOT role LIKE '% - Left%' 
+                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
+                                    AND NOT role LIKE '% - Left%'
                                     ORDER BY course, class";
                                 $resultClasses = $pdo->select($sqlClasses, $dataClasses);
 
-                                $sqlAllClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID 
+                                $sqlAllClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID
                                     FROM gibbonCourse
                                     JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID)
                                     JOIN gibbonCourseClassPerson ON (gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID )
-                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID 
-                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
+                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID
+                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
                                     AND NOT FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList)
-                                    AND NOT role LIKE '% - Left%' 
+                                    AND NOT role LIKE '% - Left%'
                                     ORDER BY course, class";
                                 $resultAllClasses = $pdo->select($sqlAllClasses, $dataClasses);
                                 ?>
@@ -365,20 +365,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 try {
                                     $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonYearGroupIDMinimum' => $row['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $row['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount);
                                     $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup, prerequisites.count
-                                    FROM gibbonPerson 
-                                    JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID) 
-                                    JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) 
+                                    FROM gibbonPerson
+                                    JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
+                                    JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
                                     LEFT JOIN (
                                         SELECT COUNT(*) as count, freeLearningUnitStudent.gibbonPersonIDStudent
-                                        FROM freeLearningUnitStudent 
+                                        FROM freeLearningUnitStudent
                                         JOIN freeLearningUnit ON (freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID)
                                         WHERE freeLearningUnit.active='Y'
                                         AND (:prerequisiteList = '' OR FIND_IN_SET(freeLearningUnit.freeLearningUnitID, :prerequisiteList))
-                                        AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt') 
+                                        AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt')
                                         GROUP BY freeLearningUnitStudent.freeLearningUnitStudentID
                                     ) AS prerequisites ON (prerequisites.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
-                                    WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID 
-                                    AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID 
+                                    WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID
+                                    AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
                                     AND (:gibbonYearGroupIDMinimum IS NULL OR gibbonStudentEnrolment.gibbonYearGroupID >= :gibbonYearGroupIDMinimum)
                                     HAVING (:prerequisiteCount = 0 OR prerequisites.count >= :prerequisiteCount)
                                     ORDER BY surname, preferredName";
@@ -556,7 +556,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         }
 
                         ?>
-                        <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_completePendingProcess.php?address='.$_GET['q'] ?>" enctype="multipart/form-data">
+                        <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_completePendingProcess.php?address='.$_GET['q'].'&'.http_build_query($urlParams) ?>" enctype="multipart/form-data">
                             <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                                 <tr>
                                     <td>
@@ -610,14 +610,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     $(document).ready(function(){
                                         $("#fileRow").css("display","none");
                                         $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
+                                        link.enable();
+                                        file.disable();
 
                                         $(".type").click(function(){
                                             if ($('input[name=type]:checked').val()=="Link" ) {
                                                 $("#fileRow").css("display","none");
                                                 $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
+                                                link.enable();
+                                                file.disable();
                                             } else {
                                                 $("#linkRow").css("display","none");
                                                 $("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
+                                                file.enable();
+                                                link.disable();
                                             }
                                          });
                                     });

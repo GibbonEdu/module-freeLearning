@@ -130,11 +130,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $status = 'Complete - Pending';
                     $commentStudent = $_POST['commentStudent'];
                     $type = $_POST['type'];
-                    $link = trim($_POST['link']);
+                    $link = (!empty($_POST['link'])) ? trim($_POST['link']) : null;
                     $gibbonCourseClassID = $row['gibbonCourseClassID'];
 
                     //Validation
-                    if ($commentStudent == '' or $type == '' or ($_FILES['file']['name'] == '' and $link == '')) {
+                    if ($commentStudent == '' || $type == '' || ($type == 'File' && empty($_FILES['file']['name'])) || ($type == 'Link' && $link == '')) {
                         //Fail 3
                         $URL .= '&return=error3';
                         header("Location: {$URL}");
@@ -228,7 +228,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 if (is_file($mailFile)) {
                                     include $mailFile;
                                 }
-                                
+
                                 //Attempt email send
                                 $subject = sprintf(__($guid, 'Request For Mentor Feedback via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
                                 $body = __($guid, 'To whom it may concern,', 'Free Learning').'<br/><br/>';
