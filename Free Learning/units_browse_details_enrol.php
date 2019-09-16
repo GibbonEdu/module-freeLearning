@@ -184,7 +184,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     JOIN gibbonCourseClassPerson ON (gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID )
                                     WHERE gibbonSchoolYearID=:gibbonSchoolYearID
                                     AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
-                                    AND NOT FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList)
+                                    AND (:gibbonDepartmentIDList = '' OR :gibbonDepartmentIDList IS NULL OR NOT FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList))
                                     AND NOT role LIKE '% - Left%'
                                     ORDER BY course, class";
                                 $resultAllClasses = $pdo->select($sqlAllClasses, $dataClasses);
