@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.04
+-------
+Fixed classes missing from dropdown in unit enrolment 
+
 v5.9.03
 -------
 Improved filter persistence during submission
