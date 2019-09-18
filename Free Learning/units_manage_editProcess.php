@@ -43,6 +43,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $name = $_POST['name'];
             $difficulty = $_POST['difficulty'];
             $blurb = $_POST['blurb'];
+            $studentReflectionText = $_POST['studentReflectionText'] ?? '';
             $count = $_POST['count'];
             $gibbonDepartmentIDList = null;
             for ($i = 0; $i < $count; ++$i) {
@@ -181,8 +182,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     //Write to database
                     try {
                         $data = array('name' => $name, 'course' => $course, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'schoolMentorCompletors' => $schoolMentorCompletors, 'schoolMentorCustom' => $schoolMentorCustom, 'schoolMentorCustomRole'
-                         => $schoolMentorCustomRole, 'outline' => $outline, 'freeLearningUnitID' => $freeLearningUnitID);
-                        $sql = 'UPDATE freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, grouping=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline WHERE freeLearningUnitID=:freeLearningUnitID';
+                         => $schoolMentorCustomRole, 'outline' => $outline, 'studentReflectionText' => $studentReflectionText, 'freeLearningUnitID' => $freeLearningUnitID);
+                        $sql = 'UPDATE freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, grouping=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline, studentReflectionText=:studentReflectionText WHERE freeLearningUnitID=:freeLearningUnitID';
                         $result = $connection2->prepare($sql);
                         $result->execute($data);
                     } catch (PDOException $e) {

@@ -572,9 +572,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         <b><?php echo __($guid, 'Comment', 'Free Learning') ?> *</b><br/>
                                         <span style="font-size: 90%"><i>
                                             <?php
-                                            echo __($guid, 'Leave a brief reflective comment on this unit<br/>and what you learned.', 'Free Learning');
+                                            if (!empty($row['studentReflectionText'])) {
+                                                echo $row['studentReflectionText'];
+                                            } else {
+                                                echo __('Leave a brief reflective comment on this unit<br/>and what you learned.', 'Free Learning');
+                                            }
+                                            
                                             if ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
-                                                echo '<br/><br/>'.__($guid, 'Your previous comment is shown here, for you to edit.', 'Free Learning');
+                                                echo '<br/><br/>'.__('Your previous comment is shown here, for you to edit.', 'Free Learning');
                                             }
                                             ?>
                                         </i></span>

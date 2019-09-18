@@ -18,6 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\View\View;
+use Gibbon\Tables\DataTable;
+use Gibbon\Domain\DataSet;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\Services\Format;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -339,215 +344,176 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                     }
                                 }
                             }
+
+                            // List students whose status is Current or Complete - Pending
+                            $unitGateway = $container->get(UnitGateway::class);
+                            $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
+                            // Get list of my classes before we start looping, for efficiency's sake
+                            $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll();
+                            
+                            $students = $unitStudentGateway->selectCurrentStudentsByUnit($gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID']);
+                            $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
+                            $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+
+                            // DATA TABLE
+                            $table = DataTable::createPaginated('manageEnrolment', $unitStudentGateway->newQueryCriteria());
+
                             if ($enrolmentType == 'staffEdit') {
-                                echo "<div class='linkTop'>";
-                                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/units_browse_details_enrolMultiple.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Add Multiple')."<img style='margin: 0 0 -4px 5px' title='".__($guid, 'Add Multiple')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new_multi.png'/></a>";
-                                echo '</div>';
+                                $table->addHeaderAction('addMultiple', __('Add Multiple'))
+                                    ->setURL('/modules/Free Learning/units_browse_details_enrolMultiple.php')
+                                    ->addParam('freeLearningUnitID', $row['freeLearningUnitID'])
+                                    ->addParam('gibbonDepartmentID', $gibbonDepartmentID)
+                                    ->addParam('difficulty', $difficulty)
+                                    ->addParam('name', $name)
+                                    ->addParam('showInactive', $showInactive)
+                                    ->addParam('gibbonPersonID', $gibbonPersonID)
+                                    ->addParam('view', $view)
+                                    ->displayLabel();
                             }
 
-                            //List students whose status is Current or Complete - Pending
-                            try {
-                                $dataClass = array('freeLearningUnitID' => $row['freeLearningUnitID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-                                $sqlClass = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.email, gibbonPerson.surname, gibbonPerson.preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName, gibbonPerson.fields
-                                    FROM freeLearningUnitStudent
-                                        INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
-                                        LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
-                                        LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
-                                        LEFT JOIN gibbonPerson AS mentor ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID)
-                                    WHERE freeLearningUnitID=:freeLearningUnitID
-                                        AND gibbonPerson.status='Full'
-                                        AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='".date('Y-m-d')."')
-                                        AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='".date('Y-m-d')."')
-                                        AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
-                                    ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
-                                $resultClass = $connection2->prepare($sqlClass);
-                                $resultClass->execute($dataClass);
-                            } catch (PDOException $e) {
-                                echo "<div class='error'>".$e->getMessage().'</div>';
-                            }
-                            $count = 0;
-                            $rowNum = 'odd';
-                            if ($resultClass->rowCount() < 1) {
-                                echo "<div class='error'>";
-                                echo __($guid, 'There are no records to display.');
-                                echo '</div>';
-                            } else {
-                                ?>
-                                <table cellspacing='0' style="width: 100%">
-                                    <tr class='head'>
-                                        <th>
-                                            <?php echo __($guid, 'Student') ?><br/>
-                                        </th>
-                                        <th>
-                                            <?php
-                                            echo __($guid, 'Status', 'Free Learning') . '<br/>';
-                                            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Enrolment Method', 'Free Learning').'</span>';
-                                            ?>
-                                        </th>
-                                       <th>
-                                            <?php echo __($guid, 'Class/Mentor', 'Free Learning') ?><br/>
-                                        </th>
-                                        <th>
-                                            <?php echo __($guid, 'View') ?><br/>
-                                        </th>
-                                        <th>
-                                            <?php echo __($guid, 'Action') ?><br/>
-                                        </th>
-                                    </tr>
-                                    <?php
+                            $table->modifyRows(function ($student, $row) {
+                                if ($student['status'] == 'Evidence Not Yet Approved') $row->addClass('error');
+                                if ($student['status'] == 'Complete - Pending') $row->addClass('pending');
+                                if ($student['status'] == 'Complete - Approved') $row->addClass('success');
+                                if ($student['status'] == 'Exempt') $row->addClass('success');
+                                return $row;
+                            });
 
-                                    //Get list of my classes before we start looping, for efficiency's sake
-                                    $myClasses = array();
-                                    try {
-                                        $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                        $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND role='Teacher' ORDER BY gibbonCourseClassID";
-                                        $resultClasses = $connection2->prepare($sqlClasses);
-                                        $resultClasses->execute($dataClasses);
-                                    } catch (PDOException $e) {}
-
-                                    if ($resultClasses->rowCount() > 0) {
-                                        while ($rowClasses = $resultClasses->fetch()) {
-                                            array_push($myClasses,$rowClasses['gibbonCourseClassID']);
+                            $table->addExpandableColumn('commentStudent')
+                                ->format(function ($student) {
+                                    $output = '';
+                                    if (!empty($student['commentStudent'])) {
+                                        $output .= '<b>'.__m('Student Comment').'</b><br/>';
+                                        $output .= nl2br($student['commentStudent']).'<br/>';
+                                    }
+                                    if (!empty($student['commentApproval'])) {
+                                        if ($student['commentStudent'] != '') {
+                                            $output .= '<br/>';
                                         }
+                                        $output .= '<b>'.__m('Teacher Comment').'</b><br/>';
+                                        $output .= nl2br($student['commentApproval']);
                                     }
 
-                                    //Check for custom field
-                                    $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+                                    return $output;
+                                });
 
-                                    //Start looping through enrolments
-                                    while ($rowClass = $resultClass->fetch()) {
-                                        if ($count % 2 == 0) {
-                                            $rowNum = 'even';
+                            $table->addColumn('student', __('Student'))
+                                ->notSortable()
+                                ->width('35%')
+                                ->format(function ($student) use ($canViewStudents, $customField) {
+                                    $output = '';
+                                    $url = './index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$student['gibbonPersonID'];
+                                    $name = Format::name('', $student['preferredName'], $student['surname'], 'Student', true, true);
+
+                                    $output = $canViewStudents
+                                        ? Format::link($url, $name)
+                                        : $name;
+
+                                    if (!$canViewStudents) {
+                                        $output .= '<br/>'.Format::link('mailto:'.$student['email'], $student['email']);
+                                    }
+                                    $fields = unserialize($student['fields']);
+                                    if (!empty($fields[$customField])) {
+                                        $output .= '<br/>'.Format::small($fields[$customField]);
+                                    }
+                                    return $output;
+                                });
+
+                            $table->addColumn('status', __('Status'))
+                                ->description(__m('Enrolment Method'))
+                                ->notSortable()
+                                ->width('25%')
+                                ->format(function ($student) {
+                                    $enrolmentMethod = ucfirst(preg_replace('/(\w+)([A-Z])/U', '\\1 \\2', $student['enrolmentMethod']));
+                                    return $student['status'] . '<br/>' . Format::small($enrolmentMethod);
+                                });
+
+                            $table->addColumn('classMentor', __m('Class/Mentor'))
+                                ->notSortable()
+                                ->width('20%')
+                                ->format(function ($student) {
+                                    if ($student['enrolmentMethod'] == 'class') {
+                                        if (!empty($student['course']) && !empty($student['class'])) {
+                                            return Format::courseClassName($student['course'], $student['class']);
                                         } else {
-                                            $rowNum = 'odd';
+                                            return Format::small(__('N/A'));
                                         }
-                                        ++$count;
+                                    } else if ($student['enrolmentMethod'] == 'schoolMentor') {
+                                        return formatName('', $student['mentorpreferredName'], $student['mentorsurname'], 'Student', false);
+                                    } else if ($student['enrolmentMethod'] == 'externalMentor') {
+                                        return $student['nameExternalMentor'];
+                                    }
+                                });
+                                
+                            $table->addColumn('view', __('View'))
+                                ->notSortable()
+                                ->width('10%')
+                                ->format(function ($student) {
+                                    if (empty($student['evidenceLocation'])) return;
 
-                                        echo "<tr class=$rowNum>";
-                                        ?>
-                                            <td>
-                                                <?php
-                                                    if (isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php')) {
-                                                        echo "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$rowClass['gibbonPersonID']."'>".formatName('', $rowClass['preferredName'], $rowClass['surname'], 'Student', true).'</a><br/>';
-                                                    }
-                                                    else {
-                                                        echo formatName('', $rowClass['preferredName'], $rowClass['surname'], 'Student', true).'<br/>';
-                                                        echo "<a href='mailto:".$rowClass['email']."'>".$rowClass['email'].'</a><br/>';
-                                                    }
-                                                    $fields = unserialize($rowClass['fields']);
-                                                    if (!empty($fields[$customField])) {
-                                                        $value = $fields[$customField];
-                                                        if ($value != '') {
-                                                            echo "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
-                                                        }
-                                                    }
-                                                ?>
-                                            </td>
-                                            <td>
-                                                <?php
-                                                echo $rowClass['status'] . '<br/>';
-                                                echo "<span style='font-size: 85%; font-style: italic'>".ucfirst(preg_replace('/(\w+)([A-Z])/U', '\\1 \\2', $rowClass['enrolmentMethod'])).'</span>';
-                                                ?>
-                                            </td>
-                                            <?php
-                                            echo '<td>';
-                                                if ($rowClass['enrolmentMethod'] == 'class') {
-                                                    if ($rowClass['course'] != '' and $rowClass['class'] != '') {
-                                                        echo $rowClass['course'].'.'.$rowClass['class'];
-                                                    } else {
-                                                        echo '<i>'.__($guid, 'N/A').'</i>';
-                                                    }
-                                                }
-                                                else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {
-                                                    echo formatName('', $rowClass['mentorpreferredName'], $rowClass['mentorsurname'], 'Student', false);
-                                                }
-                                                else if ($rowClass['enrolmentMethod'] == 'externalMentor') {
-                                                    echo $rowClass['nameExternalMentor'];
-                                                }
-                                            echo '</td>';
-                                            ?>
-                                            <td>
-                                                <?php
-                                                if ($rowClass['evidenceLocation'] != '') {
-                                                    if ($rowClass['evidenceType'] == 'Link') {
-                                                        echo "<a target='_blank' href='".$rowClass['evidenceLocation']."'>".__($guid, 'View').'</>';
-                                                    } else {
-                                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowClass['evidenceLocation']."'>".__($guid, 'View').'</>';
-                                                    }
-                                                }
-                                                ?>
-                                            </td>
-                                            <td>
-                                                <?php
-                                                //Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
-                                                $editEnrolment = false;
-                                                if ($manageAll == true) {
-                                                    $editEnrolment = true;
-                                                }
-                                                else {
-                                                    if ($rowClass['enrolmentMethod'] == 'class') { //Is teacher of this class?
-                                                        foreach ($myClasses AS $class) {
-                                                            if ($rowClass['gibbonCourseClassID'] == $class) {
-                                                                $editEnrolment = true;
-                                                            }
-                                                        }
-                                                    }
-                                                    else if ($rowClass['enrolmentMethod'] == 'schoolMentor' && $rowClass['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) { //Is mentor of this student?
-                                                        $editEnrolment = true;
-                                                    }
-                                                }
+                                    $url = $student['evidenceType'] == 'Link'
+                                        ? $student['evidenceLocation']
+                                        : './'.$student['evidenceLocation'];
 
-                                                //Layout the actions
-                                                if ($enrolmentType == 'staffEdit' || $editEnrolment) {
-                                                    if ($editEnrolment && ($rowClass['status'] == 'Complete - Pending' or $rowClass['status'] == 'Complete - Approved' or $rowClass['status'] == 'Evidence Not Yet Approved')) {
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
-                                                    }
-                                                    if ($editEnrolment) {
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_delete.php&freeLearningUnitStudentID='.$rowClass['freeLearningUnitStudentID'].'&freeLearningUnitID='.$rowClass['freeLearningUnitID']."&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Delete')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/></a> ";
-                                                    }
-                                                }
-                                                if ($editEnrolment && $rowClass['status'] == 'Current - Pending' && $rowClass['enrolmentMethod'] == 'schoolMentor') {
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Approve', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconTick.png'/><a/> ";
-                                                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$rowClass['freeLearningUnitStudentID']."&confirmationKey=".$rowClass['confirmationKey']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'><img title='".__($guid, 'Reject', 'Free Learning')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/iconCross.png'/><a/>";
-                                                }
-                                                if ($rowClass['commentStudent'] != '' or $rowClass['commentApproval'] != '') {
-                                                    echo "<script type='text/javascript'>";
-                                                    echo '$(document).ready(function(){';
-                                                    echo '$(".comment-'.$rowClass['freeLearningUnitStudentID'].'").hide();';
-                                                    echo '$(".show_hide-'.$rowClass['freeLearningUnitStudentID'].'").fadeIn(1000);';
-                                                    echo '$(".show_hide-'.$rowClass['freeLearningUnitStudentID'].'").click(function(){';
-                                                    echo '$(".comment-'.$rowClass['freeLearningUnitStudentID'].'").fadeToggle(1000);';
-                                                    echo '});';
-                                                    echo '});';
-                                                    echo '</script>';
-                                                    echo "<a title='".__($guid, 'Show Comment')."' class='show_hide-".$rowClass['freeLearningUnitStudentID']."' onclick='false' href='#'><img style='padding-right: 5px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
-                                                }
-                                                ?>
-                                            </td>
-                                        </tr>
-                                        <?php
-                                        if ($rowClass['commentStudent'] != '' or $rowClass['commentApproval'] != '') {
-                                            echo "<tr class='comment-".$rowClass['freeLearningUnitStudentID']."' id='comment-".$rowClass['freeLearningUnitStudentID']."'>";
-                                            echo '<td colspan=5>';
-                                            if ($rowClass['commentStudent'] != '') {
-                                                echo '<b>'.__($guid, 'Student Comment', 'Free Learning').'</b><br/>';
-                                                echo nl2br($rowClass['commentStudent']).'<br/>';
-                                            }
-                                            if ($rowClass['commentApproval'] != '') {
-                                                if ($rowClass['commentStudent'] != '') {
-                                                    echo '<br/>';
-                                                }
-                                                echo '<b>'.__($guid, 'Teacher Comment', 'Free Learning').'</b><br/>';
-                                                echo nl2br($rowClass['commentApproval']).'<br/>';
-                                            }
-                                            echo '</td>';
-                                            echo '</tr>';
+                                    return Format::link($url, __('View'), ['target' => '_blank']);
+                                });
+
+                            // ACTIONS
+                            $table->addActionColumn()
+                                ->addParam('freeLearningUnitStudentID')
+                                ->addParam('freeLearningUnitID')
+                                ->addParam('gibbonDepartmentID', $gibbonDepartmentID)
+                                ->addParam('difficulty', $difficulty)
+                                ->addParam('name', $name)
+                                ->addParam('showInactive', $showInactive)
+                                ->addParam('gibbonPersonID', $gibbonPersonID)
+                                ->addParam('view', $view)
+                                ->addParam('sidebar', 'true')
+                                ->format(function ($student, $actions) use ($manageAll, $enrolmentType, $myClasses, $guid) {
+                                    // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
+                                    $editEnrolment = $manageAll ? true : false;
+                                    if ($student['enrolmentMethod'] == 'class') { 
+                                        // Is teacher of this class?
+                                        if (in_array($student['gibbonCourseClassID'], $myClasses)) {
+                                            $editEnrolment = true;
+                                        }
+                                    } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) { 
+                                        // Is mentor of this student?
+                                        $editEnrolment = true;
+                                    }
+                                    
+
+                                    if ($enrolmentType == 'staffEdit' || $editEnrolment) {
+                                        if ($editEnrolment && ($student['status'] == 'Complete - Pending' or $student['status'] == 'Complete - Approved' or $student['status'] == 'Evidence Not Yet Approved')) {
+                                            $actions->addAction('edit', __('Edit'))
+                                                ->setURL('/modules/Free Learning/units_browse_details_approval.php');
+                                        }
+                                        if ($editEnrolment) {
+                                            $actions->addAction('delete', __('Delete'))
+                                                ->setURL('/modules/Free Learning/units_browse_details_delete.php');
                                         }
                                     }
-                                ?>
-                                </table>
-                                <?php
-                            }
+
+                                    if ($editEnrolment && $student['status'] == 'Current - Pending' && $student['enrolmentMethod'] == 'schoolMentor') {
+                                        $actions->addAction('approve', __m('Approve'))
+                                                ->setIcon('iconTick')
+                                                ->addParam('confirmationKey', $student['confirmationKey'])
+                                                ->addParam('response', 'Y')
+                                                ->setURL('/modules/Free Learning/units_mentorProcess.php');
+
+                                        $actions->addAction('reject', __m('Reject'))
+                                                ->setIcon('iconCross')
+                                                ->addParam('confirmationKey', $student['confirmationKey'])
+                                                ->addParam('response', 'N')
+                                                ->setURL('/modules/Free Learning/units_mentorProcess.php');
+                                    }
+                                });
+
+                            
+                            echo $table->render(new DataSet($students->fetchAll()));
+
+                            
                         echo "</div>";
                     }
                     echo '<div id="tabs3" style="border-width: 1px 0px 0px 0px !important; background-color: transparent !important; padding-left: 0; padding-right: 0; overflow: initial;">';
