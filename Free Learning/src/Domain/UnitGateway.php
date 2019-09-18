@@ -164,6 +164,22 @@ class UnitGateway extends QueryableGateway
         return $this->db()->select($sql);
     }
 
+    public function selectRelevantClassesByTeacher($gibbonSchoolYearID, $gibbonPersonID)
+    {
+        $data = array('gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbonPersonID);
+        $sql = "SELECT DISTINCT gibbonCourseClassPerson.gibbonCourseClassID 
+                FROM gibbonCourse 
+                JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) 
+                JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+                JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=freeLearningUnitStudent.gibbonCourseClassID) 
+                WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID 
+                AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
+                AND gibbonCourseClassPerson.role='Teacher' 
+                GROUP BY gibbonCourseClassPerson.gibbonCourseClassPersonID
+                ORDER BY gibbonCourseClassPerson.gibbonCourseClassID";
+        return $this->db()->select($sql, $data);
+    }
+
     public function selectLearningAreasAndCourses($gibbonPersonID = null)
     {
         if (!empty($gibbonPersonID)) {

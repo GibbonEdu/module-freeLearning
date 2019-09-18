@@ -22,6 +22,7 @@ use Gibbon\Tables\DataTable;
 use Gibbon\Domain\DataSet;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 use Gibbon\Services\Format;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -344,22 +345,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 }
                             }
 
-                            
-
-
-                            //Get list of my classes before we start looping, for efficiency's sake
-                            $myClasses = array();
-                            try {
-                                $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND role='Teacher' ORDER BY gibbonCourseClassID";
-                                $resultClasses = $connection2->prepare($sqlClasses);
-                                $resultClasses->execute($dataClasses);
-                            } catch (PDOException $e) {}
-
-                            $myClasses = $resultClasses->fetchAll();
-
-                            //List students whose status is Current or Complete - Pending
+                            // List students whose status is Current or Complete - Pending
+                            $unitGateway = $container->get(UnitGateway::class);
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
+                            // Get list of my classes before we start looping, for efficiency's sake
+                            $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll();
                             
                             $students = $unitStudentGateway->selectCurrentStudentsByUnit($gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID']);
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
@@ -408,7 +399,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 });
 
                             $table->addColumn('student', __('Student'))
-                                ->sortable(['surname', 'preferredName'])
+                                ->notSortable()
+                                ->width('35%')
                                 ->format(function ($student) use ($canViewStudents, $customField) {
                                     $output = '';
                                     $url = './index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$student['gibbonPersonID'];
@@ -430,12 +422,16 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             $table->addColumn('status', __('Status'))
                                 ->description(__m('Enrolment Method'))
+                                ->notSortable()
+                                ->width('25%')
                                 ->format(function ($student) {
                                     $enrolmentMethod = ucfirst(preg_replace('/(\w+)([A-Z])/U', '\\1 \\2', $student['enrolmentMethod']));
                                     return $student['status'] . '<br/>' . Format::small($enrolmentMethod);
                                 });
 
                             $table->addColumn('classMentor', __m('Class/Mentor'))
+                                ->notSortable()
+                                ->width('20%')
                                 ->format(function ($student) {
                                     if ($student['enrolmentMethod'] == 'class') {
                                         if (!empty($student['course']) && !empty($student['class'])) {
@@ -449,12 +445,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         return $student['nameExternalMentor'];
                                     }
                                 });
+                                
                             $table->addColumn('view', __('View'))
+                                ->notSortable()
+                                ->width('10%')
                                 ->format(function ($student) {
                                     if (empty($student['evidenceLocation'])) return;
 
                                     $url = $student['evidenceType'] == 'Link'
-                                        ? $student['evidenceType']
+                                        ? $student['evidenceLocation']
                                         : './'.$student['evidenceLocation'];
 
                                     return Format::link($url, __('View'), ['target' => '_blank']);
@@ -472,23 +471,18 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->addParam('view', $view)
                                 ->addParam('sidebar', 'true')
                                 ->format(function ($student, $actions) use ($manageAll, $enrolmentType, $myClasses, $guid) {
-
-                                    //Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
-                                    $editEnrolment = false;
-                                    if ($manageAll == true) {
-                                        $editEnrolment = true;
-                                    } else {
-                                        if ($student['enrolmentMethod'] == 'class') { //Is teacher of this class?
-                                            foreach ($myClasses AS $class) {
-                                                if ($student['gibbonCourseClassID'] == $class) {
-                                                    $editEnrolment = true;
-                                                }
-                                            }
-                                        }
-                                        else if ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) { //Is mentor of this student?
+                                    // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
+                                    $editEnrolment = $manageAll ? true : false;
+                                    if ($student['enrolmentMethod'] == 'class') { 
+                                        // Is teacher of this class?
+                                        if (in_array($student['gibbonCourseClassID'], $myClasses)) {
                                             $editEnrolment = true;
                                         }
+                                    } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) { 
+                                        // Is mentor of this student?
+                                        $editEnrolment = true;
                                     }
+                                    
 
                                     if ($enrolmentType == 'staffEdit' || $editEnrolment) {
                                         if ($editEnrolment && ($student['status'] == 'Complete - Pending' or $student['status'] == 'Complete - Approved' or $student['status'] == 'Evidence Not Yet Approved')) {
