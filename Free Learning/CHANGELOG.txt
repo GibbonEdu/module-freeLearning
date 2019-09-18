@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.9.05
+-------
+Ooified the Manage Enrolment table in Unit details
+Added an option to customize student reflection text
+
 v5.9.04
 -------
 Fixed classes missing from dropdown in unit enrolment 

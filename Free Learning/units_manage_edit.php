@@ -170,6 +170,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     </tr>
                     <tr>
                         <td>
+                            <b><?php echo __m('Student Reflection Prompt') ?></b><br/>
+                            <span style="font-size: 90%"><i><?php echo __m('Replace the default text next to the student comment field with an optional custom message.') ?></i><br/></span>
+                        </td>
+                        <td class="right">
+                            <textarea name='studentReflectionText' id='studentReflectionText' rows=3 style='width: 300px'><?php echo htmlPrep($row['studentReflectionText']) ?></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <b><?php echo __($guid, 'Learning Areas') ?></b><br/>
                         </td>
                         <td class="right">
