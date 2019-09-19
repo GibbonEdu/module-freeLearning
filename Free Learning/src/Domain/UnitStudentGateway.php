@@ -31,22 +31,26 @@ class UnitStudentGateway extends QueryableGateway
     private static $primaryKey = 'freeLearningUnitStudentID';
     private static $searchableColumns = [];
     
-    public function selectCurrentStudentsByUnit($gibbonSchoolYearID, $freeLearningUnitID)
+    public function queryCurrentStudentsByUnit($criteria, $gibbonSchoolYearID, $freeLearningUnitID)
     {
-        $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $gibbonSchoolYearID, 'today' => date('Y-m-d'));
-        $sql = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.email, gibbonPerson.surname, gibbonPerson.preferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName, gibbonPerson.fields, freeLearningUnitStudent.freeLearningUnitStudentID
-            FROM freeLearningUnitStudent
-                INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
-                LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
-                LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
-                LEFT JOIN gibbonPerson AS mentor ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID)
-            WHERE freeLearningUnitID=:freeLearningUnitID
-                AND gibbonPerson.status='Full'
-                AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)
-                AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)
-                AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
-            ORDER BY FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt'), surname, preferredName";
+        $query = $this
+            ->newQuery()
+            ->distinct()
+            ->from($this->getTableName())
+            ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"])
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+            ->leftJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
+            ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+            ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
+            ->bindValue('freeLearningUnitID', $freeLearningUnitID)
+            ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+            ->where("gibbonPerson.status='Full'")
+            ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
+            ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
+            ->bindValue('today', date('Y-m-d'));
 
-        return $this->db()->select($sql, $data);
+        return $this->runQuery($query, $criteria);
     }
 }

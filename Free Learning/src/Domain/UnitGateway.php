@@ -170,8 +170,7 @@ class UnitGateway extends QueryableGateway
         $sql = "SELECT DISTINCT gibbonCourseClassPerson.gibbonCourseClassID 
                 FROM gibbonCourse 
                 JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) 
-                JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
-                JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=freeLearningUnitStudent.gibbonCourseClassID) 
+                JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) 
                 WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID 
                 AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
                 AND gibbonCourseClassPerson.role='Teacher' 

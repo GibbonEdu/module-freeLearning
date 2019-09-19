@@ -350,14 +350,18 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
                             // Get list of my classes before we start looping, for efficiency's sake
-                            $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll();
+                            $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
                             
-                            $students = $unitStudentGateway->selectCurrentStudentsByUnit($gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID']);
+                            $criteria = $unitStudentGateway->newQueryCriteria()
+                                ->sortBy(['statusSort', 'surname', 'preferredName'])
+                                ->fromPOST();
+
+                            $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID']);
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
                             $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
 
                             // DATA TABLE
-                            $table = DataTable::createPaginated('manageEnrolment', $unitStudentGateway->newQueryCriteria());
+                            $table = DataTable::createPaginated('manageEnrolment', $criteria);
 
                             if ($enrolmentType == 'staffEdit') {
                                 $table->addHeaderAction('addMultiple', __('Add Multiple'))
@@ -399,7 +403,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 });
 
                             $table->addColumn('student', __('Student'))
-                                ->notSortable()
+                                ->sortable(['surname', 'preferredName'])
                                 ->width('35%')
                                 ->format(function ($student) use ($canViewStudents, $customField) {
                                     $output = '';
@@ -422,7 +426,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             $table->addColumn('status', __('Status'))
                                 ->description(__m('Enrolment Method'))
-                                ->notSortable()
+                                ->sortable('statusSort')
                                 ->width('25%')
                                 ->format(function ($student) {
                                     $enrolmentMethod = ucfirst(preg_replace('/(\w+)([A-Z])/U', '\\1 \\2', $student['enrolmentMethod']));
@@ -430,7 +434,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 });
 
                             $table->addColumn('classMentor', __m('Class/Mentor'))
-                                ->notSortable()
+                                ->sortable(['course', 'class'])
                                 ->width('20%')
                                 ->format(function ($student) {
                                     if ($student['enrolmentMethod'] == 'class') {
@@ -482,7 +486,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         // Is mentor of this student?
                                         $editEnrolment = true;
                                     }
-                                    
 
                                     if ($enrolmentType == 'staffEdit' || $editEnrolment) {
                                         if ($editEnrolment && ($student['status'] == 'Complete - Pending' or $student['status'] == 'Complete - Approved' or $student['status'] == 'Evidence Not Yet Approved')) {
@@ -511,7 +514,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 });
 
                             
-                            echo $table->render(new DataSet($students->fetchAll()));
+                            echo $table->render($students);
 
                             
                         echo "</div>";
