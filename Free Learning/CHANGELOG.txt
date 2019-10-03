@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.06
+-------
+Fixed missing table field for studentReflectionText
+
 v5.9.05
 -------
 Ooified the Manage Enrolment table in Unit details
