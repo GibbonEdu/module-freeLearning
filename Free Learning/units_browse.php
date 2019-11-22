@@ -142,7 +142,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if ($highestAction == 'Browse Units_all' && !$viewingAsUser) {
             $units = $unitGateway->queryAllUnits($criteria, $gibbonPersonID, $publicUnits);
         } else {
-            $units = $unitGateway->queryUnitsByPrerequisites($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbonPersonID, $roleCategory);
+            $units = $unitGateway->queryUnitsByPrerequisites($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbonPersonID, !$viewingAsUser ? $roleCategory : '');
         }
 
         // Join a set of author data per unit
