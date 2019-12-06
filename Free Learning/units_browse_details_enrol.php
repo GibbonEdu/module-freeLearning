@@ -360,7 +360,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $studentCount = 0;
                             if ($roleCategory == 'Student') {
                                 $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
-                                $prerequisiteCount = count(explode(',', $prerequisitesActive));
+                                $prerequisiteCount = !empty($prerequisitesActive) ? count(explode(',', $prerequisitesActive)) : 0;
 
                                 try {
                                     $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonYearGroupIDMinimum' => $row['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $row['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount);

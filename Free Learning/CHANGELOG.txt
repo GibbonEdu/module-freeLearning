@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.08
+-------
+Fixed empty collaborator list for units with no prerequisites
+
 v5.9.07
 -------
 Fixed empty result set when using the View As option in Browse Units
