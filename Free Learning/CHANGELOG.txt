@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.09
+-------
+Improved mentorship request link style 
+
 v5.9.08
 -------
 Fixed empty collaborator list for units with no prerequisites
@@ -19,7 +23,7 @@ Added an option to customize student reflection text
 
 v5.9.04
 -------
-Fixed classes missing from dropdown in unit enrolment 
+Fixed classes missing from dropdown in unit enrolment
 
 v5.9.03
 -------
