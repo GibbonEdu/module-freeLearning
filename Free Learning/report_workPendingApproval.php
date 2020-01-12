@@ -50,7 +50,7 @@ else {
                 LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
                 LEFT JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
             WHERE gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
-                AND gibbonCourseClassPerson.role='Teacher'
+                AND (gibbonCourseClassPerson.role='Teacher' OR gibbonCourseClassPerson.role='Assistant')
                 AND gibbonPerson.status='Full'
                 AND freeLearningUnitStudent.status='Complete - Pending'
                 AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='" . date("Y-m-d") . "')

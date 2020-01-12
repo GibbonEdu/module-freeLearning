@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v5.9.10
+-------
+Extended Work Pending Approval to include class Assistant role
+
 v5.9.09
 -------
-Improved mentorship request link style 
+Improved mentorship request link style
 
 v5.9.08
 -------
