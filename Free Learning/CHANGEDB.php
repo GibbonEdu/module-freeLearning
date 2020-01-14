@@ -992,3 +992,9 @@ $sql[$count][1] = "
 $sql[$count][0] = '5.9.10';
 $sql[$count][1] = "
 ";
+
+//v5.9.11
+++$count;
+$sql[$count][0] = '5.9.11';
+$sql[$count][1] = "
+";
