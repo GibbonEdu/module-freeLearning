@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.12
+-------
+Fixed show inactive not persisting from map links
+
 v5.9.11
 -------
 Improved school mentors request link style
