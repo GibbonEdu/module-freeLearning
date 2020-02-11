@@ -355,7 +355,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         ?>
                         <tr>
                             <td>
-                                <b><?php echo __($guid, 'Shared Publically', 'Free Learning') ?> * </b><br/>
+                                <b><?php echo __($guid, 'Shared Publicly', 'Free Learning') ?> * </b><br/>
                                 <span style="font-size: 90%"><i><?php echo __($guid, 'Share this unit via the public listing of units? Useful for building MOOCS.', 'Free Learning'); ?></i></span>
                             </td>
                             <td class="right">

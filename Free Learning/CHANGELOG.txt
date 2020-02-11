@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.13
+-------
+Changed spelling of Publically to Publicly
+
 v5.9.12
 -------
 Fixed show inactive not persisting from map links
