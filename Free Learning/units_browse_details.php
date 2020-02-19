@@ -351,7 +351,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             // Get list of my classes before we start looping, for efficiency's sake
                             $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
-                            
+
                             $criteria = $unitStudentGateway->newQueryCriteria()
                                 ->sortBy(['statusSort', 'surname', 'preferredName'])
                                 ->fromPOST();
@@ -449,7 +449,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         return $student['nameExternalMentor'];
                                     }
                                 });
-                                
+
                             $table->addColumn('view', __('View'))
                                 ->notSortable()
                                 ->width('10%')
@@ -477,12 +477,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->format(function ($student, $actions) use ($manageAll, $enrolmentType, $myClasses, $guid) {
                                     // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
                                     $editEnrolment = $manageAll ? true : false;
-                                    if ($student['enrolmentMethod'] == 'class') { 
+                                    if ($student['enrolmentMethod'] == 'class') {
                                         // Is teacher of this class?
                                         if (in_array($student['gibbonCourseClassID'], $myClasses)) {
                                             $editEnrolment = true;
                                         }
-                                    } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) { 
+                                    } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) {
                                         // Is mentor of this student?
                                         $editEnrolment = true;
                                     }
@@ -503,24 +503,26 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                 ->setIcon('iconTick')
                                                 ->addParam('confirmationKey', $student['confirmationKey'])
                                                 ->addParam('response', 'Y')
-                                                ->setURL('/modules/Free Learning/units_mentorProcess.php');
+                                                ->setURL('/modules/Free Learning/units_mentorProcess.php')
+                                                ->directLink();
 
                                         $actions->addAction('reject', __m('Reject'))
                                                 ->setIcon('iconCross')
                                                 ->addParam('confirmationKey', $student['confirmationKey'])
                                                 ->addParam('response', 'N')
-                                                ->setURL('/modules/Free Learning/units_mentorProcess.php');
+                                                ->setURL('/modules/Free Learning/units_mentorProcess.php')
+                                                ->directLink();
                                     }
                                 });
 
-                            
+
                             echo $table->render($students);
 
-                            
+
                         echo "</div>";
                     }
                     echo '<div id="tabs3" style="border-width: 1px 0px 0px 0px !important; background-color: transparent !important; padding-left: 0; padding-right: 0; overflow: initial;">';
-                        
+
                     $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
                     $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
 

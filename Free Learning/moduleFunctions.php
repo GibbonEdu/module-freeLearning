@@ -86,13 +86,13 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
                 $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
                 $data['gibbonPersonID2'] = $_SESSION[$guid]['gibbonPersonID'];
                 $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2 
-                FROM freeLearningUnit 
-                LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2) 
-                LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID) 
-                JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID) 
-                JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID) 
-                WHERE active='Y' AND availableStudents='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber) 
+                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
+                FROM freeLearningUnit
+                LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
+                LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID)
+                JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
+                JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
+                WHERE active='Y' AND availableStudents='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber)
                 ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Parent') {
@@ -568,9 +568,6 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 			<tr id="blockInner<?php echo $i ?>">
 				<td colspan=2 style='vertical-align: top'>
 					<?php
-                    if ($mode == 'masterAdd') {
-                        $contents = getSettingByScope($connection2, 'Planner', 'smartBlockTemplate');
-                    }
     				echo "<div style='text-align: left; font-weight: bold; margin-top: 15px'>".__($guid, 'Block Contents').'</div>';
                     //Block Contents
                     if ($mode != 'embed') {

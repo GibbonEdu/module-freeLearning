@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.9.14
+-------
+Remove core Smart Block template from Free Learning blocks
+Fixed bug causing School Mentor approval from within unit to fail
+
 v5.9.13
 -------
 Changed spelling of Publically to Publicly
