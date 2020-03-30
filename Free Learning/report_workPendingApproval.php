@@ -17,8 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+use Gibbon\Tables\DataTable;
+use Gibbon\Services\Format;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+
 //Module includes
 include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
+
+$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_workPendingApproval.php', $connection2);
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workPendingApproval.php")==FALSE) {
     //Acess denied
@@ -38,139 +45,105 @@ else {
         print __($guid, 'This report shows all work that is complete, but pending approval, in all of your classes.', 'Free Learning') ;
     print "<p>" ;
 
-    //List students whose status is Current or Complete - Pending
-    try {
-        $dataClass=array("gibbonPersonID"=>$_SESSION[$guid]["gibbonPersonID"], "gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID2"=>$_SESSION[$guid]["gibbonPersonID"]);
-        $sqlClass="(SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonRole.category, NULL AS mentorsurname, NULL AS mentorpreferredName, gibbonPerson.fields
-            FROM freeLearningUnit
-                JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
-                JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
-                LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
-                LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
-                LEFT JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
-            WHERE gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
-                AND (gibbonCourseClassPerson.role='Teacher' OR gibbonCourseClassPerson.role='Assistant')
-                AND gibbonPerson.status='Full'
-                AND freeLearningUnitStudent.status='Complete - Pending'
-                AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='" . date("Y-m-d") . "')
-                AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='" . date("Y-m-d") . "')
-                AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)
-            UNION
-            (SELECT enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnit.freeLearningUnitID, gibbonPerson.gibbonPersonID, gibbonPerson.surname AS studentsurname, gibbonPerson.preferredName AS studentpreferredName, freeLearningUnitStudent.*, null AS course, null AS class, gibbonRole.category, mentor.surname AS mentorsurname, mentor.preferredName AS mentorpreferredName, gibbonPerson.fields
-                FROM freeLearningUnit
-                    JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                    INNER JOIN gibbonPerson ON freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID
-                    JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
-                    LEFT JOIN gibbonPerson AS mentor ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID)
-                WHERE freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID2
-                    AND gibbonPerson.status='Full'
-                    AND freeLearningUnitStudent.status='Complete - Pending'
-                    AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<='" . date("Y-m-d") . "')
-                    AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>='" . date("Y-m-d") . "')
-                    AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)
-            ORDER BY course, class, unit, studentsurname, studentpreferredName" ;
-        $resultClass=$connection2->prepare($sqlClass);
-        $resultClass->execute($dataClass);
+    //Filter
+    $allMentors = (isset($_GET['allMentors']) && $highestAction == 'Work Pending Approval_all') ? $_GET['allMentors'] : '';
+    $search = $_GET['search'] ?? '';
+
+    if ($highestAction == 'Work Pending Approval_all') {
+        $form = Form::create('search', $_SESSION[$guid]['absoluteURL'].'/index.php', 'get');
+        $form->setTitle(__('Filter'));
+        $form->setClass('noIntBorder fullWidth');
+
+        $form->addHiddenValue('q', '/modules/'.$_SESSION[$guid]['module'].'/report_workPendingApproval.php');
+
+        $row = $form->addRow();
+            $row->addLabel('allMentors', __('All Mentors'))->description(__('Include evidence pending for all mentors.'));
+            $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
+
+        $row = $form->addRow();
+            $row->addSearchSubmit($gibbon->session, __('Clear Search'));
+
+        echo $form->getOutput();
     }
-    catch(PDOException $e) {
-        print "<div class='error'>" . $e->getMessage() . "</div>" ;
-    }
-    $count=0;
-    $rowNum="odd" ;
-    if ($resultClass->rowCount()<1) {
-        print "<div class='success'>" ;
-            print __($guid, "Well done, there is no work left to assess!") ;
-        print "</div>" ;
+
+    //Table
+    $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
+    $criteria = $unitStudentGateway->newQueryCriteria()
+        ->sortBy('course', 'DESC')
+        ->sortBy('class', 'DESC')
+        ->sortBy('unit', 'DESC')
+        ->sortBy('studentsurname', 'DESC')
+        ->sortBy('studentpreferredName', 'DESC')
+        ->fromPOST();
+
+    if (!empty($allMentors)) {
+         $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'));
     }
     else {
-        ?>
-        <table cellspacing='0' style="width: 100%">
-            <tr class='head'>
-                <th>
-                    <?php print __($guid, 'Count') ?><br/>
-                </th>
-                <th>
-                    <?php print __($guid, 'Enrolment Method', 'Free Learning') ?><br/>
-                </th>
-                <th>
-                    <?php print __($guid, 'Class/Mentor', 'Free Learning') ?><br/>
-                </th>
-                <th>
-                    <?php print __($guid, 'Unit') ?><br/>
-                </th>
-                <th>
-                    <?php print __($guid, 'Student') ?><br/>
-                </th>
-                <th>
-                    <?php print __($guid, 'Status') ?><br/>
-                </th>
-            </tr>
-            <?php
-            while ($rowClass=$resultClass->fetch()) {
-                if ($count%2==0) {
-                    $rowNum="even" ;
-                }
-                else {
-                    $rowNum="odd" ;
-                }
-                $count++ ;
-
-                print "<tr class=$rowNum>" ;
-                    print '<td>';
-                        echo $count;
-                    print '</td>';
-                    print '<td>';
-                        print ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $rowClass["enrolmentMethod"])).'<br/>';
-                    print '</td>';
-                    print "<td>" ;
-                        if ($rowClass['enrolmentMethod'] == 'class') {
-                            if ($rowClass['course'] != '' and $rowClass['class'] != '') {
-                                echo $rowClass['course'].'.'.$rowClass['class'];
-                            } else {
-                                echo '<i>'.__($guid, 'N/A').'</i>';
-                            }
-                        }
-                        else if ($rowClass['enrolmentMethod'] == 'schoolMentor') {
-                            echo formatName('', $rowClass['mentorpreferredName'], $rowClass['mentorsurname'], 'Student', false);
-                        }
-                        else if ($rowClass['enrolmentMethod'] == 'externalMentor') {
-                            echo $rowClass['nameExternalMentor'];
-                        }
-                    print "</td>" ;
-                    ?>
-                    <td>
-                        <?php
-                            print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $rowClass["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $rowClass["unit"] . "</a>" ;
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                        if ($rowClass['category'] == 'Student') {
-                            print "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $rowClass["gibbonPersonID"] . "'>" . formatName("", $rowClass["studentpreferredName"], $rowClass["studentsurname"], "Student", true) . "</a>";
-                        }
-                        else {
-                            print formatName("", $rowClass["studentpreferredName"], $rowClass["studentsurname"], "Student", true);
-                        }
-                        echo "<br/>";
-                        $fields = unserialize($rowClass['fields']);
-                        if (!empty($fields[$customField])) {
-                            $value = $fields[$customField];
-                            if ($value != '') {
-                                echo "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
-                            }
-                        }
-                        ?>
-                    </td>
-                    <td>
-                        <?php print $rowClass["status"] ?><br/>
-                    </td>
-                <?php
-                echo "</tr>" ;
-            }
-            ?>
-        </table>
-        <?php
+        $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
     }
+
+    // Render table
+    $table = DataTable::createPaginated('pending', $criteria);
+
+    $table->setTitle(__('Data'));
+
+    $table->modifyRows(function ($journey, $row) {
+        $row->addClass('pending');
+        return $row;
+    });
+
+    $table->addColumn('enrolmentMethod', __m('Enrolment Method'))
+        ->format(function($values) {
+            return ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $values["enrolmentMethod"])).'<br/>';
+        });
+
+    $table->addColumn('classMentor', __m('Class/Mentor'))
+        ->format(function($values) {
+            if ($values['enrolmentMethod'] == 'class') {
+                if ($values['course'] != '' and $values['class'] != '') {
+                    return $values['course'].'.'.$values['class'];
+                } else {
+                    return '<i>'.__($guid, 'N/A').'</i>';
+                }
+            }
+            else if ($values['enrolmentMethod'] == 'schoolMentor') {
+                return formatName('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
+            }
+            else if ($values['enrolmentMethod'] == 'externalMentor') {
+                return $values['nameExternalMentor'];
+            }
+        });
+
+    $table->addColumn('unit', __m('Unit'))
+        ->format(function($values) use ($gibbon) {
+             return "<a href='" . $gibbon->session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a>" ;
+        });
+
+    $table->addColumn('student', __('Student'))
+        ->notSortable()
+        ->format(function($values) use ($guid) {
+            $output = "";
+            if ($values['category'] == 'Student') {
+                $output .= "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $values["gibbonPersonID"] . "'>" . formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true) . "</a>";
+            }
+            else {
+                $output .= formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true);
+            }
+            $output .= "<br/>";
+            $fields = unserialize($values['fields']);
+            if (!empty($fields[$customField])) {
+                $value = $fields[$customField];
+                if ($value != '') {
+                    $output .= "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
+                }
+            }
+            return $output;
+        });
+
+    $table->addColumn('status', __m('Status'));
+
+    echo $table->render($journey);
 }
 ?>

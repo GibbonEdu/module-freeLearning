@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.15
+-------
+Improved Work Pending Approval report
+
 v5.9.14
 -------
 Remove core Smart Block template from Free Learning blocks
