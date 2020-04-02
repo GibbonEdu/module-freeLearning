@@ -1013,7 +1013,7 @@ $sql[$count][1] = "
 
 //v5.9.14
 ++$count;
-$sql[$count][0] = '5.9.13';
+$sql[$count][0] = '5.9.14';
 $sql[$count][1] = "
 ";
 
@@ -1025,4 +1025,10 @@ UPDATE gibbonAction SET name='Work Pending Approval_all', precedence='1', defaul
 DELETE FROM gibbonPermission WHERE gibbonRoleID=2 AND gibbonActionID=(SELECT gibbonActionID FROM gibbonAction JOIN gibbonModule ON (gibbonAction.gibbonModuleID=gibbonModule.gibbonModuleID) WHERE gibbonModule.name='Free Learning' AND gibbonAction.name='Work Pending Approval_all');end
 INSERT INTO `gibbonAction` (`gibbonActionID`, `gibbonModuleID`, `name`, `precedence`, `category`, `description`, `URLList`, `entryURL`, `entrySidebar`, `defaultPermissionAdmin`, `defaultPermissionTeacher`, `defaultPermissionStudent`, `defaultPermissionParent`, `defaultPermissionSupport`, `categoryPermissionStaff`, `categoryPermissionStudent`, `categoryPermissionParent`, `categoryPermissionOther`) VALUES (NULL, (SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning'), 'Work Pending Approval_my', 0, 'Reports', 'Allows a user to see all work for which approval has been requested, and is still pending, for their own students.', 'report_workPendingApproval.php','report_workPendingApproval.php', 'Y', 'N', 'Y', 'N', 'N', 'N', 'Y', 'N', 'N', 'N');end
 INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`) VALUES (NULL , '2', (SELECT gibbonActionID FROM gibbonAction JOIN gibbonModule ON (gibbonAction.gibbonModuleID=gibbonModule.gibbonModuleID) WHERE gibbonModule.name='Free Learning' AND gibbonAction.name='Work Pending Approval_my'));end
+";
+
+//v5.9.16
+++$count;
+$sql[$count][0] = '5.9.16';
+$sql[$count][1] = "
 ";

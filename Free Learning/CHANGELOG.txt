@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.9.16
+-------
+Improved gateway SQL
+Fixed ordering in Work Pending Approval report
+
 v5.9.15
 -------
 Improved Work Pending Approval report

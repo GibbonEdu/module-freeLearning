@@ -70,11 +70,11 @@ else {
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
     $criteria = $unitStudentGateway->newQueryCriteria()
-        ->sortBy('course', 'DESC')
-        ->sortBy('class', 'DESC')
-        ->sortBy('unit', 'DESC')
-        ->sortBy('studentsurname', 'DESC')
-        ->sortBy('studentpreferredName', 'DESC')
+        ->sortBy('course')
+        ->sortBy('class')
+        ->sortBy('unit')
+        ->sortBy('studentsurname')
+        ->sortBy('studentpreferredName')
         ->fromPOST();
 
     if (!empty($allMentors)) {
