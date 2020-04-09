@@ -122,7 +122,17 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
 
     try {
         $data = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
-        $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name FROM gibbonPerson LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE status='Full' AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonPerson.gibbonPersonID=:gibbonPersonID ORDER BY surname, preferredName";
+        $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name
+            FROM
+                gibbonPerson
+                LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID AND (gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonStudentEnrolment.gibbonSchoolYearID IS NULL))
+                LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
+            WHERE
+                status='Full'
+                AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."')
+                AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."')
+                AND gibbonPerson.gibbonPersonID=:gibbonPersonID
+            ORDER BY surname, preferredName";
         $result = $connection2->prepare($sql);
         $result->execute($data);
     } catch (PDOException $e) {
