@@ -123,7 +123,7 @@ else {
 
     $table->addColumn('student', __('Student'))
         ->notSortable()
-        ->format(function($values) use ($guid) {
+        ->format(function($values) use ($guid, $customField) {
             $output = "";
             if ($values['category'] == 'Student') {
                 $output .= "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $values["gibbonPersonID"] . "'>" . formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true) . "</a>";

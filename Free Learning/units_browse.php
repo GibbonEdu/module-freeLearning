@@ -135,7 +135,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         echo $templateView->fetchFromTemplate('unitButtons.twig.html', [
             'browseUnitsURL' => $browseUnitsURL,
             'publicUnits'    => $publicUnits,
-            'gibbonPersonID' => $gibbonPersonID,
+            'gibbonPersonID' => $gibbonPersonID
         ]);
 
         // QUERY
@@ -170,13 +170,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $unit['statusClass'] = 'success';
                     break;
                 case 'Current':
-                    $unit['statusClass'] = 'warning';
+                    $unit['statusClass'] = 'currentUnit';
                     break;
                 case 'Complete - Pending':
                     $unit['statusClass'] = 'pending';
                     break;
                 case 'Evidence Not Yet Approved':
-                    $unit['statusClass'] = 'error';
+                    $unit['statusClass'] = 'warning';
                     break;
                 default:
                     $unit['statusClass']  = '';
@@ -381,11 +381,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if ($unit['status'] == 'Complete - Approved' or $unit['status'] == 'Exempt') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
                     } elseif ($unit['status'] == 'Current') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
-                    } elseif ($unit['status'] == 'Evidence Not Yet Approved') {
-                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#FF0000', background:'#FF8485'}, borderWidth: 2},";
-                    } elseif ($unit['status'] == 'Complete - Pending') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#CA4AFF', background:'#F8A3FF'}, borderWidth: 2},";
+                    } elseif ($unit['status'] == 'Evidence Not Yet Approved') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
+                    } elseif ($unit['status'] == 'Complete - Pending') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#78529e', background:'#c6a5e8'}, borderWidth: 2},";
                     }
                     else {
                         if ($unit['freeLearningUnitIDPrerequisiteList'] == '') {
@@ -492,8 +492,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     });
                 </script>
                 <?php
-
             }
+
+            echo $templateView->fetchFromTemplate('unitLegend.twig.html');
         }
     }
 }

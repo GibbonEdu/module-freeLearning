@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.18
+-------
+Adjusted the status colours for units and added a legend to Browse Units
+
 v5.9.17
 -------
 Allowed students not currently enroled to see Free Learning in Student Dashboard
