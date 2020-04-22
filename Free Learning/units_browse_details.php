@@ -377,7 +377,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
 
                             $table->modifyRows(function ($student, $row) {
-                                if ($student['status'] == 'Evidence Not Yet Approved') $row->addClass('error');
+                                if ($student['status'] == 'Evidence Not Yet Approved') $row->addClass('warning');
                                 if ($student['status'] == 'Complete - Pending') $row->addClass('pending');
                                 if ($student['status'] == 'Complete - Approved') $row->addClass('success');
                                 if ($student['status'] == 'Exempt') $row->addClass('success');
