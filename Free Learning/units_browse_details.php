@@ -38,6 +38,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
     //Get action with highest precendence
     if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
         $highestAction = 'Browse Units_all';
+        $highestActionManage = null;
         $roleCategory = null ;
     } else {
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
@@ -324,10 +325,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     if ($canManage) {
                         echo "<div id='tabs2'>";
-                            echo '<p>';
-                            echo __($guid, 'Below you can view the students currently enroled in this unit, including both those who are working on it, and those who are awaiting approval.', 'Free Learning');
-                            echo '</p>';
-
                             //Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
                             $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
                             $enrolmentType = '';
@@ -345,6 +342,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 }
                             }
 
+                            echo '<p>';
+                                if ($manageAll == true) {
+                                    echo __m('Below you can view the students currently enroled in this unit, including those who are working on it, those who are awaiting approval and those who have completed it.');
+                                }
+                                else {
+                                    echo __m('Below you can view those students currently enroled in this unit from your classes or that you mentor. This includes those who are working on it, those who are awaiting approval and those who have completed it.');
+                                }
+                            echo '</p>';
+
                             // List students whose status is Current or Complete - Pending
                             $unitGateway = $container->get(UnitGateway::class);
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
@@ -356,7 +362,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->sortBy(['statusSort', 'surname', 'preferredName'])
                                 ->fromPOST();
 
-                            $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID']);
+                            $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID'], $gibbon->session->get('gibbonPersonID'), $manageAll);
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
                             $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
 
@@ -517,7 +523,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
 
                             echo $table->render($students);
-
 
                         echo "</div>";
                     }

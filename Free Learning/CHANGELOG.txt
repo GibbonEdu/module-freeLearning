@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.19
+-------
+Users with Manage Units_learning area only see their own students in Manage Enrolment
+
 v5.9.18
 -------
 Adjusted the status colours for units and added a legend to Browse Units

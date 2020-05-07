@@ -31,25 +31,49 @@ class UnitStudentGateway extends QueryableGateway
     private static $primaryKey = 'freeLearningUnitStudentID';
     private static $searchableColumns = [];
 
-    public function queryCurrentStudentsByUnit($criteria, $gibbonSchoolYearID, $freeLearningUnitID)
+    public function queryCurrentStudentsByUnit($criteria, $gibbonSchoolYearID, $freeLearningUnitID, $gibbonPersonID, $manageAll)
     {
-        $query = $this
-            ->newQuery()
-            ->distinct()
-            ->from($this->getTableName())
-            ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey')
-            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
-            ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
-            ->leftJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
-            ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
-            ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
-            ->bindValue('freeLearningUnitID', $freeLearningUnitID)
-            ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
-            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
-            ->where("gibbonPerson.status='Full'")
-            ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
-            ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
-            ->bindValue('today', date('Y-m-d'));
+        if ($manageAll) {
+            $query = $this
+                ->newQuery()
+                ->distinct()
+                ->from($this->getTableName())
+                ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey')
+                ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+                ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+                ->leftJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
+                ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+                ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
+                ->bindValue('freeLearningUnitID', $freeLearningUnitID)
+                ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+                ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+                ->where("gibbonPerson.status='Full'")
+                ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
+                ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
+                ->bindValue('today', date('Y-m-d'));
+            }
+            else {
+                $query = $this
+                    ->newQuery()
+                    ->distinct()
+                    ->from($this->getTableName())
+                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey')
+                    ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+                    ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+                    ->leftJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID AND role=\'Teacher\'')
+                    ->leftJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
+                    ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+                    ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
+                    ->bindValue('freeLearningUnitID', $freeLearningUnitID)
+                    ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+                    ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+                    ->where("gibbonPerson.status='Full'")
+                    ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
+                    ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
+                    ->where('(gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClassPerson.role=\'Teacher\') OR mentor.gibbonPersonID=:gibbonPersonID')
+                    ->bindValue('gibbonPersonID', $gibbonPersonID)
+                    ->bindValue('today', date('Y-m-d'));
+            }
 
         return $this->runQuery($query, $criteria);
     }
