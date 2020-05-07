@@ -57,12 +57,9 @@ class UnitStudentGateway extends QueryableGateway
                     ->newQuery()
                     ->distinct()
                     ->from($this->getTableName())
-                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey')
+                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'null AS course', 'null AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey')
                     ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
-                    ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
-                    ->leftJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID AND role=\'Teacher\'')
-                    ->leftJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
-                    ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+                    ->innerJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
                     ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
                     ->bindValue('freeLearningUnitID', $freeLearningUnitID)
                     ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
@@ -70,9 +67,29 @@ class UnitStudentGateway extends QueryableGateway
                     ->where("gibbonPerson.status='Full'")
                     ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
                     ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
-                    ->where('(gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClassPerson.role=\'Teacher\') OR mentor.gibbonPersonID=:gibbonPersonID')
-                    ->bindValue('gibbonPersonID', $gibbonPersonID)
-                    ->bindValue('today', date('Y-m-d'));
+                    ->bindValue('today', date('Y-m-d'))
+                    ->where('mentor.gibbonPersonID=:gibbonPersonID')
+                    ->bindValue('gibbonPersonID', $gibbonPersonID);
+
+                $this->unionAllWithCriteria($query, $criteria)
+                    ->distinct()
+                    ->from($this->getTableName())
+                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'null AS mentorsurname', 'null AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey')
+                    ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+                    ->innerJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+                    ->innerJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+                    ->innerJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
+                    ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
+                    ->bindValue('freeLearningUnitID', $freeLearningUnitID)
+                    ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+                    ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+                    ->where("gibbonPerson.status='Full'")
+                    ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
+                    ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
+                    ->bindValue('today', date('Y-m-d'))
+                    ->where('gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClassPerson.role=\'Teacher\'')
+                    ->bindValue('gibbonPersonID', $gibbonPersonID);
+
             }
 
         return $this->runQuery($query, $criteria);
