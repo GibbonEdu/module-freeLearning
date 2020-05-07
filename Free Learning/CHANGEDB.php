@@ -1050,3 +1050,10 @@ $sql[$count][1] = "
 $sql[$count][0] = '5.9.19';
 $sql[$count][1] = "
 ";
+
+//v5.9.20
+++$count;
+$sql[$count][0] = '5.9.20';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'collaborativeAssessment', 'Collaborative Assessment', 'Should students be working together submit and assess together?', 'N');end
+";

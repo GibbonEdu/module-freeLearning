@@ -64,7 +64,6 @@ if ($canManage) {
     }
 }
 
-
 $URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
@@ -191,9 +190,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             header("Location: {$URL}");
                         } else {
                             //Write to database
+                            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
                             try {
-                                $data = array('status' => $status, 'commentStudent' => $commentStudent, 'evidenceType' => $type, 'evidenceLocation' => $location, 'timestampCompletePending' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
-                                $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
+                                $data = array('status' => $status, 'commentStudent' => $commentStudent, 'evidenceType' => $type, 'evidenceLocation' => $location, 'timestampCompletePending' => date('Y-m-d H:i:s'));
+                                if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
+                                    $data['collaborationKey'] = $row['collaborationKey'];
+                                    $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE collaborationKey=:collaborationKey';
+                                }
+                                else {
+                                    $data['freeLearningUnitStudentID'] = $freeLearningUnitStudentID;
+                                    $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
+                                }
                                 $result = $connection2->prepare($sql);
                                 $result->execute($data);
                             } catch (PDOException $e) {

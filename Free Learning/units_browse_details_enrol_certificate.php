@@ -129,5 +129,5 @@ $pdf->AddPage();
 $pdf->writeHTML($output, true, 0, true, 0);
 
 $pdf->lastPage();
-$pdf->Output($_SESSION[$guid]['organisationName'].' Free Learning', 'I');
+$pdf->Output($_SESSION[$guid]['organisationName'].' Free Learning.pdf', 'I');
 ?>

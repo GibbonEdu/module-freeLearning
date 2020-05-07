@@ -37,11 +37,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $enableClassEnrolment = $_POST['enableClassEnrolment'] ?? '';
     $enableSchoolMentorEnrolment = $_POST['enableSchoolMentorEnrolment'] ?? '';
     $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'] ?? '';
+    $collaborativeAssessment = $_POST['collaborativeAssessment'] ?? '';
 
     $settingGateway = $container->get(SettingGateway::class);
 
     //Validate Inputs
-    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '') {
+    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '' or $collaborativeAssessment == '') {
         //Fail 3
         $URL .= '&return=error3';
         header("Location: {$URL}");
@@ -58,6 +59,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableClassEnrolment', $enableClassEnrolment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableSchoolMentorEnrolment', $enableSchoolMentorEnrolment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableExternalMentorEnrolment', $enableExternalMentorEnrolment);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'collaborativeAssessment', $collaborativeAssessment);
 
         $URL .= $partialFail
             ? '&return=error2'

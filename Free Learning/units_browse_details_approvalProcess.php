@@ -64,7 +64,6 @@ if ($canManage) {
     }
 }
 
-
 $URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
@@ -190,9 +189,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             }
 
                             //Write to database
+                            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
                             try {
-                                $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => $attachment, 'exemplarWorkLicense' => $exemplarWorkLicense, 'exemplarWorkEmbed' => $exemplarWorkEmbed, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCompleteApproved' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
-                                $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, exemplarWorkEmbed=:exemplarWorkEmbed, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
+                                $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => $attachment, 'exemplarWorkLicense' => $exemplarWorkLicense, 'exemplarWorkEmbed' => $exemplarWorkEmbed, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCompleteApproved' => date('Y-m-d H:i:s'));
+                                if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
+                                    $data['collaborationKey'] = $row['collaborationKey'];
+                                    $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, exemplarWorkEmbed=:exemplarWorkEmbed, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE collaborationKey=:collaborationKey';
+                                }
+                                else {
+                                    $data['freeLearningUnitStudentID'] = $freeLearningUnitStudentID;
+                                    $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, exemplarWorkEmbed=:exemplarWorkEmbed, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
+                                }
                                 $result = $connection2->prepare($sql);
                                 $result->execute($data);
                             } catch (PDOException $e) {
@@ -202,13 +209,29 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 exit;
                             }
 
+                            //Attempt to assemble list of students for notification and badges
+                            $gibbonPersonIDStudents[] = $gibbonPersonIDStudent;
+                            if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
+                                try {
+                                    $dataNotification = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitStudentID' => $freeLearningUnitStudentID, 'collaborationKey' => $row['collaborationKey']);
+                                    $sqlNotification = "SELECT gibbonPersonIDStudent FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND NOT freeLearningUnitStudentID=:freeLearningUnitStudentID AND (status='Complete - Pending' OR status='Complete - Approved' OR status='Evidence Not Yet Approved') AND collaborationKey=:collaborationKey";
+                                    $resultNotification = $connection2->prepare($sqlNotification);
+                                    $resultNotification->execute($dataNotification);
+                                } catch (PDOException $e) { echo $e->getMessage(); exit; }
+                                while ($rowNotification = $resultNotification->fetch()) {
+                                    $gibbonPersonIDStudents[] = $rowNotification['gibbonPersonIDStudent'];
+                                }
+                            }
+
                             //Attempt to notify the student and grant awards
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { //Only if status or comment has changed.
                                 $text = sprintf(__($guid, 'A teacher has approved your request for unit completion (%1$s).', 'Free Learning'), $name);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
-                                setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
-                                if (isActionAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
-                                    grantBadges($connection2, $guid, $gibbonPersonIDStudent);
+                                foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
+                                    setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
+                                    if (isActionAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
+                                        grantBadges($connection2, $guid, $gibbonPersonIDStudent);
+                                    }
                                 }
                             }
 

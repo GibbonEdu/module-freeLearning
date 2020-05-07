@@ -146,6 +146,7 @@ $gibbonSetting[5] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`n
 $gibbonSetting[6] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableSchoolMentorEnrolment', 'Enable School Mentor Enrolment', 'Should school mentor enrolment be an option for learners?', 'Y');";
 $gibbonSetting[7] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableExternalMentorEnrolment', 'Enable External Mentor Enrolment', 'Should external mentor enrolment be an option for learners?', 'N');";
 $gibbonSetting[8] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'customField', 'Custom Field', 'A user custom field to display under student names in Manage Enrolment.', '');";
+$gibbonSetting[9] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'collaborativeAssessment', 'Collaborative Assessment', 'Should students be working together submit and assess together?', 'N');";
 
 //Action rows
 $actionRows[0]['name'] = 'Manage Units_all';

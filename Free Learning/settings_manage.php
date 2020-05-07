@@ -30,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     //Proceed!
     $page->breadcrumbs
          ->add(__('Manage Settings'));
-    
+
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], null, null);
     }
@@ -63,7 +63,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addTextArea($setting['name'])->setValue($setting['value'])->setRows(8);
-        
+
     $sql = "SELECT gibbonPersonFieldID as value, name FROM gibbonPersonField WHERE active='Y'";
     $setting = $settingGateway->getSettingByScope('Free Learning', 'customField', true);
     $row = $form->addRow();
@@ -83,6 +83,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addYesNo($setting['name'])->required()->selected($setting['value']);
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'enableExternalMentorEnrolment', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $form->addRow()->addHeading(__m('Submissions Settings'));
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addYesNo($setting['name'])->required()->selected($setting['value']);

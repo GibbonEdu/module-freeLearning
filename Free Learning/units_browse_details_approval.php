@@ -181,7 +181,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     echo '</h4>';
                     echo '<p>';
                     echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.', 'Free Learning');
-                    echo '</p>'; ?>
+                    echo '</p>';
+
+                    $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+                    if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
+                        echo "<div class='message'>";
+                        echo __m('Collaborative Assessment is enabled: you will be giving feedback to all members of this group in one go.');
+                        echo '</div>';
+                    }
+
+                    ?>
 					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_approvalProcess.php?address='.$_GET['q']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view" ?>"  enctype="multipart/form-data">
 						<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 							<tr>
