@@ -29,6 +29,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     color: #633f86;
 }
 
+.currentPending {
+    border-color: #d69e2e;
+    background-color: #faf089;
+    color: #d69e2e;
+}
+
 .vis-tooltip {
     margin-top: 4.5rem;
     margin-left: 0.5rem;
@@ -63,4 +69,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
 }
-

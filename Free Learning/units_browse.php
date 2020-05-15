@@ -100,7 +100,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->setClass('noIntBorder fullWidth');
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $view);
-    
+
         $learningAreas = $unitGateway->selectLearningAreasAndCourses();
         $row = $form->addRow();
             $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
@@ -128,7 +128,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         $row = $form->addRow();
             $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
-        
+
         echo $form->getOutput();
 
         // NAVIGATION BUTTONS
@@ -172,6 +172,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 case 'Current':
                     $unit['statusClass'] = 'currentUnit';
                     break;
+                case 'Current - Pending':
+                    $unit['statusClass'] = 'currentPending';
+                    break;
                 case 'Complete - Pending':
                     $unit['statusClass'] = 'pending';
                     break;
@@ -203,7 +206,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     ->width('15%')
                     ->format(function ($unit) use ($defaultImage) {
                         $imageClass = 'w-20 h-20 sm:w-32 sm:h-32 p-1 block mx-auto shadow bg-white border border-gray-600';
-                        
+
                         $output = '<div class="text-sm sm:text-base font-bold text-center mt-1 mb-2">'.$unit['name'].'</div>';
                         $output .= sprintf('<img class="%1$s" src="%2$s">', $imageClass, $unit['logo'] ?? $defaultImage);
                         $output .= !empty($unit['status']) ? '<div class="text-sm text-center mt-2">'.$unit['status'].'</div>' : '';
@@ -276,7 +279,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 $output = '<span class="tag inline-block dull mb-2">'.__m('Not Met').'</span><br/>';
                             }
                         }
-                        
+
                         $output .= !empty($prerequisiteList)
                             ? implode('<br/>', $prerequisiteList)
                             : Format::small(__('None'));
@@ -382,6 +385,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
                     } elseif ($unit['status'] == 'Current') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#CA4AFF', background:'#F8A3FF'}, borderWidth: 2},";
+                    } elseif ($unit['status'] == 'Current - Pending') {
+                        $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#d69e2e', background:'#faf089'}, borderWidth: 2},";
                     } elseif ($unit['status'] == 'Evidence Not Yet Approved') {
                         $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#D65602', background:'#FFD2A9'}, borderWidth: 2},";
                     } elseif ($unit['status'] == 'Complete - Pending') {
@@ -471,7 +476,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 }
                             },
                         },
-                        
+
                         interaction:{
                             navigationButtons: true,
                             zoomView: false
