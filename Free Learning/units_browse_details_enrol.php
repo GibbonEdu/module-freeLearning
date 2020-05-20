@@ -544,18 +544,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         echo '</p>';
                     }
                     else {
+                        $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+                        if ($collaborativeAssessment == 'Y' AND  !empty($rowEnrol['collaborationKey'])) {
+                            echo "<div class='message'>";
+                            echo __m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.');
+                            echo '</div>';
+                        }
                         if ($rowEnrol['status'] == 'Current') {
                             echo '<p>';
                             echo sprintf(__m('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $row['name']);
                             echo '</p>';
-
-                            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
-                            if ($collaborativeAssessment == 'Y' AND  !empty($rowEnrol['collaborationKey'])) {
-                                echo "<div class='message'>";
-                                echo __m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.');
-                                echo '</div>';
-                            }
-
                         } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
                             echo "<div class='warning'>";
                             echo __m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:').'<br/><br/>';
