@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.23
+-------
+Better collaborative assessment interface
+
 v5.9.22
 -------
 Fixed collaborative assessment bug

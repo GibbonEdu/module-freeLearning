@@ -359,12 +359,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
 
                             $criteria = $unitStudentGateway->newQueryCriteria()
-                                ->sortBy(['statusSort', 'surname', 'preferredName'])
+                                ->sortBy(['statusSort', 'collaborationKey', 'surname', 'preferredName'])
                                 ->fromPOST();
 
                             $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID'], $gibbon->session->get('gibbonPersonID'), $manageAll);
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
                             $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+
+                            $lastCollaborationKey = null;
+                            $group = 0;
 
                             // DATA TABLE
                             $table = DataTable::createPaginated('manageEnrolment', $criteria);
@@ -440,20 +443,34 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 });
 
                             $table->addColumn('classMentor', __m('Class/Mentor'))
+                                ->description(__m('Grouping'))
                                 ->sortable(['course', 'class'])
                                 ->width('20%')
-                                ->format(function ($student) {
+                                ->format(function ($student) use (&$lastCollaborationKey, &$group) {
+                                    $return = '';
                                     if ($student['enrolmentMethod'] == 'class') {
                                         if (!empty($student['course']) && !empty($student['class'])) {
-                                            return Format::courseClassName($student['course'], $student['class']);
+                                            $return .= Format::courseClassName($student['course'], $student['class']);
                                         } else {
-                                            return Format::small(__('N/A'));
+                                            $return .= Format::small(__('N/A'));
                                         }
                                     } else if ($student['enrolmentMethod'] == 'schoolMentor') {
-                                        return formatName('', $student['mentorpreferredName'], $student['mentorsurname'], 'Student', false);
+                                        $return .= formatName('', $student['mentorpreferredName'], $student['mentorsurname'], 'Student', false);
                                     } else if ($student['enrolmentMethod'] == 'externalMentor') {
-                                        return $student['nameExternalMentor'];
+                                        $return .= $student['nameExternalMentor'];
                                     }
+
+                                    $grouping = $student['grouping'];
+                                    if ($student['collaborationKey'] != '') {
+                                        if ($lastCollaborationKey != $student['collaborationKey']) {
+                                            ++$group;
+                                        }
+                                        $grouping .= " (".__m("Group")." ".$group.")";
+                                    }
+                                    $return .= '<br/>' . Format::small($grouping);
+
+                                    $lastCollaborationKey = $student['collaborationKey'];
+                                    return $return;
                                 });
 
                             $table->addColumn('view', __('View'))
