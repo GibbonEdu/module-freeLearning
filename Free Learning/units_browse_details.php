@@ -369,6 +369,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $lastCollaborationKey = null;
                             $group = 0;
 
+                            //Legend
+                            $templateView = new View($container->get('twig'));
+                            echo $templateView->fetchFromTemplate('unitLegend.twig.html');
+
                             // DATA TABLE
                             $table = DataTable::createPaginated('manageEnrolment', $criteria);
 
@@ -386,6 +390,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
 
                             $table->modifyRows(function ($student, $row) {
+                                if ($student['status'] == 'Current - Pending') $row->addClass('currentPending');
+                                if ($student['status'] == 'Current') $row->addClass('currentUnit');
                                 if ($student['status'] == 'Evidence Not Yet Approved') $row->addClass('warning');
                                 if ($student['status'] == 'Complete - Pending') $row->addClass('pending');
                                 if ($student['status'] == 'Complete - Approved') $row->addClass('success');

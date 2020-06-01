@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+
+v5.9.24
+-------
+Manage Enrolment legend
+Added placeholder to approval status
+
 v5.9.23
 -------
 Better collaborative assessment interface

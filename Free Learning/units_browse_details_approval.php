@@ -209,11 +209,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 								</td>
 								<td class="right">
 									<select style="width: 302px" name="status" id="status">
-										<option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'>Complete - Approved</option>
-										<option <?php if ($row['status'] == 'Evidence Not Yet Approved') { echo 'selected'; } ?> value='Evidence Not Yet Approved'>Evidence Not Yet Approved</option>
+                                        <option value="Please select..."><?php echo __('Please select...')?></option>
+                                        <option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'>Complete - Approved</option>
+                                        <option <?php if ($row['status'] == 'Evidence Not Yet Approved') { echo 'selected'; } ?> value='Evidence Not Yet Approved'>Evidence Not Yet Approved</option>
 									</select>
 								</td>
 							</tr>
+							<script type="text/javascript">
+								var statusCheck=new LiveValidation('status');
+								statusCheck.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php print _('Select something!') ?>"});
+							 </script>
 							<script type="text/javascript">
 								/* Subbmission type control */
 								$(document).ready(function(){
