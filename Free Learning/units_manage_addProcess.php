@@ -126,38 +126,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             } else {
                 $partialFail = false;
 
-                //Lock tables
-                try {
-                    $sql = 'LOCK TABLES freeLearningUnit WRITE, freeLearningUnitAuthor WRITE, freeLearningUnitBlock WRITE';
-                    $result = $connection2->query($sql);
-                } catch (PDOException $e) {
-                    //Fail 2
-                    $URL .= '&return=error2';
-                    header("Location: {$URL}");
-                    exit();
-                }
-
-                //Get next autoincrement
-                try {
-                    $sqlAI = "SHOW TABLE STATUS LIKE 'freeLearningUnit'";
-                    $resultAI = $connection2->query($sqlAI);
-                } catch (PDOException $e) {
-                    //Fail 2
-                    $URL .= '&return=error2';
-                    header("Location: {$URL}");
-                    exit();
-                }
-
-                $rowAI = $resultAI->fetch();
-                $AI = str_pad($rowAI['Auto_increment'], 10, '0', STR_PAD_LEFT);
-
                 //Move attached file, if there is one
-                $partialFail = false;
                 $attachment = null;
                 if (!empty($_FILES['file']['tmp_name'])) {
                     $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
                     $fileUploader->getFileExtensions('Graphics/Design');
-
+                    
                     $file = (isset($_FILES['file']))? $_FILES['file'] : null;
 
                     // Upload the file, return the /uploads relative path
@@ -171,28 +145,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     $attachment = $_SESSION[$guid]['absoluteURL'].'/'.$attachment;
                 }
 
-                //Write to database
-                try {
-                    $data = array('name' => $name, 'course' => $course, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'schoolMentorCompletors' => $schoolMentorCompletors, 'schoolMentorCustom' => $schoolMentorCustom, 'schoolMentorCustomRole' => $schoolMentorCustomRole, 'outline' => $outline, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestamp' => date('Y-m-d H:i:s'));
-                    $sql = 'INSERT INTO freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, grouping=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp';
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    //Fail 2
+                // Write to database
+                $data = array('name' => $name, 'course' => $course, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'schoolMentorCompletors' => $schoolMentorCompletors, 'schoolMentorCustom' => $schoolMentorCustom, 'schoolMentorCustomRole' => $schoolMentorCustomRole, 'outline' => $outline, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestamp' => date('Y-m-d H:i:s'));
+                $sql = 'INSERT INTO freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, grouping=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp';
+                $inserted = $pdo->insert($sql, $data);
+
+                if (empty($inserted)) {
                     $URL .= '&return=error2';
                     header("Location: {$URL}");
                     exit();
                 }
 
-                //Write author to database
-                try {
-                    $data = array('freeLearningUnitID' => $AI, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'surname' => $_SESSION[$guid]['surname'], 'preferredName' => $_SESSION[$guid]['preferredName'], 'website' => $_SESSION[$guid]['website']);
-                    $sql = 'INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website';
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    $partialFail = true;
-                }
+                $AI = str_pad($inserted, 10, '0', STR_PAD_LEFT);
+
+                // Write author to database
+                $data = array('freeLearningUnitID' => $AI, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'surname' => $_SESSION[$guid]['surname'], 'preferredName' => $_SESSION[$guid]['preferredName'], 'website' => $_SESSION[$guid]['website']);
+                $sql = 'INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website';
+                
+                $inserted = $pdo->insert($sql, $data);
+                $partialFail &= !$inserted;
 
                 //ADD BLOCKS
                 $blockCount = ($_POST['blockCount'] - 1);
@@ -219,24 +190,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         $teachersNotes = $_POST["teachersNotes$i"];
 
                         if ($title != '' or $contents != '') {
-                            try {
-                                $dataBlock = array('freeLearningUnitID' => $AI, 'title' => $title, 'type' => $type2, 'length' => $length, 'contents' => $contents, 'teachersNotes' => $teachersNotes, 'sequenceNumber' => $sequenceNumber);
-                                $sqlBlock = 'INSERT INTO freeLearningUnitBlock SET freeLearningUnitID=:freeLearningUnitID, title=:title, type=:type, length=:length, contents=:contents, teachersNotes=:teachersNotes, sequenceNumber=:sequenceNumber';
-                                $resultBlock = $connection2->prepare($sqlBlock);
-                                $resultBlock->execute($dataBlock);
-                            } catch (PDOException $e) {
-                                $partialFail = true;
-                            }
+
+                            $dataBlock = array('freeLearningUnitID' => $AI, 'title' => $title, 'type' => $type2, 'length' => $length, 'contents' => $contents, 'teachersNotes' => $teachersNotes, 'sequenceNumber' => $sequenceNumber);
+                            $sqlBlock = 'INSERT INTO freeLearningUnitBlock SET freeLearningUnitID=:freeLearningUnitID, title=:title, type=:type, length=:length, contents=:contents, teachersNotes=:teachersNotes, sequenceNumber=:sequenceNumber';
+
+                            $inserted = $pdo->insert($sqlBlock, $dataBlock);
+                            $partialFail &= !$inserted;
                             ++$sequenceNumber;
                         }
                     }
-                }
-
-                //Unlock module table
-                try {
-                    $sql = 'UNLOCK TABLES';
-                    $result = $connection2->query($sql);
-                } catch (PDOException $e) {
                 }
 
                 if ($partialFail == true) {
