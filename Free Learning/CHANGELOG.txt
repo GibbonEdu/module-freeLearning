@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v5.9.25
+-------
+Fixed error when attaching an image in Add Unit
+
 v5.9.24
 -------
 Manage Enrolment legend
