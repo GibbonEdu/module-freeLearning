@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         try {
             $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-            $sql = "SELECT freeLearningUnit.name, surname, preferredName, (SELECT sum(length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) AS length, timestampCompleteApproved
+            $sql = "SELECT freeLearningUnit.name, officialName, surname, preferredName, (SELECT sum(length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) AS length, timestampCompleteApproved
                 FROM freeLearningUnit
                     JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                     JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
@@ -72,7 +72,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $output .= "<p></p><p></p>";
             $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">This document certifies that</p>";
-            $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$row['preferredName']." ".$row['surname']."</h1>";
+            $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$row['officialName']."</h1>";
             $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">has successfully completed</p>";
             $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$row['name']."</h1>";
             if (is_numeric($row['length']) && $row['length'] > 0) {

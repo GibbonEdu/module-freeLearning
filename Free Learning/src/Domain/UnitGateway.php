@@ -30,7 +30,7 @@ class UnitGateway extends QueryableGateway
     private static $tableName = 'freeLearningUnit';
     private static $primaryKey = 'freeLearningUnitID';
     private static $searchableColumns = ['freeLearningUnit.name'];
-    
+
     /**
      * @param QueryCriteria $criteria
      * @return DataSet
@@ -41,7 +41,7 @@ class UnitGateway extends QueryableGateway
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status', 
+            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
                 "(SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length",
                 "FIND_IN_SET(freeLearningUnit.difficulty, :difficultyOptions) as difficultyOrder"])
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
@@ -73,7 +73,7 @@ class UnitGateway extends QueryableGateway
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status', 
+            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
                 "(SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length",
                 "FIND_IN_SET(freeLearningUnit.difficulty, :difficultyOptions) as difficultyOrder"])
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
@@ -86,8 +86,8 @@ class UnitGateway extends QueryableGateway
 
         switch ($roleCategory) {
             case 'Student':
-                $query->innerJoin('gibbonStudentEnrolment', 'gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID')
-                      ->innerJoin('gibbonYearGroup as studentYearGroup', 'gibbonStudentEnrolment.gibbonYearGroupID=studentYearGroup.gibbonYearGroupID')
+                $query->leftJoin('gibbonStudentEnrolment', 'gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID')
+                      ->leftJoin('gibbonYearGroup as studentYearGroup', 'gibbonStudentEnrolment.gibbonYearGroupID=studentYearGroup.gibbonYearGroupID')
                       ->leftJoin('gibbonYearGroup as minimumYearGroup', 'freeLearningUnit.gibbonYearGroupIDMinimum=minimumYearGroup.gibbonYearGroupID')
                       ->where('(minimumYearGroup.sequenceNumber IS NULL OR minimumYearGroup.sequenceNumber<=studentYearGroup.sequenceNumber)')
                       ->where("freeLearningUnit.active='Y'")
@@ -142,7 +142,7 @@ class UnitGateway extends QueryableGateway
     public function selectUnitPrerequisitesByPerson($gibbonPersonID)
     {
         $data = ['gibbonPersonID' => $gibbonPersonID];
-        $sql = "SELECT freeLearningUnit.freeLearningUnitID as groupBy, prerequisite.name, freeLearningUnitStudent.status, 
+        $sql = "SELECT freeLearningUnit.freeLearningUnitID as groupBy, prerequisite.name, freeLearningUnitStudent.status,
                 (CASE WHEN status='Complete - Approved' OR status='Complete - Pending' OR status='Exempt' THEN 'Y' ELSE 'N' END) as complete
                 FROM freeLearningUnit
                 JOIN freeLearningUnit as prerequisite ON (FIND_IN_SET(prerequisite.freeLearningUnitID, freeLearningUnit.freeLearningUnitIDPrerequisiteList))
@@ -155,10 +155,10 @@ class UnitGateway extends QueryableGateway
     public function selectUnitAuthors()
     {
         $sql = "SELECT freeLearningUnitID as groupBy, freeLearningUnitID,
-                (CASE WHEN gibbonPerson.surname IS NOT NULL THEN gibbonPerson.surname ELSE freeLearningUnitAuthor.surname END) as surname, 
+                (CASE WHEN gibbonPerson.surname IS NOT NULL THEN gibbonPerson.surname ELSE freeLearningUnitAuthor.surname END) as surname,
                 (CASE WHEN gibbonPerson.preferredName IS NOT NULL THEN gibbonPerson.preferredName ELSE freeLearningUnitAuthor.preferredName END) as preferredName,
                 (CASE WHEN gibbonPerson.gibbonPersonID IS NULL THEN freeLearningUnitAuthor.website END) as website
-                FROM freeLearningUnitAuthor 
+                FROM freeLearningUnitAuthor
                 LEFT JOIN gibbonPerson ON (gibbonPerson.gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID)
                 ORDER BY surname, preferredName";
         return $this->db()->select($sql);
@@ -167,13 +167,13 @@ class UnitGateway extends QueryableGateway
     public function selectRelevantClassesByTeacher($gibbonSchoolYearID, $gibbonPersonID)
     {
         $data = array('gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbonPersonID);
-        $sql = "SELECT DISTINCT gibbonCourseClassPerson.gibbonCourseClassID 
-                FROM gibbonCourse 
-                JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) 
-                JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) 
-                WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID 
-                AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID 
-                AND gibbonCourseClassPerson.role='Teacher' 
+        $sql = "SELECT DISTINCT gibbonCourseClassPerson.gibbonCourseClassID
+                FROM gibbonCourse
+                JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
+                JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+                WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID
+                AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
+                AND gibbonCourseClassPerson.role='Teacher'
                 GROUP BY gibbonCourseClassPerson.gibbonCourseClassPersonID
                 ORDER BY gibbonCourseClassPerson.gibbonCourseClassID";
         return $this->db()->select($sql, $data);
@@ -183,25 +183,25 @@ class UnitGateway extends QueryableGateway
     {
         if (!empty($gibbonPersonID)) {
             $data = ['gibbonPersonID' => $gibbonPersonID];
-            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy 
+            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy
                     FROM freeLearningUnit
                     JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
-                    JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) 
-                    WHERE gibbonDepartment.type='Learning Area' AND gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID 
+                    JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
+                    WHERE gibbonDepartment.type='Learning Area' AND gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID
                     AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')
                     GROUP BY gibbonDepartment.gibbonDepartmentID
                     ORDER BY gibbonDepartment.name)";
         } else {
             $data = [];
-            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy 
-                    FROM freeLearningUnit 
+            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy
+                    FROM freeLearningUnit
                     JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
-                    WHERE type='Learning Area' 
+                    WHERE type='Learning Area'
                     GROUP BY gibbonDepartment.gibbonDepartmentID
                     ORDER BY gibbonDepartment.name)";
         }
 
-        $sql .= " UNION ALL 
+        $sql .= " UNION ALL
         (SELECT DISTINCT course as value, course as name, 'Course' as groupBy FROM freeLearningUnit WHERE active='Y' AND NOT course IS NULL AND NOT course='' ORDER BY course)
         ORDER BY groupBy DESC, name";
 

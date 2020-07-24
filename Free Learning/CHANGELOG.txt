@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v5.9.27
+-------
+Relaxed student unit browsing to allow non-enrolled students
+Fixed MySQL 8 compatibility issues
+
+v5.9.26
+-------
+Switched certificates to use Official Name
 
 v5.9.25
 -------

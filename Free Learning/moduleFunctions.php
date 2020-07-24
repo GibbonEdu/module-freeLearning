@@ -90,8 +90,8 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
                 FROM freeLearningUnit
                 LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
                 LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID)
-                JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
-                JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
+                LEFT JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
+                LEFT JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
                 WHERE active='Y' AND availableStudents='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber)
                 ORDER BY $difficultyOrder name";
             }
@@ -315,7 +315,7 @@ function prerequisitesMet($connection2, $gibbonPersonID, $prerequisites, $strict
             $sql = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND (status='Complete - Approved' OR status='Exempt') ORDER BY freeLearningUnitID";
         }
         else {
-                $sql = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND (status='Complete - Approved' OR status='Complete - Pending' OR status='Exempt') ORDER BY freeLearningUnitID";
+            $sql = "SELECT * FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND (status='Complete - Approved' OR status='Complete - Pending' OR status='Exempt') ORDER BY freeLearningUnitID";
         }
         $result = $connection2->prepare($sql);
         $result->execute($data);
@@ -835,7 +835,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                         FROM freeLearningUnitStudent
                         WHERE gibbonPersonIDStudent=:gibbonPersonID
                             AND status='Complete - Approved'
-                            AND grouping='Individual'
+                            AND `grouping`='Individual'
                     ";
                     $resultCount = $connection2->prepare($sqlCount);
                     $resultCount->execute($dataCount);
@@ -855,7 +855,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                         FROM freeLearningUnitStudent
                         WHERE gibbonPersonIDStudent=:gibbonPersonID
                             AND status='Complete - Approved'
-                            AND NOT grouping='Individual'
+                            AND NOT `grouping`='Individual'
                     ";
                     $resultCount = $connection2->prepare($sqlCount);
                     $resultCount->execute($dataCount);
