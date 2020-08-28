@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+
 require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
@@ -147,7 +150,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 } else {
                     //Get Inputs
                     $status = $_POST['status'];
+
+                    // Get the comment and strip the wrapping paragraph tags
                     $commentApproval = $_POST['commentApproval'];
+                    $commentApproval = preg_replace('/^<p>|<\/p>$/i', '', $commentApproval);
+
                     $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'];
                     $exemplarWork = $_POST['exemplarWork'];
                     $exemplarWorkLicense = '';
@@ -165,6 +172,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         header("Location: {$URL}");
                     } else {
                         $partialFail = false;
+
+                        // Insert discussion records
+                        $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+                        $discussionGateway = $container->get(DiscussionGateway::class);
+                        $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                            
+                        $data = [
+                            'foreignTable'   => 'freeLearningUnitStudent',
+                            'foreignTableID' => $freeLearningUnitStudentID,
+                            'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'), 
+                            'gibbonPersonID' => $gibbonPersonID,
+                            'comment'        => $commentApproval,
+                            'type'           => $status,
+                            'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
+                        ];
+
+                        if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
+                            $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
+                            foreach ($collaborators as $collaborator) {
+                                $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+                                $discussionGateway->insert($data);
+                            }
+                        } else {
+                            $discussionGateway->insert($data);
+                        }
 
                         if ($status == 'Complete - Approved') { //APPROVED!
                             //Move attached file, if there is one
@@ -188,25 +220,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 }
                             }
 
-                            //Write to database
-                            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
-                            try {
-                                $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => $attachment, 'exemplarWorkLicense' => $exemplarWorkLicense, 'exemplarWorkEmbed' => $exemplarWorkEmbed, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCompleteApproved' => date('Y-m-d H:i:s'));
-                                if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
-                                    $data['collaborationKey'] = $row['collaborationKey'];
-                                    $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, exemplarWorkEmbed=:exemplarWorkEmbed, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE collaborationKey=:collaborationKey';
-                                }
-                                else {
-                                    $data['freeLearningUnitStudentID'] = $freeLearningUnitStudentID;
-                                    $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, exemplarWorkEmbed=:exemplarWorkEmbed, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
-                                }
-                                $result = $connection2->prepare($sql);
-                                $result->execute($data);
-                            } catch (PDOException $e) {
-                                //Fail 2
-                                $URL .= '&return=error2';
-                                header("Location: {$URL}");
-                                exit;
+                            // Write to database
+                            $unitStudentGateway = $container->get(UnitStudentGateway::class); 
+                           
+                            $data = [
+                                'status' => $status,
+                                'exemplarWork' => $exemplarWork,
+                                'exemplarWorkThumb' => $attachment,
+                                'exemplarWorkLicense' => $exemplarWorkLicense,
+                                'exemplarWorkEmbed' => $exemplarWorkEmbed,
+                                'commentApproval' => $commentApproval,
+                                'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'],
+                                'timestampCompleteApproved' => date('Y-m-d H:i:s')
+                            ];
+
+                            if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
+                                $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
+                            } else {
+                                $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
                             }
 
                             //Attempt to assemble list of students for notification and badges

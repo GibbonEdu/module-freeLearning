@@ -18,11 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\View\View;
-use Gibbon\Tables\DataTable;
 use Gibbon\Domain\DataSet;
-use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
+use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -399,22 +400,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 return $row;
                             });
 
+                            $unitStudentGateway = $container->get(UnitStudentGateway::class);
                             $table->addExpandableColumn('commentStudent')
-                                ->format(function ($student) {
-                                    $output = '';
-                                    if (!empty($student['commentStudent'])) {
-                                        $output .= '<b>'.__m('Student Comment').'</b><br/>';
-                                        $output .= nl2br($student['commentStudent']).'<br/>';
-                                    }
-                                    if (!empty($student['commentApproval'])) {
-                                        if ($student['commentStudent'] != '') {
-                                            $output .= '<br/>';
-                                        }
-                                        $output .= '<b>'.__m('Teacher Comment').'</b><br/>';
-                                        $output .= nl2br($student['commentApproval']);
-                                    }
-
-                                    return $output;
+                                ->format(function ($student) use (&$page, &$unitStudentGateway) {
+                                    $logs = $unitStudentGateway->selectUnitStudentDiscussion($student['freeLearningUnitStudentID'])->fetchAll();
+                
+                                    return $page->fetchFromTemplate('ui/discussion.twig.html', [
+                                        'discussion' => $logs
+                                    ]);
                                 });
 
                             $table->addColumn('student', __('Student'))

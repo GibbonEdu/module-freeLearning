@@ -1092,3 +1092,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.9.27';
 $sql[$count][1] = "";
+
+//v5.9.28
+++$count;
+$sql[$count][0] = '5.9.28';
+$sql[$count][1] = "";

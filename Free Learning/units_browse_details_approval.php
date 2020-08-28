@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -354,12 +357,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr>
 								<td colspan=2>
-									<b><?php echo __($guid, 'Student Comment', 'Free Learning') ?> *</b><br/>
-									<p>
-										<?php
-                                            echo $row['commentStudent'];
-                    					?>
-									</p>
+                                    <?php
+                                        $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                                        $logs = $unitStudentGateway->selectUnitStudentDiscussion($freeLearningUnitStudentID)->fetchAll();
+                    
+                                        echo $page->fetchFromTemplate('ui/discussion.twig.html', [
+                                            'title' => __('Comments'),
+                                            'discussion' => $logs
+                                        ]);
+                                    ?>
 								</td>
 							</tr>
 
@@ -372,6 +378,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 							</tr>
 							<tr>
 								<td class="right" colspan=2>
+                                    <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
 									<input type="hidden" name="freeLearningUnitStudentID" value="<?php echo $row['freeLearningUnitStudentID'] ?>">
 									<input type="hidden" name="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>">
 									<input type="submit" id="submit" value="Submit">

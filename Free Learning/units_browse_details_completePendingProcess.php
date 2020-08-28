@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Contracts\Comms\Mailer;
+use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 require_once '../../gibbon.php';
 
@@ -189,25 +191,46 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $URL .= '&return=error6';
                             header("Location: {$URL}");
                         } else {
-                            //Write to database
+                            // Write to database
+                            $unitStudentGateway = $container->get(UnitStudentGateway::class);
                             $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
-                            try {
-                                $data = array('status' => $status, 'commentStudent' => $commentStudent, 'evidenceType' => $type, 'evidenceLocation' => $location, 'timestampCompletePending' => date('Y-m-d H:i:s'));
-                                if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
-                                    $data['collaborationKey'] = $row['collaborationKey'];
-                                    $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE collaborationKey=:collaborationKey';
+
+                            $data = [
+                                'status' => $status,
+                                'commentStudent' => $commentStudent,
+                                'evidenceType' => $type,
+                                'evidenceLocation' => $location,
+                                'timestampCompletePending' => date('Y-m-d H:i:s')
+                            ];
+                            if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
+                                $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
+                            } else {
+                                $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
+                            }
+
+                            // Insert discussion records
+                            $discussionGateway = $container->get(DiscussionGateway::class);
+                            
+                            $data = [
+                                'foreignTable'       => 'freeLearningUnitStudent',
+                                'foreignTableID'     => $freeLearningUnitStudentID,
+                                'gibbonModuleID'     => getModuleIDFromName($connection2, 'Free Learning'),
+                                'gibbonPersonID'     => $gibbonPersonID,
+                                'comment'            => $commentStudent,
+                                'type'               => 'Complete - Pending',
+                                'tag'                => 'pending',
+                                'attachmentType'     => $type,
+                                'attachmentLocation' => $location,
+                            ];
+
+                            if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
+                                $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
+                                foreach ($collaborators as $collaborator) {
+                                    $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+                                    $discussionGateway->insert($data);
                                 }
-                                else {
-                                    $data['freeLearningUnitStudentID'] = $freeLearningUnitStudentID;
-                                    $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentStudent=:commentStudent, evidenceType=:evidenceType, evidenceLocation=:evidenceLocation, timestampCompletePending=:timestampCompletePending WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
-                                }
-                                $result = $connection2->prepare($sql);
-                                $result->execute($data);
-                            } catch (PDOException $e) {
-                                //Fail 2
-                                $URL .= '&return=error2';
-                                header("Location: {$URL}");
-                                exit;
+                            } else {
+                                $discussionGateway->insert($data);
                             }
 
 

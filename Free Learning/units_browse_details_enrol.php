@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\View\View;
+use Gibbon\Services\Format;
+use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == false) {
     // Access denied
     echo "<div class='error'>";
@@ -555,10 +560,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             echo sprintf(__m('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $row['name']);
                             echo '</p>';
                         } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
-                            echo "<div class='warning'>";
-                            echo __m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:').'<br/><br/>';
-                            echo '<b>'.$rowEnrol['commentApproval'].'</b>';
-                            echo '</div>';
+                            echo Format::alert(__m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:'), 'warning');
+
+                            $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                            $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+        
+                            echo $page->fetchFromTemplate('ui/discussion.twig.html', [
+                                'title' => __('Comments'),
+                                'discussion' => $logs
+                            ]);
                         }
 
                         ?>
@@ -683,6 +693,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 </tr>
                                 <tr>
                                     <td class="right" colspan=2>
+                                        <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
                                         <input type="hidden" name="freeLearningUnitStudentID" value="<?php echo $rowEnrol['freeLearningUnitStudentID'] ?>">
                                         <input type="hidden" name="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>">
                                         <input type="submit" id="submit" value="Submit">
@@ -740,12 +751,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         </tr>
                     </table>
                     <?php
-                    echo '<h4>';
-                    echo __m('Student Comment');
-                    echo '</h4>';
-                    echo '<p>';
-                    echo $rowEnrol['commentStudent'];
-                    echo '</p>';
+
+                    $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                    $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+
+                    echo $page->fetchFromTemplate('ui/discussion.twig.html', [
+                        'title' => __('Comments'),
+                        'discussion' => $logs
+                    ]);
+
                 } elseif ($rowEnrol['status'] == 'Complete - Approved') { //Complete, show status and feedback from teacher.
                     echo '<h4>';
                     echo __m('Complete - Approved');
@@ -801,19 +815,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         </tr>
                     </table>
                     <?php
-                    echo '<h4>';
-                    echo __m('Teacher Comment');
-                    echo '</h4>';
-                    echo '<p>';
-                    echo $rowEnrol['commentApproval'];
-                    echo '</p>';
+                    
+                    $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                    $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
 
-                    echo '<h4>';
-                    echo __m('Student Comment');
-                    echo '</h4>';
-                    echo '<p>';
-                    echo $rowEnrol['commentStudent'];
-                    echo '</p>';
+                    echo $page->fetchFromTemplate('ui/discussion.twig.html', [
+                        'title' => __('Comments'),
+                        'discussion' => $logs
+                    ]);
+                    
                 } elseif ($rowEnrol['status'] == 'Exempt') { //Exempt, let student know
                     echo '<h4>';
                     echo __m('Exempt');

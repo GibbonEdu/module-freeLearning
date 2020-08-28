@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.28
+-------
+Implemented the discussion table for feedback
+
 v5.9.27
 -------
 Relaxed student unit browsing to allow non-enrolled students
