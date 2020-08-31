@@ -171,4 +171,17 @@ class UnitStudentGateway extends QueryableGateway
 
         return $result;
     }
+
+    public function selectUnitCollaboratorsByKey($collaborationKey)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnitStudent.*', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240'])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->where('freeLearningUnitStudent.collaborationKey = :collaborationKey')
+            ->bindValue('collaborationKey', $collaborationKey);
+
+        return $this->runSelect($query);
+    }
 }

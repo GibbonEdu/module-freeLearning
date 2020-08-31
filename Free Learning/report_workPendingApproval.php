@@ -84,6 +84,9 @@ else {
         $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
     }
 
+    $lastCollaborationKey = null;
+    $group = 0;
+
     // Render table
     $table = DataTable::createPaginated('pending', $criteria);
 
@@ -100,20 +103,34 @@ else {
         });
 
     $table->addColumn('classMentor', __m('Class/Mentor'))
-        ->format(function($values) {
+        ->description(__m('Grouping'))
+        ->format(function($values) use (&$lastCollaborationKey, &$group) {
+            $output = '';
             if ($values['enrolmentMethod'] == 'class') {
                 if ($values['course'] != '' and $values['class'] != '') {
-                    return $values['course'].'.'.$values['class'];
+                    $output .= $values['course'].'.'.$values['class'];
                 } else {
-                    return '<i>'.__($guid, 'N/A').'</i>';
+                    $output .= '<i>'.__($guid, 'N/A').'</i>';
                 }
             }
             else if ($values['enrolmentMethod'] == 'schoolMentor') {
-                return formatName('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
+                $output .= formatName('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
             }
             else if ($values['enrolmentMethod'] == 'externalMentor') {
-                return $values['nameExternalMentor'];
+                $output .= $values['nameExternalMentor'];
             }
+
+            $grouping = $values['grouping'];
+            if ($values['collaborationKey'] != '') {
+                if ($lastCollaborationKey != $values['collaborationKey']) {
+                    ++$group;
+                }
+                $grouping .= " (".__m("Group")." ".$group.")";
+            }
+            $output .= '<br/>' . Format::small($grouping);
+
+            $lastCollaborationKey = $values['collaborationKey'];
+            return $output;
         });
 
     $table->addColumn('unit', __m('Unit'))
