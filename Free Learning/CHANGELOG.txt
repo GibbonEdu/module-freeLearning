@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.9.29
+-------
+Display grouping information in Work Pending Approval
+Display all collaborator names on Unit Complete Approval page
+
 v5.9.28
 -------
 Implemented the discussion table for feedback

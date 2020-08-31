@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Services\Format;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
@@ -202,8 +203,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 									<span style="font-size: 90%"><i><?php echo __($guid, 'This value cannot be changed.') ?></i></span>
 								</td>
 								<td class="right">
-									<?php echo "<input readonly value='".formatName('', $row['preferredName'], $row['surname'], 'Student', false)."' type='text' style='width: 300px'>";
-                    				?>
+                                    <?php 
+
+                                    if (!empty($row['collaborationKey'])) {
+                                        $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                                        $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($row['collaborationKey'])->fetchAll();
+
+                                        foreach ($collaborators as $collaborator) {
+                                            echo "<input readonly value='".Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false)."' type='text' style='width: 300px'>";
+                                        }
+                                    } else {
+                                        echo "<input readonly value='".Format::name('', $row['preferredName'], $row['surname'], 'Student', false)."' type='text' style='width: 300px'>";
+                                    }
+                                    
+                                    ?>
 								</td>
 							</tr>
 							<tr>
