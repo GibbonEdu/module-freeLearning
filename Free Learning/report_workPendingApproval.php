@@ -84,8 +84,7 @@ else {
         $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
     }
 
-    $lastCollaborationKey = null;
-    $group = 0;
+    $collaborationKeys = [];
 
     // Render table
     $table = DataTable::createPaginated('pending', $criteria);
@@ -104,7 +103,7 @@ else {
 
     $table->addColumn('classMentor', __m('Class/Mentor'))
         ->description(__m('Grouping'))
-        ->format(function($values) use (&$lastCollaborationKey, &$group) {
+        ->format(function($values) use (&$collaborationKeys) {
             $output = '';
             if ($values['enrolmentMethod'] == 'class') {
                 if ($values['course'] != '' and $values['class'] != '') {
@@ -122,14 +121,18 @@ else {
 
             $grouping = $values['grouping'];
             if ($values['collaborationKey'] != '') {
-                if ($lastCollaborationKey != $values['collaborationKey']) {
-                    ++$group;
+                // Get the index for the group, otherwise add it to the array
+                $group = array_search($values['collaborationKey'], $collaborationKeys);
+                if ($group === false) {
+                    $collaborationKeys[] = $values['collaborationKey'];
+                    $group = count($collaborationKeys);
+                } else {
+                    $group++;
                 }
                 $grouping .= " (".__m("Group")." ".$group.")";
             }
             $output .= '<br/>' . Format::small($grouping);
 
-            $lastCollaborationKey = $values['collaborationKey'];
             return $output;
         });
 

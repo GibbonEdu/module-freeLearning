@@ -367,8 +367,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
                             $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
 
-                            $lastCollaborationKey = null;
-                            $group = 0;
+                            $collaborationKeys = [];
 
                             //Legend
                             $templateView = new View($container->get('twig'));
@@ -403,6 +402,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
                             $table->addExpandableColumn('commentStudent')
                                 ->format(function ($student) use (&$page, &$unitStudentGateway) {
+                                    if ($student['status'] == 'Current' || $student['status'] == 'Current - Pending') return;
+
                                     $logs = $unitStudentGateway->selectUnitStudentDiscussion($student['freeLearningUnitStudentID'])->fetchAll();
                 
                                     return $page->fetchFromTemplate('ui/discussion.twig.html', [
@@ -445,7 +446,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->description(__m('Grouping'))
                                 ->sortable(['course', 'class'])
                                 ->width('20%')
-                                ->format(function ($student) use (&$lastCollaborationKey, &$group) {
+                                ->format(function ($student) use (&$collaborationKeys) {
                                     $return = '';
                                     if ($student['enrolmentMethod'] == 'class') {
                                         if (!empty($student['course']) && !empty($student['class'])) {
@@ -461,14 +462,18 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                                     $grouping = $student['grouping'];
                                     if ($student['collaborationKey'] != '') {
-                                        if ($lastCollaborationKey != $student['collaborationKey']) {
-                                            ++$group;
+                                        // Get the index for the group, otherwise add it to the array
+                                        $group = array_search($student['collaborationKey'], $collaborationKeys);
+                                        if ($group === false) {
+                                            $collaborationKeys[] = $student['collaborationKey'];
+                                            $group = count($collaborationKeys);
+                                        } else {
+                                            $group++;
                                         }
                                         $grouping .= " (".__m("Group")." ".$group.")";
                                     }
                                     $return .= '<br/>' . Format::small($grouping);
 
-                                    $lastCollaborationKey = $student['collaborationKey'];
                                     return $return;
                                 });
 
