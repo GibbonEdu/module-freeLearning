@@ -135,6 +135,22 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
+    public function getUnitStudentDetailsByID($freeLearningUnitID, $freeLearningUnitStudentID)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnit.*','freeLearningUnitStudent.*', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240'])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('freeLearningUnit', 'freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->where('freeLearningUnitStudent.freeLearningUnitID = :freeLearningUnitID')
+            ->bindValue('freeLearningUnitID', $freeLearningUnitID)
+            ->where('freeLearningUnitStudent.freeLearningUnitStudentID = :freeLearningUnitStudentID')
+            ->bindValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
+
+        return $this->runSelect($query)->fetch();
+    }
+
     public function selectUnitStudentDiscussion($freeLearningUnitStudentID)
     {
         $query = $this
@@ -153,14 +169,14 @@ class UnitStudentGateway extends QueryableGateway
         if ($result->rowCount() == 0) {
             $query = $this
                 ->newSelect()
-                ->cols(['freeLearningUnitStudent.commentStudent as comment', "'Complete - Pending' as type", "'pending' as tag", 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240'])
+                ->cols(['freeLearningUnitStudent.commentStudent as comment', "'Complete - Pending' as type", "'pending' as tag", 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240',  'timestampCompletePending as timestamp'])
                 ->from('freeLearningUnitStudent')
                 ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
                 ->where('freeLearningUnitStudent.freeLearningUnitStudentID = :freeLearningUnitStudentID')
                 ->bindValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
 
             $query->union()
-                ->cols(['freeLearningUnitStudent.commentApproval as comment', 'freeLearningUnitStudent.status as type', "(CASE WHEN freeLearningUnitStudent.status = 'Complete - Pending' THEN 'pending' WHEN freeLearningUnitStudent.status = 'Evidence Not Yet Approved' THEN 'warning' WHEN freeLearningUnitStudent.status = 'Complete - Approved' THEN 'success' ELSE 'dull' END) as tag", 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240'])
+                ->cols(['freeLearningUnitStudent.commentApproval as comment', 'freeLearningUnitStudent.status as type', "(CASE WHEN freeLearningUnitStudent.status = 'Complete - Pending' THEN 'pending' WHEN freeLearningUnitStudent.status = 'Evidence Not Yet Approved' THEN 'warning' WHEN freeLearningUnitStudent.status = 'Complete - Approved' THEN 'success' ELSE 'dull' END) as tag", 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240',  'timestampCompleteApproved as timestamp'])
                 ->from('freeLearningUnitStudent')
                 ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDApproval=gibbonPerson.gibbonPersonID')
                 ->where('freeLearningUnitStudent.freeLearningUnitStudentID = :freeLearningUnitStudentID')

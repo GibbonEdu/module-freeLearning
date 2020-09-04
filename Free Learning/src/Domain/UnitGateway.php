@@ -164,6 +164,31 @@ class UnitGateway extends QueryableGateway
         return $this->db()->select($sql);
     }
 
+    public function selectUnitAuthorsByID($freeLearningUnitID)
+    {
+        $data = ['freeLearningUnitID' => $freeLearningUnitID];
+        $sql = "SELECT 
+                gibbonPerson.title as title,
+                (CASE WHEN gibbonPerson.surname IS NOT NULL THEN gibbonPerson.surname ELSE freeLearningUnitAuthor.surname END) as surname,
+                (CASE WHEN gibbonPerson.preferredName IS NOT NULL THEN gibbonPerson.preferredName ELSE freeLearningUnitAuthor.preferredName END) as preferredName,
+                (CASE WHEN gibbonPerson.gibbonPersonID IS NULL THEN freeLearningUnitAuthor.website END) as website
+                FROM freeLearningUnitAuthor
+                LEFT JOIN gibbonPerson ON (gibbonPerson.gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID)
+                WHERE freeLearningUnitID=:freeLearningUnitID
+                ORDER BY surname, preferredName";
+        return $this->db()->select($sql, $data);
+    }
+
+    public function selectUnitDepartmentsByID($freeLearningUnitID)
+    {
+        $data = ['freeLearningUnitID' => $freeLearningUnitID];
+        $sql = "SELECT gibbonDepartment.name FROM freeLearningUnit 
+                JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
+                WHERE freeLearningUnitID=:freeLearningUnitID";
+
+        return $this->db()->select($sql, $data);
+    }
+
     public function selectRelevantClassesByTeacher($gibbonSchoolYearID, $gibbonPersonID)
     {
         $data = array('gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbonPersonID);
