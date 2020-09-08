@@ -163,7 +163,7 @@ if (!$block) {
                         <td colspan=2>
                             <b><?php echo __($guid, 'Mentor Comment', 'Free Learning') ?> *</b><br/>
                             <span style="font-size: 90%"><i><?php echo __($guid, 'Leave a comment on the student\'s progress.', 'Free Learning') ?></i></span>
-                            <?php echo getEditor($guid,  true, 'commentApproval', $row['commentApproval'], 15, false, true) ?>
+                            <?php echo getEditor($guid,  true, 'commentApproval', '', 15, false, true) ?>
                         </td>
                     </tr>
                     <tr>
