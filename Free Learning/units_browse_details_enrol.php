@@ -606,11 +606,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                                 autosize($('textarea'));
                                             });
                                         </script>
-                                        <textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"><?php
-                                        if ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
-                                            echo $rowEnrol['commentStudent'];
-                                        }
-                                        ?></textarea>
+                                        <textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"></textarea>
                                         <script type="text/javascript">
                                             var commentStudent=new LiveValidation('commentStudent');
                                             commentStudent.add(Validate.Presence);

@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v5.9.30
+-------
+Added an edit icon to the Work Pending Approval page
+Added the discussion view to dashboard and student profile
+Stopped pre-filling previous comments
+OOified the Approval page
+
 v5.9.29
 -------
 Display grouping information in Work Pending Approval

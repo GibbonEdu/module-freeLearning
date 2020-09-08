@@ -18,8 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
-use Gibbon\Tables\DataTable;
 use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 //Module includes
@@ -67,6 +68,7 @@ else {
     }
 
     //Table
+    $unitGateway = $container->get(UnitGateway::class);
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
     $criteria = $unitStudentGateway->newQueryCriteria()
@@ -84,8 +86,11 @@ else {
         $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
     }
 
+    $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
     $collaborationKeys = [];
 
+    // Get list of my classes before we start looping, for efficiency's sake
+    $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
     // Render table
     $table = DataTable::createPaginated('pending', $criteria);
 
@@ -163,6 +168,32 @@ else {
         });
 
     $table->addColumn('status', __m('Status'));
+
+    // ACTIONS
+    $table->addActionColumn()
+        ->addParam('freeLearningUnitStudentID')
+        ->addParam('freeLearningUnitID')
+        ->addParam('sidebar', true)
+        ->format(function ($student, $actions) use ($manageAll, $myClasses, $guid) {
+            // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
+            $editEnrolment = $manageAll ? true : false;
+            if ($student['enrolmentMethod'] == 'class') {
+                // Is teacher of this class?
+                if (in_array($student['gibbonCourseClassID'], $myClasses)) {
+                    $editEnrolment = true;
+                }
+            } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) {
+                // Is mentor of this student?
+                $editEnrolment = true;
+            }
+
+            if (!$editEnrolment) return;
+
+            if ($editEnrolment && ($student['status'] == 'Complete - Pending' or $student['status'] == 'Complete - Approved' or $student['status'] == 'Evidence Not Yet Approved')) {
+                $actions->addAction('edit', __('Edit'))
+                    ->setURL('/modules/Free Learning/units_browse_details_approval.php');
+            }
+        });
 
     echo $table->render($journey);
 }
