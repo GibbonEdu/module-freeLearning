@@ -156,14 +156,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $commentApproval = preg_replace('/^<p>|<\/p>$/i', '', $commentApproval);
 
                     $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'];
-                    $exemplarWork = $_POST['exemplarWork'];
-                    $exemplarWorkLicense = '';
-                    $exemplarWorkEmbed = '';
+                    $exemplarWork = $_POST['exemplarWork'] ?? 'N';
+                    $exemplarWorkLicense = $_POST['exemplarWorkLicense'] ?? '';
+                    $exemplarWorkEmbed = $_POST['exemplarWorkEmbed'] ?? '';
                     $attachment = '';
-                    if ($exemplarWork == 'Y') {
-                        $exemplarWorkLicense = $_POST['exemplarWorkLicense'];
-                        $exemplarWorkEmbed = $_POST['exemplarWorkEmbed'];
-                    }
 
                     //Validation
                     if ($commentApproval == '' or $exemplarWork == '') {
