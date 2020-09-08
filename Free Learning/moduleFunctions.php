@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+
 function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $gibbonDepartmentID = null, $difficulty = null, $name = null, $showInactive = null, $publicUnits = null, $freeLearningUnitID = null, $difficulties = null)
 {
     $return = array();
@@ -118,6 +120,13 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
 
 function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = false)
 {
+    global $container, $page, $autoloader;
+    
+    // This is a HACK :( whole whole function needs ooified
+    $autoloader->addPsr4('Gibbon\\Module\\FreeLearning\\', realpath(__DIR__.'/../../').'/modules/Free Learning/src');
+
+    $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
     $output = false;
 
     try {
@@ -250,19 +259,16 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                 $output .= '</td>';
                 $output .= '</tr>';
                 if ($row['commentStudent'] != '' or $row['commentApproval'] != '') {
+
                     $output .= "<tr class='comment-".$row['freeLearningUnitStudentID']."' id='comment-".$row['freeLearningUnitStudentID']."'>";
                     $output .= '<td colspan=7>';
-                    if ($row['commentStudent'] != '') {
-                        $output .= '<b>'.__($guid, 'Student Comment', 'Free Learning').'</b><br/>';
-                        $output .= nl2br($row['commentStudent']).'<br/>';
-                    }
-                    if ($row['commentApproval'] != '') {
-                        if ($row['commentStudent'] != '') {
-                            $output .= '<br/>';
-                        }
-                        $output .= '<b>'.__($guid, 'Teacher Comment', 'Free Learning').'</b><br/>';
-                        $output .= nl2br($row['commentApproval']).'<br/>';
-                    }
+
+                    $logs = $unitStudentGateway->selectUnitStudentDiscussion($row['freeLearningUnitStudentID'])->fetchAll();
+                
+                    $output .= $page->fetchFromTemplate('ui/discussion.twig.html', [
+                        'discussion' => $logs
+                    ]);
+
                     $output .= '</td>';
                     $output .= '</tr>';
                 }
