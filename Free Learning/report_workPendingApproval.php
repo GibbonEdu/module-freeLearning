@@ -72,11 +72,7 @@ else {
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
     $criteria = $unitStudentGateway->newQueryCriteria()
-        ->sortBy('course')
-        ->sortBy('class')
-        ->sortBy('unit')
-        ->sortBy('studentsurname')
-        ->sortBy('studentpreferredName')
+        ->sortBy('timestampCompletePending')
         ->fromPOST();
 
     if (!empty($allMentors)) {
@@ -168,6 +164,8 @@ else {
         });
 
     $table->addColumn('status', __m('Status'));
+
+    $table->addColumn('timestampCompletePending', __m('When'))->format(Format::using('relativeTime', 'timestampCompletePending'));
 
     // ACTIONS
     $table->addActionColumn()
