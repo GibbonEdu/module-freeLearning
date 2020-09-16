@@ -104,7 +104,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo __($guid, 'The selected record does not exist, or you do not have access to it.');
                 echo '</div>';
             } else {
-                $row = $result->fetch();
+                $values = $result->fetch();
                 if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                     echo "<div class='linkTop'>";
                     echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
@@ -115,10 +115,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 if ($highestAction == 'Browse Units_all') {
                     $proceed = true;
                 } elseif ($highestAction == 'Browse Units_prerequisites') {
-                    if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
+                    if ($values['freeLearningUnitIDPrerequisiteList'] == null or $values['freeLearningUnitIDPrerequisiteList'] == '') {
                         $proceed = true;
                     } else {
-                        $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
+                        $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
                         $prerequisitesMet = prerequisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
                         if ($prerequisitesMet) {
                             $proceed = true;
@@ -169,7 +169,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>";
                     echo '<tr>';
                     echo "<td style='width: 50%; vertical-align: middle'>";
-                    echo "<span style='font-size: 150%; font-weight: bold'>".$row['name'].'</span><br/>';
+                    echo "<span style='font-size: 150%; font-weight: bold'>".$values['name'].'</span><br/>';
                     echo '</td>';
                     echo "<td style='width: 50%; vertical-align: top'>";
                     echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Time', 'Free Learning').'</span><br/>';
@@ -177,7 +177,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $blocks = getBlocksArray($connection2, $freeLearningUnitID);
                     if ($blocks != false) {
                         foreach ($blocks as $block) {
-                            if ($block[0] == $row['freeLearningUnitID']) {
+                            if ($block[0] == $values['freeLearningUnitID']) {
                                 if (is_numeric($block[2])) {
                                     $timing += $block[2];
                                 }
@@ -191,21 +191,21 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo '</td>';
                     echo "<td style='width: 135%!important; vertical-align: top; text-align: right' rowspan=4>";
-                    if ($row['logo'] == null) {
+                    if ($values['logo'] == null) {
                         echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_125.jpg'/><br/>";
                     } else {
-                        echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$row['logo']."'/><br/>";
+                        echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
                     }
                     echo '</td>';
                     echo '</tr>';
                     echo '<tr>';
                     echo "<td style='padding-top: 15px; vertical-align: top'>";
                     echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Difficulty', 'Free Learning').'</span><br/>';
-                    echo '<i>'.$row['difficulty'].'<i>';
+                    echo '<i>'.$values['difficulty'].'<i>';
                     echo '</td>';
                     echo "<td style='padding-top: 15px; vertical-align: top'>";
                     echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Prerequisites', 'Free Learning').'</span><br/>';
-                    $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
+                    $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
                     if ($prerequisitesActive != false) {
                         $prerequisites = explode(',', $prerequisitesActive);
                         $units = getUnitsArray($connection2);
@@ -225,7 +225,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo '<i>'.__($guid, 'No Learning Areas available.', 'Free Learning').'</i>';
                     } else {
                         for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                            if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
+                            if (is_numeric(strpos($values['gibbonDepartmentIDList'], $learningAreas[$i]))) {
                                 echo '<i>'.__($guid, $learningAreas[($i + 1)]).'</i><br/>';
                             }
                         }
@@ -246,8 +246,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '<tr>';
                     echo "<td style='vertical-align: top'>";
                     echo "<span style='font-size: 115%; font-weight: bold'>".__($guid, 'Groupings', 'Free Learning').'</span><br/>';
-                    if ($row['grouping'] != '') {
-                        $groupings = explode(',', $row['grouping']);
+                    if ($values['grouping'] != '') {
+                        $groupings = explode(',', $values['grouping']);
                         foreach ($groupings as $grouping) {
                             echo ucwords($grouping).'<br/>';
                         }
@@ -299,22 +299,22 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo __($guid, 'Blurb', 'Free Learning');
                     echo '</h3>';
                     echo '<p>';
-                    echo $row['blurb'];
+                    echo $values['blurb'];
                     echo '</p>';
-                    if ($row['license'] != '') {
+                    if ($values['license'] != '') {
                         echo '<h4>';
                         echo __($guid, 'License', 'Free Learning');
                         echo '</h4>';
                         echo '<p>';
-                        echo __($guid, 'This work is shared under the following license:', 'Free Learning').' '.$row['license'];
+                        echo __($guid, 'This work is shared under the following license:', 'Free Learning').' '.$values['license'];
                         echo '</p>';
                     }
-                    if ($row['outline'] != '') {
+                    if ($values['outline'] != '') {
                         echo '<h3>';
                         echo 'Outline';
                         echo '</h3>';
                         echo '<p>';
-                        echo $row['outline'];
+                        echo $values['outline'];
                         echo '</p>';
                     }
                     echo '</div>';
@@ -336,7 +336,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 $learningAreas = getLearningAreas($connection2, $guid, true);
                                 if ($learningAreas != '') {
                                     for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                                        if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
+                                        if (is_numeric(strpos($values['gibbonDepartmentIDList'], $learningAreas[$i]))) {
                                             $enrolmentType = 'staffEdit';
                                         }
                                     }
@@ -363,7 +363,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->sortBy(['statusSort', 'collaborationKey', 'surname', 'preferredName'])
                                 ->fromPOST();
 
-                            $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $gibbon->session->get('gibbonSchoolYearID'), $row['freeLearningUnitID'], $gibbon->session->get('gibbonPersonID'), $manageAll);
+                            $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $gibbon->session->get('gibbonSchoolYearID'), $values['freeLearningUnitID'], $gibbon->session->get('gibbonPersonID'), $manageAll);
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
                             $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
 
@@ -379,7 +379,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             if ($enrolmentType == 'staffEdit') {
                                 $table->addHeaderAction('addMultiple', __('Add Multiple'))
                                     ->setURL('/modules/Free Learning/units_browse_details_enrolMultiple.php')
-                                    ->addParam('freeLearningUnitID', $row['freeLearningUnitID'])
+                                    ->addParam('freeLearningUnitID', $values['freeLearningUnitID'])
                                     ->addParam('gibbonDepartmentID', $gibbonDepartmentID)
                                     ->addParam('difficulty', $difficulty)
                                     ->addParam('name', $name)

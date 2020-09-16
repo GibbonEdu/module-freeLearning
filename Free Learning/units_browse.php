@@ -130,10 +130,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         } elseif ($roleCategory == 'Parent') {
             // Allow parents to view the map for their children
             $children = $container->get(StudentGateway::class)->selectActiveStudentsByFamilyAdult($_SESSION[$guid]['gibbonSchoolYearID'], $_SESSION[$guid]['gibbonPersonID'])->fetchAll();
-            $children = array_reduce($children, function ($group, $item) {
-                $group[$item['gibbonPersonID']] = Format::name($item['title'], $item['preferredName'], $item['surname'], 'Student', false, true);
-                return $group;
-            }, []);
+            $children = Format::nameListArray($children, 'Student', false, true);
 
             if (empty($children[$gibbonPersonID])) {
                 $gibbonPersonID = null;

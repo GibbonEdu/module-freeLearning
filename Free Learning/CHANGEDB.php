@@ -1107,3 +1107,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.9.30';
 $sql[$count][1] = "";
+
+//v5.9.31
+++$count;
+$sql[$count][0] = '5.9.31';
+$sql[$count][1] = "
+INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Evidence Submitted', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');end
+";

@@ -135,7 +135,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function getUnitStudentDetailsByID($freeLearningUnitID, $freeLearningUnitStudentID)
+    public function getUnitStudentDetailsByID($freeLearningUnitID, $gibbonPersonID = null, $freeLearningUnitStudentID = null)
     {
         $query = $this
             ->newSelect()
@@ -144,9 +144,17 @@ class UnitStudentGateway extends QueryableGateway
             ->innerJoin('freeLearningUnit', 'freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID')
             ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
             ->where('freeLearningUnitStudent.freeLearningUnitID = :freeLearningUnitID')
-            ->bindValue('freeLearningUnitID', $freeLearningUnitID)
-            ->where('freeLearningUnitStudent.freeLearningUnitStudentID = :freeLearningUnitStudentID')
-            ->bindValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
+            ->bindValue('freeLearningUnitID', $freeLearningUnitID);
+
+        if (!empty($gibbonPersonID)) {
+            $query->where('freeLearningUnitStudent.gibbonPersonIDStudent = :gibbonPersonID')
+                ->bindValue('gibbonPersonID', $gibbonPersonID);
+        }
+
+        if (!empty($freeLearningUnitStudentID)) {
+            $query->where('freeLearningUnitStudent.freeLearningUnitStudentID = :freeLearningUnitStudentID')
+                ->bindValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
+        }
 
         return $this->runSelect($query)->fetch();
     }
@@ -199,5 +207,95 @@ class UnitStudentGateway extends QueryableGateway
             ->bindValue('collaborationKey', $collaborationKey);
 
         return $this->runSelect($query);
+    }
+
+    public function selectUnitMentors($freeLearningUnitID, $gibbonPersonID, $params = [])
+    {
+        $data = ['freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbonPersonID];
+        $sql = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+            FROM gibbonPerson
+                JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
+                JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
+            WHERE gibbonPerson.status='Full'
+                AND freeLearningUnitID=:freeLearningUnitID
+                AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+            )";
+
+        if (!empty($params['schoolMentorCompletors']) && $params['schoolMentorCompletors'] == 'Y') {
+            $sql .= " UNION DISTINCT
+                (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+                    FROM gibbonPerson
+                    LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID)
+                    LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID)
+                    WHERE gibbonPerson.status='Full'
+                        AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
+                        AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
+                    GROUP BY gibbonPersonID)";
+        }
+        if (!empty($params['schoolMentorCustom'])) {
+
+            $data['schoolMentorCustom'] = $params['schoolMentorCustom'];
+            $sql .= " UNION DISTINCT
+            (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+                FROM gibbonPerson
+                WHERE FIND_IN_SET(gibbonPersonID, :schoolMentorCustom)
+                    AND status='Full')";
+
+        }
+        if (!empty($params['schoolMentorCustomRole'])) {
+            $data['gibbonRoleID'] = $params['schoolMentorCustomRole'];
+            $sql .= " UNION DISTINCT
+            (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+                FROM gibbonPerson
+                    JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
+                WHERE gibbonRoleID=:gibbonRoleID
+                    AND status='Full')";
+        }
+        $sql .= " ORDER BY surname, preferredName";
+
+        return $this->db()->select($sql, $data);
+    }
+
+    public function selectUnitCollaborators($gibbonSchoolYearID, $gibbonPersonID, $roleCategory, $prerequisiteCount, $params = [])
+    {
+        if ($roleCategory == 'Student') {
+            $data = ['gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbonPersonID, 'gibbonYearGroupIDMinimum' => $params['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $params['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount];
+            $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup, prerequisites.count
+            FROM gibbonPerson
+            JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
+            JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
+            LEFT JOIN (
+                SELECT COUNT(*) as count, freeLearningUnitStudent.gibbonPersonIDStudent
+                FROM freeLearningUnitStudent
+                JOIN freeLearningUnit ON (freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID)
+                WHERE freeLearningUnit.active='Y'
+                AND (:prerequisiteList = '' OR FIND_IN_SET(freeLearningUnit.freeLearningUnitID, :prerequisiteList))
+                AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt')
+                GROUP BY freeLearningUnitStudent.freeLearningUnitStudentID
+            ) AS prerequisites ON (prerequisites.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
+            WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID
+            AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+            AND (:gibbonYearGroupIDMinimum IS NULL OR gibbonStudentEnrolment.gibbonYearGroupID >= :gibbonYearGroupIDMinimum)
+            HAVING (:prerequisiteCount = 0 OR prerequisites.count >= :prerequisiteCount)
+            ORDER BY surname, preferredName";
+        } else if ($roleCategory == 'Staff') {
+            $data = ['gibbonPersonID' => $gibbonPersonID];
+            $sql = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
+                FROM gibbonPerson
+                JOIN gibbonStaff ON (gibbonStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
+                WHERE status='Full'
+                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+                ORDER BY surname, preferredName";
+        } else if ($roleCategory == 'Parent') {
+            $data = ['gibbonPersonID' => $gibbonPersonID];
+            $sql = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
+                FROM gibbonPerson
+                JOIN gibbonRole ON (gibbonRole.gibbonRoleID LIKE concat( '%', gibbonPerson.gibbonRoleIDAll, '%' ) AND category='Parent')
+                WHERE status='Full'
+                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+                ORDER BY surname, preferredName";
+        }
+
+        return $this->db()->select($sql, $data);
     }
 }

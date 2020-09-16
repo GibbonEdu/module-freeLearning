@@ -77,7 +77,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     }
 
     // Check that the record exists
-    $values = $unitStudentGateway->getUnitStudentDetailsByID($freeLearningUnitID, $freeLearningUnitStudentID);
+    $values = $unitStudentGateway->getUnitStudentDetailsByID($freeLearningUnitID, null, $freeLearningUnitStudentID);
     if (empty($values)) {
         $page->addError(__('The selected record does not exist, or you do not have access to it.'));
         return;
@@ -180,7 +180,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $row = $form->addRow();
         $row->addLabel('submission', __m('Submission'));
-        $row->addContent(Format::link($submissionLink, __m('View Submission'), ['class' => 'w-full ml-2', 'target' => '_blank']));
+        $row->addContent(Format::link($submissionLink, __m('View Submission'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
     
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
     $logs = $unitStudentGateway->selectUnitStudentDiscussion($freeLearningUnitStudentID)->fetchAll();

@@ -17,819 +17,375 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\View\View;
+use Gibbon\Forms\Form;
+use Gibbon\FileUploader;
 use Gibbon\Services\Format;
-use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == false) {
     // Access denied
-    echo "<div class='error'>";
-    echo __('You do not have access to this action.');
-    echo "</div>";
+    $page->addError(__('You do not have access to this action.'));
 } else {
-    //Check ability to enrol
+    // Check ability to enrol
     $proceed = false;
+    $gibbonSchoolYearID = $_SESSION[$guid]['gibbonSchoolYearID'];
+    $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+
     if ($highestAction == 'Browse Units_all') {
         $proceed = true;
     } elseif ($highestAction == 'Browse Units_prerequisites') {
-        if ($row['freeLearningUnitIDPrerequisiteList'] == null or $row['freeLearningUnitIDPrerequisiteList'] == '') {
+        if ($values['freeLearningUnitIDPrerequisiteList'] == null or $values['freeLearningUnitIDPrerequisiteList'] == '') {
             $proceed = true;
         } else {
-            $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
-            $prerequisitesMet = prerequisitesMet($connection2, $_SESSION[$guid]['gibbonPersonID'], $prerequisitesActive, true);
+            $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
+            $prerequisitesMet = prerequisitesMet($connection2, $gibbonPersonID, $prerequisitesActive, true);
             if ($prerequisitesMet) {
                 $proceed = true;
             }
         }
     }
 
-    if ($proceed == false) {
-        echo "<div class='warning'>";
-        echo __m('You cannot enrol, as you have not fully met the prerequisites for this unit.');
-        echo '</div>';
+    if ($proceed == false && $values['status'] != 'Exempt') {
+        echo Format::alert(__m('You cannot enrol, as you have not fully met the prerequisites for this unit.'), 'warning');
+        return;
     }
-    else {
-        //Check enrolment status
-        $enrolCheckFail = false;
-        try {
-            $dataEnrol = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-            $sqlEnrol = 'SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID';
-            $resultEnrol = $connection2->prepare($sqlEnrol);
-            $resultEnrol->execute($dataEnrol);
-        } catch (PDOException $e) {
-            echo "<div class='error'>".$e->getMessage().'</div>';
-            $enrolCheckFail = true;
-        }
 
-        if ($enrolCheckFail == false) {
-            if ($resultEnrol->rowCount()==0) { //ENROL NOW
-                echo '<h3>';
-                echo __m('Enrol Now');
-                echo '</h3>';
+    // Get enrolment settings
+    $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+    $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+    $enableClassEnrolment = $roleCategory == 'Student'
+        ? getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment')
+        : 'N';
 
-                ?>
-                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolProcess.php?address='.$_GET['q'].'&'.http_build_query($urlParams) ?>">
-                    <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                        <?php
-                        $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
-                        if ($roleCategory != 'Student') {
-                            $enableClassEnrolment = 'N';
-                        }
-                        $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
-                        $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+    // Check enrolment status
+    $unitStudentGateway = $container->get(UnitStudentGateway::class);
+    $rowEnrol = $unitStudentGateway->getUnitStudentDetailsByID($freeLearningUnitID, $gibbonPersonID);
 
-                        $checked1 = '';
-                        $checked2 = '';
-                        $checked3 = '';
-                        if ($enableClassEnrolment == 'Y')
-                            $checked1 = 'checked';
-                        else if ($enableSchoolMentorEnrolment == 'Y')
-                            $checked2 = 'checked';
-                        else if ($enableExternalMentorEnrolment == 'Y')
-                            $checked3 = 'checked';
+    if (empty($rowEnrol)) { 
 
-                        ?>
-                        <script type="text/javascript">
-                            /* Subbmission type control */
-                            $(document).ready(function(){
-                                <?php
-
-                                if ($enableClassEnrolment == 'Y') {
-                                    print '$(".schoolMentor").css("display","none");';
-                                    print 'gibbonPersonIDSchoolMentor.disable();' ;
-                                    print '$(".externalMentor").css("display","none");';
-                                    print 'emailExternalMentor.disable();';
-                                    print 'nameExternalMentor.disable();';
-                                }
-                                else if ($enableSchoolMentorEnrolment == 'Y') {
-                                    print '$(".class").css("display","none");';
-                                    print 'gibbonCourseClassID.disable();';
-                                    print '$(".externalMentor").css("display","none");';
-                                    print 'emailExternalMentor.disable();';
-                                    print 'nameExternalMentor.disable();';
-                                }
-                                else if ($enableExternalMentorEnrolment == 'Y') {
-                                    print '$(".schoolMentor").css("display","none");';
-                                    print 'gibbonPersonIDSchoolMentor.disable();' ;
-                                    print '$(".class").css("display","none");';
-                                    print 'gibbonCourseClassID.disable();';
-                                }
-                                ?>
-                                $(".enrolmentMethod").click(function(){
-                                    if ($('input[name=enrolmentMethod]:checked').val()=="class" ) {
-                                        $(".class").slideDown("fast", $(".class").css("display","table-row"));
-                                        $(".schoolMentor").css("display","none");
-                                        $(".externalMentor").css("display","none");
-                                        gibbonCourseClassID.enable();
-                                        gibbonPersonIDSchoolMentor.disable();
-                                        emailExternalMentor.disable();
-                                        nameExternalMentor.disable();
-                                    } else if ($('input[name=enrolmentMethod]:checked').val()=="schoolMentor" ) {
-                                        $(".class").css("display","none");
-                                        $(".schoolMentor").slideDown("fast", $(".schoolMentor").css("display","table-row"));
-                                        $(".externalMentor").css("display","none");
-                                        gibbonCourseClassID.disable();
-                                        gibbonPersonIDSchoolMentor.enable();
-                                        emailExternalMentor.disable();
-                                        nameExternalMentor.disable();
-                                    } else {
-                                        $(".class").css("display","none");
-                                        $(".schoolMentor").css("display","none");
-                                        $(".externalMentor").slideDown("fast", $(".externalMentor").css("display","table-row"));
-                                        gibbonCourseClassID.disable();
-                                        gibbonPersonIDSchoolMentor.disable();
-                                        emailExternalMentor.enable();
-                                        nameExternalMentor.enable();
-                                    }
-                                    });
-                            });
-                        </script>
-                        <tr>
-                            <td>
-                                <b><?php echo __m('Enrolment Method') ?> * </b><br/>
-                                <span style="font-size: 90%"><i></i></span>
-                            </td>
-                            <td class="right">
-                                <?php
-                                if ($enableClassEnrolment == 'Y') {
-                                    echo __m('Timetable Class').' <input '.$checked1.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="class" /><br/>';
-                                }
-                                if ($enableSchoolMentorEnrolment == 'Y') {
-                                    echo __m('School Mentor').' <input '.$checked2.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="schoolMentor" /><br/>';
-                                }
-                                if ($enableExternalMentorEnrolment == 'Y') {
-                                    echo __m('External Mentor').' <input '.$checked3.' type="radio" name="enrolmentMethod" class="enrolmentMethod" value="externalMentor" /><br/>';
-                                }
-                                ?>
-                            </td>
-                        </tr>
-                        <tr class='class'>
-                            <td>
-                                <b><?php echo __('Class') ?> *</b><br/>
-                                <span style="font-size: 90%"><i><?php echo __m('Which class are you enroling for?') ?></i></span>
-                            </td>
-                            <td class="right">
-                                <?php
-                                $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonDepartmentIDList' => $row['gibbonDepartmentIDList']);
-                                    $sqlClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID
-                                    FROM gibbonCourse
-                                    JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID)
-                                    JOIN gibbonCourseClassPerson ON (gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID )
-                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID
-                                    AND FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList)
-                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
-                                    AND NOT role LIKE '% - Left%'
-                                    ORDER BY course, class";
-                                $resultClasses = $pdo->select($sqlClasses, $dataClasses);
-
-                                $sqlAllClasses = "SELECT gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, gibbonCourseClass.gibbonCourseClassID
-                                    FROM gibbonCourse
-                                    JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID)
-                                    JOIN gibbonCourseClassPerson ON (gibbonCourseClass.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID )
-                                    WHERE gibbonSchoolYearID=:gibbonSchoolYearID
-                                    AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
-                                    AND (:gibbonDepartmentIDList = '' OR :gibbonDepartmentIDList IS NULL OR NOT FIND_IN_SET(gibbonCourse.gibbonDepartmentID, :gibbonDepartmentIDList))
-                                    AND NOT role LIKE '% - Left%'
-                                    ORDER BY course, class";
-                                $resultAllClasses = $pdo->select($sqlAllClasses, $dataClasses);
-                                ?>
-                                <select name="gibbonCourseClassID" id="gibbonCourseClassID" style="width: 302px">
-                                    <option value="Please select..."><?php echo __('Please select...') ?></option>
-                                    <?php if ($resultClasses->rowCount() > 0) { ?>
-                                        <optgroup label="-- <?php echo __('Learning Area'); ?> --">
-                                        <?php
-                                        while ($rowClasses = $resultClasses->fetch()) {
-                                            echo "<option value='".$rowClasses['gibbonCourseClassID']."'>".$rowClasses['course'].'.'.$rowClasses['class'].'</option>';
-                                        }
-                                        ?>
-                                        </optgroup>
-                                    <?php } ?>
-                                    <optgroup label="-- <?php echo __('My Classes'); ?> --">
-                                    <?php
-                                    while ($rowClasses = $resultAllClasses->fetch()) {
-                                        echo "<option value='".$rowClasses['gibbonCourseClassID']."'>".$rowClasses['course'].'.'.$rowClasses['class'].'</option>';
-                                    }
-                                    ?>
-                                    </optgroup>
-                                </select>
-                                <script type="text/javascript">
-                                    var gibbonCourseClassID=new LiveValidation('gibbonCourseClassID');
-                                    gibbonCourseClassID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __('Select something!') ?>"});
-                                    </script>
-                            </td>
-                        </tr>
-                        <tr class='schoolMentor'>
-                            <td>
-                                <b><?php echo __m('School Mentor') ?> *</b><br/>
-                                <span style="font-size: 90%"><i></i></span>
-                            </td>
-                            <td class="right">
-                                <select name="gibbonPersonIDSchoolMentor" id="gibbonPersonIDSchoolMentor" style="width: 302px">
-                                    <option value="Please select..."><?php echo __('Please select...') ?></option>
-                                    <?php
-                                        try {
-                                            $dataSelect = array('freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID']);
-                                            $sqlSelect = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                                FROM gibbonPerson
-                                                    JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
-                                                    JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
-                                                WHERE gibbonPerson.status='Full'
-                                                    AND freeLearningUnitID=:freeLearningUnitID3
-                                                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID2
-                                                )";
-                                            if ($row['schoolMentorCompletors'] == 'Y') {
-                                                $dataSelect['gibbonPersonID1'] = $_SESSION[$guid]['gibbonPersonID'];
-                                                $dataSelect['freeLearningUnitID1'] = $freeLearningUnitID;
-                                                $dataSelect['freeLearningUnitID2'] = $freeLearningUnitID;
-                                                $sqlSelect .= " UNION DISTINCT
-                                                    (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                                        FROM gibbonPerson
-                                                        LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID1)
-                                                        LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID2)
-                                                        WHERE gibbonPerson.status='Full'
-                                                            AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
-                                                            AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
-                                                        GROUP BY gibbonPersonID)";
-                                            }
-                                            if ($row['schoolMentorCustom'] != '') {
-                                                $staffs = explode(",", $row['schoolMentorCustom']);
-                                                $staffCount = 0 ;
-                                                foreach ($staffs AS $staff) {
-                                                    $dataSelect["staff$staffCount"] = $staff;
-                                                    $sqlSelect .= " UNION DISTINCT
-                                                    (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                                        FROM gibbonPerson
-                                                        WHERE gibbonPersonID=:staff$staffCount
-                                                            AND status='Full')";
-                                                    $staffCount ++;
-                                                }
-                                            }
-                                            if ($row['schoolMentorCustomRole'] != '') {
-                                                $dataSelect["gibbonRoleID"] = $row['schoolMentorCustomRole'];
-                                                $sqlSelect .= " UNION DISTINCT
-                                                (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
-                                                    FROM gibbonPerson
-                                                        JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
-                                                    WHERE gibbonRoleID=:gibbonRoleID
-                                                        AND status='Full')";
-                                            }
-                                            $sqlSelect .= " ORDER BY surname, preferredName";
-                                            $resultSelect = $connection2->prepare($sqlSelect);
-                                            $resultSelect->execute($dataSelect);
-                                        } catch (PDOException $e) { echo 'error'.$e->getMessage(); }
-                                        while ($rowSelect = $resultSelect->fetch()) {
-                                            echo "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                                        }
-                                    ?>
-                                </select>
-                                <script type="text/javascript">
-                                    var gibbonPersonIDSchoolMentor=new LiveValidation('gibbonPersonIDSchoolMentor');
-                                    gibbonPersonIDSchoolMentor.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __('Select something!') ?>"});
-                                </script>
-                            </td>
-                        </tr>
-                        <tr class='externalMentor'>
-                            <td>
-                                <b><?php echo __m('External Mentor Name') ?> *</b><br/>
-                                <span style="font-size: 90%"><i></i></span>
-                            </td>
-                            <td class="right">
-                                <input name="nameExternalMentor" id="nameExternalMentor" maxlength=255 value="" type="text" class="standardWidth">
-                                <script type="text/javascript">
-                                    var nameExternalMentor=new LiveValidation('nameExternalMentor');
-                                    nameExternalMentor.add(Validate.Presence);
-                                </script>
-                            </td>
-                        </tr>
-                        <tr class='externalMentor'>
-                            <td>
-                                <b><?php echo __m('External Mentor Email') ?> *</b><br/>
-                                <span style="font-size: 90%"><i></i></span>
-                            </td>
-                            <td class="right">
-                                <input name="emailExternalMentor" id="emailExternalMentor" maxlength=255 value="" type="text" class="standardWidth">
-                                <script type="text/javascript">
-                                    var emailExternalMentor=new LiveValidation('emailExternalMentor');
-                                    emailExternalMentor.add(Validate.Presence);
-                                    emailExternalMentor.add(Validate.Email);
-                                </script>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style='width: 275px'>
-                                <b><?php echo __m('Grouping') ?> *</b><br/>
-                                <span style="font-size: 90%"><i><?php echo __m('How do you want to study this unit?') ?></i></span>
-                            </td>
-                            <td class="right">
-                                <select name="grouping" id="grouping" style="width: 302px">
-                                    <option value="Please select..."><?php echo __('Please select...') ?></option>
-                                    <?php
-                                    $group = false;
-                                    $extraSlots = 0;
-                                    if (strpos($row['grouping'], 'Individual') !== false) {
-                                        echo '<option value="Individual">'.__m('Individual').'</option>';
-                                    }
-                                    if (strpos($row['grouping'], 'Pairs') !== false) {
-                                        echo '<option value="Pairs">'.__m('Pair').'</option>';
-                                        $group = true;
-                                        $extraSlots = 1;
-                                    }
-                                    if (strpos($row['grouping'], 'Threes') !== false) {
-                                        echo '<option value="Threes">'.__m('Three').'</option>';
-                                        $group = true;
-                                        $extraSlots = 2;
-                                    }
-                                    if (strpos($row['grouping'], 'Fours') !== false) {
-                                        echo '<option value="Fours">'.__m('Four').'</option>';
-                                        $group = true;
-                                        $extraSlots = 3;
-                                    }
-                                    if (strpos($row['grouping'], 'Fives') !== false) {
-                                        echo '<option value="Fives">'.__m('Five').'</option>';
-                                        $group = true;
-                                        $extraSlots = 4;
-                                    }
-                                    ?>
-                                </select>
-                                <script type="text/javascript">
-                                    var grouping=new LiveValidation('grouping');
-                                    grouping.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __('Select something!') ?>"});
-                                    </script>
-                            </td>
-                        </tr>
-                        <?php
-                        if ($group) {
-                            //Get array of possible collaborators, dependent on role category
-                            $students = array();
-                            $studentCount = 0;
-                            if ($roleCategory == 'Student') {
-                                $prerequisitesActive = prerequisitesRemoveInactive($connection2, $row['freeLearningUnitIDPrerequisiteList']);
-                                $prerequisiteCount = !empty($prerequisitesActive) ? count(explode(',', $prerequisitesActive)) : 0;
-
-                                try {
-                                    $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonYearGroupIDMinimum' => $row['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $row['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount);
-                                    $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup, prerequisites.count
-                                    FROM gibbonPerson
-                                    JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
-                                    JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
-                                    LEFT JOIN (
-                                        SELECT COUNT(*) as count, freeLearningUnitStudent.gibbonPersonIDStudent
-                                        FROM freeLearningUnitStudent
-                                        JOIN freeLearningUnit ON (freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID)
-                                        WHERE freeLearningUnit.active='Y'
-                                        AND (:prerequisiteList = '' OR FIND_IN_SET(freeLearningUnit.freeLearningUnitID, :prerequisiteList))
-                                        AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt')
-                                        GROUP BY freeLearningUnitStudent.freeLearningUnitStudentID
-                                    ) AS prerequisites ON (prerequisites.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
-                                    WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID
-                                    AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
-                                    AND (:gibbonYearGroupIDMinimum IS NULL OR gibbonStudentEnrolment.gibbonYearGroupID >= :gibbonYearGroupIDMinimum)
-                                    HAVING (:prerequisiteCount = 0 OR prerequisites.count >= :prerequisiteCount)
-                                    ORDER BY surname, preferredName";
-                                    $resultSelect = $connection2->prepare($sqlSelect);
-                                    $resultSelect->execute($dataSelect);
-                                } catch (PDOException $e) {}
-
-                                while ($rowSelect = $resultSelect->fetch()) {
-                                    $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.$rowSelect['rollGroup'].')</option>';
-                                    ++$studentCount;
-                                }
-
-                            } elseif ($roleCategory == 'Staff') {
-                                try {
-                                    $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                    $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
-                                        FROM gibbonPerson
-                                        JOIN gibbonStaff ON (gibbonStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
-                                        WHERE status='Full'
-                                            AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
-                                        ORDER BY surname, preferredName";
-                                    $resultSelect = $connection2->prepare($sqlSelect);
-                                    $resultSelect->execute($dataSelect);
-                                } catch (PDOException $e) { }
-                                while ($rowSelect = $resultSelect->fetch()) {
-                                    $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                                    ++$studentCount;
-                                }
-                            } elseif ($roleCategory == 'Parent') {
-                                try {
-                                    $dataSelect = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
-                                    $sqlSelect = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
-                                        FROM gibbonPerson
-                                        JOIN gibbonRole ON (gibbonRole.gibbonRoleID LIKE concat( '%', gibbonPerson.gibbonRoleIDAll, '%' ) AND category='Parent')
-                                        WHERE status='Full'
-                                            AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
-                                        ORDER BY surname, preferredName";
-                                    $resultSelect = $connection2->prepare($sqlSelect);
-                                    $resultSelect->execute($dataSelect);
-                                } catch (PDOException $e) { }
-                                while ($rowSelect = $resultSelect->fetch()) {
-                                    $students[$studentCount] = "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                                    ++$studentCount;
-                                }
-                            }
-
-                            //Controls for lists
-                            ?>
-                            <script type='text/javascript'>
-                                $(document).ready(function(){
-                                $('tr.collaborator').css('display','none');
-                                <?php
-                                for ($i = 1; $i <= $extraSlots; ++$i) {
-                                    echo 'collaborator'.$i.'.disable();';
-                                }
-                                ?>
-                                $('#grouping').change(function(){
-                                    if ($('#grouping').val()=='Individual') {
-                                        $('#trCollaborator1').css('display','none');
-                                        collaborator1.disable() ;
-                                        $('#trCollaborator2').css('display','none');
-                                        collaborator2.disable() ;
-                                        $('#trCollaborator3').css('display','none');
-                                        collaborator3.disable() ;
-                                        $('#trCollaborator4').css('display','none');
-                                        collaborator4.disable() ;
-                                    }
-                                    else if ($('#grouping').val()=='Pairs') {
-                                        $('#trCollaborator1').css('display','table-row');
-                                        collaborator1.enable() ;
-                                        $('#trCollaborator2').css('display','none');
-                                        collaborator2.disable() ;
-                                        $('#trCollaborator3').css('display','none');
-                                        collaborator3.disable() ;
-                                        $('#trCollaborator4').css('display','none');
-                                        collaborator4.disable() ;
-                                    }
-                                    else if ($('#grouping').val()=='Threes') {
-                                        $('#trCollaborator1').css('display','table-row');
-                                        collaborator1.enable() ;
-                                        $('#trCollaborator2').css('display','table-row');
-                                        collaborator2.enable() ;
-                                        $('#trCollaborator3').css('display','none');
-                                        collaborator3.disable() ;
-                                        $('#trCollaborator4').css('display','none');
-                                        collaborator4.disable() ;
-                                    }
-                                    else if ($('#grouping').val()=='Fours') {
-                                        $('#trCollaborator1').css('display','table-row');
-                                        collaborator1.enable() ;
-                                        $('#trCollaborator2').css('display','table-row');
-                                        collaborator2.enable() ;
-                                        $('#trCollaborator3').css('display','table-row');
-                                        collaborator3.enable() ;
-                                        $('#trCollaborator4').css('display','none');
-                                        collaborator4.disable() ;
-                                    }
-                                    else if ($('#grouping').val()=='Fives') {
-                                        $('#trCollaborator1').css('display','table-row');
-                                        collaborator1.enable() ;
-                                        $('#trCollaborator2').css('display','table-row');
-                                        collaborator2.enable() ;
-                                        $('#trCollaborator3').css('display','table-row');
-                                        collaborator3.enable() ;
-                                        $('#trCollaborator4').css('display','table-row');
-                                        collaborator4.enable() ;
-                                    }
-                                    });
-                                });
-                            </script>
-
-                            <?php
-                            //Output select lists
-                            for ($i = 1; $i <= $extraSlots; ++$i) {
-                                ?>
-                                <tr class='collaborator' id='<?php echo "trCollaborator$i" ?>'>
-                                    <td style='width: 275px'>
-                                        <b><?php echo sprintf(__m('Collaborator %1$s'), $i) ?> *</b><br/>
-                                    </td>
-                                    <td class="right">
-                                        <select name="collaborators[]" id="collaborator<?php echo $i ?>" style="width: 302px">
-                                            <option value="Please select..."><?php echo __('Please select...') ?></option>
-                                            <?php
-                                            foreach ($students as $student) {
-                                                echo $student;
-                                            }
-                                            ?>
-                                        </select>
-                                        <script type="text/javascript">
-                                            var collaborator<?php echo $i ?>=new LiveValidation('collaborator<?php echo $i ?>');
-                                            collaborator<?php echo $i ?>.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __('Select something!') ?>"});
-                                        </script>
-                                    </td>
-                                </tr>
-                                <?php
-                            }
-                        }
-                        ?>
-                        <tr>
-                            <td class="right" colspan=2>
-                                <input type="hidden" name="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>">
-                                <input type="submit" id="submit" value="Enrol Now">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="right" colspan=2>
-                                <span style="font-size: 90%"><i>* <?php echo __('denotes a required field'); ?></i></span>
-                            </td>
-                        </tr>
-                    </table>
-                </form>
-                <?php
-            }
-            if ($resultEnrol->rowCount() == 1) { //Already enroled, deal with different statuses
-                $rowEnrol = $resultEnrol->fetch();
-                if ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Yet Approved') { //Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
-                    echo '<h4>';
-                    echo __m('Currently Enroled');
-                    echo '</h4>';
-                    if ($rowEnrol['status'] == 'Current - Pending') {
-                        echo '<p>';
-                        echo sprintf(__m('You are currently enroled in %1$s, but your chosen mentor has yet to confirm their participation. You cannot submit evidence until they have done so.'), $row['name']);
-                        echo '</p>';
-                    }
-                    else {
-                        $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
-                        if ($collaborativeAssessment == 'Y' AND  !empty($rowEnrol['collaborationKey'])) {
-                            echo "<div class='message'>";
-                            echo __m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.');
-                            echo '</div>';
-                        }
-                        if ($rowEnrol['status'] == 'Current') {
-                            echo '<p>';
-                            echo sprintf(__m('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $row['name']);
-                            echo '</p>';
-                        } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
-                            echo Format::alert(__m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:'), 'warning');
-
-                            $unitStudentGateway = $container->get(UnitStudentGateway::class);
-                            $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+        // ENROL NOW
+        $form = Form::create('enrol', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_enrolProcess.php?'.http_build_query($urlParams));
+        $form->setTitle(__m('Enrol Now'));
+        $form->setFactory(DatabaseFormFactory::create($pdo));
         
-                            echo $page->fetchFromTemplate('ui/discussion.twig.html', [
-                                'title' => __('Comments'),
-                                'discussion' => $logs
-                            ]);
-                        }
+        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
 
-                        ?>
-                        <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_completePendingProcess.php?address='.$_GET['q'].'&'.http_build_query($urlParams) ?>" enctype="multipart/form-data">
-                            <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                                <tr>
-                                    <td>
-                                        <b><?php echo __('Status') ?> *</b><br/>
-                                        <span style="font-size: 90%"><i><?php echo __('This value cannot be changed.') ?></i></span>
-                                    </td>
-                                    <td class="right">
-                                        <input readonly style='width: 300px' type='text' value='Complete - Pending' />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <b><?php echo __m('Comment') ?> *</b><br/>
-                                        <span style="font-size: 90%"><i>
-                                            <?php
-                                            if (!empty($row['studentReflectionText'])) {
-                                                echo $row['studentReflectionText'];
-                                            } else {
-                                                echo __('Leave a brief reflective comment on this unit<br/>and what you learned.', 'Free Learning');
-                                            }
+        $enrolmentMethodSelected = '';
+        $enrolmentMethods = [];
 
-                                            if ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
-                                                echo '<br/><br/>'.__('Your previous comment is shown here, for you to edit.', 'Free Learning');
-                                            }
-                                            ?>
-                                        </i></span>
-                                    </td>
-                                    <td class="right">
-                                        <script type='text/javascript'>
-                                            $(document).ready(function(){
-                                                autosize($('textarea'));
-                                            });
-                                        </script>
-                                        <textarea name="commentStudent" id="commentStudent" rows=8 style="width: 300px"></textarea>
-                                        <script type="text/javascript">
-                                            var commentStudent=new LiveValidation('commentStudent');
-                                            commentStudent.add(Validate.Presence);
-                                        </script>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <b><?php echo __m('Type') ?> *</b><br/>
-                                    </td>
-                                    <td class="right">
-                                        <input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
-                                        <input type="radio" id="type" name="type" class="type" value="File" /> File
-                                    </td>
-                                </tr>
-                                <script type="text/javascript">
-                                    /* Subbmission type control */
-                                    $(document).ready(function(){
-                                        $("#fileRow").css("display","none");
-                                        $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
-                                        link.enable();
-                                        file.disable();
+        if ($enableExternalMentorEnrolment == 'Y') {
+            $enrolmentMethodSelected = 'class';
+            $enrolmentMethods['externalMentor'] = __m('External Mentor');
+        }
+        if ($enableSchoolMentorEnrolment == 'Y') {
+            $enrolmentMethodSelected = 'class';
+            $enrolmentMethods['schoolMentor'] = __m('School Mentor');
+        }
+        if ($enableClassEnrolment == 'Y') {
+            $enrolmentMethodSelected = 'class';
+            $enrolmentMethods['class'] = __m('Timetable Class');
+        }
 
-                                        $(".type").click(function(){
-                                            if ($('input[name=type]:checked').val()=="Link" ) {
-                                                $("#fileRow").css("display","none");
-                                                $("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row"));
-                                                link.enable();
-                                                file.disable();
-                                            } else {
-                                                $("#linkRow").css("display","none");
-                                                $("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row"));
-                                                file.enable();
-                                                link.disable();
-                                            }
-                                         });
-                                    });
-                                </script>
+        $row = $form->addRow();
+            $row->addLabel('enrolmentMethod', __m('Enrolment Method'));
+            $row->addRadio('enrolmentMethod')->fromArray(array_reverse($enrolmentMethods))->required();
 
-                                <tr id="fileRow">
-                                    <td>
-                                        <b><?php echo __m('Submit File') ?> *</b><br/>
-                                    </td>
-                                    <td class="right">
-                                        <input type="file" name="file" id="file"><br/><br/>
-                                        <?php
-                                        echo getMaxUpload($guid);
+        // CLASS ENROLMENT
+        if ($enableClassEnrolment == 'Y') {
+            $form->toggleVisibilityByClass('classEnrolment')->onRadio('enrolmentMethod')->when('class');
 
-                                        //Get list of acceptable file extensions
-                                        try {
-                                            $dataExt = array();
-                                            $sqlExt = 'SELECT * FROM gibbonFileExtension';
-                                            $resultExt = $connection2->prepare($sqlExt);
-                                            $resultExt->execute($dataExt);
-                                        } catch (PDOException $e) {
-                                        }
-                                        $ext = '';
-                                        while ($rowExt = $resultExt->fetch()) {
-                                            $ext = $ext."'.".$rowExt['extension']."',";
-                                        }
-                                        ?>
+            $row = $form->addRow()->addClass('classEnrolment');
+                $row->addLabel('gibbonCourseClassID', __m('Class'))->description(__m('Which class are you enroling for?'));
+                $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, ['allClasses' => false, 'departments' => $values['gibbonDepartmentIDList']])->required();
+        }
 
-                                        <script type="text/javascript">
-                                            var file=new LiveValidation('file');
-                                            file.add( Validate.Inclusion, { within: [<?php echo $ext; ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
-                                        </script>
-                                    </td>
-                                </tr>
-                                <tr id="linkRow">
-                                    <td>
-                                        <b><?php echo __m('Submit Link') ?> *</b><br/>
-                                    </td>
-                                    <td class="right">
-                                        <input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
-                                        <script type="text/javascript">
-                                            var link=new LiveValidation('link');
-                                            link.add( Validate.Inclusion, { within: ['http://', 'https://'], failureMessage: "Address must start with http:// or https://", partialMatch: true } );
-                                        </script>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right" colspan=2>
-                                        <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
-                                        <input type="hidden" name="freeLearningUnitStudentID" value="<?php echo $rowEnrol['freeLearningUnitStudentID'] ?>">
-                                        <input type="hidden" name="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>">
-                                        <input type="submit" id="submit" value="Submit">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right" colspan=2>
-                                        <span style="font-size: 90%"><i>* <?php echo __('denotes a required field'); ?></i></span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </form>
-                        <?php
-                    }
-                } elseif ($rowEnrol['status'] == 'Complete - Pending') { //Waiting for teacher feedback
-                    echo '<h4>';
-                    echo __m('Complete - Pending Approval');
-                    echo '</h4>';
-                    echo '<p>';
-                    echo __m('Your evidence, shown below, has been submitted to your teacher/mentor for approval. This screen will show a teacher comment, once approval has been given.');
-                    echo '</p>';
-                    ?>
-                    <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                        <tr>
-                            <td>
-                                <b><?php echo __('Status') ?></b><br/>
-                            </td>
-                            <td class="right">
-                                <input readonly style='width: 300px' type='text' value='Complete - Pending' />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b><?php echo __m('Evidence Type') ?></b><br/>
-                            </td>
-                            <td class="right">
-                                <input readonly style='width: 300px' type='text' value='<?php echo $rowEnrol['evidenceType'] ?>' />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b><?php echo __m('Evidence') ?></b><br/>
-                            </td>
-                            <td class="right">
-                                <div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
-                                    <?php
-                                    if ($rowEnrol['evidenceType'] == 'Link') {
-                                        echo "<a target='_blank' href='".$rowEnrol['evidenceLocation']."'>".__('View').'</>';
-                                    } else {
-                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowEnrol['evidenceLocation']."'>".__('View').'</>';
-                                    }
-                                    ?>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                    <?php
+        // SCHOOL MENTOR
+        if ($enableSchoolMentorEnrolment == 'Y') {
+            $form->toggleVisibilityByClass('schoolMentorEnrolment')->onRadio('enrolmentMethod')->when('schoolMentor');
 
-                    $unitStudentGateway = $container->get(UnitStudentGateway::class);
-                    $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+            $mentors = $unitStudentGateway->selectUnitMentors($freeLearningUnitID, $gibbonPersonID)->fetchAll();
+            $mentors = Format::nameListArray($mentors, 'Staff', true, true);
 
-                    echo $page->fetchFromTemplate('ui/discussion.twig.html', [
-                        'title' => __('Comments'),
-                        'discussion' => $logs
-                    ]);
+            $row = $form->addRow()->addClass('schoolMentorEnrolment');
+                $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'));
+                $row->addSelectPerson('gibbonPersonIDSchoolMentor')->fromArray($mentors)->required()->placeholder();
+        }
 
-                } elseif ($rowEnrol['status'] == 'Complete - Approved') { //Complete, show status and feedback from teacher.
-                    echo '<h4>';
-                    echo __m('Complete - Approved');
-                    echo '</h4>';
-                    echo '<p>';
-                    echo __m('Congralutations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.');
-                    echo '</p>';
-                    ?>
-                    <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                        <tr>
-                            <td>
-                                <b><?php echo __('Status') ?></b><br/>
-                            </td>
-                            <td class="right">
-                                <input readonly style='width: 300px' type='text' value='Complete - Approved' />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b><?php echo __m('Evidence Type') ?></b><br/>
-                            </td>
-                            <td class="right">
-                                <input readonly style='width: 300px' type='text' value='<?php echo $rowEnrol['evidenceType'] ?>' />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b><?php echo __m('Evidence') ?></b><br/>
-                            </td>
-                            <td class="right">
-                                <div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
-                                    <?php
-                                    if ($rowEnrol['evidenceType'] == 'Link') {
-                                        echo "<a target='_blank' href='".$rowEnrol['evidenceLocation']."'>".__('View').'</>';
-                                    } else {
-                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowEnrol['evidenceLocation']."'>".__('View').'</>';
-                                    }
-                                    ?>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b><?php echo __m('Certificate of Completion') ?></b><br/>
-                            </td>
-                            <td class="right">
-                                <div style='width: 300px; float: right; text-align: left; font-size: 115%; height: 24px; padding-top: 5px'>
-                                    <?php
-                                    echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_browse_details_enrol_certificate.php?freeLearningUnitID=$freeLearningUnitID'>".__m('Print Certificate')."</a>";
-                                    ?>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                    <?php
-                    
-                    $unitStudentGateway = $container->get(UnitStudentGateway::class);
-                    $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+        // EXTERNAL MENTOR
+        if ($enableExternalMentorEnrolment == 'Y') {
+            $form->toggleVisibilityByClass('externalMentorEnrolment')->onRadio('enrolmentMethod')->when('externalMentor');
 
-                    echo $page->fetchFromTemplate('ui/discussion.twig.html', [
-                        'title' => __('Comments'),
-                        'discussion' => $logs
-                    ]);
-                    
-                } elseif ($rowEnrol['status'] == 'Exempt') { //Exempt, let student know
-                    echo '<h4>';
-                    echo __m('Exempt');
-                    echo '</h4>';
-                    echo '<p>';
-                    echo __m('You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.');
-                    echo '</p>';
-                }
+            $row = $form->addRow()->addClass('externalMentorEnrolment');
+                $row->addLabel('nameExternalMentor', __m('External Mentor Name'));
+                $row->addTextField('nameExternalMentor')->required();
+
+            $row = $form->addRow()->addClass('externalMentorEnrolment');
+                $row->addLabel('emailExternalMentor', __m('External Mentor Email'));
+                $row->addEmail('emailExternalMentor')->required();
+        }
+
+        // GROUPING 
+        $groupings = [];
+        $extraSlots = 0;
+        if (strpos($values['grouping'], 'Individual') !== false) {
+            $groupings['Individual'] = __m('Individual');
+        }
+        if (strpos($values['grouping'], 'Pairs') !== false) {
+            $form->toggleVisibilityByClass('group1')->onSelect('grouping')->when(['Pairs','Threes','Fours','Fives']);
+            $groupings['Pairs'] = __m('Pair');
+            $extraSlots = 1;
+        }
+        if (strpos($values['grouping'], 'Threes') !== false) {
+            $form->toggleVisibilityByClass('group2')->onSelect('grouping')->when(['Threes','Fours','Fives']);
+            $groupings['Threes'] = __m('Three');
+            $extraSlots = 2;
+        }
+        if (strpos($values['grouping'], 'Fours') !== false) {
+            $form->toggleVisibilityByClass('group3')->onSelect('grouping')->when(['Fours','Fives']);
+            $groupings['Fours'] = __m('Four');
+            $extraSlots = 3;
+        }
+        if (strpos($values['grouping'], 'Fives') !== false) {
+            $form->toggleVisibilityByClass('group4')->onSelect('grouping')->when(['Fives']);
+            $groupings['Fives'] = __m('Five');
+            $extraSlots = 4;
+        }
+
+        $row = $form->addRow();
+            $row->addLabel('grouping', __m('Grouping'))->description(__m('How do you want to study this unit?'));
+            $row->addSelect('grouping')->fromArray($groupings)->required()->placeholder();
+        
+        // COLLABORATORS
+        if ($extraSlots > 0) {
+            $prerequisitesActive = prerequisitesRemoveInactive($connection2, $roleCategory == 'Student' ? $values['freeLearningUnitIDPrerequisiteList'] : '');
+            $prerequisiteCount = !empty($prerequisitesActive) ? count(explode(',', $prerequisitesActive)) : 0;
+
+            $collaborators = $unitStudentGateway->selectUnitCollaborators($gibbonSchoolYearID, $gibbonPersonID, $roleCategory, $prerequisiteCount, $values)->fetchAll();
+            $collaborators = Format::nameListArray($collaborators, 'Student', true);
+
+            for ($i = 1; $i <= $extraSlots; ++$i) {
+                $row = $form->addRow()->addClass('group'.$i);
+                    $row->addLabel('collaborators', __m('Collaborator {number}', ['number' => $i]));
+                    $row->addSelect('collaborators[]')
+                        ->setID('collaborator'.$i)
+                        ->fromArray($collaborators)
+                        ->required()
+                        ->placeholder();
             }
         }
+
+        $row = $form->addRow();
+            $row->addFooter();
+            $row->addSubmit(__m('Enrol Now'));
+
+        echo $form->getOutput();
+
+    } elseif ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Yet Approved') { 
+        // Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
+
+        $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+        $form->setClass('blank');
+        $form->setTitle(__m('Currently Enroled'));
+
+        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+        $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
+
+        if ($rowEnrol['status'] == 'Current - Pending') {
+            $form->setDescription(sprintf(__m('You are currently enroled in %1$s, but your chosen mentor has yet to confirm their participation. You cannot submit evidence until they have done so.'), $values['name']));
+        } else {
+            $description = '';
+
+            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+            if ($collaborativeAssessment == 'Y' AND  !empty($rowEnrol['collaborationKey'])) {
+                $description .= Format::alert(__m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.'), 'message');
+            }
+
+            if ($rowEnrol['status'] == 'Current') {
+                $description .= '<p>'.sprintf(__m('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $values['name']).'</p>';
+            } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
+                $description .= Format::alert(__m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:'), 'warning');
+    
+                
+            }
+            $form->setDescription($description);
+
+            // DISCUSSION
+            $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+            $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+                'title' => __('Comments'),
+                'discussion' => $logs
+            ]));
+
+            // ADD COMMENT
+            $commentBox = $form->getFactory()->createColumn()->addClass('flex flex-col');
+            $commentBox->addTextArea('addComment')
+                ->placeholder(__m('Leave a comment'))
+                ->setClass('flex w-full')
+                ->setRows(3);
+            $commentBox->addButton(__m('Add Comment'))
+                ->onClick('document.getElementById("enrolComment").submit()')
+                ->setClass('button rounded-sm right');
+
+            $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+                'discussion' => [[
+                    'surname' => $gibbon->session->get('surname'),
+                    'preferredName' => $gibbon->session->get('preferredName'),
+                    'image_240' => $gibbon->session->get('image_240'),
+                    'comment' => $commentBox->getOutput(),
+                ]]
+            ]));
+            
+            echo $form->getOutput();
+    
+            // SUBMIT EVIDENCE
+            $form = Form::create('enrol', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_completePendingProcess.php?'.http_build_query($urlParams));
+
+            $form->addHiddenValue('address', $gibbon->session->get('address'));
+            $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+            $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
+
+            $form->addRow()->addHeading(__('Submit your Evidence'));
+
+            $row = $form->addRow();
+                $row->addLabel('status', __('Status'));
+                $row->addTextField('status')->readonly()->setValue(__m('Complete - Pending'));
+
+            $row = $form->addRow();
+                $row->addLabel('commentStudent', __('Comment'))->description(!empty($values['studentReflectionText']) ? $values['studentReflectionText'] : __m('Leave a brief reflective comment on this unit<br/>and what you learned.'));
+                $row->addTextArea('commentStudent')->setRows(4);
+
+            $types = ['Link' => __('Link'), 'File' => __('File')];
+            $row = $form->addRow();
+                $row->addLabel('type', __('Type'));
+                $row->addRadio('type')->fromArray($types)->inline()->required()->checked('Link');
+    
+            // File
+            $fileUploader = $container->get(FileUploader::class);
+            $form->toggleVisibilityByClass('evidenceFile')->onRadio('type')->when('File');
+            $row = $form->addRow()->addClass('evidenceFile');
+                $row->addLabel('file', __('Submit File'));
+                $row->addFileUpload('file')->accepts($fileUploader->getFileExtensions())->required();
+
+            // Link
+            $form->toggleVisibilityByClass('evidenceLink')->onRadio('type')->when('Link');
+            $row = $form->addRow()->addClass('evidenceLink');
+                $row->addLabel('link', __('Submit Link'));
+                $row->addURL('link')->maxLength(255)->required();
+
+            $row = $form->addRow();
+                $row->addFooter();
+                $row->addSubmit();
+        }
+
+        echo $form->getOutput();
+
+    } elseif ($rowEnrol['status'] == 'Complete - Pending') { 
+        // Waiting for teacher feedback
+
+        $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+        $form->setClass('blank');
+        $form->setTitle(__m('Complete - Pending Approval'));
+        $form->setDescription(__m('Your evidence, shown below, has been submitted to your teacher/mentor for approval. This screen will show a teacher comment, once approval has been given.'));
+
+        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+        $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
+
+        $evidenceLink = $rowEnrol['evidenceType'] == 'Link' ? $rowEnrol['evidenceLocation'] : './'.$rowEnrol['evidenceLocation'];
+
+        // DISCUSSION
+        $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+        $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+            'title' => __('Comments'),
+            'discussion' => $logs
+        ]));
+
+        // ADD COMMENT
+        $commentBox = $form->getFactory()->createColumn();
+        $commentBox->addTextArea('addComment')
+            ->placeholder(__m('Leave a comment'))
+            ->setClass('flex w-full')
+            ->setRows(3);
+        $commentBox->addButton(__m('Add Comment'))
+            ->onClick('document.getElementById("enrolComment").submit()')
+            ->setClass('button rounded-sm right');
+
+        $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+            'discussion' => [[
+                'surname' => $gibbon->session->get('surname'),
+                'preferredName' => $gibbon->session->get('preferredName'),
+                'image_240' => $gibbon->session->get('image_240'),
+                'comment' => $commentBox->getOutput(),
+            ]]
+        ]));
+
+        echo $form->getOutput();
+
+        // EVIDENCE DETAILS
+        $form = Form::create('enrol', '');
+        $row = $form->addRow();
+            $row->addLabel('statusLabel', __('Status'));
+            $row->addTextField('status')->readonly()->setValue($values['status']);
+
+        $row = $form->addRow();
+            $row->addLabel('evidenceTypeLabel', __m('Evidence Type'));
+            $row->addTextField('evidenceType')->readonly()->setValue($rowEnrol['evidenceType']);
+
+        $row = $form->addRow();
+            $row->addLabel('evidence', __m('Evidence'));
+            $row->addContent(Format::link($evidenceLink, __m('View'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
+
+        echo $form->getOutput();
+
+    } elseif ($rowEnrol['status'] == 'Complete - Approved') { 
+        // Complete, show status and feedback from teacher.
+
+        $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+        $logContent .= $page->fetchFromTemplate('ui/discussion.twig.html', [
+            'title' => __('Comments'),
+            'discussion' => $logs
+        ]);
+
+        $form = Form::create('enrol', '');
+        $form->setTitle(__m('Complete - Approved'));
+        
+        $form->setDescription(__m('Congratulations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') . $logContent );
+
+        $evidenceLink = $rowEnrol['evidenceType'] == 'Link' ? $rowEnrol['evidenceLocation']: './'.$rowEnrol['evidenceLocation'];
+        $certificateLink = './modules/Free Learning/units_browse_details_enrol_certificate.php?freeLearningUnitID='.$freeLearningUnitID;
+
+        $row = $form->addRow();
+            $row->addLabel('statusLabel', __('Status'));
+            $row->addTextField('status')->readonly()->setValue($values['status']);
+
+        $row = $form->addRow();
+            $row->addLabel('evidenceTypeLabel', __m('Evidence Type'));
+            $row->addTextField('evidenceType')->readonly()->setValue($rowEnrol['evidenceType']);
+
+        $row = $form->addRow();
+            $row->addLabel('evidence', __m('Evidence'));
+            $row->addContent(Format::link($evidenceLink, __m('View'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
+
+        $row = $form->addRow();
+            $row->addLabel('certificate', __m('Certificate of Completion'));
+            $row->addContent(Format::link($certificateLink, __m('Print Certificate'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
+
+        echo $form->getOutput();
+        
+        
+        
+    } elseif ($rowEnrol['status'] == 'Exempt') { 
+        // Exempt, let student know
+
+        $form = Form::create('enrol', '');
+        $form->addClass('blank');
+        $form->setTitle(__m('Exempt'));
+        $form->setDescription(__m('You are exempt from completing this unit, which means you get the status of completion, without needing to submit any evidence.'));
+
+        echo $form->getOutput();
     }
+
 }
-?>
