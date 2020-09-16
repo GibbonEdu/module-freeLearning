@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Forms\Form;
-use Gibbon\Module\FreeLearning\Domain\UnitGateway;
-use Gibbon\Forms\DatabaseFormFactory;
-use Gibbon\Tables\DataTable;
-use Gibbon\Services\Format;
-use Gibbon\Tables\View\GridView;
 use Gibbon\View\View;
+use Gibbon\Forms\Form;
+use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
+use Gibbon\Tables\View\GridView;
+use Gibbon\Domain\Students\StudentGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -69,7 +70,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
         $viewingAsUser = false;
 
-        if ($canManage && !empty($_GET['gibbonPersonID']) && $_GET['gibbonPersonID'] != $gibbonPersonID) {
+        // Allow viewing other users based on permissions/role
+        if (($canManage || $roleCategory == 'Parent') && !empty($_GET['gibbonPersonID']) && $_GET['gibbonPersonID'] != $gibbonPersonID) {
             $gibbonPersonID = $_GET['gibbonPersonID'];
             $viewingAsUser = true;
         }
@@ -117,6 +119,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $row->addTextField('name')->setValue($criteria->getSearchText());
 
         if ($canManage) {
+            // Allow admins to view the map for any user
             $row = $form->addRow();
                 $row->addLabel('showInactive', __m('Show Inactive Units?'));
                 $row->addYesNo('showInactive')->selected($showInactive);
@@ -124,6 +127,23 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __m('View As'));
                 $row->addSelectUsers('gibbonPersonID', $_SESSION[$guid]['gibbonSchoolYearID'], ['includeStudents' => true])->selected($gibbonPersonID);
+        } elseif ($roleCategory == 'Parent') {
+            // Allow parents to view the map for their children
+            $children = $container->get(StudentGateway::class)->selectActiveStudentsByFamilyAdult($_SESSION[$guid]['gibbonSchoolYearID'], $_SESSION[$guid]['gibbonPersonID'])->fetchAll();
+            $children = array_reduce($children, function ($group, $item) {
+                $group[$item['gibbonPersonID']] = Format::name($item['title'], $item['preferredName'], $item['surname'], 'Student', false, true);
+                return $group;
+            }, []);
+
+            if (empty($children[$gibbonPersonID])) {
+                $gibbonPersonID = null;
+            }
+
+            $row = $form->addRow();
+                $row->addLabel('gibbonPersonID', __m('View As'));
+                $row->addSelectPerson('gibbonPersonID', $_SESSION[$guid]['gibbonSchoolYearID'], ['includeStudents' => true])
+                    ->fromArray($children)
+                    ->selected($gibbonPersonID);
         }
 
         $row = $form->addRow();

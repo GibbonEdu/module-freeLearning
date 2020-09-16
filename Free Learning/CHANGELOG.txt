@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.9.31
+-------
+Enabled parents viewing their children's units on the map view
+
 v5.9.30
 -------
 Added an edit icon to the Work Pending Approval page
