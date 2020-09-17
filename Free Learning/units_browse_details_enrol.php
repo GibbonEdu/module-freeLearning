@@ -226,7 +226,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 ->setClass('flex w-full')
                 ->setRows(3);
             $commentBox->addButton(__m('Add Comment'))
-                ->onClick('document.getElementById("enrolComment").submit()')
+                ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
                 ->setClass('button rounded-sm right');
 
             $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
@@ -310,7 +310,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             ->setClass('flex w-full')
             ->setRows(3);
         $commentBox->addButton(__m('Add Comment'))
-            ->onClick('document.getElementById("enrolComment").submit()')
+            ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
             ->setClass('button rounded-sm right');
 
         $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
