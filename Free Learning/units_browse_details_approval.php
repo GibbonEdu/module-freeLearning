@@ -203,13 +203,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $row = $form->addRow();
         $row->addLabel('status', __('Status'));
-        $row->addSelect('status')->fromArray($statuses)->required()->placeholder();
+        $row->addSelect('status')->fromArray($statuses)->required()->placeholder()->selected($values['status']);
 
     $form->toggleVisibilityByClass('exemplar')->onSelect('status')->when('Complete - Approved');
 
     $row = $form->addRow()->addClass('exemplar');
         $row->addLabel('exemplarWork', __m('Exemplar Work'))->description(__m('Work and comments will be made viewable to other users.'));
-        $row->addYesNo('exemplarWork')->required()->selected('N');
+        $row->addYesNo('exemplarWork')->required()->selected($values['exemplarWork'] ?? 'N');
 
     $form->toggleVisibilityByClass('exemplarYes')->onSelect('exemplarWork')->when('Y');
 
@@ -221,11 +221,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $row = $form->addRow()->addClass('exemplarYes');
         $row->addLabel('exemplarWorkLicense', __m('Exemplar Work Thumbnail Image Credit'))->description(__m('Credit and license for image used above.'));
-        $row->addTextField('exemplarWorkLicense')->maxLength(255);
+        $row->addTextField('exemplarWorkLicense')->maxLength(255)->setValue($values['exemplarWorkLicense']);
 
     $row = $form->addRow()->addClass('exemplarYes');
         $row->addLabel('exemplarWorkEmbed', __m('Exemplar Work Embed'))->description(__m('Include embed code, otherwise link to work will be used.'));
-        $row->addTextField('exemplarWorkLicense')->maxLength(255);
+        $row->addTextField('exemplarWorkEmbed')->maxLength(255)->setValue($values['exemplarWorkEmbed']);
 
     $row = $form->addRow();
         $row->addFooter();
