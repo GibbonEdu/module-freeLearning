@@ -344,7 +344,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         // Complete, show status and feedback from teacher.
 
         $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
-        $logContent .= $page->fetchFromTemplate('ui/discussion.twig.html', [
+        $logContent = $page->fetchFromTemplate('ui/discussion.twig.html', [
             'title' => __('Comments'),
             'discussion' => $logs
         ]);

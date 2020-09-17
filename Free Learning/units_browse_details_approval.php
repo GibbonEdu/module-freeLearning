@@ -60,6 +60,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         'view'                      => $_GET['view'] ?? '',
         'sidebar'                   => 'true',
         'gibbonPersonID'            => $gibbonPersonID,
+        'tab'                       => 2,
     ];
 
     $page->breadcrumbs
@@ -69,6 +70,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $unitGateway = $container->get(UnitGateway::class);
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
+    if (isset($_GET['return'])) {
+        returnProcess($guid, $_GET['return'], null, null);
+    }
 
     // Check that the required values are present
     if (empty($freeLearningUnitID) || empty($freeLearningUnitStudentID)) {
@@ -149,6 +154,47 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $alert = Format::alert(__m('Collaborative Assessment is enabled: you will be giving feedback to all members of this group in one go.'), 'message');
     }
 
+    // COMMENT FORM
+    $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+    $form->setClass('blank');
+
+    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+    $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
+
+    // DISCUSSION
+    $logs = $unitStudentGateway->selectUnitStudentDiscussion($freeLearningUnitStudentID)->fetchAll();
+    $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+        'title' => __('Comments'),
+        'discussion' => $logs
+    ]));
+
+    // ADD COMMENT
+    $commentBox = $form->getFactory()->createColumn()->addClass('flex flex-col');
+    $commentBox->addTextArea('addComment')
+        ->placeholder(__m('Leave a comment'))
+        ->setClass('flex w-full')
+        ->setRows(3);
+    $commentBox->addButton(__m('Add Comment'))
+        ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
+        ->setClass('button rounded-sm right');
+
+    $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+        'discussion' => [[
+            'surname' => $gibbon->session->get('surname'),
+            'preferredName' => $gibbon->session->get('preferredName'),
+            'image_240' => $gibbon->session->get('image_240'),
+            'comment' => $commentBox->getOutput(),
+        ]]
+    ]));
+    
+    echo $form->getOutput();
+
+    // Not ready for approval
+    if ($values['status'] == 'Current' || $values['status'] == 'Evidence Not Yet Approved') {
+        return;
+    }
+
     // FORM
     $form = Form::create('approval', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_approvalProcess.php?'.http_build_query($urlParams));
     $form->setTitle(__m('Unit Complete Approval'));
@@ -181,15 +227,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $row = $form->addRow();
         $row->addLabel('submission', __m('Submission'));
         $row->addContent(Format::link($submissionLink, __m('View Submission'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
-    
-    $unitStudentGateway = $container->get(UnitStudentGateway::class);
-    $logs = $unitStudentGateway->selectUnitStudentDiscussion($freeLearningUnitStudentID)->fetchAll();
-        
-    $col = $form->addRow()->addColumn();
-    $col->addLabel('comments', __m('Comments'));
-    $col->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
-        'discussion' => $logs
-    ]));
 
     $row = $form->addRow();
         $col = $row->addColumn();

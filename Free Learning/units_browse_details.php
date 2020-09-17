@@ -515,7 +515,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                     }
 
                                     if ($enrolmentType == 'staffEdit' || $editEnrolment) {
-                                        if ($editEnrolment && ($student['status'] == 'Complete - Pending' or $student['status'] == 'Complete - Approved' or $student['status'] == 'Evidence Not Yet Approved')) {
+                                        if ($editEnrolment && ($student['status'] == 'Current' || $student['status'] == 'Complete - Pending' or $student['status'] == 'Complete - Approved' or $student['status'] == 'Evidence Not Yet Approved')) {
                                             $actions->addAction('edit', __('Edit'))
                                                 ->setURL('/modules/Free Learning/units_browse_details_approval.php');
                                         }
