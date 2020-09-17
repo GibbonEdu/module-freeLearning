@@ -120,10 +120,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             // Attempt to notify school mentor
             $event->addRecipient($teacher['gibbonPersonIDSchoolMentor']);
 
-        } elseif ($values['enrolmentMethod'] == 'externalMentor' && !empty($values['emailExternalMentor'])) { 
-            // Attempt to notify external mentors
-
-            // TODO
+        } elseif ($values['enrolmentMethod'] == 'externalMentor') { 
+            // Not available through the Mentor interface
         }
     }
 

@@ -220,23 +220,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             ]));
 
             // ADD COMMENT
-            $commentBox = $form->getFactory()->createColumn()->addClass('flex flex-col');
-            $commentBox->addTextArea('addComment')
-                ->placeholder(__m('Leave a comment'))
-                ->setClass('flex w-full')
-                ->setRows(3);
-            $commentBox->addButton(__m('Add Comment'))
-                ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
-                ->setClass('button rounded-sm right');
+            if ($rowEnrol['enrolmentMethod'] != 'externalMentor') {
+                $commentBox = $form->getFactory()->createColumn()->addClass('flex flex-col');
+                $commentBox->addTextArea('addComment')
+                    ->placeholder(__m('Leave a comment'))
+                    ->setClass('flex w-full')
+                    ->setRows(3);
+                $commentBox->addButton(__m('Add Comment'))
+                    ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
+                    ->setClass('button rounded-sm right');
 
-            $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
-                'discussion' => [[
-                    'surname' => $gibbon->session->get('surname'),
-                    'preferredName' => $gibbon->session->get('preferredName'),
-                    'image_240' => $gibbon->session->get('image_240'),
-                    'comment' => $commentBox->getOutput(),
-                ]]
-            ]));
+                $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+                    'discussion' => [[
+                        'surname' => $gibbon->session->get('surname'),
+                        'preferredName' => $gibbon->session->get('preferredName'),
+                        'image_240' => $gibbon->session->get('image_240'),
+                        'comment' => $commentBox->getOutput(),
+                    ]]
+                ]));
+            }
             
             echo $form->getOutput();
     
@@ -304,23 +306,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         ]));
 
         // ADD COMMENT
-        $commentBox = $form->getFactory()->createColumn();
-        $commentBox->addTextArea('addComment')
-            ->placeholder(__m('Leave a comment'))
-            ->setClass('flex w-full')
-            ->setRows(3);
-        $commentBox->addButton(__m('Add Comment'))
-            ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
-            ->setClass('button rounded-sm right');
+        if ($rowEnrol['enrolmentMethod'] != 'externalMentor') {
+            $commentBox = $form->getFactory()->createColumn();
+            $commentBox->addTextArea('addComment')
+                ->placeholder(__m('Leave a comment'))
+                ->setClass('flex w-full')
+                ->setRows(3);
+            $commentBox->addButton(__m('Add Comment'))
+                ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
+                ->setClass('button rounded-sm right');
 
-        $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
-            'discussion' => [[
-                'surname' => $gibbon->session->get('surname'),
-                'preferredName' => $gibbon->session->get('preferredName'),
-                'image_240' => $gibbon->session->get('image_240'),
-                'comment' => $commentBox->getOutput(),
-            ]]
-        ]));
+            $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+                'discussion' => [[
+                    'surname' => $gibbon->session->get('surname'),
+                    'preferredName' => $gibbon->session->get('preferredName'),
+                    'image_240' => $gibbon->session->get('image_240'),
+                    'comment' => $commentBox->getOutput(),
+                ]]
+            ]));
+        }
 
         echo $form->getOutput();
 
