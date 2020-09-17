@@ -1,4 +1,7 @@
 <?php
+
+use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 /*
 Gibbon, Flexible & Open School System
 Copyright (C) 2010, Ross Parker
@@ -64,62 +67,77 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
         $name = $row['unit'];
 
         //Get Inputs
-        $status = $_POST['status'];
-        $commentApproval = $_POST['commentApproval'];
-        $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'];
+        $status = $_POST['status'] ?? '';
+        $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'] ?? '';
+        $commentApproval = $_POST['commentApproval'] ?? '';
+        $commentApproval = trim(preg_replace('/^<p>|<\/p>$/i', '', $commentApproval));
 
         //Validation
         if ($commentApproval == '') {
             //Fail 3
             $URL .= '&return=error3';
             header("Location: {$URL}");
+        } elseif ($status != 'Complete - Approved' && $status != 'Evidence Not Yet Approved') {
+            $URL .= '&return=error3';
+            header("Location: {$URL}");
         } else {
-            if ($status == 'Complete - Approved') { //APPROVED!
-                //Write to database
-                try {
-                    $data = array('status' => $status, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => null, 'timestampCompleteApproved' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
-                    $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    //Fail 2
-                    $URL .= '&return=error2';
-                    header("Location: {$URL}");
-                    exit;
-                }
+            // Post Discussion
+            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+            $discussionGateway = $container->get(DiscussionGateway::class);
+            $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                
+            $data = [
+                'foreignTable'   => 'freeLearningUnitStudent',
+                'foreignTableID' => $freeLearningUnitStudentID,
+                'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'), 
+                'gibbonPersonID' => $gibbonPersonID,
+                'comment'        => $commentApproval,
+                'type'           => $status,
+                'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
+            ];
 
+            if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
+                $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
+                foreach ($collaborators as $collaborator) {
+                    $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+                    $discussionGateway->insert($data);
+                }
+            } else {
+                $discussionGateway->insert($data);
+            }
+
+            // Write to database
+            $unitStudentGateway = $container->get(UnitStudentGateway::class); 
+                        
+            $data = [
+                'status' => $status,
+                'commentApproval' => $commentApproval,
+                'gibbonPersonIDApproval' => null,
+                'timestampCompleteApproved' => date('Y-m-d H:i:s')
+            ];
+
+            if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
+                $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
+            } else {
+                $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
+            }
+
+            if ($status == 'Complete - Approved') { //APPROVED!
                 //Attempt to notify the student and grant awards
                 $text = sprintf(__($guid, 'Your mentor has approved your request for unit completion (%1$s).', 'Free Learning'), $name);
                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                 grantBadges($connection2, $guid, $gibbonPersonIDStudent);
 
-
                 $URL .= '&return=success0';
                 header("Location: {$URL}");
             } elseif ($status == 'Evidence Not Yet Approved') { //NOT YET APPROVED
-                //Write to database
-                try {
-                    $data = array('status' => $status, 'commentApproval' => $commentApproval, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCompleteApproved' => date('Y-m-d H:i:s'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
-                    $sql = 'UPDATE freeLearningUnitStudent SET status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
-                    $result = $connection2->prepare($sql);
-                    $result->execute($data);
-                } catch (PDOException $e) {
-                    //Fail 2
-                    $URL .= '&return=error2';
-                    header("Location: {$URL}");
-                    exit;
-                }
-
                 //Attempt to notify the student
                 $text = sprintf(__($guid, 'Your mentor has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1&view=$view";
                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
 
                 $URL .= '&return=success1';
-                header("Location: {$URL}");
-            } else {
-                $URL .= '&return=error3';
                 header("Location: {$URL}");
             }
         }

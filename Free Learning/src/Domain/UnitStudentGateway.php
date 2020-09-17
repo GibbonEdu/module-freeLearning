@@ -159,18 +159,28 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runSelect($query)->fetch();
     }
 
-    public function selectUnitStudentDiscussion($freeLearningUnitStudentID)
+    public function selectUnitStudentDiscussion($freeLearningUnitStudentID, $includeMentor = false)
     {
         $query = $this
             ->newSelect()
-            ->cols(['gibbonDiscussion.*', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240', 'gibbonPerson.username', 'gibbonPerson.email'])
+            ->cols(['gibbonDiscussion.comment', 'gibbonDiscussion.type', 'gibbonDiscussion.tag', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240', 'gibbonPerson.username', 'gibbonPerson.email', 'gibbonDiscussion.timestamp'])
             ->from('gibbonDiscussion')
             ->innerJoin('gibbonPerson', 'gibbonDiscussion.gibbonPersonID=gibbonPerson.gibbonPersonID')
             ->where('gibbonDiscussion.foreignTable = :foreignTable')
             ->bindValue('foreignTable', 'freeLearningUnitStudent')
             ->where('gibbonDiscussion.foreignTableID = :foreignTableID')
-            ->bindValue('foreignTableID', $freeLearningUnitStudentID)
-            ->orderBy(['gibbonDiscussion.timestamp']);
+            ->bindValue('foreignTableID', $freeLearningUnitStudentID);
+
+        $query->union()
+            ->cols(['freeLearningUnitStudent.commentApproval as comment', 'freeLearningUnitStudent.status as type', "(CASE WHEN freeLearningUnitStudent.status = 'Complete - Pending' THEN 'pending' WHEN freeLearningUnitStudent.status = 'Evidence Not Yet Approved' THEN 'warning' WHEN freeLearningUnitStudent.status = 'Complete - Approved' THEN 'success' ELSE 'dull' END) as tag", "'' as title", 'nameExternalMentor as surname', "'' as preferredName", '"" as image_240', '"" as email', '"" as username', 'timestampCompleteApproved as timestamp'])
+            ->from('freeLearningUnitStudent')
+            ->where('freeLearningUnitStudent.freeLearningUnitStudentID = :freeLearningUnitStudentID')
+            ->bindValue('freeLearningUnitStudentID', $freeLearningUnitStudentID)
+            ->where("freeLearningUnitStudent.enrolmentMethod = 'externalMentor'")
+            ->where('gibbonPersonIDApproval IS NULL')
+            ->where('commentApproval IS NOT NULL')
+
+        ->orderBy(['timestamp']);
 
         $result = $this->runSelect($query);
 

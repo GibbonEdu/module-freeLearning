@@ -555,9 +555,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $blocks = $pdo->select($sqlBlocks, $dataBlocks)->fetchAll();
 
                     if (empty($blocks)) {
-                        echo "<div class='error'>";
-                        echo __('There are no records to display.');
-                        echo '</div>';
+                        echo Format::alert(__('There are no records to display.'));
                     } else {
                         $templateView = $container->get(View::class);
                         $resourceContents = '';
@@ -565,7 +563,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $blockCount = 0;
                         foreach ($blocks as $block) {
                             echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
-                                'roleCategory' => $roleCategory, 'gibbonPersonID' => $_SESSION[$guid]['username'] ?? '', 'blockCount' => $blockCount
+                                'roleCategory' => $roleCategory,
+                                'gibbonPersonID' => $_SESSION[$guid]['username'] ?? '',
+                                'blockCount' => $blockCount
                             ]);
                             $resourceContents .= $block['contents'];
                             $blockCount++;
