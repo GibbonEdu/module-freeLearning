@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\View\View;
 use Gibbon\Contracts\Comms\Mailer;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
@@ -25,7 +26,7 @@ require_once '../../gibbon.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
-$highestAction = getHighestGroupedAction($guid, $_GET['address'], $connection2);
+$highestAction = getHighestGroupedAction($guid, $_POST['address'], $connection2);
 
 //Get params
 $freeLearningUnitID = '';
@@ -66,7 +67,7 @@ if ($canManage) {
     }
 }
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     //Fail 0
@@ -120,8 +121,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $row = $result->fetch();
                     $name = $row['name'];
                     $confirmationKey = $row['confirmationKey'];
-                    $student[0] = formatName('', $row['preferredName'], $row['surname'], 'Student', true);
-                    $student[1] = $row['email'];
+                    $studentName = formatName('', $row['preferredName'], $row['surname'], 'Student', true);
+                    $studentEmail = $row['email'];
                     $enrolmentMethod = $row['enrolmentMethod'];
                     $gibbonPersonIDSchoolMentor = $row['gibbonPersonIDSchoolMentor'];
                     $emailExternalMentor = $row['emailExternalMentor'];
@@ -250,58 +251,41 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             }
                             else if ($enrolmentMethod == 'schoolMentor' && $gibbonPersonIDSchoolMentor != '') { //Attempt to notify school mentor
                                 $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
-                                $actionLink = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey";
+                                $actionLink = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey";
                                 setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $text, 'Free Learning', $actionLink);
                             }
-                            elseif ($enrolmentMethod == 'externalMentor' && $emailExternalMentor != '') { //Attempt to notify external mentors
-                                $mailFile = '../../lib/PHPMailer/PHPMailerAutoload.php';
-                                if (is_file($mailFile)) {
-                                    include $mailFile;
-                                }
+                            elseif ($enrolmentMethod == 'externalMentor' && $emailExternalMentor != '') { 
+                                // Attempt to notify external mentors
+                                
+                                $subject = sprintf(__m('Request For Mentor Feedback via %1$s at %2$s'), $gibbon->session->get('systemName'), $gibbon->session->get('organisationNameShort'));
+                                $buttonURL = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey";
 
-                                //Attempt email send
-                                $subject = sprintf(__($guid, 'Request For Mentor Feedback via %1$s at %2$s', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationNameShort']);
-                                $body = __($guid, 'To whom it may concern,', 'Free Learning').'<br/><br/>';
-                                if ($roleCategory == 'Staff') {
-                                    $roleCategoryFull = 'member of staff';
-                                }
-                                else {
-                                    $roleCategoryFull = strtolower($roleCategory);
-                                }
-                                $roleCategoryFull = __($guid, $roleCategoryFull) ;
+                                $body = $container->get(View::class)->fetchFromTemplate('mentorSubmit.twig.html', [
+                                    'roleCategoryFull' => $roleCategory == 'Staff' ? __m('member of staff') : __(strtolower($roleCategory)),
+                                    'unitName' => $name,
+                                    'studentName' => $studentName,
+                                    'organisationNameShort' => $gibbon->session->get('organisationNameShort'),
+                                    'organisationAdministratorName' => $gibbon->session->get('organisationAdministratorName'),
+                                    'organisationAdministratorEmail' => $gibbon->session->get('organisationAdministratorEmail'),
+                                ]);
 
-                                $body .= sprintf(__($guid, 'The following %1$s at %2$s has requested your feedback on their %3$sFree Learning%4$s work (%5$s), which they have just submitted, and on which you previously agreed to mentor them.', 'Free Learning'), $roleCategoryFull, $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>', '<b>'.$name.'</b>');
-                                $body .= '<br/>';
-                                $body .= '<ul>';
-                                $body .= '<li>'.$student[0].'</li>';
-                                $body .= '</ul>';
-                                $body .= sprintf(__($guid, 'Please %1$sclick here%2$s to view and give feedback on the submitted work.', 'Free Learning'), "<a style='font-weight: bold; text-decoration: underline; color: #390' target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey'>", '</a>');
-                                $body .= '<br/><br/>';
-                                $body .= sprintf(__($guid, 'Thank you very much for your time. Should you have any questions about this matter, please reply to this email, or contact %1$s on %2$s.', 'Free Learning'), $_SESSION[$guid]['organisationAdministratorName'], $_SESSION[$guid]['organisationAdministratorEmail']);
-                                $body .= '<br/><br/>';
-                                $body .= sprintf(__($guid, 'Email sent via %1$s at %2$s.', 'Free Learning'), $_SESSION[$guid]['systemName'], $_SESSION[$guid]['organisationName']);
-                                $body .= '</p>';
-                                $bodyPlain = emailBodyConvert($body);
-
+                                // Attempt email send
                                 $mail = $container->get(Mailer::class);
-                                $mail->IsSMTP();
-                                $mail->SetFrom($_SESSION[$guid]['organisationEmail'], $_SESSION[$guid]['organisationName']);
-                                $mail->AddReplyTo($student[1], $student[0]);
-                                $mail->AddAddress($emailExternalMentor);
-                                $mail->CharSet = 'UTF-8';
-                                $mail->Encoding = 'base64';
-                                $mail->IsHTML(true);
-                                $mail->Subject = $subject;
-                                $mail->Body = $body;
-                                $mail->AltBody = $bodyPlain;
+                                $mail->AddReplyTo($studentEmail, $studentName);
+                                $mail->AddAddress($emailExternalMentor, $nameExternalMentor);
+                                $mail->setDefaultSender($subject);
+                                $mail->renderBody('mail/message.twig.html', [
+                                    'title'  => __m('Request For Mentor Feedback'),
+                                    'body'   => $body,
+                                    'button' => [
+                                        'url'  => $buttonURL,
+                                        'text' => __('View Evidence'),
+                                    ],
+                                ]);
 
-                                try {
-                                    $mail->Send();
-                                } catch (phpmailerException $e) {
-                                    print "there"; exit();
-                                }
-                            }
-                            else {
+                                $sent = $mail->Send();
+                                $partialFail &= !$sent;
+                            } else {
                                 $partialFail = true;
                             }
 

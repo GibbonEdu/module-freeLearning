@@ -1,4 +1,9 @@
 <?php
+
+use Gibbon\View\View;
+use Gibbon\Forms\Form;
+use Gibbon\Services\Format;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 /*
 Gibbon, Flexible & Open School System
 Copyright (C) 2010, Ross Parker
@@ -25,27 +30,21 @@ $page->breadcrumbs
 
 $block = false;
 if (isset($_GET['return'])) {
-    returnProcess($guid, $_GET['return'], null, array('success0' => __($guid, 'Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your positive feedback.', 'Free Learning'), 'success1' => __($guid, 'Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your feedback and will resubmit their work in due course, at which point your input will be requested once again: in the meanwhile, no further action is required on your part.', 'Free Learning')));
+    returnProcess($guid, $_GET['return'], null, array('success0' => __m('Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your positive feedback.'), 'success1' => __m('Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your feedback and will resubmit their work in due course, at which point your input will be requested once again: in the meanwhile, no further action is required on your part.')));
     if ($_GET['return'] == 'success0' or $_GET['return'] == 'success1') {
         $block = true;
     }
 }
 
 if (!$block) {
-    //Get params
-    $freeLearningUnitStudentID = null;
-    if (isset($_GET['freeLearningUnitStudentID'])) {
-        $freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'];
-    }
-    $confirmationKey = null;
-    if (isset($_GET['confirmationKey'])) {
-        $confirmationKey = $_GET['confirmationKey'];
-    }
+    // Get params
+    $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
+    $freeLearningUnitStudentID =  $_GET['freeLearningUnitStudentID'] ?? '';
+    $confirmationKey = $_GET['confirmationKey'] ?? '';
 
     if ($freeLearningUnitStudentID == '' or $confirmationKey == '') {
-        echo "<div class='error'>";
-        echo __($guid, 'You have not specified one or more required parameters.');
-        echo '</div>';
+        echo Format::alert(__('You have not specified one or more required parameters.'));
     } else {
         //Check student & confirmation key
         try {
@@ -60,129 +59,108 @@ if (!$block) {
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) {
-            echo "<div class='error'>";
-            echo __($guid, 'Your request failed due to a database error.');
-            echo '</div>';
+            echo Format::alert(__('Your request failed due to a database error.'));
         }
 
         if ($result->rowCount()!=1) {
-            echo "<div class='error'>";
-            echo __($guid, 'The specified record cannot be found.');
-            echo '</div>';
+            echo Format::alert(__('The specified record cannot be found.'));
         }
         else {
-            $row = $result->fetch() ;
-            $freeLearningUnitID = $row['freeLearningUnitID'];
+            $values = $result->fetch() ;
+            $freeLearningUnitID = $values['freeLearningUnitID'];
 
             echo '<p>';
-                echo __($guid, 'This screen allows you to give feedback on the submitted work. Immediately below you can browse the contents of the unit, which will tell you what has been learned. Following that you can view and feedback on the submitted work.', 'Free Learning');
+                echo __m('This screen allows you to give feedback on the submitted work. Immediately below you can browse the contents of the unit, which will tell you what has been learned. Following that you can view and feedback on the submitted work.');
             echo '</p>';
 
-            //Show unit content
+            // Show unit content
             echo '<h3>';
-                echo __($guid, 'Unit Content', 'Free Learning');
+                echo __m('Unit Content');
             echo '</h3>';
-            try {
-                $dataBlocks = array('freeLearningUnitID' => $row['freeLearningUnitID']);
-                $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
-                $resultBlocks = $connection2->prepare($sqlBlocks);
-                $resultBlocks->execute($dataBlocks);
-            } catch (PDOException $e) {
-                echo "<div class='error'>".$e->getMessage().'</div>';
-            }
 
-            if ($resultBlocks->rowCount() < 1) {
-                echo "<div class='error'>";
-                echo __($guid, 'There are no records to display.');
-                echo '</div>';
+            $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
+            $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
+
+            $blocks = $pdo->select($sqlBlocks, $dataBlocks)->fetchAll();
+
+            if (empty($blocks)) {
+                echo Format::alert(__('There are no records to display.'));
             } else {
-                while ($rowBlocks = $resultBlocks->fetch()) {
-                    echo displayBlockContent($guid, $connection2, $rowBlocks['title'], $rowBlocks['type'], $rowBlocks['length'], $rowBlocks['contents'], $rowBlocks['teachersNotes']);
+                $templateView = $container->get(View::class);
+                $resourceContents = '';
+
+                $blockCount = 0;
+                foreach ($blocks as $block) {
+                    echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
+                        'roleCategory' => 'Staff', 
+                        'gibbonPersonID' => $_SESSION[$guid]['username'] ?? '',
+                        'blockCount' => $blockCount
+                    ]);
+                    $resourceContents .= $block['contents'];
+                    $blockCount++;
                 }
             }
 
-            //Show feedback form
-            echo '<h3>';
-                echo __($guid, 'Feedback Form', 'Free Learning');
-            echo '</h3>';
-            echo '<p>';
-            echo __($guid, 'Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.', 'Free Learning');
-            echo '</p>';
-            ?>
-            <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_mentor_approvalProcess.php' ?>">
-                <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                    <tr>
-                        <td>
-                            <b><?php echo __($guid, 'Student') ?> *</b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'This value cannot be changed.') ?></i></span>
-                        </td>
-                        <td class="right">
-                            <?php echo "<input readonly value='".formatName('', $row['preferredName'], $row['surname'], 'Student', false)."' type='text' style='width: 300px'>";
-                            ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <b><?php echo __($guid, 'Status') ?> *</b><br/>
-                        </td>
-                        <td class="right">
-                            <select style="width: 302px" name="status" id="status">
-                                <option <?php if ($row['status'] == 'Complete - Approved') { echo 'selected'; } ?> value='Complete - Approved'><?php echo __($guid, 'Complete - Approved', 'Free Learning'); ?></option>
-                                <option <?php if ($row['status'] == 'Evidence Not Yet Approved') { echo 'selected'; } ?> value='Evidence Not Yet Approved'><?php echo __($guid, 'Evidence Not Yet Approved', 'Free Learning'); ?></option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <b><?php echo __($guid, 'Submission', 'Free Learning') ?> *</b><br/>
-                        </td>
-                        <td class="right">
-                            <?php
-                            if ($row['evidenceLocation'] != '') {
-                                if ($row['evidenceType'] == 'Link') {
-                                    echo "<a target='_blank' href='".$row['evidenceLocation']."'>".__($guid, 'View Student Work', 'Free Learning').'</a>';
-                                } else {
-                                    echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View Student Work', 'Free Learning').'</a>';
-                                }
-                            }
-                            ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan=2>
-                            <b><?php echo __($guid, 'Student Comment', 'Free Learning') ?> *</b><br/>
-                            <p>
-                                <?php
-                                    echo $row['commentStudent'];
-                                ?>
-                            </p>
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td colspan=2>
-                            <b><?php echo __($guid, 'Mentor Comment', 'Free Learning') ?> *</b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'Leave a comment on the student\'s progress.', 'Free Learning') ?></i></span>
-                            <?php echo getEditor($guid,  true, 'commentApproval', '', 15, false, true) ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="right" colspan=2>
-                            <input type="hidden" name="freeLearningUnitStudentID" value="<?php echo $row['freeLearningUnitStudentID'] ?>">
-                            <input type="hidden" name="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>">
-                            <input type="hidden" name="confirmationKey" value="<?php echo $confirmationKey ?>">
-                            <input type="submit" id="submit" value="Submit">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="right" colspan=2>
-                            <span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-            <?php
+            // FORM
+            $form = Form::create('approval', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_mentor_approvalProcess.php');
+            $form->setTitle(__m('Feedback Form'));
+            $form->setDescription(__m('Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.').'</p>');
+
+            $form->addHiddenValue('address', $gibbon->session->get('address'));
+            $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+            $form->addHiddenValue('freeLearningUnitStudentID', $values['freeLearningUnitStudentID']);
+            $form->addHiddenValue('confirmationKey', $confirmationKey);
+
+            if (!empty($values['collaborationKey'])) {
+                $row = $form->addRow();
+                    $row->addLabel('student', __('Students'));
+                    $col = $row->addColumn()->setClass('flex-col');
+                
+                $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
+                foreach ($collaborators as $index => $collaborator) {
+                    $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false));
+                }
+            } else {
+                $row = $form->addRow();
+                    $row->addLabel('student', __('Student'));
+                    $row->addTextField('student')->readonly()->setValue(Format::name('', $values['preferredName'], $values['surname'], 'Student', false));
+            }
+
+            $submissionLink = $values['evidenceType'] == 'Link'
+                ? $values['evidenceLocation']
+                : $gibbon->session->get('absoluteURL').'/'.$values['evidenceLocation'];
+
+            $row = $form->addRow();
+                $row->addLabel('submission', __m('Submission'));
+                $row->addContent(Format::link($submissionLink, __m('View Submission'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
+
+            // DISCUSSION
+            $logs = $unitStudentGateway->selectUnitStudentDiscussion($values['freeLearningUnitStudentID'])->fetchAll();
+            $col = $form->addRow()->addColumn();
+            $col->addLabel('comments', __m('Comments'));
+            $col->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+                'discussion' => $logs
+            ]));
+
+            $col = $form->addRow()->addColumn();
+                $col->addLabel('commentApproval', __m('Mentor Comment'))->description(__m('Leave a comment on the student\'s progress.'));
+                $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required();
+                
+            $statuses = [
+                'Complete - Approved' => __m('Complete - Approved'),
+                'Evidence Not Yet Approved' => __m('Evidence Not Yet Approved'),
+            ];
+
+            $row = $form->addRow();
+                $row->addLabel('status', __('Status'));
+                $row->addSelect('status')->fromArray($statuses)->required()->placeholder()->selected($values['status']);
+
+            $row = $form->addRow();
+                $row->addFooter();
+                $row->addSubmit();
+
+            echo $form->getOutput();
         }
     }
 }
-?>
