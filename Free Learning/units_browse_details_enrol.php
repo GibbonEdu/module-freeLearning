@@ -162,7 +162,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $prerequisitesActive = prerequisitesRemoveInactive($connection2, $roleCategory == 'Student' ? $values['freeLearningUnitIDPrerequisiteList'] : '');
             $prerequisiteCount = !empty($prerequisitesActive) ? count(explode(',', $prerequisitesActive)) : 0;
 
-            $collaborators = $unitStudentGateway->selectUnitCollaborators($gibbonSchoolYearID, $gibbonPersonID, $roleCategory, $prerequisiteCount, $values)->fetchAll();
+            $collaborators = $unitStudentGateway->selectPotentialCollaborators($gibbonSchoolYearID, $gibbonPersonID, $roleCategory, $prerequisiteCount, $values)->fetchAll();
             $collaborators = Format::nameListArray($collaborators, 'Student', true);
 
             for ($i = 1; $i <= $extraSlots; ++$i) {

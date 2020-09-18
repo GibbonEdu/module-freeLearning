@@ -268,11 +268,11 @@ class UnitStudentGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
-    public function selectUnitCollaborators($gibbonSchoolYearID, $gibbonPersonID, $roleCategory, $prerequisiteCount, $params = [])
+    public function selectPotentialCollaborators($gibbonSchoolYearID, $gibbonPersonID, $roleCategory, $prerequisiteCount, $params = [])
     {
         if ($roleCategory == 'Student') {
-            $data = ['gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbonPersonID, 'gibbonYearGroupIDMinimum' => $params['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $params['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount];
-            $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup, prerequisites.count
+            $data = ['gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbonPersonID, 'gibbonYearGroupIDMinimum' => $params['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $params['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount, 'freeLearningUnitID' => $params['freeLearningUnitID']];
+            $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup, prerequisites.count, currentUnit.completed
             FROM gibbonPerson
             JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
             JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
@@ -285,10 +285,16 @@ class UnitStudentGateway extends QueryableGateway
                 AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt')
                 GROUP BY freeLearningUnitStudent.freeLearningUnitStudentID
             ) AS prerequisites ON (prerequisites.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
+            LEFT JOIN (
+                SELECT freeLearningUnitStudentID as completed, freeLearningUnitStudent.gibbonPersonIDStudent 
+                FROM freeLearningUnitStudent
+                WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
+                AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt') 
+            ) as currentUnit ON (currentUnit.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
             WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID
             AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
             AND (:gibbonYearGroupIDMinimum IS NULL OR gibbonStudentEnrolment.gibbonYearGroupID >= :gibbonYearGroupIDMinimum)
-            HAVING (:prerequisiteCount = 0 OR prerequisites.count >= :prerequisiteCount)
+            HAVING (:prerequisiteCount = 0 OR prerequisites.count >= :prerequisiteCount) AND (currentUnit.completed IS NULL)
             ORDER BY surname, preferredName";
         } else if ($roleCategory == 'Staff') {
             $data = ['gibbonPersonID' => $gibbonPersonID];
