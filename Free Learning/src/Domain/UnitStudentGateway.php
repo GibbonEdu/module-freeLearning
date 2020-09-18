@@ -159,7 +159,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runSelect($query)->fetch();
     }
 
-    public function selectUnitStudentDiscussion($freeLearningUnitStudentID, $includeMentor = false)
+    public function selectUnitStudentDiscussion($freeLearningUnitStudentID)
     {
         $query = $this
             ->newSelect()
