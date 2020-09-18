@@ -1108,9 +1108,9 @@ $sql[$count][1] = "";
 $sql[$count][0] = '5.9.30';
 $sql[$count][1] = "";
 
-//v5.9.31
+//v5.10.00
 ++$count;
-$sql[$count][0] = '5.9.31';
+$sql[$count][0] = '5.10.00';
 $sql[$count][1] = "
 INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Evidence Submitted', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');end
 INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Unit Comment', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');end

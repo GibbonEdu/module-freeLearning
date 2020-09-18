@@ -1,8 +1,12 @@
 CHANGELOG
 =========
-v5.9.31
+v5.10.00
 -------
+Added the ability for students and mentors to comment on units
 Enabled parents viewing their children's units on the map view
+Fixed collaborative submissions for external mentorship
+Updated external mentorship emails to use an email template
+Ooified the Enrol tab and Mentorship forms
 
 v5.9.30
 -------
