@@ -200,7 +200,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
             if ($collaborativeAssessment == 'Y' AND  !empty($rowEnrol['collaborationKey'])) {
-                $description .= Format::alert(__m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.'), 'message');
+                $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($rowEnrol['collaborationKey'])->fetchAll();
+                $collaborators = Format::nameListArray($collaborators, 'Student');
+
+                $description .= Format::alert(__m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.') .'<br/><br/>'. __m('Your Group').': '. implode(', ', $collaborators), 'message');
             }
 
             if ($rowEnrol['status'] == 'Current') {

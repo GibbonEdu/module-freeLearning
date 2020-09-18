@@ -63,12 +63,12 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
         exit();
     }
     else {
-        $row = $result->fetch() ;
-        $name = $row['unit'];
+        $values = $result->fetch() ;
+        $name = $values['unit'];
 
         //Get Inputs
         $status = $_POST['status'] ?? '';
-        $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'] ?? '';
+        $gibbonPersonIDStudent = $values['gibbonPersonIDStudent'] ?? '';
         $commentApproval = $_POST['commentApproval'] ?? '';
         $commentApproval = trim(preg_replace('/^<p>|<\/p>$/i', '', $commentApproval));
 
@@ -85,6 +85,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
             $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
             $discussionGateway = $container->get(DiscussionGateway::class);
             $unitStudentGateway = $container->get(UnitStudentGateway::class);
+            
                 
             $data = [
                 'foreignTable'   => 'freeLearningUnitStudent',
@@ -96,13 +97,14 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
             ];
 
-            if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
-                $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
+            if ($collaborativeAssessment == 'Y' AND !empty($values['collaborationKey'])) {
+                $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $values['collaborationKey']])->fetchAll();
                 foreach ($collaborators as $collaborator) {
                     $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
                     $discussionGateway->insert($data);
                 }
             } else {
+                $collaborators = [$values];
                 $discussionGateway->insert($data);
             }
 
@@ -116,26 +118,30 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 'timestampCompleteApproved' => date('Y-m-d H:i:s')
             ];
 
-            if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
-                $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
+            if ($collaborativeAssessment == 'Y' AND !empty($values['collaborationKey'])) {
+                $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $values['collaborationKey']], $data);
             } else {
                 $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
             }
 
             if ($status == 'Complete - Approved') { //APPROVED!
-                //Attempt to notify the student and grant awards
-                $text = sprintf(__($guid, 'Your mentor has approved your request for unit completion (%1$s).', 'Free Learning'), $name);
-                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
-                setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
-                grantBadges($connection2, $guid, $gibbonPersonIDStudent);
+                // Attempt to notify the student(s) and grant awards
+                foreach ($collaborators as $collaborator) {
+                    $text = sprintf(__($guid, 'Your mentor has approved your request for unit completion (%1$s).', 'Free Learning'), $name);
+                    $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
+                    setNotification($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
+                    grantBadges($connection2, $guid, $collaborator['gibbonPersonIDStudent']);
+                }
 
                 $URL .= '&return=success0';
                 header("Location: {$URL}");
             } elseif ($status == 'Evidence Not Yet Approved') { //NOT YET APPROVED
-                //Attempt to notify the student
-                $text = sprintf(__($guid, 'Your mentor has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
-                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1&view=$view";
-                setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
+                // Attempt to notify the student(s)
+                foreach ($collaborators as $collaborator) {
+                    $text = sprintf(__($guid, 'Your mentor has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
+                    $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1&view=$view";
+                    setNotification($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
+                }
 
                 $URL .= '&return=success1';
                 header("Location: {$URL}");
