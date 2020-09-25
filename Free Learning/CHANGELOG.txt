@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.10.01
+-------
+Added Free Learning classes to the top of the class enrolment list
+Fixed PHP notices
+
 v5.10.00
 -------
 Added the ability for students and mentors to comment on units

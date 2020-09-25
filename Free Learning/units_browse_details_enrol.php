@@ -98,7 +98,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $row = $form->addRow()->addClass('classEnrolment');
                 $row->addLabel('gibbonCourseClassID', __m('Class'))->description(__m('Which class are you enroling for?'));
-                $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, ['allClasses' => false, 'departments' => $values['gibbonDepartmentIDList']])->required();
+                $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, [
+                    'allClasses' => false, 
+                    'courseFilter' => 'Free Learning',
+                    'departments' => $values['gibbonDepartmentIDList'],
+                ])->required();
         }
 
         // SCHOOL MENTOR

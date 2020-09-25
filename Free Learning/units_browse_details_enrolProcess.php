@@ -216,10 +216,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         $nameExternalMentor = $_POST['nameExternalMentor'];
                     }
                     $grouping = $_POST['grouping'];
-                    $collaborators = null;
-                    if (isset($_POST['collaborators'])) {
-                        $collaborators = $_POST['collaborators'];
-                    }
+                    $collaborators = $_POST['collaborators'] ?? [];
+                    
 
                     $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
                     if ($roleCategory != 'Student') {
