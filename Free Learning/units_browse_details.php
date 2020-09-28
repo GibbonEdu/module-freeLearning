@@ -67,7 +67,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ? ($_GET['gibbonPersonID'] ?? $_SESSION[$guid]['gibbonPersonID'] ?? null)
             : $_SESSION[$guid]['gibbonPersonID'] ?? null;
 
-        $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
+        $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID', 'freeLearningUnitID');
 
         //Breadcrumbs
         if ($roleCategory == null) {
@@ -81,7 +81,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
 
         if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null, null);
+            returnProcess($guid, $_GET['return'], null, [
+                'error6' => __('An error occured with your submission, most likely because a submitted file was too large.'),
+            ]);
         }
 
         if ($freeLearningUnitID == '') {

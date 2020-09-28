@@ -1121,3 +1121,8 @@ INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `typ
 ++$count;
 $sql[$count][0] = '5.10.01';
 $sql[$count][1] = "";
+
+//v5.10.02
+++$count;
+$sql[$count][0] = '5.10.02';
+$sql[$count][1] = "";

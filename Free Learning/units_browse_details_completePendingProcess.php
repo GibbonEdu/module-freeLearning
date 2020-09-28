@@ -26,63 +26,42 @@ require_once '../../gibbon.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
-$highestAction = getHighestGroupedAction($guid, $_POST['address'], $connection2);
+$highestAction = getHighestGroupedAction($guid, $_SESSION[$guid]['address'], $connection2);
 
 //Get params
-$freeLearningUnitID = '';
-if (isset($_GET['freeLearningUnitID'])) {
-    $freeLearningUnitID = $_GET['freeLearningUnitID'];
-}
-$canManage = false;
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
-    $canManage = true;
-}
-$showInactive = 'N';
-if ($canManage and isset($_GET['showInactive'])) {
-    $showInactive = $_GET['showInactive'];
-}
-$gibbonDepartmentID = '';
-if (isset($_GET['gibbonDepartmentID'])) {
-    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-}
-$difficulty = '';
-if (isset($_GET['difficulty'])) {
-    $difficulty = $_GET['difficulty'];
-}
-$name = '';
-if (isset($_GET['name'])) {
-    $name = $_GET['name'];
-}
-$view = '';
-if (isset($_GET['view'])) {
-    $view = $_GET['view'];
-}
+$freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
+
+$canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all';
+
+$showInactive = $canManage and isset($_GET['showInactive']) ? $_GET['showInactive'] : $showInactive;
+$gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+$difficulty = $_GET['difficulty'] ?? '';
+$name = $_GET['name'] ?? '';
+$view = $_GET['view'] ?? '';
+
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
-if ($canManage) {
-    if (isset($_GET['gibbonPersonID'])) {
-        $gibbonPersonID = $_GET['gibbonPersonID'];
-    }
-}
+$gibbonPersonID = $canManage && isset($_GET['gibbonPersonID'])
+    ? $_GET['gibbonPersonID']
+    : $_SESSION[$guid]['gibbonPersonID'];
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
-    //Fail 0
+    // Fail 0
     $URL .= '&return=error0';
     header("Location: {$URL}");
 } else {
-    if ($highestAction == false) {
-        //Fail 0
-        $URL .= '&return=error0';
+    if (empty($_POST)) {
+        // Fail 6
+        $URL .= '&return=error6';
         header("Location: {$URL}");
     } else {
         $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
-        if (empty($_POST)) {
-            //Fail 6
-            $URL .= '&return=error6';
+        if ($highestAction == false || empty($roleCategory)) {
+            // Fail 0
+            $URL .= '&return=error0';
             header("Location: {$URL}");
         } else {
             $freeLearningUnitID = $_POST['freeLearningUnitID'];

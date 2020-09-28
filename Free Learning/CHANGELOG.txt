@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.02
+-------
+Fixed submission error when the file is too large, added better error message
+
 v5.10.01
 -------
 Added Free Learning classes to the top of the class enrolment list
