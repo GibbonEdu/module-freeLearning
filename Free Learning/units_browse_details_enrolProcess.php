@@ -266,7 +266,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         //If there are collaborators, generate a unique collaboration key
                         $collaborationKey = null;
                         $unique = false;
-                        if (is_array($collaborators)) {
+                        if (is_array($collaborators) && !empty($collaborators)) {
                             $spinCount = 0;
                             while ($spinCount < 100 and $unique != true) {
                                 $collaborationKey = randomPassword(20);
