@@ -26,42 +26,19 @@ $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
 
 //Get params
-$freeLearningUnitID = '';
-if (isset($_GET['freeLearningUnitID'])) {
-    $freeLearningUnitID = $_GET['freeLearningUnitID'];
-}
-$canManage = false;
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
-    $canManage = true;
-}
-$showInactive = 'N';
-if ($canManage and isset($_GET['showInactive'])) {
-    $showInactive = $_GET['showInactive'];
-}
-$gibbonDepartmentID = '';
-if (isset($_GET['gibbonDepartmentID'])) {
-    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-}
-$difficulty = '';
-if (isset($_GET['difficulty'])) {
-    $difficulty = $_GET['difficulty'];
-}
-$name = '';
-if (isset($_GET['name'])) {
-    $name = $_GET['name'];
-}
-$view = '';
-if (isset($_GET['view'])) {
-    $view = $_GET['view'];
-}
+$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
+$canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all';
+$showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
+$gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+$difficulty = $_GET['difficulty'] ?? '';
+$name = $_GET['name'] ?? '';
+$view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
 $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
-if ($canManage) {
-    if (isset($_GET['gibbonPersonID'])) {
-        $gibbonPersonID = $_GET['gibbonPersonID'];
-    }
+if ($canManage and isset($_GET['gibbonPersonID'])) {
+    $gibbonPersonID = $_GET['gibbonPersonID'];
 }
 
 

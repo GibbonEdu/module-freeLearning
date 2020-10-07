@@ -62,40 +62,27 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $availableStaff = $_POST['availableStaff'];
             $availableParents = $_POST['availableParents'];
             $availableOther = $_POST['availableOther'];
-            $sharedPublic = null;
-            if (isset($_POST['sharedPublic'])) {
-                $sharedPublic = $_POST['sharedPublic'];
-            }
+            $sharedPublic = $_POST['sharedPublic'] ?? null;
             $active = $_POST['active'];
             $gibbonYearGroupIDMinimum = null;
             if ($_POST['gibbonYearGroupIDMinimum'] != '') {
                 $gibbonYearGroupIDMinimum = $_POST['gibbonYearGroupIDMinimum'];
             }
             $grouping = '';
-            if (isset($_POST['Individual'])) {
-                if ($_POST['Individual'] == 'on') {
-                    $grouping .= 'Individual,';
-                }
+            if (isset($_POST['Individual']) and $_POST['Individual'] == 'on') {
+                $grouping .= 'Individual,';
             }
-            if (isset($_POST['Pairs'])) {
-                if ($_POST['Pairs'] == 'on') {
-                    $grouping .= 'Pairs,';
-                }
+            if (isset($_POST['Pairs']) and $_POST['Pairs'] == 'on') {
+                $grouping .= 'Pairs,';
             }
-            if (isset($_POST['Threes'])) {
-                if ($_POST['Threes'] == 'on') {
-                    $grouping .= 'Threes,';
-                }
+            if (isset($_POST['Threes']) and $_POST['Threes'] == 'on') {
+                $grouping .= 'Threes,';
             }
-            if (isset($_POST['Fours'])) {
-                if ($_POST['Fours'] == 'on') {
-                    $grouping .= 'Fours,';
-                }
+            if (isset($_POST['Fours']) and $_POST['Fours'] == 'on') {
+                $grouping .= 'Fours,';
             }
-            if (isset($_POST['Fives'])) {
-                if ($_POST['Fives'] == 'on') {
-                    $grouping .= 'Fives,';
-                }
+            if (isset($_POST['Fives']) and $_POST['Fives'] == 'on') {
+                $grouping .= 'Fives,';
             }
             if (substr($grouping, -1) == ',') {
                 $grouping = substr($grouping, 0, -1);
@@ -109,10 +96,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $freeLearningUnitIDPrerequisiteList = substr($freeLearningUnitIDPrerequisiteList, 0, -1);
             }
             $outline = $_POST['outline'];
-            $schoolMentorCompletors = null ;
-            if (isset($_POST['schoolMentorCompletors'])) {
-                $schoolMentorCompletors = $_POST['schoolMentorCompletors'];
-            }
+            $schoolMentorCompletors = $_POST['schoolMentorCompletors'] ?? null;
             $schoolMentorCustom = null ;
             if (isset($_POST['schoolMentorCustom']) && is_array($_POST['schoolMentorCustom'])) {
                 $schoolMentorCustom = implode(",", $_POST['schoolMentorCustom']);
@@ -132,7 +116,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
                     $fileUploader->getFileExtensions('Graphics/Design');
                     
-                    $file = (isset($_FILES['file']))? $_FILES['file'] : null;
+                    $file = $_FILES['file'] ?? null;
 
                     // Upload the file, return the /uploads relative path
                     $attachment = $fileUploader->uploadFromPost($file, $name);
@@ -169,10 +153,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $blockCount = ($_POST['blockCount'] - 1);
                 $sequenceNumber = 0;
                 if ($blockCount > 0) {
-                    $order = array();
-                    if (isset($_POST['order'])) {
-                        $order = $_POST['order'];
-                    }
+                    $order = $_POST['order'] ?? array();
                     foreach ($order as $i) {
                         $title = '';
                         if ($_POST["title$i"] != "Block $i") {

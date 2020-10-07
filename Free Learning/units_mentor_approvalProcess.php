@@ -25,18 +25,9 @@ require_once '../../gibbon.php';
 require_once  './moduleFunctions.php';
 
 //Get parameters
-$freeLearningUnitStudentID = null;
-if (isset($_POST['freeLearningUnitStudentID'])) {
-    $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'];
-}
-$freeLearningUnitID = null;
-if (isset($_POST['freeLearningUnitID'])) {
-    $freeLearningUnitID = $_POST['freeLearningUnitID'];
-}
-$confirmationKey = null;
-if (isset($_POST['confirmationKey'])) {
-    $confirmationKey = $_POST['confirmationKey'];
-}
+$freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? null;
+$freeLearningUnitID = $_POST['freeLearningUnitID'] ?? null;
+$confirmationKey = $_POST['confirmationKey'] ?? null;
 
 //Set return URL
 $URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_mentor_approval.php&sidebar=true&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey';

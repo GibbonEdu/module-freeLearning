@@ -33,10 +33,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
          ->add(__m('Free Learning Showcase'));
 
     //Set pagination variable
-    $page = 1;
-    if (isset($_GET['page'])) {
-        $page = $_GET['page'];
-    }
+    $page = $_GET['page'] ?? 1;
     if ((!is_numeric($page)) or $page < 1) {
         $page = 1;
     }

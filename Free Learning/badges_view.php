@@ -34,10 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
         echo '</div>';
     } else {
         //Set pagination variable
-        $page = null;
-        if (isset($_GET['page'])) {
-            $page = $_GET['page'];
-        }
+        $page = $_GET['page'] ?? null;
         if ((!is_numeric($page)) or $page < 1) {
             $page = 1;
         }

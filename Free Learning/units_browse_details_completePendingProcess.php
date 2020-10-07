@@ -150,7 +150,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 if (!empty($_FILES['file']['tmp_name'])) {
                                     $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
 
-                                    $file = (isset($_FILES['file']))? $_FILES['file'] : null;
+                                    $file = $_FILES['file'] ?? null;
 
                                     // Upload the file, return the /uploads relative path
                                     $location = $fileUploader->uploadFromPost($file, $_SESSION[$guid]['username']);

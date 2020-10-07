@@ -33,53 +33,24 @@ if (isset($_SESSION[$guid]['gibbonPersonID'])) {
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
         $canManage = true;
     }
-    if ($canManage) {
-        if (isset($_GET['gibbonPersonID'])) {
-            $gibbonPersonID = $_GET['gibbonPersonID'];
-        }
+    if ($canManage and isset($_GET['gibbonPersonID'])) {
+        $gibbonPersonID = $_GET['gibbonPersonID'];
     }
 }
 
 //Get params
-$freeLearningUnitID = '';
-if (isset($_GET['freeLearningUnitID'])) {
-    $freeLearningUnitID = $_GET['freeLearningUnitID'];
-}
-$showInactive = 'N';
-if ($canManage and isset($_GET['showInactive'])) {
-    $showInactive = $_GET['showInactive'];
-}
-$gibbonDepartmentID = '';
-if (isset($_GET['gibbonDepartmentID'])) {
-    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-}
-$difficulty = '';
-if (isset($_GET['difficulty'])) {
-    $difficulty = $_GET['difficulty'];
-}
-$name = '';
-if (isset($_GET['name'])) {
-    $name = $_GET['name'];
-}
-$view = '';
-if (isset($_GET['view'])) {
-    $view = $_GET['view'];
-}
+$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
+$showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
+$gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+$difficulty = $_GET['difficulty'] ?? '';
+$name = $_GET['name'] ?? '';
+$view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$response = null;
-if (isset($_GET['response'])) {
-    $response = $_GET['response'];
-}
-$freeLearningUnitStudentID = null;
-if (isset($_GET['freeLearningUnitStudentID'])) {
-    $freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'];
-}
-$confirmationKey = null;
-if (isset($_GET['confirmationKey'])) {
-    $confirmationKey = $_GET['confirmationKey'];
-}
+$response = $_GET['response'] ?? null;
+$freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'] ?? null;
+$confirmationKey = $_GET['confirmationKey'] ?? null;
 
 //Check to see if system settings are set from databases
 if (@$_SESSION[$guid]['systemSettingsSet'] == false) {

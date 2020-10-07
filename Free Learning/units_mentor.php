@@ -32,53 +32,23 @@ if (isset($_SESSION[$guid]['gibbonPersonID'])) {
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
         $canManage = true;
     }
-    if ($canManage) {
-        if (isset($_GET['gibbonPersonID'])) {
-            $gibbonPersonID = $_GET['gibbonPersonID'];
-        }
+    if ($canManage and isset($_GET['gibbonPersonID'])) {
+        $gibbonPersonID = $_GET['gibbonPersonID'];
     }
 }
 
 //Get params
-$freeLearningUnitID = '';
-if (isset($_GET['freeLearningUnitID'])) {
-    $freeLearningUnitID = $_GET['freeLearningUnitID'];
-}
-$showInactive = 'N';
-if ($canManage and isset($_GET['showInactive'])) {
-    $showInactive = $_GET['showInactive'];
-}
-$gibbonDepartmentID = '';
-if (isset($_GET['gibbonDepartmentID'])) {
-    $gibbonDepartmentID = $_GET['gibbonDepartmentID'];
-}
-$difficulty = '';
-if (isset($_GET['difficulty'])) {
-    $difficulty = $_GET['difficulty'];
-}
-$name = '';
-if (isset($_GET['name'])) {
-    $name = $_GET['name'];
-}
-$view = '';
-if (isset($_GET['view'])) {
-    $view = $_GET['view'];
-}
+$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
+$showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
+$gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+$difficulty = $_GET['difficulty'] ?? '';
+$name = $_GET['name'] ?? '';
+$view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$freeLearningUnitID = null;
-if (isset($_GET['freeLearningUnitID'])) {
-    $freeLearningUnitID = $_GET['freeLearningUnitID'];
-}
-$mode = 'external';
-if (isset($_GET['mode']) && $_GET['mode'] == 'internal') {
-    $mode = $_GET['mode'];
-}
-$confirmationKey = null;
-if (isset($_GET['confirmationKey'])) {
-    $confirmationKey = $_GET['confirmationKey'];
-}
+$mode = (isset($_GET['mode']) && $_GET['mode'] == 'internal') ? $_GET['mode'] : 'external';
+$confirmationKey = $_GET['confirmationKey'] ?? null;
 
 $urlParams = compact('view', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
 $page->breadcrumbs
