@@ -77,7 +77,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $output .= '</td>';
             $output .= "<td style=\"vertical-align: top; text-align: right\" rowspan=\"8\">";
             if ($row['logo'] == null) {
-                $output .= "<img style=\"margin: 5px; height: 125px; width: 125px; background-color: #ffffff ; border: 1px solid #000000 ; padding: 4px ; box-shadow: 2px 2px 2px rgba(50,50,50,0.35);\" src=\"".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_125.jpg\"/><br/>";
+                $output .= "<img style=\"margin: 5px; height: 125px; width: 125px; background-color: #ffffff ; border: 1px solid #000000 ; padding: 4px ; box-shadow: 2px 2px 2px rgba(50,50,50,0.35);\" src=\"".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg\"/><br/>";
             } else {
                 $output .= "<img style=\"margin: 5px; height: 125px; width: 125px; background-color: #ffffff ; border: 1px solid #000000 ; padding: 4px ; box-shadow: 2px 2px 2px rgba(50,50,50,0.35);\" src=\"".$row['logo']."\"/><br/>";
             }
@@ -237,18 +237,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
 //Create PDF objects
 $pdf = new TCPDF ('P', 'mm', 'A4', true, 'UTF-8', false);
-$fontFile = $_SESSION[$guid]['absolutePath']. '/resources/assets/fonts/DroidSansFallback.ttf';
+$fontFile = $gibbon->session->get('absolutePath'). '/resources/assets/fonts/DroidSansFallback.ttf';
 if (is_file($fontFile)) {
     $pdf->addTTFfont($fontFile, 'TrueTypeUnicode', '', 32);
 } else {
     $pdf->addTTFfont('DroidSansFallback');
 }
 
-$pdf->SetCreator($_SESSION[$guid]['organisationName']);
-$pdf->SetAuthor($_SESSION[$guid]['organisationName']);
-$pdf->SetTitle($_SESSION[$guid]['organisationName'].' Free Learning');
+$pdf->SetCreator($gibbon->session->get('organisationName'));
+$pdf->SetAuthor($gibbon->session->get('organisationName'));
+$pdf->SetTitle($gibbon->session->get('organisationName').' Free Learning');
 
-$pdf->SetHeaderData('', 0, $_SESSION[$guid]['organisationName'], 'Free Learning Unit Export');
+$pdf->SetHeaderData('', 0, $gibbon->session->get('organisationName'), 'Free Learning Unit Export');
 
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
@@ -274,5 +274,5 @@ $pdf->AddPage();
 $pdf->writeHTML($output, true, 0, true, 0);
 
 $pdf->lastPage();
-$pdf->Output($_SESSION[$guid]['organisationName'].' Free Learning', 'I');
+$pdf->Output($gibbon->session->get('organisationName').' Free Learning', 'I');
 ?>

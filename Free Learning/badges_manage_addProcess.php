@@ -21,7 +21,7 @@ require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/badges_manage_add.php&search='.$_GET['search'];
+$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/badges_manage_add.php&search='.$_GET['search'];
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manage_add.php') == false) {
     //Fail 0

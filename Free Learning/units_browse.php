@@ -31,17 +31,17 @@ require_once __DIR__ . '/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
-if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false))) {
+if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and !$gibbon->session->exists('username')))) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
     //Get action with highest precendence
-    if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+    if ($publicUnits == 'Y' and !$gibbon->session->exists('username')) {
         $highestAction = 'Browse Units_all';
         $roleCategory = null ;
     } else {
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
     }
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
@@ -126,10 +126,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __m('View As'));
-                $row->addSelectUsers('gibbonPersonID', $_SESSION[$guid]['gibbonSchoolYearID'], ['includeStudents' => true])->selected($gibbonPersonID);
+                $row->addSelectUsers('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), ['includeStudents' => true])->selected($gibbonPersonID);
         } elseif ($roleCategory == 'Parent') {
             // Allow parents to view the map for their children
-            $children = $container->get(StudentGateway::class)->selectActiveStudentsByFamilyAdult($_SESSION[$guid]['gibbonSchoolYearID'], $_SESSION[$guid]['gibbonPersonID'])->fetchAll();
+            $children = $container->get(StudentGateway::class)->selectActiveStudentsByFamilyAdult($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll();
             $children = Format::nameListArray($children, 'Student', false, true);
 
             if (empty($children[$gibbonPersonID])) {
@@ -138,7 +138,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __m('View As'));
-                $row->addSelectPerson('gibbonPersonID', $_SESSION[$guid]['gibbonSchoolYearID'], ['includeStudents' => true])
+                $row->addSelectPerson('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), ['includeStudents' => true])
                     ->fromArray($children)
                     ->selected($gibbonPersonID);
         }
@@ -353,8 +353,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '<p>';
                 echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.', 'Free Learning');
                 echo '</p>'; ?>
-                <script type="text/javascript" src="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.js"></script>
-                <link href="<?php echo $_SESSION[$guid]['absoluteURL'] ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+                <script type="text/javascript" src="<?php echo $gibbon->session->get('absoluteURL') ?>/lib/vis/dist/vis.js"></script>
+                <link href="<?php echo $gibbon->session->get('absoluteURL') ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 
                 <div id="map" class="w-full border rounded shadow-inner mb-4" style="height: 800px;"></div>
 
@@ -371,7 +371,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         if ($unit['logo'] != '') {
                             $image = $unit['logo'];
                         } else {
-                            $image = $_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName'].'/img/anonymous_240_square.jpg';
+                            $image = $gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName').'/img/anonymous_240_square.jpg';
                         }
                     } else {
                         $image = 'undefined';
@@ -509,7 +509,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     network.on( 'click', function(properties) {
                         var nodeNo = properties.nodes ;
                         if (nodeNo != '') {
-                            window.location = '<?php echo $_SESSION[$guid]['absoluteURL'] ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&showInactive=<?php echo $showInactive; ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
+                            window.location = '<?php echo $gibbon->session->get('absoluteURL') ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&showInactive=<?php echo $showInactive; ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
                         }
                     });
                 </script>

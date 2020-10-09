@@ -51,11 +51,11 @@ else {
     $search = $_GET['search'] ?? '';
 
     if ($highestAction == 'Work Pending Approval_all') {
-        $form = Form::create('search', $_SESSION[$guid]['absoluteURL'].'/index.php', 'get');
+        $form = Form::create('search', $gibbon->session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__('Filter'));
         $form->setClass('noIntBorder fullWidth');
 
-        $form->addHiddenValue('q', '/modules/'.$_SESSION[$guid]['module'].'/report_workPendingApproval.php');
+        $form->addHiddenValue('q', '/modules/'.$gibbon->session->get('module').'/report_workPendingApproval.php');
 
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'))->description(__('Include evidence pending for all mentors.'));
@@ -180,7 +180,7 @@ else {
                 if (in_array($student['gibbonCourseClassID'], $myClasses)) {
                     $editEnrolment = true;
                 }
-            } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) {
+            } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $gibbon->session->get('gibbonPersonID')) {
                 // Is mentor of this student?
                 $editEnrolment = true;
             }

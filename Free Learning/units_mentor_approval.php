@@ -93,7 +93,7 @@ if (!$block) {
                 foreach ($blocks as $block) {
                     echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
                         'roleCategory' => 'Staff', 
-                        'gibbonPersonID' => $_SESSION[$guid]['username'] ?? '',
+                        'gibbonPersonID' => $gibbon->session->get('username') ?? '',
                         'blockCount' => $blockCount
                     ]);
                     $resourceContents .= $block['contents'];

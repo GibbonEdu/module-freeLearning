@@ -30,7 +30,7 @@ $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? null;
 $confirmationKey = $_POST['confirmationKey'] ?? null;
 
 //Set return URL
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_mentor_approval.php&sidebar=true&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey';
+$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_mentor_approval.php&sidebar=true&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey';
 
 if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmationKey == '') {
     $URL .= '&return=error3';

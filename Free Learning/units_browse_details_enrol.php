@@ -29,8 +29,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 } else {
     // Check ability to enrol
     $proceed = false;
-    $gibbonSchoolYearID = $_SESSION[$guid]['gibbonSchoolYearID'];
-    $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
 
     if ($highestAction == 'Browse Units_all') {
         $proceed = true;

@@ -26,7 +26,7 @@ require_once '../../gibbon.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
-$highestAction = getHighestGroupedAction($guid, $_SESSION[$guid]['address'], $connection2);
+$highestAction = getHighestGroupedAction($guid, $gibbon->session->get('address'), $connection2);
 
 //Get params
 $freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
@@ -44,9 +44,9 @@ if ($view != 'grid' and $view != 'map') {
 }
 $gibbonPersonID = $canManage && isset($_GET['gibbonPersonID'])
     ? $_GET['gibbonPersonID']
-    : $_SESSION[$guid]['gibbonPersonID'];
+    : $gibbon->session->get('gibbonPersonID');
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
+$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     // Fail 0
@@ -58,7 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error6';
         header("Location: {$URL}");
     } else {
-        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
         if ($highestAction == false || empty($roleCategory)) {
             // Fail 0
             $URL .= '&return=error0';
@@ -153,7 +153,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     $file = $_FILES['file'] ?? null;
 
                                     // Upload the file, return the /uploads relative path
-                                    $location = $fileUploader->uploadFromPost($file, $_SESSION[$guid]['username']);
+                                    $location = $fileUploader->uploadFromPost($file, $gibbon->session->get('username'));
 
                                     if (empty($location)) {
                                         $partialFail = true;

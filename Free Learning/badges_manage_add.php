@@ -42,7 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         $returns = array();
         $editLink = '';
         if (isset($_GET['editID'])) {
-            $editLink = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$_GET['editID'].'&search='.$_GET['search'];
+            $editLink = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$_GET['editID'].'&search='.$_GET['search'];
         }
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], $editLink, null);
@@ -50,12 +50,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         if ($_GET['search'] != '') {
             echo "<div class='linkTop'>";
-            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__($guid, 'Back to Search Results')."</a>";
+            echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__($guid, 'Back to Search Results')."</a>";
             echo '</div>';
         }
 
         ?>
-        <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/badges_manage_addProcess.php?search='.$_GET['search'] ?>" enctype="multipart/form-data">
+        <form method="post" action="<?php echo $gibbon->session->get('absoluteURL').'/modules/Free Learning/badges_manage_addProcess.php?search='.$_GET['search'] ?>" enctype="multipart/form-data">
             <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                 <tr>
                     <td>
@@ -229,7 +229,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                         <span style="font-size: 90%"><i><?php echo __($guid, '* denotes a required field'); ?></i></span>
                     </td>
                     <td class="right">
-                        <input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
+                        <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
                         <input type="submit" value="Submit">
                     </td>
                 </tr>

@@ -73,7 +73,7 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
     }
 
     //Do it!
-    if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+    if ($publicUnits == 'Y' and !$gibbon->session->exists('username')) {
         $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name";
     } else {
         if ($highestAction == 'Browse Units_all') {
@@ -85,9 +85,9 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
             }
         } elseif ($highestAction == 'Browse Units_prerequisites') {
             if ($roleCategory == 'Student') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                $data['gibbonPersonID2'] = $_SESSION[$guid]['gibbonPersonID'];
-                $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
+                $data['gibbonPersonID'] = $gibbon->session->get('gibbonPersonID');
+                $data['gibbonPersonID2'] = $gibbon->session->get('gibbonPersonID');
+                $data['gibbonSchoolYearID'] = $gibbon->session->get('gibbonSchoolYearID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
                 FROM freeLearningUnit
                 LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
@@ -98,15 +98,15 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
                 ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Parent') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                $data['gibbonPersonID'] = $gibbon->session->get('gibbonPersonID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableParents='Y' $sqlWhere ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Staff') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                $data['gibbonPersonID'] = $gibbon->session->get('gibbonPersonID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableStaff='Y' $sqlWhere ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Other') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                $data['gibbonPersonID'] = $gibbon->session->get('gibbonPersonID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableOther='Y' $sqlWhere ORDER BY $difficultyOrder name";
             }
         }
@@ -130,7 +130,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
     $output = false;
 
     try {
-        $data = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+        $data = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
         $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name
             FROM
                 gibbonPerson
@@ -219,7 +219,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                 }
                 $output .= '</td>';
                 $output .= '<td>';
-                $output .= "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$row['freeLearningUnitID']."&sidebar=true'>".$row['unit'].'</a>';
+                $output .= "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$row['freeLearningUnitID']."&sidebar=true'>".$row['unit'].'</a>';
                 $output .= '</td>';
                 $output .= '<td>';
                     $output .= ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $row["enrolmentMethod"])).'<br/>';
@@ -239,7 +239,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                     if ($row['evidenceType'] == 'Link') {
                         $output .= "<a target='_blank' href='".$row['evidenceLocation']."'>".__($guid, 'View').'</>';
                     } else {
-                        $output .= "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View').'</>';
+                        $output .= "<a target='_blank' href='".$gibbon->session->get('absoluteURL').'/'.$row['evidenceLocation']."'>".__($guid, 'View').'</>';
                     }
                 }
                 $output .= '</td>';
@@ -254,7 +254,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                     $output .= '});';
                     $output .= '});';
                     $output .= '</script>';
-                    $output .= "<a title='".__($guid, 'Show Comment')."' class='show_hide-".$row['freeLearningUnitStudentID']."' onclick='false' href='#'><img style='padding-right: 5px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
+                    $output .= "<a title='".__($guid, 'Show Comment')."' class='show_hide-".$row['freeLearningUnitStudentID']."' onclick='false' href='#'><img style='padding-right: 5px' src='".$gibbon->session->get('absoluteURL')."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
                 }
                 $output .= '</td>';
                 $output .= '</tr>';
@@ -470,7 +470,7 @@ function getLearningAreas($connection2, $guid, $limit = false)
     $output = false;
     try {
         if ($limit == true) {
-            $data = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+            $data = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
             $sql = "SELECT * FROM gibbonDepartment JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE type='Learning Area' AND gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')  ORDER BY name";
         } else {
             $data = array();
@@ -519,7 +519,7 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 				$( ".sortable" ).bind( "sortstart", function(event, ui) {
 					$("#blockInner<?php echo $i ?>").css("display","none") ;
 					$("#block<?php echo $i ?>").css("height","72px") ;
-					$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
+					$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/plus.png\'"?>)");
 					tinyMCE.execCommand('mceRemoveEditor', false, 'contents<?php echo $i ?>') ;
 					tinyMCE.execCommand('mceRemoveEditor', false, 'teachersNotes<?php echo $i ?>') ;
 					$(".sortable").sortable( "refresh" ) ;
@@ -538,13 +538,13 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 					if ($("#blockInner<?php echo $i ?>").is(":visible")) {
 						$("#blockInner<?php echo $i ?>").css("display","none");
 						$("#block<?php echo $i ?>").css("height","72px")
-						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
+						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/plus.png\'"?>)");
 						tinyMCE.execCommand('mceRemoveEditor', false, 'contents<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceRemoveEditor', false, 'teachersNotes<?php echo $i ?>') ;
 					} else {
 						$("#blockInner<?php echo $i ?>").slideDown("fast", $("#blockInner<?php echo $i ?>").css("display","table-row"));
 						$("#block<?php echo $i ?>").css("height","auto")
-						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/minus.png\'"?>)");
+						$('#show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/minus.png\'"?>)");
 						tinyMCE.execCommand('mceRemoveEditor', false, 'contents<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceAddEditor', false, 'contents<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceRemoveEditor', false, 'teachersNotes<?php echo $i ?>') ;
@@ -575,7 +575,7 @@ function makeBlock($guid, $connection2, $i, $mode = 'masterAdd', $title = '', $t
 				<td style='text-align: right; width: 50%'>
 					<div style='margin-bottom: 5px'>
 						<?php
-                        echo "<img id='delete$i' title='".__($guid, 'Delete')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/> "; echo "<div title='".__($guid, 'Show/Hide Details')."' id='show$i' style='margin-right: 3px; margin-top: -1px; margin-left: 3px; padding-right: 1px; float: right; width: 25px; height: 25px; background-image: url(\"".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\"); background-repeat: no-repeat'></div></br>"; ?>
+                        echo "<img id='delete$i' title='".__($guid, 'Delete')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/garbage.png'/> "; echo "<div title='".__($guid, 'Show/Hide Details')."' id='show$i' style='margin-right: 3px; margin-top: -1px; margin-left: 3px; padding-right: 1px; float: right; width: 25px; height: 25px; background-image: url(\"".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/plus.png\"); background-repeat: no-repeat'></div></br>"; ?>
 					</div>
 					<input type='hidden' name='freeLearningUnitBlockID<?php echo $i ?>' value='<?php echo $freeLearningUnitBlockID ?>'>
 					<input type='hidden' name='freeLearningUnitClassBlockID<?php echo $i ?>' value='<?php echo $freeLearningUnitClassBlockID ?>'>
@@ -626,7 +626,7 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
 				$( "#<?php echo $type ?>" ).bind( "sortstart", function(event, ui) {
 					$("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","none");
 					$("#<?php echo $type ?>Block<?php echo $i ?>").css("height","72px") ;
-					$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
+					$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/plus.png\'"?>)");
 					tinyMCE.execCommand('mceRemoveEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 					$("#<?php echo $type ?>").sortable( "refreshPositions" ) ;
 				});
@@ -648,12 +648,12 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
 					if ($("#<?php echo $type ?>BlockInner<?php echo $i ?>").is(":visible")) {
 						$("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","none");
 						$("#<?php echo $type ?>Block<?php echo $i ?>").css("height","72px") ;
-						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\'"?>)");
+						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/plus.png\'"?>)");
 						tinyMCE.execCommand('mceRemoveEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 					} else {
 						$("#<?php echo $type ?>BlockInner<?php echo $i ?>").slideDown("fast", $("#<?php echo $type ?>BlockInner<?php echo $i ?>").css("display","table-row"));
 						$("#<?php echo $type ?>Block<?php echo $i ?>").css("height","auto")
-						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/minus.png\'"?>)");
+						$('#<?php echo $type ?>show<?php echo $i ?>').css("background-image", "<?php echo "url(\'".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/minus.png\'"?>)");
 						tinyMCE.execCommand('mceRemoveEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 						tinyMCE.execCommand('mceAddEditor', false, '<?php echo $type ?>contents<?php echo $i ?>') ;
 					}
@@ -686,7 +686,7 @@ function makeBlockOutcome($guid,  $i, $type = '', $gibbonOutcomeID = '', $title 
 					<td style='text-align: right; width: 50%'>
 						<div style='margin-bottom: 25px'>
 							<?php
-                            echo "<img id='".$type."delete$i' title='".__($guid, 'Delete')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/> "; echo "<div id='".$type."show$i' title='".__($guid, 'Show/Hide Details')."' style='margin-right: 3px; margin-left: 3px; padding-right: 1px; float: right; width: 25px; height: 25px; background-image: url(\"".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/plus.png\"); background-repeat: no-repeat'></div>"; ?>
+                            echo "<img id='".$type."delete$i' title='".__($guid, 'Delete')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/garbage.png'/> "; echo "<div id='".$type."show$i' title='".__($guid, 'Show/Hide Details')."' style='margin-right: 3px; margin-left: 3px; padding-right: 1px; float: right; width: 25px; height: 25px; background-image: url(\"".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/plus.png\"); background-repeat: no-repeat'></div>"; ?>
 						</div>
 						<input type='hidden' name='id<?php echo $i ?>' value='<?php echo $id ?>'>
 					</td>
@@ -741,7 +741,7 @@ function displayBlockContent($guid, $connection2, $title, $type, $length, $conte
     if ($contents != '') {
         $return .= "<div style='margin-top:20px; padding: 25px 3px 10px 3px; width: 100%; text-align: justify; border-bottom: 1px solid #ddd'>".$contents.'</div>';
     }
-    if (isset($_SESSION[$guid]['username'])) {
+    if ($gibbon->session->exists('username')) {
         if ($roleCategory == 'Staff') {
             if ($teachersNotes != '') {
                 $return .= "<div style='margin-top:20px; background-color: #F6CECB; padding: 0px 3px 10px 3px; width: 98%; text-align: justify; border-bottom: 1px solid #ddd'><p style='margin-bottom: 0px'><b>".__($guid, "Teacher's Notes").':</b></p> '.$teachersNotes.'</div>';
@@ -801,7 +801,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                 $hitsNeeded ++;
                 try {
                     //Count conditions
-                    $dataCount = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
                     $sqlCount = "SELECT freeLearningUnitStudentID FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID AND status='Complete - Approved'";
                     $resultCount = $connection2->prepare($sqlCount);
                     $resultCount->execute($dataCount);
@@ -946,7 +946,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
             //GRANT AWARD
             if ($hitsNeeded > 0 AND $hitsActually == $hitsNeeded) {
                 try {
-                    $dataGrant = array('badgesBadgeID' => $row['badgesBadgeID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonID, 'comment' => '', 'gibbonPersonIDCreator' => null);
+                    $dataGrant = array('badgesBadgeID' => $row['badgesBadgeID'], 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonID, 'comment' => '', 'gibbonPersonIDCreator' => null);
                     $sqlGrant = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                     $resultGrant = $connection2->prepare($sqlGrant);
                     $resultGrant->execute($dataGrant);

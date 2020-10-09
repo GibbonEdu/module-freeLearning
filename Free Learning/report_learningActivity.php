@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 //Module includes
-include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
+include "./modules/" . $gibbon->session->get('module') . "/moduleFunctions.php" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learningActivity.php")==FALSE) {
     //Acess denied
@@ -39,7 +39,7 @@ else {
 
     ?>
 
-    <form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
+    <form method="get" action="<?php echo $gibbon->session->get('absoluteURL') ?>/index.php">
         <table class='smallIntBorder' cellspacing='0' style="width: 100%">
             <tr>
                 <td style='width: 275px'>
@@ -64,7 +64,7 @@ else {
             </tr>
             <tr>
                 <td colspan=2 class="right">
-                    <input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_learningActivity.php">
+                    <input type="hidden" name="q" value="/modules/<?php echo $gibbon->session->get('module') ?>/report_learningActivity.php">
                     <input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
                 </td>
             </tr>
@@ -119,7 +119,7 @@ else {
             echo '</table>';
 
             //PLOT DATA
-            echo '<script type="text/javascript" src="'.$_SESSION[$guid]['absoluteURL'].'/lib/Chart.js/Chart.min.js"></script>';
+            echo '<script type="text/javascript" src="'.$gibbon->session->get('absoluteURL').'/lib/Chart.js/Chart.min.js"></script>';
             echo "<p style='margin-top: 20px; margin-bottom: 5px'><b>".__($guid, 'Data').'</b></p>';
             echo '<div style="width:100%">';
             echo '<div>';

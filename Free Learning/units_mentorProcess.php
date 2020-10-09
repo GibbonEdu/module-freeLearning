@@ -26,9 +26,9 @@ $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 $highestAction = false;
 $canManage = false;
 $gibbonPersonID ='';
-if (isset($_SESSION[$guid]['gibbonPersonID'])) {
+if ($gibbon->session->exists('gibbonPersonID')) {
     $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse.php', $connection2);
-    $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+    $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
     $canManage = false;
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
         $canManage = true;
@@ -53,12 +53,12 @@ $freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'] ?? null;
 $confirmationKey = $_GET['confirmationKey'] ?? null;
 
 //Check to see if system settings are set from databases
-if (@$_SESSION[$guid]['systemSettingsSet'] == false) {
+if (@$gibbon->session->get('systemSettingsSet') == false) {
     getSystemSettings($guid, $connection2);
 }
 
 //Set return URL
-$URL = $_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_mentor.php&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view";
+$URL = $gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_mentor.php&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view";
 
 if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '') {
     $URL .= '&return=error3';
