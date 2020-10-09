@@ -43,18 +43,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         }
 
         //Set pagination variable
-        $page = null;
-        if (isset($_GET['page'])) {
-            $page = $_GET['page'];
-        }
+        $page = $_GET['page'] ?? null;
         if ((!is_numeric($page)) or $page < 1) {
             $page = 1;
         }
 
-        $search = null;
-        if (isset($_GET['search'])) {
-            $search = $_GET['search'];
-        }
+        $search = $_GET['search'] ?? null;
 
         echo "<h2 class='top'>";
         echo __($guid, 'Search');

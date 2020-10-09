@@ -35,10 +35,7 @@ else {
     echo __($guid, 'Choose Time Frame', 'Free Learning');
     echo '</h2>';
 
-    $timePeriod = null;
-    if (isset($_GET['timePeriod'])) {
-        $timePeriod = $_GET['timePeriod'];
-    }
+    $timePeriod = $_GET['timePeriod'] ?? null;
 
     ?>
 

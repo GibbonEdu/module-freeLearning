@@ -24,23 +24,14 @@ require_once  './moduleFunctions.php';
 $page = $container->get('page');
 
 $id = $_GET['id'];
-$mode = null;
-if (isset($_GET['mode'])) {
-    $mode = $_GET['mode'];
-}
+$mode = $_GET['mode'] ?? null;
 if ($mode == '') {
     $mode = 'masterAdd';
 }
-$gibbonUnitBlockID = null;
-if (isset($_GET['gibbonUnitBlockID'])) {
-    $gibbonUnitBlockID = $_GET['gibbonUnitBlockID'];
-}
+$gibbonUnitBlockID = $_GET['gibbonUnitBlockID'] ?? null;
 
 //IF UNIT DOES NOT CONTAIN HYPHEN, IT IS A GIBBON UNIT
-$gibbonUnitID = null;
-if (isset($_GET['gibbonUnitID'])) {
-    $gibbonUnitID = $_GET['gibbonUnitID'];
-}
+$gibbonUnitID = $_GET['gibbonUnitID'] ?? null;
 if (strpos($gibbonUnitID, '-') == false) {
     $hooked = false;
 } else {

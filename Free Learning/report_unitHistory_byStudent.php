@@ -37,10 +37,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         echo __($guid, 'Choose Student', 'Free Learning');
         echo '</h2>';
 
-        $gibbonPersonID = null;
-        if (isset($_GET['gibbonPersonID'])) {
-            $gibbonPersonID = $_GET['gibbonPersonID'];
-        }
+        $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
         ?>
 
         <form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">

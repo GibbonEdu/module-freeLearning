@@ -26,13 +26,11 @@ getSystemSettings($guid, $connection2);
 setCurrentSchoolYear($guid, $connection2);
 
 //Set up for i18n via gettext
-if (isset($_SESSION[$guid]['i18n']['code'])) {
-    if ($_SESSION[$guid]['i18n']['code'] != null) {
-        putenv('LC_ALL='.$_SESSION[$guid]['i18n']['code']);
-        setlocale(LC_ALL, $_SESSION[$guid]['i18n']['code']);
-        bindtextdomain('gibbon', getcwd().'/../i18n');
-        textdomain('gibbon');
-    }
+if (isset($_SESSION[$guid]['i18n']['code']) and $_SESSION[$guid]['i18n']['code'] != null) {
+    putenv('LC_ALL='.$_SESSION[$guid]['i18n']['code']);
+    setlocale(LC_ALL, $_SESSION[$guid]['i18n']['code']);
+    bindtextdomain('gibbon', getcwd().'/../i18n');
+    textdomain('gibbon');
 }
 
 

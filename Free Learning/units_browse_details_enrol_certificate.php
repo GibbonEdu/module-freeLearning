@@ -37,10 +37,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $output .= '</div>';
 } else {
 
-    $freeLearningUnitID = '';
-    if (isset($_GET['freeLearningUnitID'])) {
-        $freeLearningUnitID = $_GET['freeLearningUnitID'];
-    }
+    $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
 
     if ($freeLearningUnitID == '') {
         $output .= "<div class='error'>";
