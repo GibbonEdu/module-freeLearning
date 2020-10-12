@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.03
+-------
+Refactored session variables and added null coalesce operators
+
 v5.10.02
 -------
 Fixed submission error when the file is too large, added better error message

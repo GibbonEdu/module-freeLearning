@@ -172,7 +172,7 @@ else {
         ->addParam('freeLearningUnitStudentID')
         ->addParam('freeLearningUnitID')
         ->addParam('sidebar', true)
-        ->format(function ($student, $actions) use ($manageAll, $myClasses, $guid) {
+        ->format(function ($student, $actions) use ($manageAll, $myClasses, $gibbon) {
             // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
             $editEnrolment = $manageAll ? true : false;
             if ($student['enrolmentMethod'] == 'class') {
