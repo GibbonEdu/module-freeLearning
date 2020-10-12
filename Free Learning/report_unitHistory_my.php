@@ -33,7 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $page->breadcrumbs
              ->add(__m('Unit History by Student'));
 
-        $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
 
         //Check access for parents
         echo getStudentHistory($connection2, $guid, $gibbonPersonID);

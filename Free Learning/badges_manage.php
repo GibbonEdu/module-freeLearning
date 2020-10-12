@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         echo __($guid, 'Search');
         echo '</h2>';
         ?>
-        <form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
+        <form method="get" action="<?php echo $gibbon->session->get('absoluteURL') ?>/index.php">
             <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                 <tr>
                     <td>
@@ -67,10 +67,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                 </tr>
                 <tr>
                     <td colspan=2 class="right">
-                        <input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/badges_manage.php">
-                        <input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
+                        <input type="hidden" name="q" value="/modules/<?php echo $gibbon->session->get('module') ?>/badges_manage.php">
+                        <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
                         <?php
-                        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/badges_manage.php'>Clear Search</a> "; ?>
+                        echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.$gibbon->session->get('module')."/badges_manage.php'>Clear Search</a> "; ?>
                         <input type="submit" value="Submit">
                     </td>
                 </tr>
@@ -96,22 +96,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                     WHERE (badgesBadge.name LIKE :search1 OR badgesBadge.category LIKE :search2)
                     ORDER BY category, name';
             }
-            $sqlPage = $sql.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($page - 1) * $_SESSION[$guid]['pagination']);
+            $sqlPage = $sql.' LIMIT '.$gibbon->session->get('pagination').' OFFSET '.(($page - 1) * $gibbon->session->get('pagination'));
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
         }
 
         echo "<div class='linkTop'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/badges_manage_add.php&search=$search'>".__($guid, 'Add')."<img style='margin-left: 5px' title='".__($guid, 'Add')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new.png'/></a>";
+        echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/badges_manage_add.php&search=$search'>".__($guid, 'Add')."<img style='margin-left: 5px' title='".__($guid, 'Add')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/page_new.png'/></a>";
         echo '</div>';
 
         if ($result->rowCount() < 1) { echo "<div class='error'>";
             echo __($guid, 'There are no badges to display.', 'Free Learning');
             echo '</div>';
         } else {
-            if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-                printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top', "search=$search");
+            if ($result->rowCount() > $gibbon->session->get('pagination')) {
+                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'top', "search=$search");
             }
 
             echo "<table cellspacing='0' style='width: 100%'>";
@@ -154,9 +154,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                 echo "<tr class=$rowNum>";
                 echo '<td>';
                 if ($row['logo'] != '') {
-                    echo "<img class='user' style='max-width: 150px' src='".$_SESSION[$guid]['absoluteURL'].'/'.$row['logo']."'/>";
+                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/'.$row['logo']."'/>";
                 } else {
-                    echo "<img class='user' style='max-width: 150px' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_240_square.jpg'/>";
+                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_240_square.jpg'/>";
                 }
                 echo '</td>';
                 echo '<td>';
@@ -175,9 +175,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                 echo '});';
                 echo '});';
                 echo '</script>';
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$row['freeLearningBadgeID']."&search=$search'><img title='Edit' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
+                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$row['freeLearningBadgeID']."&search=$search'><img title='Edit' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/config.png'/></a> ";
                 if ($row['description'] != '') {
-                    echo "<a class='show_hide-$count' onclick='false' href='#'><img style='padding-right: 5px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' title='Show Description' onclick='return false;' /></a>";
+                    echo "<a class='show_hide-$count' onclick='false' href='#'><img style='padding-right: 5px' src='".$gibbon->session->get('absoluteURL')."/themes/Default/img/page_down.png' title='Show Description' onclick='return false;' /></a>";
                 }
                 echo '</td>';
                 echo '</tr>';
@@ -191,8 +191,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             }
             echo '</table>';
 
-            if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-                printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'bottom', "search=$search");
+            if ($result->rowCount() > $gibbon->session->get('pagination')) {
+                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'bottom', "search=$search");
             }
         }
     }

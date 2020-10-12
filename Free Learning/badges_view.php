@@ -49,7 +49,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
                 FROM  freeLearningBadge
                     JOIN badgesBadge ON (freeLearningBadge.badgesBadgeID=badgesBadge.badgesBadgeID)
                 ORDER BY unitsCompleteTotal, unitsCompleteDepartmentCount, name';
-            $sqlPage = $sql.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($page - 1) * $_SESSION[$guid]['pagination']);
+            $sqlPage = $sql.' LIMIT '.$gibbon->session->get('pagination').' OFFSET '.(($page - 1) * $gibbon->session->get('pagination'));
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
@@ -60,8 +60,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
             echo __($guid, 'There are no badges to display.', 'Free Learning');
             echo '</div>';
         } else {
-            if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-                printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top');
+            if ($result->rowCount() > $gibbon->session->get('pagination')) {
+                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'top');
             }
 
             echo "<table cellspacing='0' style='width: 100%'>";
@@ -104,9 +104,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
                 echo "<tr class=$rowNum>";
                 echo '<td>';
                 if ($row['logo'] != '') {
-                    echo "<img class='user' style='max-width: 150px' src='".$_SESSION[$guid]['absoluteURL'].'/'.$row['logo']."'/>";
+                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/'.$row['logo']."'/>";
                 } else {
-                    echo "<img class='user' style='max-width: 150px' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_240_square.jpg'/>";
+                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_240_square.jpg'/>";
                 }
                 echo '</td>';
                 echo '<td>';
@@ -121,8 +121,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
             }
             echo '</table>';
 
-            if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-                printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'bottom');
+            if ($result->rowCount() > $gibbon->session->get('pagination')) {
+                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'bottom');
             }
         }
     }

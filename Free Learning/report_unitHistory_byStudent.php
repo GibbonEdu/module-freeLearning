@@ -40,7 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
         ?>
 
-        <form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
+        <form method="get" action="<?php echo $gibbon->session->get('absoluteURL')?>/index.php">
             <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                 <tr>
                     <td style='width: 275px'>
@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                                 <option></option>
                                 <?php
                                 try {
-                                    $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'today' => date('Y-m-d'));
+                                    $dataSelect = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'today' => date('Y-m-d'));
                                     $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonStudentEnrolmentID, surname, preferredName, gibbonYearGroup.nameShort AS yearGroup, gibbonRollGroup.nameShort AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonYearGroup ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup.gibbonYearGroupID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) JOIN gibbonFamilyChild ON (gibbonPerson.gibbonPersonID=gibbonFamilyChild.gibbonPersonID) JOIN gibbonFamily ON (gibbonFamilyChild.gibbonFamilyID=gibbonFamily.gibbonFamilyID) JOIN gibbonFamilyAdult ON (gibbonFamilyAdult.gibbonFamilyID=gibbonFamily.gibbonFamilyID AND childDataAccess='Y') WHERE gibbonFamilyAdult.gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<=:today) AND (dateEnd IS NULL  OR dateEnd>=:today) ORDER BY surname, preferredName";
                                     $resultSelect = $connection2->prepare($sqlSelect);
                                     $resultSelect->execute($dataSelect);
@@ -78,7 +78,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                                 <optgroup label='--<?php echo __($guid, 'Students by Roll Group', 'Free Learning') ?>--'>
                                     <?php
                                     try {
-                                        $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'today' => date('Y-m-d'));
+                                        $dataSelect = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'today' => date('Y-m-d'));
                                         $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname, gibbonRollGroup.name AS name 
                                         FROM freeLearningUnitStudent
                                         JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
@@ -108,7 +108,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                                 <optgroup label='--<?php echo __($guid, 'All Users by Name', 'Free Learning') ?>--'>
                                     <?php
                                     try {
-                                        $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'today' => date('Y-m-d'));
+                                        $dataSelect = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'today' => date('Y-m-d'));
                                         $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname, gibbonRollGroup.name AS name 
                                         FROM freeLearningUnitStudent
                                         JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) 
@@ -143,7 +143,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                 </tr>
                 <tr>
                     <td colspan=2 class="right">
-                        <input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/report_unitHistory_byStudent.php">
+                        <input type="hidden" name="q" value="/modules/<?php echo $gibbon->session->get('module') ?>/report_unitHistory_byStudent.php">
                         <input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
                     </td>
                 </tr>
@@ -160,7 +160,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             //Check access for parents
             if ($highestAction == 'Unit History By Student_myChildren') {
                 try {
-                    $dataChild = array('gibbonPersonID' => $gibbonPersonID, 'gibbonPersonID2' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                    $dataChild = array('gibbonPersonID' => $gibbonPersonID, 'gibbonPersonID2' => $gibbon->session->get('gibbonPersonID'), 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
                     $sqlChild = "SELECT gibbonPerson.gibbonPersonID, surname, preferredName FROM gibbonFamilyChild JOIN gibbonPerson ON (gibbonFamilyChild.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonFamily ON (gibbonFamilyChild.gibbonFamilyID=gibbonFamily.gibbonFamilyID) JOIN gibbonFamilyAdult ON (gibbonFamilyAdult.gibbonFamilyID=gibbonFamily.gibbonFamilyID) WHERE gibbonFamilyAdult.childDataAccess='Y' AND gibbonPerson.gibbonPersonID=:gibbonPersonID AND gibbonFamilyAdult.gibbonPersonID=:gibbonPersonID2 AND gibbonPerson.status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName ";
                     $resultChild = $connection2->prepare($sqlChild);
                     $resultChild->execute($dataChild);

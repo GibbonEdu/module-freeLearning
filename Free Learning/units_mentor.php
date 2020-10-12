@@ -25,9 +25,9 @@ $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 $highestAction = false;
 $canManage = false;
 $gibbonPersonID ='';
-if (isset($_SESSION[$guid]['gibbonPersonID'])) {
+if ($gibbon->session->exists('gibbonPersonID')) {
     $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse.php', $connection2);
-    $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+    $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
     $canManage = false;
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
         $canManage = true;
@@ -58,7 +58,7 @@ if (isset($_GET['return'])) {
     returnProcess($guid, $_GET['return'], null, array('success0' => __($guid, 'Your request was completed successfully. Thank you for your time.', 'Free Learning'), 'success1' => __($guid, 'Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.', 'Free Learning')));
 }
 
-if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
+if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
     //Check unit
     try {
         $data = array('freeLearningUnitID' => $freeLearningUnitID) ;
@@ -83,7 +83,7 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
         //Show choice for school mentor
         if ($mode == "internal" && $confirmationKey != '') {
             echo '<p>';
-            echo sprintf(__($guid, 'The following users at %1$s have requested your input into their %2$sFree Learning%3$s work, with the hope that you will be able to act as a "critical buddy" or mentor, offering feedback on their progress.', 'Free Learning'), $_SESSION[$guid]['systemName'], "<a target='_blank' href='http://rossparker.org'>", '</a>');
+            echo sprintf(__($guid, 'The following users at %1$s have requested your input into their %2$sFree Learning%3$s work, with the hope that you will be able to act as a "critical buddy" or mentor, offering feedback on their progress.', 'Free Learning'), $gibbon->session->get('systemName'), "<a target='_blank' href='http://rossparker.org'>", '</a>');
             echo '<br/>';
             echo '</p>';
 
@@ -115,7 +115,7 @@ if ($freeLearningUnitID != '' && isset($_SESSION[$guid]['gibbonPersonID'])) {
                 echo '</ul>';
                 echo '<p style=\'margin-top: 20px\'>';
                 echo sprintf(__($guid, 'The unit you are being asked to advise on is called %1$s and is described as follows:', 'Free Learning'), '<b>'.$row['name'].'</b>').$row['blurb']."<br/><br/>";
-                echo sprintf(__($guid, 'Please %1$sclick here%2$s if you are able to get involved, or, %3$sclick here%4$s if you not in a position to help.', 'Free Learning'), "<a class='p-1 border border-solid border-green-500 text-green-500 bg-green-200' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>', "<a class='p-1 border border-solid border-red-500 text-red-500 bg-red-200' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>');
+                echo sprintf(__($guid, 'Please %1$sclick here%2$s if you are able to get involved, or, %3$sclick here%4$s if you not in a position to help.', 'Free Learning'), "<a class='p-1 border border-solid border-green-500 text-green-500 bg-green-200' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>', "<a class='p-1 border border-solid border-red-500 text-red-500 bg-red-200' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>');
                 echo '</p>';
             }
         }

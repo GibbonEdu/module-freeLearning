@@ -40,7 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         return;
     }
 
-    $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+    $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
     $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') && $highestAction == 'Browse Units_all';
 
     // Get params
@@ -48,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
     $gibbonPersonID = $canManage && !empty($_GET['gibbonPersonID'])
         ? $_GET['gibbonPersonID']
-        : $_SESSION[$guid]['gibbonPersonID'];
+        : $gibbon->session->get('gibbonPersonID');
 
     $urlParams = [
         'freeLearningUnitStudentID' => $freeLearningUnitStudentID,
@@ -98,7 +98,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($manageAll == true) {
         $proceed = true;
     }
-    else if ($values['enrolmentMethod'] == 'schoolMentor' && $values['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) {
+    else if ($values['enrolmentMethod'] == 'schoolMentor' && $values['gibbonPersonIDSchoolMentor'] == $gibbon->session->get('gibbonPersonID')) {
         $proceed = true;
     } else {
         $learningAreas = getLearningAreas($connection2, $guid, true);
@@ -114,7 +114,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     //Check to see if class is in one teacher teachers
     if ($values['enrolmentMethod'] == 'class') { //Is teacher of this class?
         try {
-            $dataClasses = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'gibbonCourseClassID' => $values['gibbonCourseClassID']);
+            $dataClasses = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'gibbonCourseClassID' => $values['gibbonCourseClassID']);
             $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClass.gibbonCourseClassID=:gibbonCourseClassID AND role='Teacher'";
             $resultClasses = $connection2->prepare($sqlClasses);
             $resultClasses->execute($dataClasses);

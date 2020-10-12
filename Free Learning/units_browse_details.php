@@ -32,18 +32,18 @@ $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
 $browseAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php', 'Browse Units_all');
 
-if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false))) {
+if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and !$gibbon->session->exists('username')))) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
     //Get action with highest precendence
-    if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+    if ($publicUnits == 'Y' and !$gibbon->session->exists('username')) {
         $highestAction = 'Browse Units_all';
         $highestActionManage = null;
         $roleCategory = null ;
     } else {
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
     }
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
@@ -64,8 +64,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
 
         $gibbonPersonID = ($canManage)
-            ? ($_GET['gibbonPersonID'] ?? $_SESSION[$guid]['gibbonPersonID'] ?? null)
-            : $_SESSION[$guid]['gibbonPersonID'] ?? null;
+            ? ($_GET['gibbonPersonID'] ?? $gibbon->session->get('gibbonPersonID') ?? null)
+            : $gibbon->session->get('gibbonPersonID') ?? null;
 
         $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID', 'freeLearningUnitID');
 
@@ -109,7 +109,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $values = $result->fetch();
                 if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
+                    echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Back to Search Results', 'Free Learning').'</a>';
                     echo '</div>';
                 }
 
@@ -137,13 +137,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     if ($canManage || $browseAll) {
                         echo "<div class='linkTop'>";
                         if ($canManage) {
-                            echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a>";
+                            echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/config.png'/></a>";
                         }
                         if ($canManage & $browseAll) {
                             echo " | ";
                         }
                         if ($browseAll) {
-                            echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL']."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__($guid, 'Export')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Export')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/download.png'/></a>";
+                            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__($guid, 'Export')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Export')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/download.png'/></a>";
                         }
                         echo '</div>';
                     }
@@ -194,7 +194,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '</td>';
                     echo "<td style='width: 135%!important; vertical-align: top; text-align: right' rowspan=4>";
                     if ($values['logo'] == null) {
-                        echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$_SESSION[$guid]['absoluteURL'].'/themes/'.$_SESSION[$guid]['gibbonThemeName']."/img/anonymous_125.jpg'/><br/>";
+                        echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
                     } else {
                         echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
                     }
@@ -511,7 +511,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         if (in_array($student['gibbonCourseClassID'], $myClasses)) {
                                             $editEnrolment = true;
                                         }
-                                    } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $_SESSION[$guid]['gibbonPersonID']) {
+                                    } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $gibbon->session->get('gibbonPersonID')) {
                                         // Is mentor of this student?
                                         $editEnrolment = true;
                                     }
@@ -566,7 +566,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         foreach ($blocks as $block) {
                             echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
                                 'roleCategory' => $roleCategory,
-                                'gibbonPersonID' => $_SESSION[$guid]['username'] ?? '',
+                                'gibbonPersonID' => $gibbon->session->get('username') ?? '',
                                 'blockCount' => $blockCount
                             ]);
                             $resourceContents .= $block['contents'];
@@ -755,7 +755,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo '});';
                             echo '</script>';
                             if ($rowBlocks['content'] != '') {
-                                echo "<a title='".__($guid, 'View Description', 'Free Learning')."' class='show_hide-$count' onclick='false' href='#'><img style='padding-left: 0px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
+                                echo "<a title='".__($guid, 'View Description', 'Free Learning')."' class='show_hide-$count' onclick='false' href='#'><img style='padding-left: 0px' src='".$gibbon->session->get('absoluteURL')."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
                             }
                             echo '</td>';
                             echo '</tr>';
@@ -820,15 +820,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
                                     echo "<p>";
                                     if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'/></a>";
+                                        echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
                                     } else { //It's a link
-                                        echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
+                                        echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
                                     }
                                     echo '</p>';
                                 } else { //Not an image
                                     echo '<p class=\'button\'>';
                                     if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                        echo "<a class='button'target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
+                                        echo "<a class='button'target='_blank' href='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                                     } else { //It's a link
                                         echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                                     }

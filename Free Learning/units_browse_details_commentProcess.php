@@ -42,7 +42,7 @@ $urlParams = [
     'gibbonPersonID'            => $gibbonPersonID,
 ];
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&tab=1&'.http_build_query($urlParams);
+$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&tab=1&'.http_build_query($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     $URL .= '&return=error0';
@@ -53,7 +53,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
     $discussionGateway = $container->get(DiscussionGateway::class);
     $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
-    $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+    $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
 
     // Validate the required values
     if (empty($freeLearningUnitID) || empty($freeLearningUnitStudentID) || empty($comment)) {
@@ -101,7 +101,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1");
         $event->addRecipient($values['gibbonPersonIDStudent']);
 
-        $URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&'.http_build_query($urlParams);
+        $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&'.http_build_query($urlParams);
 
     } else {
         $event->addScope('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);

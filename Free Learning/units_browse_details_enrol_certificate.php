@@ -46,7 +46,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     } else {
 
         try {
-            $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+            $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
             $sql = "SELECT freeLearningUnit.name, officialName, surname, preferredName, (SELECT sum(length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) AS length, timestampCompleteApproved
                 FROM freeLearningUnit
                     JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
@@ -78,10 +78,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             else {
                 $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">on".$row['length']."</p>";
             }
-            $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$_SESSION[$guid]['organisationName']."</h1>";
+            $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$gibbon->session->get('organisationName')."</h1>";
             $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">Approved on ".dateConvertBack($guid, substr($row['timestampCompleteApproved'], 0, 10))."</p>";
             $output .= "<p></p><p></p>";
-            $output .= "<div style=\"margin-top: -100px; text-align: center\"><img style=\"height: 100px; width: 400px; background-color: #ffffff ; border: 1px solid #000000 ; padding: 4px ; box-shadow: 2px 2px 2px rgba(50,50,50,0.35);\" src=\"".$_SESSION[$guid]['absoluteURL'].'/'.$_SESSION[$guid]['organisationLogo']."\"/></div><br/>";
+            $output .= "<div style=\"margin-top: -100px; text-align: center\"><img style=\"height: 100px; width: 400px; background-color: #ffffff ; border: 1px solid #000000 ; padding: 4px ; box-shadow: 2px 2px 2px rgba(50,50,50,0.35);\" src=\"".$gibbon->session->get('absoluteURL').'/'.$gibbon->session->get('organisationLogo')."\"/></div><br/>";
         }
     }
 }
@@ -89,18 +89,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 //Create PDF objects
 $pdf = new TCPDF ('P', 'mm', 'A4', true, 'UTF-8', false);
 
-$fontFile = $_SESSION[$guid]['absolutePath']. '/resources/assets/fonts/DroidSansFallback.ttf';
+$fontFile = $gibbon->session->get('absolutePath'). '/resources/assets/fonts/DroidSansFallback.ttf';
 if (is_file($fontFile)) {
     $pdf->addTTFfont($fontFile, 'TrueTypeUnicode', '', 32);
 } else {
     $pdf->addTTFfont('DroidSansFallback');
 }
 
-$pdf->SetCreator($_SESSION[$guid]['organisationName']);
-$pdf->SetAuthor($_SESSION[$guid]['organisationName']);
-$pdf->SetTitle($_SESSION[$guid]['organisationName'].' Free Learning');
+$pdf->SetCreator($gibbon->session->get('organisationName'));
+$pdf->SetAuthor($gibbon->session->get('organisationName'));
+$pdf->SetTitle($gibbon->session->get('organisationName').' Free Learning');
 
-$pdf->SetHeaderData('', 0, $_SESSION[$guid]['organisationName']);
+$pdf->SetHeaderData('', 0, $gibbon->session->get('organisationName'));
 
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
@@ -126,5 +126,5 @@ $pdf->AddPage();
 $pdf->writeHTML($output, true, 0, true, 0);
 
 $pdf->lastPage();
-$pdf->Output($_SESSION[$guid]['organisationName'].' Free Learning.pdf', 'I');
+$pdf->Output($gibbon->session->get('organisationName').' Free Learning.pdf', 'I');
 ?>

@@ -73,7 +73,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $data = array('freeLearningUnitID' => $freeLearningUnitID);
                 $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
             } elseif ($highestAction == 'Manage Units_learningAreas') {
-                $data = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID'], 'freeLearningUnitID' => $freeLearningUnitID);
+                $data = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
                 $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID ORDER BY difficulty, name";
             }
             $result = $connection2->prepare($sql);
@@ -90,7 +90,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row = $result->fetch();
             if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Back to Search Results').'</a>';
+                echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Back to Search Results').'</a>';
                 echo '</div>';
             }
 
@@ -98,12 +98,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 if ($row['active'] == 'N') $showInactive = 'Y';
 
                 echo "<div class='linkTop'>";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/plus.png'/></a>";
+                echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/plus.png'/></a>";
                 echo '</div>';
             }
 
             ?>
-            <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module']."/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&address=".$_GET['q'] ?>" enctype="multipart/form-data">
+            <form method="post" action="<?php echo $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module')."/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&address=".$_GET['q'] ?>" enctype="multipart/form-data">
                 <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                     <tr class='break'>
                         <td colspan=2>
@@ -631,8 +631,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                                         }
                                                         echo "<option class='all ".$rowSelect['category']."'   value='".$rowSelect['gibbonOutcomeID']."'>".$rowSelect['name'].'</option>';
                                                         $switchContents .= 'case "'.$rowSelect['gibbonOutcomeID'].'": ';
-                                                        $switchContents .= "$(\"#outcome\").append('<div id=\'outcomeOuter' + outcomeCount + '\'><img style=\'margin: 10px 0 5px 0\' src=\'".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');";
-                                                        $switchContents .= '$("#outcomeOuter" + outcomeCount).load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_manage_add_blockOutcomeAjax.php","type=outcome&id=" + outcomeCount + "&title='.urlencode($rowSelect['name'])."\&category=".urlencode($rowSelect['category']).'&gibbonOutcomeID='.$rowSelect['gibbonOutcomeID'].'&contents='.urlencode($rowSelect['description']).'&allowOutcomeEditing='.urlencode($allowOutcomeEditing).'") ;';
+                                                        $switchContents .= "$(\"#outcome\").append('<div id=\'outcomeOuter' + outcomeCount + '\'><img style=\'margin: 10px 0 5px 0\' src=\'".$gibbon->session->get('absoluteURL')."/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');";
+                                                        $switchContents .= '$("#outcomeOuter" + outcomeCount).load("'.$gibbon->session->get('absoluteURL').'/modules/Free%20Learning/units_manage_add_blockOutcomeAjax.php","type=outcome&id=" + outcomeCount + "&title='.urlencode($rowSelect['name'])."\&category=".urlencode($rowSelect['category']).'&gibbonOutcomeID='.$rowSelect['gibbonOutcomeID'].'&contents='.urlencode($rowSelect['description']).'&allowOutcomeEditing='.urlencode($allowOutcomeEditing).'") ;';
                                                         $switchContents .= 'outcomeCount++ ;';
                                                         $switchContents .= "$('#newOutcome').val('0');";
                                                         $switchContents .= 'break;';
@@ -672,8 +672,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                                         }
                                                         echo "<option class='all ".$rowSelect['category']."'   value='".$rowSelect['gibbonOutcomeID']."'>".$rowSelect['name'].'</option>';
                                                         $switchContents .= 'case "'.$rowSelect['gibbonOutcomeID'].'": ';
-                                                        $switchContents .= "$(\"#outcome\").append('<div id=\'outcomeOuter' + outcomeCount + '\'><img style=\'margin: 10px 0 5px 0\' src=\'".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');";
-                                                        $switchContents .= '$("#outcomeOuter" + outcomeCount).load("'.$_SESSION[$guid]['absoluteURL'].'/modules/Free%20Learning/units_manage_add_blockOutcomeAjax.php","type=outcome&id=" + outcomeCount + "&title='.urlencode($rowSelect['name'])."\&category=".urlencode($rowSelect['category']).'&gibbonOutcomeID='.$rowSelect['gibbonOutcomeID'].'&contents='.urlencode($rowSelect['description']).'&allowOutcomeEditing='.urlencode($allowOutcomeEditing).'") ;';
+                                                        $switchContents .= "$(\"#outcome\").append('<div id=\'outcomeOuter' + outcomeCount + '\'><img style=\'margin: 10px 0 5px 0\' src=\'".$gibbon->session->get('absoluteURL')."/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');";
+                                                        $switchContents .= '$("#outcomeOuter" + outcomeCount).load("'.$gibbon->session->get('absoluteURL').'/modules/Free%20Learning/units_manage_add_blockOutcomeAjax.php","type=outcome&id=" + outcomeCount + "&title='.urlencode($rowSelect['name'])."\&category=".urlencode($rowSelect['category']).'&gibbonOutcomeID='.$rowSelect['gibbonOutcomeID'].'&contents='.urlencode($rowSelect['description']).'&allowOutcomeEditing='.urlencode($allowOutcomeEditing).'") ;';
                                                         $switchContents .= 'outcomeCount++ ;';
                                                         $switchContents .= "$('#newOutcome').val('0');";
                                                         $switchContents .= 'break;';
@@ -798,8 +798,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                                     var count=<?php echo $resultBlocks->rowCount() + 1 ?> ;
                                                     $(document).ready(function(){
                                                         $("#new").click(function(){
-                                                            $("#sortable").append('<div id=\'blockOuter' + count + '\' class=\'blockOuter\'><img style=\'margin: 10px 0 5px 0\' src=\'<?php echo $_SESSION[$guid]['absoluteURL'] ?>/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');
-                                                            $("#blockOuter" + count).load("<?php echo $_SESSION[$guid]['absoluteURL'] ?>/modules/Free%20Learning/units_manage_add_blockAjax.php","id=" + count + "&mode=masterEdit") ;
+                                                            $("#sortable").append('<div id=\'blockOuter' + count + '\' class=\'blockOuter\'><img style=\'margin: 10px 0 5px 0\' src=\'<?php echo $gibbon->session->get('absoluteURL') ?>/themes/Default/img/loading.gif\' alt=\'Loading\' onclick=\'return false;\' /><br/>Loading</div>');
+                                                            $("#blockOuter" + count).load("<?php echo $gibbon->session->get('absoluteURL') ?>/modules/Free%20Learning/units_manage_add_blockAjax.php","id=" + count + "&mode=masterEdit") ;
                                                             count++ ;
                                                          });
                                                     });

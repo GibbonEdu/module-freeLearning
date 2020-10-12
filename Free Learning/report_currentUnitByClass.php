@@ -34,16 +34,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? '';
     $sort = $_GET['sort'] ?? 'unit';
 
-    $form = Form::create('filter', $_SESSION[$guid]['absoluteURL'] . '/index.php', 'get');
+    $form = Form::create('filter', $gibbon->session->get('absoluteURL') . '/index.php', 'get');
     $form->setFactory(DatabaseFormFactory::create($pdo));
     $form->setClass('noIntBorder fullWidth');
     $form->setTitle(__m('Choose Class'));
 
-    $form->addHiddenValue('q', '/modules/' . $_SESSION[$guid]['module'] . '/report_currentUnitByClass.php');
+    $form->addHiddenValue('q', '/modules/' . $gibbon->session->get('module') . '/report_currentUnitByClass.php');
 
     $row = $form->addRow();
         $row->addLabel('gibbonCourseClassID', __('Class'));
-        $row->addSelectClass('gibbonCourseClassID', $_SESSION[$guid]['gibbonSchoolYearID'], $_SESSION[$guid]['gibbonPersonID'])
+        $row->addSelectClass('gibbonCourseClassID', $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))
             ->required()
             ->selected($gibbonCourseClassID)
             ->placeholder();
@@ -98,7 +98,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             }
 
             echo "<div class='linkTop'>";
-            echo "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/report.php?q=/modules/'.$_SESSION[$guid]['module']."/report_students_byRollGroup_print.php&gibbonCourseClassID=$gibbonCourseClassID'>".__($guid, 'Print')."<img style='margin-left: 5px' title='".__($guid, 'Print')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/print.png'/></a>";
+            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL').'/report.php?q=/modules/'.$gibbon->session->get('module')."/report_students_byRollGroup_print.php&gibbonCourseClassID=$gibbonCourseClassID'>".__($guid, 'Print')."<img style='margin-left: 5px' title='".__($guid, 'Print')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/print.png'/></a>";
             echo '</div>';
 
             //Check for custom field
@@ -153,7 +153,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 echo $count;
                 echo '</td>';
                 echo '<td>';
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".formatName('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
+                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".formatName('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
                 $fields = unserialize($row['fields']);
                 if (!empty($fields[$customField])) {
                     $value = $fields[$customField];
@@ -172,7 +172,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 }
                 echo '</td>';
                 echo '<td>';
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
+                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
                 echo "<br/><span style='font-size: 85%; font-style: italic'>".$row['status'].'</span>';
                 echo '</td>';
                 echo '<td>';

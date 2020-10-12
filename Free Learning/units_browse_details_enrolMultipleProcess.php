@@ -36,13 +36,13 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+$gibbonPersonID = $gibbon->session->get('gibbonPersonID');
 if ($canManage and isset($_GET['gibbonPersonID'])) {
     $gibbonPersonID = $_GET['gibbonPersonID'];
 }
 
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_enrolMultiple.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&tab=2&view='.$view;
+$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_enrolMultiple.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&tab=2&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
     //Fail 0
@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&updateReturn=error0';
         header("Location: {$URL}");
     } else {
-        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
 
         $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
 
@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             header("Location: {$URL}");
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
+                $unitList = getUnitList($connection2, $guid, $gibbon->session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
@@ -119,7 +119,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         foreach ($gibbonPersonIDMulti as $gibbonPersonID) {
                             //Write to database
                             try {
-                                $data = array('gibbonPersonID' => $gibbonPersonID, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
+                                $data = array('gibbonPersonID' => $gibbonPersonID, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
                                 $sql = 'INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonID, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, gibbonCourseClassID=:gibbonCourseClassID, `grouping`=:grouping, status=:status';
                                 $result = $connection2->prepare($sql);
                                 $result->execute($data);

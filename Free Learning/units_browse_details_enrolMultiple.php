@@ -30,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
-        $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
 
         //Get params
         $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
@@ -43,7 +43,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         if ($view != 'grid' and $view != 'map') {
             $view = 'list';
         }
-        $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
+        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
         if ($canManage and isset($_GET['gibbonPersonID'])) {
             $gibbonPersonID = $_GET['gibbonPersonID'];
         }
@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             echo '</div>';
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $_SESSION[$guid]['gibbonPersonID'], $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
+                $unitList = getUnitList($connection2, $guid, $gibbon->session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
@@ -85,7 +85,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 }
                 ?>
 
-                <form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view" ?>">
+                <form method="post" action="<?php echo $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID='.$_GET['freeLearningUnitID']."&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view" ?>">
                     <table class='smallIntBorder' cellspacing='0' style="width: 100%">
                         <tr>
                             <td>
@@ -109,10 +109,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     <?php
                                     try {
                                         if ($highestAction2 == 'Manage Units_all') {
-                                            $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                            $dataSelect = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
                                             $sqlSelect = 'SELECT gibbonCourseClassID, gibbonCourse.name, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY course, class';
                                         } else {
-                                            $dataSelect = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+                                            $dataSelect = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
                                             $sqlSelect = "SELECT gibbonCourseClass.gibbonCourseClassID, gibbonCourse.name, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE role='Teacher' AND gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonPersonID=:gibbonPersonID ORDER BY course, class";
                                         }
                                         $resultSelect = $connection2->prepare($sqlSelect);
@@ -135,7 +135,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 <select multiple name="gibbonPersonIDMulti[]" id="gibbonPersonIDMulti" style="width: 302px; height:150px">
                                     <?php
                                     try {
-                                        $dataSelect2 = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                                        $dataSelect2 = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
                                         $sqlSelect2 = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS name, gibbonCourseClassID FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE role='Student' AND status='FULL' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName";
                                         $resultSelect2 = $connection2->prepare($sqlSelect2);
                                         $resultSelect2->execute($dataSelect2);
@@ -167,7 +167,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 <span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
                             </td>
                             <td class="right">
-                                <input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
+                                <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
                                 <input type="submit" value="<?php echo __($guid, 'Next') ?>">
                             </td>
                         </tr>
