@@ -347,10 +347,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             echo '<p>';
                                 if ($manageAll == true) {
-                                    echo __m('Below you can view the students currently enroled in this unit, including those who are working on it, those who are awaiting approval and those who have completed it.');
+                                    echo __m('Below you can view the students currently enrolled in this unit, including those who are working on it, those who are awaiting approval and those who have completed it.');
                                 }
                                 else {
-                                    echo __m('Below you can view those students currently enroled in this unit from your classes or that you mentor. This includes those who are working on it, those who are awaiting approval and those who have completed it.');
+                                    echo __m('Below you can view those students currently enrolled in this unit from your classes or that you mentor. This includes those who are working on it, those who are awaiting approval and those who have completed it.');
                                 }
                             echo '</p>';
 

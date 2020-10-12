@@ -115,7 +115,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
         echo __($guid, 'Report Data');
         echo '</h2>';
 
-        //Check the years groups the student has been enroled into
+        //Check the years groups the student has been enrolled into
         $proceed = true;
         $gibbonYearGroupIDWhere = '';
         try {

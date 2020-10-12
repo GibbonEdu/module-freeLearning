@@ -187,18 +187,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         echo $form->getOutput();
 
     } elseif ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Yet Approved') { 
-        // Currently enroled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
+        // Currently enrolled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
 
         $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
         $form->setClass('blank');
-        $form->setTitle(__m('Currently Enroled'));
+        $form->setTitle(__m('Currently Enrolled'));
 
         $form->addHiddenValue('address', $gibbon->session->get('address'));
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
         $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
 
         if ($rowEnrol['status'] == 'Current - Pending') {
-            $form->setDescription(sprintf(__m('You are currently enroled in %1$s, but your chosen mentor has yet to confirm their participation. You cannot submit evidence until they have done so.'), $values['name']));
+            $form->setDescription(sprintf(__m('You are currently enrolled in %1$s, but your chosen mentor has yet to confirm their participation. You cannot submit evidence until they have done so.'), $values['name']));
         } else {
             $description = '';
 
@@ -211,7 +211,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             }
 
             if ($rowEnrol['status'] == 'Current') {
-                $description .= '<p>'.sprintf(__m('You are currently enroled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $values['name']).'</p>';
+                $description .= '<p>'.sprintf(__m('You are currently enrolled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $values['name']).'</p>';
             } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
                 $description .= Format::alert(__m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:'), 'warning');
     
