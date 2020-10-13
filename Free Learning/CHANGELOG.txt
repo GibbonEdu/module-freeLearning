@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.04
+-------
+Add language support for Afrikaans and Spanish
+
 v5.10.03
 -------
 Refactored session variables and added null coalesce operators
