@@ -44,7 +44,6 @@ if ($canManage and isset($_GET['gibbonPersonID'])) {
     $gibbonPersonID = $_GET['gibbonPersonID'];
 }
 
-
 $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&sidebar=true&tab=1&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
@@ -57,6 +56,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
+        // Get enrolment settings
+        $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+        $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+        $enableClassEnrolment = $roleCategory == 'Student'
+            ? getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment')
+            : 'N';
+
+        //Check whether any enrolment methods are available
+        if ($enableSchoolMentorEnrolment != Y && $enableExternalMentorEnrolment != Y && $enableClassEnrolment != Y) {
+            //Fail 0
+            $URL .= '&return=error0';
+            header("Location: {$URL}");
+            exit;
+        }
+
         $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
 
         $freeLearningUnitID = $_POST['freeLearningUnitID'];
@@ -194,7 +208,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     }
                     $grouping = $_POST['grouping'];
                     $collaborators = $_POST['collaborators'] ?? [];
-                    
+
 
                     $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
                     if ($roleCategory != 'Student') {
@@ -373,10 +387,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                 // Notify external mentors by email
                                 if (($enrolmentMethod == 'externalMentor' and $_POST['emailExternalMentor'] != '')) {
-                                    
+
                                     $subject = sprintf(__m('Request For Mentorship via %1$s at %2$s'), $gibbon->session->get('systemName'), $gibbon->session->get('organisationNameShort'));
                                     $buttonURL = "/modules/Free Learning/units_mentorProcess.php?freeLearningUnitStudentID=$AI&confirmationKey=$confirmationKey";
-                                    
+
                                     $body = $container->get(View::class)->fetchFromTemplate('mentorRequest.twig.html', [
                                         'roleCategoryFull' => $roleCategory == 'Staff' ? __m('member of staff') : __(strtolower($roleCategory)),
                                         'unitName' => $unit,

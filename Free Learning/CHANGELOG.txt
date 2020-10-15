@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.10.06
+-------
+Adjusted Enrol tab to show message when no enrolment methods are available
+Fixed session bug
+
 v5.10.05
 -------
 Fixed Afrikaans language code

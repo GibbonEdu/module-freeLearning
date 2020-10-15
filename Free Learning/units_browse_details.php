@@ -407,7 +407,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                     if ($student['status'] == 'Current' || $student['status'] == 'Current - Pending') return;
 
                                     $logs = $unitStudentGateway->selectUnitStudentDiscussion($student['freeLearningUnitStudentID'])->fetchAll();
-                
+
                                     return $page->fetchFromTemplate('ui/discussion.twig.html', [
                                         'discussion' => $logs
                                     ]);
@@ -503,7 +503,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->addParam('gibbonPersonID', $gibbonPersonID)
                                 ->addParam('view', $view)
                                 ->addParam('sidebar', 'true')
-                                ->format(function ($student, $actions) use ($manageAll, $enrolmentType, $myClasses, $guid) {
+                                ->format(function ($student, $actions) use ($manageAll, $enrolmentType, $myClasses, $gibbon) {
                                     // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
                                     $editEnrolment = $manageAll ? true : false;
                                     if ($student['enrolmentMethod'] == 'class') {
@@ -543,7 +543,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                                 ->directLink();
                                     }
                                 });
-
 
                             echo $table->render($students);
 

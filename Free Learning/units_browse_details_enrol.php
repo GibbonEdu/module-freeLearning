@@ -27,6 +27,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
+    // Get enrolment settings
+    $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+    $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+    $enableClassEnrolment = $roleCategory == 'Student'
+        ? getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment')
+        : 'N';
+
+    //Check whether any enrolment methods are available
+    if ($enableSchoolMentorEnrolment != Y && $enableExternalMentorEnrolment != Y && $enableClassEnrolment != Y) {
+        echo Format::alert(__m('Enrolment is currently disabled: units can be viewed but not joined.'), 'message');
+        return;
+    }
+
     // Check ability to enrol
     $proceed = false;
     $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
@@ -51,24 +64,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         return;
     }
 
-    // Get enrolment settings
-    $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
-    $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
-    $enableClassEnrolment = $roleCategory == 'Student'
-        ? getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment')
-        : 'N';
-
     // Check enrolment status
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
     $rowEnrol = $unitStudentGateway->getUnitStudentDetailsByID($freeLearningUnitID, $gibbonPersonID);
 
-    if (empty($rowEnrol)) { 
+    if (empty($rowEnrol)) {
 
         // ENROL NOW
         $form = Form::create('enrol', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_enrolProcess.php?'.http_build_query($urlParams));
         $form->setTitle(__m('Enrol Now'));
         $form->setFactory(DatabaseFormFactory::create($pdo));
-        
+
         $form->addHiddenValue('address', $gibbon->session->get('address'));
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
 
@@ -99,7 +105,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $row = $form->addRow()->addClass('classEnrolment');
                 $row->addLabel('gibbonCourseClassID', __m('Class'))->description(__m('Which class are you enroling for?'));
                 $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, [
-                    'allClasses' => false, 
+                    'allClasses' => false,
                     'courseFilter' => 'Free Learning',
                     'departments' => $values['gibbonDepartmentIDList'],
                 ])->required();
@@ -130,7 +136,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $row->addEmail('emailExternalMentor')->required();
         }
 
-        // GROUPING 
+        // GROUPING
         $groupings = [];
         $extraSlots = 0;
         if (strpos($values['grouping'], 'Individual') !== false) {
@@ -160,7 +166,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $row = $form->addRow();
             $row->addLabel('grouping', __m('Grouping'))->description(__m('How do you want to study this unit?'));
             $row->addSelect('grouping')->fromArray($groupings)->required()->placeholder();
-        
+
         // COLLABORATORS
         if ($extraSlots > 0) {
             $prerequisitesActive = prerequisitesRemoveInactive($connection2, $roleCategory == 'Student' ? $values['freeLearningUnitIDPrerequisiteList'] : '');
@@ -186,7 +192,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         echo $form->getOutput();
 
-    } elseif ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Yet Approved') { 
+    } elseif ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Yet Approved') {
         // Currently enrolled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
 
         $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
@@ -214,8 +220,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $description .= '<p>'.sprintf(__m('You are currently enrolled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $values['name']).'</p>';
             } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
                 $description .= Format::alert(__m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:'), 'warning');
-    
-                
+
+
             }
             $form->setDescription($description);
 
@@ -246,9 +252,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     ]]
                 ]));
             }
-            
+
             echo $form->getOutput();
-    
+
             // SUBMIT EVIDENCE
             $form = Form::create('enrol', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_completePendingProcess.php?'.http_build_query($urlParams));
 
@@ -270,7 +276,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $row = $form->addRow();
                 $row->addLabel('type', __('Type'));
                 $row->addRadio('type')->fromArray($types)->inline()->required()->checked('Link');
-    
+
             // File
             $fileUploader = $container->get(FileUploader::class);
             $form->toggleVisibilityByClass('evidenceFile')->onRadio('type')->when('File');
@@ -291,7 +297,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         echo $form->getOutput();
 
-    } elseif ($rowEnrol['status'] == 'Complete - Pending') { 
+    } elseif ($rowEnrol['status'] == 'Complete - Pending') {
         // Waiting for teacher feedback
 
         $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
@@ -351,7 +357,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         echo $form->getOutput();
 
-    } elseif ($rowEnrol['status'] == 'Complete - Approved') { 
+    } elseif ($rowEnrol['status'] == 'Complete - Approved') {
         // Complete, show status and feedback from teacher.
 
         $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
@@ -362,7 +368,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $form = Form::create('enrol', '');
         $form->setTitle(__m('Complete - Approved'));
-        
+
         $form->setDescription(__m('Congratulations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') . $logContent );
 
         $evidenceLink = $rowEnrol['evidenceType'] == 'Link' ? $rowEnrol['evidenceLocation']: './'.$rowEnrol['evidenceLocation'];
@@ -385,10 +391,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $row->addContent(Format::link($certificateLink, __m('Print Certificate'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
 
         echo $form->getOutput();
-        
-        
-        
-    } elseif ($rowEnrol['status'] == 'Exempt') { 
+
+
+
+    } elseif ($rowEnrol['status'] == 'Exempt') {
         // Exempt, let student know
 
         $form = Form::create('enrol', '');
