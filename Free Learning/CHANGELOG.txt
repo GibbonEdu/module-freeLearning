@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.05
+-------
+Fixed Afrikaans language code
+
 v5.10.04
 -------
 Add language support for Afrikaans and Spanish
