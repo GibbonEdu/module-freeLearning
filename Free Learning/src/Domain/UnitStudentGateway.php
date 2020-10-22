@@ -252,7 +252,6 @@ class UnitStudentGateway extends QueryableGateway
                 FROM gibbonPerson
                 WHERE FIND_IN_SET(gibbonPersonID, :schoolMentorCustom)
                     AND status='Full')";
-
         }
         if (!empty($params['schoolMentorCustomRole'])) {
             $data['gibbonRoleID'] = $params['schoolMentorCustomRole'];
@@ -286,10 +285,10 @@ class UnitStudentGateway extends QueryableGateway
                 GROUP BY freeLearningUnitStudent.freeLearningUnitStudentID
             ) AS prerequisites ON (prerequisites.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
             LEFT JOIN (
-                SELECT freeLearningUnitStudentID as completed, freeLearningUnitStudent.gibbonPersonIDStudent 
+                SELECT freeLearningUnitStudentID as completed, freeLearningUnitStudent.gibbonPersonIDStudent
                 FROM freeLearningUnitStudent
                 WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
-                AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt') 
+                AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt')
             ) as currentUnit ON (currentUnit.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
             WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID
             AND status='Full' AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
