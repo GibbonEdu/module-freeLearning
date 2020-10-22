@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.07
+-------
+Fixed School Mentor selection, which was not honouring unit settings
+
 v5.10.06
 -------
 Adjusted Enrol tab to show message when no enrolment methods are available

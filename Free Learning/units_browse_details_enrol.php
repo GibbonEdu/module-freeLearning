@@ -115,7 +115,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         if ($enableSchoolMentorEnrolment == 'Y') {
             $form->toggleVisibilityByClass('schoolMentorEnrolment')->onRadio('enrolmentMethod')->when('schoolMentor');
 
-            $mentors = $unitStudentGateway->selectUnitMentors($freeLearningUnitID, $gibbonPersonID)->fetchAll();
+            $params['schoolMentorCompletors'] = $values['schoolMentorCompletors'];
+            $params['schoolMentorCustom'] = $values['schoolMentorCustom'];
+            $params['schoolMentorCustomRole'] = $values['schoolMentorCustomRole'];
+            $mentors = $unitStudentGateway->selectUnitMentors($freeLearningUnitID, $gibbonPersonID, $params)->fetchAll();
             $mentors = Format::nameListArray($mentors, 'Staff', true, true);
 
             $row = $form->addRow()->addClass('schoolMentorEnrolment');
