@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.08
+-------
+Added School Mentor and External Mentor enrolments to Current Unit by Class
+
 v5.10.07
 -------
 Fixed School Mentor selection, which was not honouring unit settings
