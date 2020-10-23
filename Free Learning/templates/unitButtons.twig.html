@@ -16,20 +16,20 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
             <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconList.png"/>
         </a>
         <a class="{{ buttonClass }}" href="{{ browseUnitsURL }}&view=grid">
-            {{ __('Grid') }} 
+            {{ __('Grid') }}
             <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconGrid.png"/>
-        </a> 
+        </a>
         <a class="{{ buttonClass }} rounded-r" href="{{ browseUnitsURL }}&view=map">
-            {{ __('Map') }} 
+            {{ __m('Map') }}
             <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconMap.png"/>
-        </a> 
+        </a>
     </div>
-        
+
     {% if publicUnits == 'Y' and gibbonPersonID is empty %}
-    <a class="block rounded border border-red-800 bg-red-700 hover:bg-red-600 text-white hover:shadow-md text-base font-bold py-3 px-4 " 
+    <a class="block rounded border border-red-800 bg-red-700 hover:bg-red-600 text-white hover:shadow-md text-base font-bold py-3 px-4 "
         href="{{ absoluteURL }}/index.php?q=/modules/Free Learning/showcase.php&sidebar=false">
         {{ __('View Our Free Learning Showcase') }}
     </a>
     {% endif %}
-    
+
 </div>

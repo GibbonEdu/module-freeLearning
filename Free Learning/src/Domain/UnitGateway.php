@@ -167,7 +167,7 @@ class UnitGateway extends QueryableGateway
     public function selectUnitAuthorsByID($freeLearningUnitID)
     {
         $data = ['freeLearningUnitID' => $freeLearningUnitID];
-        $sql = "SELECT 
+        $sql = "SELECT
                 gibbonPerson.title as title,
                 (CASE WHEN gibbonPerson.surname IS NOT NULL THEN gibbonPerson.surname ELSE freeLearningUnitAuthor.surname END) as surname,
                 (CASE WHEN gibbonPerson.preferredName IS NOT NULL THEN gibbonPerson.preferredName ELSE freeLearningUnitAuthor.preferredName END) as preferredName,
@@ -182,7 +182,7 @@ class UnitGateway extends QueryableGateway
     public function selectUnitDepartmentsByID($freeLearningUnitID)
     {
         $data = ['freeLearningUnitID' => $freeLearningUnitID];
-        $sql = "SELECT gibbonDepartment.name FROM freeLearningUnit 
+        $sql = "SELECT gibbonDepartment.name FROM freeLearningUnit
                 JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
                 WHERE freeLearningUnitID=:freeLearningUnitID";
 
@@ -208,7 +208,7 @@ class UnitGateway extends QueryableGateway
     {
         if (!empty($gibbonPersonID)) {
             $data = ['gibbonPersonID' => $gibbonPersonID];
-            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy
+            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, '".__m("Learning Area")."' as groupBy
                     FROM freeLearningUnit
                     JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
                     JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
@@ -218,7 +218,7 @@ class UnitGateway extends QueryableGateway
                     ORDER BY gibbonDepartment.name)";
         } else {
             $data = [];
-            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, 'Learning Area' as groupBy
+            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, '".__m("Learning Area")."' as groupBy
                     FROM freeLearningUnit
                     JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
                     WHERE type='Learning Area'
@@ -227,7 +227,7 @@ class UnitGateway extends QueryableGateway
         }
 
         $sql .= " UNION ALL
-        (SELECT DISTINCT course as value, course as name, 'Course' as groupBy FROM freeLearningUnit WHERE active='Y' AND NOT course IS NULL AND NOT course='' ORDER BY course)
+        (SELECT DISTINCT course as value, course as name, '".__m("Course")."' as groupBy FROM freeLearningUnit WHERE active='Y' AND NOT course IS NULL AND NOT course='' ORDER BY course)
         ORDER BY groupBy DESC, name";
 
         return $this->db()->select($sql, $data);

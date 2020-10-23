@@ -818,7 +818,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             <span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
                         </td>
                         <td class="right">
-                            <input id="submit" type="submit" value="Submit">
+                            <input id="submit" type="submit" value="<?php echo __('Submit')?>">
                         </td>
                     </tr>
                 </table>

@@ -105,13 +105,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         $learningAreas = $unitGateway->selectLearningAreasAndCourses();
         $row = $form->addRow();
-            $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
+            $row->addLabel('gibbonDepartmentID', __m('Learning Area & Course'));
             $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
 
         $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
         $difficulties = array_map('trim', explode(',', $difficultyOptions));
         $row = $form->addRow();
-            $row->addLabel('difficulty', __('Difficulty'));
+            $row->addLabel('difficulty', __m('Difficulty'));
             $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
 
         $row = $form->addRow();
@@ -232,7 +232,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     });
 
                 $table->addColumn('learningArea', __('Learning Areas'))
-                    ->description(__('Authors'))
+                    ->description(__m('Authors'))
                     ->context('secondary')
                     ->sortable(['learningArea'])
                     ->width('12%')
@@ -266,7 +266,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $relativeTime = __n('{count} min', '{count} mins', $minutes);
                         if ($minutes > 60) {
                             $hours = round($minutes / 60, 1);
-                            $relativeTime = Format::tooltip(__n('{count} hr', '{count} hrs', ceil($minutes / 60), ['count' => $hours]), $relativeTime);
+                            $relativeTime = Format::tooltip(__n('{count} hr', '{count} '.__m('hrs'), ceil($minutes / 60), ['count' => $hours]), $relativeTime);
                         }
 
                         return !empty($unit['length'])
@@ -276,7 +276,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 $table->addColumn('grouping', __m('Grouping'))
                     ->format(function ($unit) {
-                        return implode('<br/>', explode(',', $unit['grouping'] ?? []));
+                        $output = '';
+                        foreach (explode(',', $unit['grouping']) as $grouping) {
+                            $output .= __m($grouping)."<br/>";
+                        }
+                        return $output ;
                     });
 
                 $table->addColumn('prerequisites', __m('Prerequisites'))

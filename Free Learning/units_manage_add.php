@@ -524,7 +524,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             });
                         </script>
                         <input name="blockCount" id=blockCount value="5" type="hidden">
-                        <input type="submit" id="submit" value="Submit">
+                        <input type="submit" id="submit" value="<?php echo __('Submit')?>">
                     </td>
                 </tr>
                 <tr>
