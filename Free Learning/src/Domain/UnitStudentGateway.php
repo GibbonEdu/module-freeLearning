@@ -240,7 +240,7 @@ class UnitStudentGateway extends QueryableGateway
                     LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID)
                     LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID)
                     WHERE gibbonPerson.status='Full'
-                        AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID1
+                        AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
                         AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitAuthor.freeLearningUnitAuthorID IS NOT NULL)
                     GROUP BY gibbonPersonID)";
         }

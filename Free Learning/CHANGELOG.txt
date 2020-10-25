@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.11
+-------
+Fixed completors as mentors bug
+
 v5.10.10
 -------
 Improved i18n support

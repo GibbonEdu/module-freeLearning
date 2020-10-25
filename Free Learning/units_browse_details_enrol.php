@@ -35,7 +35,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         : 'N';
 
     //Check whether any enrolment methods are available
-    if ($enableSchoolMentorEnrolment != Y && $enableExternalMentorEnrolment != Y && $enableClassEnrolment != Y) {
+    if ($enableSchoolMentorEnrolment != 'Y' && $enableExternalMentorEnrolment != 'Y' && $enableClassEnrolment != 'Y') {
         echo Format::alert(__m('Enrolment is currently disabled: units can be viewed but not joined.'), 'message');
         return;
     }
