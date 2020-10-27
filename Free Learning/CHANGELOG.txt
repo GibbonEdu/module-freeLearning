@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.12
+-------
+Added missing file extension to unit export
+
 v5.10.11
 -------
 Fixed completors as mentors bug

@@ -274,5 +274,5 @@ $pdf->AddPage();
 $pdf->writeHTML($output, true, 0, true, 0);
 
 $pdf->lastPage();
-$pdf->Output($gibbon->session->get('organisationName').' Free Learning', 'I');
+$pdf->Output($gibbon->session->get('organisationName').' Free Learning.pdf', 'I');
 ?>
