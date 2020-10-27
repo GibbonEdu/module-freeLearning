@@ -18,8 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
-use Gibbon\Tables\DataTable;
 use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
+use Gibbon\Forms\Prefab\BulkActionForm;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
 // Module includes
@@ -46,7 +47,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         // QUERY
         $unitGateway = $container->get(UnitGateway::class);
-        $criteria = $unitGateway->newQueryCriteria()
+        $criteria = $unitGateway->newQueryCriteria(true)
             ->searchBy($unitGateway->getSearchableColumns(), $name)
             ->sortBy('name')
             ->filterBy('department', $gibbonDepartmentID)
@@ -87,8 +88,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $units = $unitGateway->queryUnitsByLearningAreaStaff($criteria, $gibbon->session->get('gibbonPersonID'));
         }
 
+
+        $form = BulkActionForm::create('bulkAction', $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/units_manageProcessBulk.php');
+
+        $bulkActions = ['Export' => __('Export')];
+        $col = $form->createBulkActionColumn($bulkActions);
+            $col->addSubmit(__('Go'));
+
         // DATA TABLE
-        $table = DataTable::createPaginated('units', $criteria);
+        $table = $form->addRow()->addDataTable('units', $criteria)->withData($units);
         $table->setTitle(__('View'));
 
         $table->addHeaderAction('add', __('Add'))
@@ -96,12 +104,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->addParam('difficulty', $difficulty)
             ->addParam('name', $name)
             ->setURL('/modules/Free Learning/units_manage_add.php')
+            ->displayLabel()
+            ->append(' | ');
+
+        $table->addHeaderAction('import', __('Import'))
+            ->setURL('/modules/Free Learning/units_manage_import.php')
             ->displayLabel();
             
         $table->modifyRows(function ($unit, $row) {
             if ($unit['active'] != 'Y') $row->addClass('error');
             return $row;
         });
+
+        $table->addMetaData('bulkActions', $col);
 
         $table->addMetaData('filterOptions', [
             'showInactive:Y'  => __('Show Inactive'),
@@ -145,6 +160,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         ->setURL('/modules/Free Learning/units_manage_delete.php');
             });
 
-        echo $table->render($units);
+        $table->addCheckboxColumn('freeLearningUnitID');
+
+        echo $form->getOutput();
     }
 }
