@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.10.13
+-------
+Moved Manage Enrolment_all into its own action
+
 v5.10.12
 -------
 Added missing file extension to unit export

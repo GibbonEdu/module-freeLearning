@@ -91,10 +91,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $values['authors'] = $unitGateway->selectUnitAuthorsByID($freeLearningUnitID)->fetchAll();
     $values['departments'] = $unitGateway->selectUnitDepartmentsByID($freeLearningUnitID)->fetchAll(PDO::FETCH_COLUMN, 0);
 
-
     $proceed = false;
-    //Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s) or if canManage is true
-    $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
+    //Check to see if we have access to manage all enrolments, or only those belonging to ourselves
+    $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/enrolment_manage.php', 'Manage Enrolment_all');
     if ($manageAll == true) {
         $proceed = true;
     }
@@ -187,7 +186,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             'comment' => $commentBox->getOutput(),
         ]]
     ]));
-    
+
     echo $form->getOutput();
 
     // Not ready for approval
@@ -209,7 +208,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $row = $form->addRow();
             $row->addLabel('student', __('Students'));
             $col = $row->addColumn()->setClass('flex-col');
-        
+
         $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
         foreach ($collaborators as $index => $collaborator) {
             $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false));
@@ -232,7 +231,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $col = $row->addColumn();
         $col->addLabel('commentApproval', __m('Teacher Comment'))->description(__m('Leave a comment on the student\'s progress.'));
         $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required();
-        
+
     $statuses = [
         'Complete - Approved' => __m('Complete - Approved'),
         'Evidence Not Yet Approved' => __m('Evidence Not Yet Approved'),
@@ -270,4 +269,3 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     echo $form->getOutput();
 }
-

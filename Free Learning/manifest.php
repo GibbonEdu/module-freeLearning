@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.10.12';
+$version = '5.10.13';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -421,6 +421,24 @@ $actionRows[15]['categoryPermissionStaff'] = 'Y';
 $actionRows[15]['categoryPermissionStudent'] = 'N';
 $actionRows[15]['categoryPermissionParent'] = 'N';
 $actionRows[15]['categoryPermissionOther'] = 'N';
+
+$actionRows[16]['name'] = 'Manage Enrolment_all';
+$actionRows[16]['precedence'] = '0';
+$actionRows[16]['category'] = 'Admin';
+$actionRows[16]['description'] = 'Allows a user to manage all enrolments within Browse Units. Does not have an interface of its own.';
+$actionRows[16]['URLList'] = 'enrolment_manage.php';
+$actionRows[16]['entryURL'] = 'enrolment_manage.php';
+$actionRows[16]['entrySidebar'] = 'Y';
+$actionRows[16]['menuShow'] = 'N';
+$actionRows[16]['defaultPermissionAdmin'] = 'Y';
+$actionRows[16]['defaultPermissionTeacher'] = 'N';
+$actionRows[16]['defaultPermissionStudent'] = 'N';
+$actionRows[16]['defaultPermissionParent'] = 'N';
+$actionRows[16]['defaultPermissionSupport'] = 'N';
+$actionRows[16]['categoryPermissionStaff'] = 'Y';
+$actionRows[16]['categoryPermissionStudent'] = 'N';
+$actionRows[16]['categoryPermissionParent'] = 'N';
+$actionRows[16]['categoryPermissionOther'] = 'N';
 
 $array = array();
 $array['toggleSettingName'] = 'publicUnits';

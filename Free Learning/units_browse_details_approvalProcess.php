@@ -94,8 +94,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $commentApprovalOriginal = trim($row['commentApproval']);
 
                 $proceed = false;
-                //Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
-                $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
+                //Check to see if we have access to manage all enrolments, or only those belonging to ourselves
+                $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/enrolment_manage.php', 'Manage Enrolment_all');
                 if ($manageAll == true) {
                     $proceed = true;
                 } else {
@@ -154,11 +154,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
                             $discussionGateway = $container->get(DiscussionGateway::class);
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
-                                
+
                             $data = [
                                 'foreignTable'   => 'freeLearningUnitStudent',
                                 'foreignTableID' => $freeLearningUnitStudentID,
-                                'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'), 
+                                'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'),
                                 'gibbonPersonID' => $gibbonPersonID,
                                 'comment'        => $commentApproval,
                                 'type'           => $status,
@@ -199,8 +199,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             }
 
                             // Write to database
-                            $unitStudentGateway = $container->get(UnitStudentGateway::class); 
-                           
+                            $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
                             $data = [
                                 'status' => $status,
                                 'exemplarWork' => $exemplarWork,

@@ -87,8 +87,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $row = $result->fetch();
 
                 $proceed = false;
-                //Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
-                $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
+                //Check to see if we have access to manage all enrolments, or only those belonging to ourselves
+                $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/enrolment_manage.php', 'Manage Enrolment_all');
                 if ($manageAll == true) {
                     $proceed = true;
                 } else {
