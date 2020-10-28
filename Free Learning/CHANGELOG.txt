@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.11.00
+-------
+Added tools to export and import units
+
 v5.10.13
 -------
 Moved Manage Enrolment_all into its own action

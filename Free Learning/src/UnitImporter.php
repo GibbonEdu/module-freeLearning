@@ -57,27 +57,18 @@ class UnitImporter
         $this->course = $course;
     }
 
-    public function importFromFile($filePath) : bool
+    public function importFromFile($zipFilePath) : bool
     {
         $zip = new ZipArchive();
-        $zip->open($filePath);
+        $zip->open($zipFilePath);
 
         $json = $zip->getFromName('data.json');
-
         $data = json_decode($json, true);
-        $files = [];
 
         if (empty($data['units'])) return false;
 
-        // Upload Files
-        foreach ($data['files'] as $filename) {
-            $uploadsFolder = 'uploads/'.date('Y').'/'.date('m');
-            $destinationPath = $this->session->get('absolutePath').'/'.$uploadsFolder.'/'.$filename;
-
-            if (@copy('zip://'.$filePath.'#files/'.$filename, $destinationPath)) {
-                $files[$filename] = $this->session->get('absoluteURL').'/'.$uploadsFolder.'/'.$filename;
-            }
-        }
+        // Upload all necessary files first
+        $this->files = $this->uploadImportedFiles($data, $zipFilePath);
 
         // Import Units
         foreach ($data['units'] as $index => $unit) {
@@ -89,23 +80,10 @@ class UnitImporter
                 continue;
             }
 
-            // Apply default values
-            if (!empty($this->gibbonDepartmentIDList)) $unit['unit']['gibbonDepartmentIDList'] = $this->gibbonDepartmentIDList;
-            if (!empty($this->course)) $unit['unit']['course'] = $this->course;
-            $unit['unit']['gibbonPersonIDCreator'] = $this->session->get('gibbonPersonID');
-            $unit['unit']['freeLearningUnitIDPrerequisiteList'] = '';
+            // Update certain values before importing
+            $unit = $this->updateUnitDetails($unit);
 
-            // Get the uploaded logo URL
-            if (!empty($unit['unit']['logo']) && !empty($files[$unit['unit']['logo']])) {
-                $unit['unit']['logo'] = $files[$unit['unit']['logo']] ?? '';
-            }
-
-            // Update unit outline to point to new file locations
-            foreach ($files as $filename => $url) {
-                $unit['unit']['outline'] = str_replace($filename, $url, $unit['unit']['outline']);
-            }
-
-            // Add or update the unit
+            // Add or update the unit in the database
             if (!empty($existingUnit)) {
                 $freeLearningUnitID = $existingUnit['freeLearningUnitID'];
                 $this->unitGateway->update($freeLearningUnitID, $unit['unit']);
@@ -113,50 +91,106 @@ class UnitImporter
                 $freeLearningUnitID = $this->unitGateway->insert($unit['unit']);
             }
 
-            // Add Blocks
-            foreach ($unit['blocks'] as $block) {
-                $block['freeLearningUnitID'] = $freeLearningUnitID;
-                if (!empty($existingUnit)) {
-                    $existingBlock = $this->unitBlockGateway->selectBy([
-                        'freeLearningUnitID' => $existingUnit['freeLearningUnitID'],
-                        'title' => $block['title'],
-                    ])->fetch();
-                }
+            // Add blocks and authors
+            $this->addUnitBlocks($unit['blocks'], $freeLearningUnitID, $existingUnit);
+            $this->addUnitAuthors($unit['authors'], $freeLearningUnitID, $existingUnit);
+        }
 
-                // Update uploaded files to point to their new file location
-                foreach ($files as $filename => $url) {
-                    $block['contents'] = str_replace($filename, $url, $block['contents']);
-                }
+        // Connect prerequisites after all units have been imported
+        $this->connectUnitPrerequisites($data);
 
-                if (!empty($existingBlock)) {
-                    $this->unitBlockGateway->update($existingBlock['freeLearningUnitBlockID'], $block);
-                } else {
-                    $this->unitBlockGateway->insert($block);
-                }
-            }
+        $zip->close();
 
-            // Add Authors
-            foreach ($unit['authors'] as $author) {
-                $author['freeLearningUnitID'] = $freeLearningUnitID;
-                $author['gibbonPersonID'] = null;
+        unlink($zipFilePath);
 
-                if (!empty($existingUnit)) {
-                    $existingAuthor = $this->unitAuthorGateway->selectBy([
-                        'freeLearningUnitID' => $existingUnit['freeLearningUnitID'],
-                        'surname' => $author['surname'],
-                        'preferredName' => $author['preferredName'],
-                    ])->fetch();
-                }
+        return true;
+    }
 
-                if (!empty($existingAuthor)) {
-                    $this->unitAuthorGateway->update($existingAuthor['freeLearningUnitAuthorID'], $author);
-                } else {
-                    $this->unitAuthorGateway->insert($author);
-                }
+    protected function uploadImportedFiles($data, $zipFilePath) {
+        $this->files = [];
+
+        foreach ($data['files'] as $filename) {
+            $uploadsFolder = 'uploads/'.date('Y').'/'.date('m');
+            $destinationPath = $this->session->get('absolutePath').'/'.$uploadsFolder.'/'.$filename;
+
+            if (@copy('zip://'.$zipFilePath.'#files/'.$filename, $destinationPath)) {
+                $this->files[$filename] = $this->session->get('absoluteURL').'/'.$uploadsFolder.'/'.$filename;
             }
         }
 
-        // Connect Unit Prerequisites
+        return $this->files;
+    }
+
+    protected function updateUnitDetails($unit) {
+        // Reset un-importable values
+        $unit['unit']['gibbonPersonIDCreator'] = $this->session->get('gibbonPersonID');
+        $unit['unit']['freeLearningUnitIDPrerequisiteList'] = '';
+
+        // Apply default values
+        if (!empty($this->gibbonDepartmentIDList)) $unit['unit']['gibbonDepartmentIDList'] = $this->gibbonDepartmentIDList;
+        if (!empty($this->course)) $unit['unit']['course'] = $this->course;
+
+        // Get the uploaded logo URL
+        if (!empty($unit['unit']['logo']) && !empty($this->files[$unit['unit']['logo']])) {
+            $unit['unit']['logo'] = $this->files[$unit['unit']['logo']] ?? '';
+        }
+
+        // Update unit outline to point to new file locations
+        foreach ($this->files as $filename => $url) {
+            $unit['unit']['outline'] = str_replace($filename, $url, $unit['unit']['outline']);
+        }
+
+        return $unit;
+    }
+
+    protected function addUnitBlocks($blocks, $freeLearningUnitID, $existingUnit)
+    {
+        foreach ($blocks as $block) {
+            $block['freeLearningUnitID'] = $freeLearningUnitID;
+            if (!empty($existingUnit)) {
+                $existingBlock = $this->unitBlockGateway->selectBy([
+                    'freeLearningUnitID' => $existingUnit['freeLearningUnitID'],
+                    'title' => $block['title'],
+                ])->fetch();
+            }
+
+            // Update uploaded files to point to their new file location
+            foreach ($this->files as $filename => $url) {
+                $block['contents'] = str_replace($filename, $url, $block['contents']);
+            }
+
+            if (!empty($existingBlock)) {
+                $this->unitBlockGateway->update($existingBlock['freeLearningUnitBlockID'], $block);
+            } else {
+                $this->unitBlockGateway->insert($block);
+            }
+        }
+    }
+
+    protected function addUnitAuthors($authors, $freeLearningUnitID, $existingUnit)
+    {
+        foreach ($authors as $author) {
+            $author['freeLearningUnitID'] = $freeLearningUnitID;
+            $author['gibbonPersonID'] = null;
+
+            if (!empty($existingUnit)) {
+                $existingAuthor = $this->unitAuthorGateway->selectBy([
+                    'freeLearningUnitID' => $existingUnit['freeLearningUnitID'],
+                    'surname' => $author['surname'],
+                    'preferredName' => $author['preferredName'],
+                ])->fetch();
+            }
+
+            if (!empty($existingAuthor)) {
+                $this->unitAuthorGateway->update($existingAuthor['freeLearningUnitAuthorID'], $author);
+            } else {
+                $this->unitAuthorGateway->insert($author);
+            }
+        }
+    }
+
+    protected function connectUnitPrerequisites($data)
+    {
         foreach ($data['units'] as $unit) {
             if (empty($unit['prerequisites'])) continue;
 
@@ -165,12 +199,5 @@ class UnitImporter
             $prerequisiteList = $this->unitGateway->selectPrerequisiteIDsByNames($unit['prerequisites'])->fetchAll(\PDO::FETCH_COLUMN);
             $this->unitGateway->update($existingUnit['freeLearningUnitID'], ['freeLearningUnitIDPrerequisiteList' => implode(',', $prerequisiteList)]);
         }
-
-        $zip->close();
-
-        unlink($filePath);
-
-        return true;
     }
-
 }
