@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace Gibbon\Module\FreeLearning;
 
 use ZipArchive;
+use DOMDocument;
 use Gibbon\Contracts\Services\Session;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
@@ -44,17 +45,53 @@ class UnitExporter
         $this->session = $session;
     }
 
+    public function setFilename($filename)
+    {
+        $this->filename = preg_replace('/[^a-zA-Z0-9]/', '', $filename);
+    }
+
     public function addUnitToExport($freeLearningUnitID)
     {
         $unit = $this->unitGateway->getByID($freeLearningUnitID);
 
         if (empty($unit)) return;
 
+        // Extract logo image
         if (!empty($unit['logo'])) {
             $logoPath = $_SERVER['DOCUMENT_ROOT'] . parse_url($unit['logo'], PHP_URL_PATH);
-            if (file_exists($logoPath)) {
-                $this->files[] = $logoPath;
-                $unit['logo'] = basename($logoPath);
+            $this->files[] = file_exists($logoPath)
+                ? ['type' => 'path', 'location' => $logoPath]
+                : ['type' => 'url', 'location' => $unit['logo']];
+
+            $unit['logo'] = basename($logoPath);
+        }
+
+        // Extract images from unit outline
+        $dom = new DOMDocument();
+        @$dom->loadHTML($unit['outline']);
+        foreach ($dom->getElementsByTagName('img') as $node) {
+            $src = $node->getAttribute('src');
+            $srcPath = $_SERVER['DOCUMENT_ROOT'] . parse_url($src, PHP_URL_PATH);
+            $this->files[] = file_exists($srcPath)
+                ? ['type' => 'path', 'location' => $srcPath]
+                : ['type' => 'url', 'location' => $src];
+
+            $unit['outline'] = str_replace($src, basename($src), $unit['outline']);
+        }
+
+        // Extract images from blocks
+        $blocks = $this->unitBlockGateway->selectBlocksByUnit($freeLearningUnitID)->fetchAll();
+        foreach ($blocks as $index => $block) {
+            $dom = new DOMDocument();
+            @$dom->loadHTML($blocks[$index]['contents']);
+            foreach ($dom->getElementsByTagName('img') as $node) {
+                $src = $node->getAttribute('src');
+                $srcPath = $_SERVER['DOCUMENT_ROOT'] . parse_url($src, PHP_URL_PATH);
+                $this->files[] = file_exists($srcPath)
+                    ? ['type' => 'path', 'location' => $srcPath]
+                    : ['type' => 'url', 'location' => $src];
+
+                $blocks[$index]['contents'] = str_replace($src, basename($src), $blocks[$index]['contents']);
             }
         }
         
@@ -62,7 +99,7 @@ class UnitExporter
             'name' => $unit['name'],
             'unit' => $unit,
             'prerequisites' => $this->unitGateway->selectPrerequisiteNamesByIDs($unit['freeLearningUnitIDPrerequisiteList'])->fetchAll(\PDO::FETCH_COLUMN),
-            'blocks' => $this->unitBlockGateway->selectBlocksByUnit($freeLearningUnitID)->fetchAll(),
+            'blocks' => $blocks,
             'authors' => $this->unitAuthorGateway->selectAuthorsByUnit($freeLearningUnitID)->fetchAll(),
         ];
     }
@@ -75,15 +112,24 @@ class UnitExporter
         $zip->open($filepath, ZipArchive::CREATE);
 
         // Add Files
-        foreach ($this->files as $filePath) {
-            if (!file_exists($filePath)) continue;
+        foreach ($this->files as $file) {
+            if ($file['type'] == 'url') {
+                $fileContents = file_get_contents($file['location']);
+                if (empty($fileContents)) continue;
 
-            $zip->addFile($filePath, 'Units/files/'.basename($filePath));
-            $this->data['files'][] = basename($filePath);
+                $zip->addFromString('files/'.basename($file['location']), $fileContents);
+                $this->data['files'][] = basename($file['location']);
+
+            } elseif ($file['type'] == 'path') {
+                if (!file_exists($file['location'])) continue;
+
+                $zip->addFile($file['location'], 'files/'.basename($file['location']));
+                $this->data['files'][] = basename($file['location']);
+            }
         }
 
         // Add Data
-        $zip->addFromString('Units/data.json', json_encode($this->data, JSON_PRETTY_PRINT));
+        $zip->addFromString('data.json', json_encode($this->data, JSON_PRETTY_PRINT));
 
         $zip->close();
 

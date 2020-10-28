@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Module\FreeLearning\UnitExporter;
 
+$_POST['address'] = '/modules/Free Learning/units_manage.php';
+
 require_once '../../gibbon.php';
 
 $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
@@ -28,8 +30,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     header("Location: {$URL}");
 } else {
     // Proceed!
-    $action = $_POST['action'] ?? '';
-    $freeLearningUnitIDList = $_POST['freeLearningUnitID'] ?? [];
+    $action = $_REQUEST['action'] ?? '';
+    $name = $_REQUEST['name'] ?? [];
+    $freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? [];
+    $freeLearningUnitIDList = is_array($freeLearningUnitID) ? $freeLearningUnitID : [$freeLearningUnitID];
     $partialFail = false;
 
     if (empty($action)) {
@@ -41,6 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     if ($action == 'Export') {
 
         $exporter = $container->get(UnitExporter::class);
+        $exporter->setFilename(!empty($name)? $name : 'FreeLearningUnits');
 
         foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
             $exporter->addUnitToExport($freeLearningUnitID);

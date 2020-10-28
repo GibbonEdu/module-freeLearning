@@ -56,7 +56,7 @@ class UnitImporter
         $zip = new ZipArchive();
         $zip->open($filePath);
 
-        $json = $zip->getFromName('Units/data.json');
+        $json = $zip->getFromName('data.json');
 
         $data = json_decode($json, true);
         $files = [];
@@ -68,7 +68,7 @@ class UnitImporter
             $uploadsFolder = 'uploads/'.date('Y').'/'.date('m');
             $destinationPath = $this->session->get('absolutePath').'/'.$uploadsFolder.'/'.$filename;
 
-            if (@copy('zip://'.$filePath.'#Units/files/'.$filename, $destinationPath)) {
+            if (@copy('zip://'.$filePath.'#files/'.$filename, $destinationPath)) {
                 $files[$filename] = $this->session->get('absoluteURL').'/'.$uploadsFolder.'/'.$filename;
             }
         }
@@ -87,6 +87,11 @@ class UnitImporter
                 $unit['unit']['logo'] = $files[$unit['unit']['logo']] ?? '';
             }
 
+            // Update unit outline to point to new file locations
+            foreach ($files as $filename => $url) {
+                $unit['unit']['outline'] = str_replace($filename, $url, $unit['unit']['outline']);
+            }
+
             // Add or update the unit
             if (!empty($existingUnit)) {
                 $freeLearningUnitID = $existingUnit['freeLearningUnitID'];
@@ -103,6 +108,11 @@ class UnitImporter
                         'freeLearningUnitID' => $existingUnit['freeLearningUnitID'],
                         'title' => $block['title'],
                     ])->fetch();
+                }
+
+                // Update uploaded files to point to their new file location
+                foreach ($files as $filename => $url) {
+                    $block['contents'] = str_replace($filename, $url, $block['contents']);
                 }
 
                 if (!empty($existingBlock)) {
