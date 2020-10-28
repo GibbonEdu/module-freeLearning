@@ -143,7 +143,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo " | ";
                         }
                         if ($browseAll) {
-                            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__($guid, 'Export')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Export')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/download.png'/></a>";
+                            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__('Download')."<img style='margin: 0 0 -4px 3px' title='".__('Download')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/download.png'/></a> | ";
+
+                            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_manageProcessBulk.php?action=Export&freeLearningUnitID=$freeLearningUnitID&name=".$values['name']."'>".__('Export')."<img style='margin: 0 0 -4px 3px' title='".__('Export')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/delivery2.png'/></a>";
                         }
                         echo '</div>';
                     }

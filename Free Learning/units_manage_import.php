@@ -36,7 +36,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
     $row = $form->addRow();
         $row->addLabel('file', __('ZIP File'));
-        $row->addFileUpload('file')->required();
+        $row->addFileUpload('file')->required()->accepts('.zip');
 
     $sql = "SELECT gibbonDepartmentID as value, name FROM gibbonDepartment WHERE type='Learning Area' ORDER BY name";
     $row = $form->addRow();
