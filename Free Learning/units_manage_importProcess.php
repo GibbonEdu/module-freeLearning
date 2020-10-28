@@ -24,6 +24,11 @@ require_once '../../gibbon.php';
 
 $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
 
+// Override the ini to keep this process alive
+ini_set('memory_limit', '2048M');
+ini_set('max_execution_time', 1800);
+set_time_limit(1800);
+
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') == false) {
     $URL .= '&return=error0';
     header("Location: {$URL}");
@@ -31,6 +36,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     // Proceed!
     $gibbonDepartmentIDList = isset($_POST['gibbonDepartmentIDList']) ? implode(',', $_POST['gibbonDepartmentIDList']) : '';
     $course = $_POST['course'] ?? '';
+    $override = $_POST['override'] ?? false;
 
     if (empty($_FILES['file'])) {
         $URL .= '&return=error1';
@@ -49,6 +55,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
     $importer = $container->get(UnitImporter::class);
     $importer->setDefaults($gibbonDepartmentIDList, $course);
+    $importer->setOverride($override == 'Y');
+
     $success = $importer->importFromFile($gibbon->session->get('absolutePath').'/'.$zipFile);
 
 

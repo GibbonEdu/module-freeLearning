@@ -30,6 +30,7 @@ class UnitImporter
     protected $gibbonDepartmentIDList;
     protected $course;
 
+    protected $override = false;
     protected $files;
 
     protected $unitGateway;
@@ -43,6 +44,11 @@ class UnitImporter
         $this->unitBlockGateway = $unitBlockGateway;
         $this->unitAuthorGateway = $unitAuthorGateway;
         $this->session = $session;
+    }
+
+    public function setOverride($override)
+    {
+        $this->override = $override;
     }
 
     public function setDefaults($gibbonDepartmentIDList = null, $course = null)
@@ -74,13 +80,20 @@ class UnitImporter
         }
 
         // Import Units
-        foreach ($data['units'] as $unit) {
+        foreach ($data['units'] as $index => $unit) {
             $existingUnit = $this->unitGateway->selectBy(['name' => $unit['name']])->fetch();
+
+            // Skip existing units if override is not enabled
+            if (!$this->override && !empty($existingUnit)) {
+                unset($data['units'][$index]);
+                continue;
+            }
 
             // Apply default values
             if (!empty($this->gibbonDepartmentIDList)) $unit['unit']['gibbonDepartmentIDList'] = $this->gibbonDepartmentIDList;
             if (!empty($this->course)) $unit['unit']['course'] = $this->course;
             $unit['unit']['gibbonPersonIDCreator'] = $this->session->get('gibbonPersonID');
+            $unit['unit']['freeLearningUnitIDPrerequisiteList'] = '';
 
             // Get the uploaded logo URL
             if (!empty($unit['unit']['logo']) && !empty($files[$unit['unit']['logo']])) {
@@ -150,7 +163,7 @@ class UnitImporter
             $existingUnit = $this->unitGateway->selectBy(['name' => $unit['name']])->fetch();
 
             $prerequisiteList = $this->unitGateway->selectPrerequisiteIDsByNames($unit['prerequisites'])->fetchAll(\PDO::FETCH_COLUMN);
-            $this->unitGateway->update($freeLearningUnitID, ['freeLearningUnitIDPrerequisiteList' => implode(',', $prerequisiteList)]);
+            $this->unitGateway->update($existingUnit['freeLearningUnitID'], ['freeLearningUnitIDPrerequisiteList' => implode(',', $prerequisiteList)]);
         }
 
         $zip->close();

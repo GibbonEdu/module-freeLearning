@@ -48,6 +48,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $row->addTextField('course');
 
     $row = $form->addRow();
+        $row->addLabel('override', __m('Allow override?'))->description(__m('Units with the same name will be updated with the imported content.'));
+        $row->addCheckbox('override')->setValue('Y');
+
+    $row = $form->addRow();
         $row->addFooter();
         $row->addSubmit();
 

@@ -95,6 +95,7 @@ class UnitExporter
             }
         }
         
+        // Add unit details to data array
         $this->data['units'][] = [
             'name' => $unit['name'],
             'unit' => $unit,
@@ -114,13 +115,17 @@ class UnitExporter
         // Add Files
         foreach ($this->files as $file) {
             if ($file['type'] == 'url') {
-                $fileContents = file_get_contents($file['location']);
+                // Handle images from url by downloading them firsy
+                $context  = stream_context_create(['ssl' => ['verify_peer' => false]]);
+                $fileContents = file_get_contents($file['location'], false, $context);
+
                 if (empty($fileContents)) continue;
 
                 $zip->addFromString('files/'.basename($file['location']), $fileContents);
                 $this->data['files'][] = basename($file['location']);
 
             } elseif ($file['type'] == 'path') {
+                // Handle local images by adding them directly
                 if (!file_exists($file['location'])) continue;
 
                 $zip->addFile($file['location'], 'files/'.basename($file['location']));
