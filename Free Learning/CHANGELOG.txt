@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.11.01
+-------
+Improved Afrikaans translation 
+
 v5.11.00
 -------
 Added tools to export and import units
