@@ -139,6 +139,26 @@ class UnitGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
+    public function selectPrerequisiteNamesByIDs($freeLearningUnitIDPrerequisiteList)
+    {
+        $freeLearningUnitIDPrerequisiteList = is_array($freeLearningUnitIDPrerequisiteList) ? implode(',', $freeLearningUnitIDPrerequisiteList) : $freeLearningUnitIDPrerequisiteList;
+
+        $data = ['freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList];
+        $sql = "SELECT name FROM freeLearningUnit WHERE FIND_IN_SET(freeLearningUnitID, :freeLearningUnitIDPrerequisiteList) ORDER BY FIND_IN_SET(freeLearningUnitID, :freeLearningUnitIDPrerequisiteList)";
+
+        return $this->db()->select($sql, $data);
+    }
+
+    public function selectPrerequisiteIDsByNames($freeLearningUnitIDPrerequisiteList)
+    {
+        $freeLearningUnitIDPrerequisiteList = is_array($freeLearningUnitIDPrerequisiteList) ? implode(',', $freeLearningUnitIDPrerequisiteList) : $freeLearningUnitIDPrerequisiteList;
+        
+        $data = ['freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList];
+        $sql = "SELECT freeLearningUnitID FROM freeLearningUnit WHERE FIND_IN_SET(name, :freeLearningUnitIDPrerequisiteList) ORDER BY FIND_IN_SET(freeLearningUnitID, :freeLearningUnitIDPrerequisiteList)";
+
+        return $this->db()->select($sql, $data);
+    }
+
     public function selectUnitPrerequisitesByPerson($gibbonPersonID)
     {
         $data = ['gibbonPersonID' => $gibbonPersonID];

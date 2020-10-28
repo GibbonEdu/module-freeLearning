@@ -73,17 +73,17 @@ class UnitImporter
             }
         }
 
+        // Import Units
         foreach ($data['units'] as $unit) {
-            $existingUnit = $this->unitGateway->selectBy([
-                'name' => $unit['name'],
-            ])->fetch();
+            $existingUnit = $this->unitGateway->selectBy(['name' => $unit['name']])->fetch();
 
             // Apply default values
             if (!empty($this->gibbonDepartmentIDList)) $unit['unit']['gibbonDepartmentIDList'] = $this->gibbonDepartmentIDList;
             if (!empty($this->course)) $unit['unit']['course'] = $this->course;
+            $unit['unit']['gibbonPersonIDCreator'] = $this->session->get('gibbonPersonID');
 
             // Get the uploaded logo URL
-            if (!empty($unit['unit']['logo'])) {
+            if (!empty($unit['unit']['logo']) && !empty($files[$unit['unit']['logo']])) {
                 $unit['unit']['logo'] = $files[$unit['unit']['logo']] ?? '';
             }
 
@@ -131,6 +131,16 @@ class UnitImporter
                     $this->unitAuthorGateway->insert($author);
                 }
             }
+        }
+
+        // Connect Unit Prerequisites
+        foreach ($data['units'] as $unit) {
+            if (empty($unit['prerequisites'])) continue;
+
+            $existingUnit = $this->unitGateway->selectBy(['name' => $unit['name']])->fetch();
+
+            $prerequisiteList = $this->unitGateway->selectPrerequisiteIDsByNames($unit['prerequisites'])->fetchAll(\PDO::FETCH_COLUMN);
+            $this->unitGateway->update($freeLearningUnitID, ['freeLearningUnitIDPrerequisiteList' => implode(',', $prerequisiteList)]);
         }
 
         $zip->close();

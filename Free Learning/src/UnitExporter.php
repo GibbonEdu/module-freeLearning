@@ -28,8 +28,8 @@ use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 class UnitExporter 
 {
     protected $filename = 'FreeLearningUnits';
-    protected $data;
-    protected $files;
+    protected $data = [];
+    protected $files = [];
 
     protected $unitGateway;
     protected $unitBlockGateway;
@@ -52,13 +52,16 @@ class UnitExporter
 
         if (!empty($unit['logo'])) {
             $logoPath = $_SERVER['DOCUMENT_ROOT'] . parse_url($unit['logo'], PHP_URL_PATH);
-            $this->files[] = $logoPath;
-            $unit['logo'] = basename($logoPath);
+            if (file_exists($logoPath)) {
+                $this->files[] = $logoPath;
+                $unit['logo'] = basename($logoPath);
+            }
         }
         
         $this->data['units'][] = [
             'name' => $unit['name'],
             'unit' => $unit,
+            'prerequisites' => $this->unitGateway->selectPrerequisiteNamesByIDs($unit['freeLearningUnitIDPrerequisiteList'])->fetchAll(\PDO::FETCH_COLUMN),
             'blocks' => $this->unitBlockGateway->selectBlocksByUnit($freeLearningUnitID)->fetchAll(),
             'authors' => $this->unitAuthorGateway->selectAuthorsByUnit($freeLearningUnitID)->fetchAll(),
         ];
@@ -73,6 +76,8 @@ class UnitExporter
 
         // Add Files
         foreach ($this->files as $filePath) {
+            if (!file_exists($filePath)) continue;
+
             $zip->addFile($filePath, 'Units/files/'.basename($filePath));
             $this->data['files'][] = basename($filePath);
         }
