@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v5.11.02
+-------
+Improved unit block time handling
+
 v5.11.01
 -------
-Improved Afrikaans translation 
+Improved Afrikaans translation
 
 v5.11.00
 -------

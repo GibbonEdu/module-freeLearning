@@ -249,11 +249,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                 if ($_POST["type$i"] != 'type (e.g. discussion, outcome)') {
                                     $type2 = $_POST["type$i"];
                                 }
-                                $length = '';
-                                if ($_POST["length$i"] != 'length (min)') {
-                                    $length = $_POST["length$i"];
-                                }
-                                $contents = $_POST["contents$i"];
+                                $length = (is_numeric(trim($_POST["length$i"]))) ? $_POST["length$i"] : null;
+                                $contents = trim($_POST["contents$i"]);
                                 $teachersNotes = $_POST["teachersNotes$i"];
                                 $freeLearningUnitBlockID = @$_POST["freeLearningUnitBlockID$i"];
 

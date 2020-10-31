@@ -1194,3 +1194,12 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.11.01';
 $sql[$count][1] = "";
+
+//v5.11.02
+++$count;
+$sql[$count][0] = '5.11.02';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnitBlock` CHANGE `length` `length` VARCHAR(3) NULL DEFAULT NULL;
+UPDATE freeLearningUnitBlock SET length=NULL WHERE length='';end
+ALTER TABLE `freeLearningUnitBlock` CHANGE `length` `length` INT(3) UNSIGNED NULL DEFAULT NULL;end
+";

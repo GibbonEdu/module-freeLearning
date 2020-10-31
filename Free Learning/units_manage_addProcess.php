@@ -115,7 +115,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 if (!empty($_FILES['file']['tmp_name'])) {
                     $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
                     $fileUploader->getFileExtensions('Graphics/Design');
-                    
+
                     $file = $_FILES['file'] ?? null;
 
                     // Upload the file, return the /uploads relative path
@@ -145,7 +145,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 // Write author to database
                 $data = array('freeLearningUnitID' => $AI, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'surname' => $gibbon->session->get('surname'), 'preferredName' => $gibbon->session->get('preferredName'), 'website' => $gibbon->session->get('website'));
                 $sql = 'INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website';
-                
+
                 $inserted = $pdo->insert($sql, $data);
                 $partialFail &= !$inserted;
 
@@ -163,10 +163,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         if ($_POST["type$i"] != 'type (e.g. discussion, outcome)') {
                             $type2 = $_POST["type$i"];
                         }
-                        $length = '';
-                        if ($_POST["length$i"] != 'length (min)') {
-                            $length = $_POST["length$i"];
-                        }
+                        $length = (is_numeric(trim($_POST["length$i"]))) ? $_POST["length$i"] : null;
                         $contents = $_POST["contents$i"];
                         $teachersNotes = $_POST["teachersNotes$i"];
 
