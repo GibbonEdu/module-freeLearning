@@ -1203,3 +1203,8 @@ ALTER TABLE `freeLearningUnitBlock` CHANGE `length` `length` VARCHAR(3) NULL DEF
 UPDATE freeLearningUnitBlock SET length=NULL WHERE NOT length REGEXP '^-?[0-9]+$' OR length='';end
 ALTER TABLE `freeLearningUnitBlock` CHANGE `length` `length` INT(3) UNSIGNED NULL DEFAULT NULL;end
 ";
+
+//v5.12.00
+++$count;
+$sql[$count][0] = '5.12.00';
+$sql[$count][1] = "";
