@@ -1200,6 +1200,6 @@ $sql[$count][1] = "";
 $sql[$count][0] = '5.11.02';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnitBlock` CHANGE `length` `length` VARCHAR(3) NULL DEFAULT NULL;
-UPDATE freeLearningUnitBlock SET length=NULL WHERE length='';end
+UPDATE freeLearningUnitBlock SET length=NULL WHERE NOT length REGEXP '^-?[0-9]+$' OR length='';end
 ALTER TABLE `freeLearningUnitBlock` CHANGE `length` `length` INT(3) UNSIGNED NULL DEFAULT NULL;end
 ";
