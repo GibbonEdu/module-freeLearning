@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+use Gibbon\Forms\DatabaseFormFactory;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -27,87 +30,30 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
     //Proceed!
     $page->breadcrumbs
          ->add(__m('Outcomes by Student'));
-         
+
     echo '<h2>';
     echo __($guid, 'Choose Student', 'Free Learning');
     echo '</h2>';
 
     $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
-    ?>
 
-    <form method="get" action="<?php echo $gibbon->session->get('absoluteURL') ?>/index.php">
-        <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-            <tr>
-                <td style='width: 275px'>
-                    <b><?php echo __($guid, 'Student') ?> *</b><br/>
-                </td>
-                <td class="right">
-                    <select name="gibbonPersonID" id="gibbonPersonID" style="width: 302px">
-                        <option></option>
-                        <optgroup label='--<?php echo __($guid, 'Students by Roll Group') ?>--'>
-                            <?php
-                            try {
-                                $dataSelect = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'today' => date('Y-m-d'));
-                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname, gibbonRollGroup.name AS name 
-                                        FROM freeLearningUnitStudent
-                                        JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
-                                        JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID)
-                                        JOIN gibbonYearGroup ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup.gibbonYearGroupID)
-                                        JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
-                                        WHERE gibbonPerson.status='Full' 
-                                        AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) 
-                                        AND (gibbonPerson.dateEnd IS NULL  OR gibbonPerson.dateEnd>=:today) 
-                                        AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID 
-                                        GROUP BY gibbonPerson.gibbonPersonID, gibbonRollGroup.gibbonRollGroupID
-                                        ORDER BY gibbonYearGroup.sequenceNumber, gibbonRollGroup.name, gibbonPerson.surname, gibbonPerson.preferredName";
-                                $resultSelect = $connection2->prepare($sqlSelect);
-                                $resultSelect->execute($dataSelect);
-                            } catch (PDOException $e) {
-                            }
-                    while ($rowSelect = $resultSelect->fetch()) {
-                        $selected = '';
-                        if ($rowSelect['gibbonPersonID'] == $gibbonPersonID) {
-                            $selected = 'selected';
-                        }
-                        echo "<option $selected value='".$rowSelect['gibbonPersonID']."'>".htmlPrep($rowSelect['name']).' - '.formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).'</option>';
-                    }
-                    ?>
-                        </optgroup>
-                        <optgroup label='--<?php echo __($guid, 'Students by Name') ?>--'>
-                            <?php
-                            try {
-                                $dataSelect = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'today' => date('Y-m-d'));
-                                        $sqlSelect = "SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname, gibbonRollGroup.name AS name 
-                                        FROM freeLearningUnitStudent
-                                        JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) 
-                                        LEFT JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) 
-                                        LEFT JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) 
-                                        WHERE gibbonPerson.status='Full' 
-                                        AND (gibbonRollGroup.gibbonSchoolYearID=:gibbonSchoolYearID OR gibbonRollGroup.gibbonSchoolYearID IS NULL) 
-                                        AND (dateStart IS NULL OR dateStart<=:today) AND (dateEnd IS NULL  OR dateEnd>=:today) 
-                                        GROUP BY gibbonPerson.gibbonPersonID, gibbonRollGroup.gibbonRollGroupID
-                                        ORDER BY gibbonPerson.surname, gibbonPerson.preferredName";
-                                $resultSelect = $connection2->prepare($sqlSelect);
-                                $resultSelect->execute($dataSelect);
-                            } catch (PDOException $e) {
-                            }
-                    while ($rowSelect = $resultSelect->fetch()) {
-                        echo "<option value='".$rowSelect['gibbonPersonID']."'>".formatName('', htmlPrep($rowSelect['preferredName']), htmlPrep($rowSelect['surname']), 'Student', true).' ('.htmlPrep($rowSelect['name']).')</option>';
-                    }
-                    ?>
-                        </optgroup>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td colspan=2 class="right">
-                    <input type="hidden" name="q" value="/modules/<?php echo $gibbon->session->get('module') ?>/report_outcomes_byStudent.php">
-                    <input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
-                </td>
-            </tr>
-        </table>
-    </form>
-    <?php
+    // FORM
+    $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+    $form->setTitle(__('Filter'));
+
+    $form->setFactory(DatabaseFormFactory::create($pdo));
+    $form->setClass('noIntBorder fullWidth');
+    $form->addHiddenValue('q', '/modules/Free Learning/report_outcomes_byStudent.php');
+
+    $row = $form->addRow();
+        $row->addLabel('gibbonPersonID', __('Student'));
+        $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), array("allStudents" => false, "byName" => true, "byRoll" => true))->required()->placeholder()->selected($gibbonPersonID);
+
+    $row = $form->addRow();
+        $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+
+    echo $form->getOutput();
+
 
     if ($gibbonPersonID != '') {
         $output = '';

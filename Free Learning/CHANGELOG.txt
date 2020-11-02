@@ -2,7 +2,7 @@ CHANGELOG
 =========
 v5.12.00
 -------
-OOification of Unit Add and Edit interfaces
+Final form OOification
 
 v5.11.02
 -------

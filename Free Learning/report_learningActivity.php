@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+
 //Module includes
 include "./modules/" . $gibbon->session->get('module') . "/moduleFunctions.php" ;
 
@@ -37,41 +39,27 @@ else {
 
     $timePeriod = $_GET['timePeriod'] ?? null;
 
-    ?>
+    // FORM
+	$form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+	$form->setTitle(__('Filter'));
 
-    <form method="get" action="<?php echo $gibbon->session->get('absoluteURL') ?>/index.php">
-        <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-            <tr>
-                <td style='width: 275px'>
-                    <b><?php echo __($guid, 'Time Period') ?> *</b><br/>
-                </td>
-                <td class="right">
-                    <select style="width: 302px" name="timePeriod">
-                        <?php
-                        echo "<option value=''></option>";
-                        $selected = '';
-                        if ($timePeriod == 'Last 30 Days')
-                            $selected = 'selected';
-                        echo "<option $selected value='Last 30 Days'>".__($guid, 'Last 30 Days', 'Free Learning').'</option>';
-                        $selected = '';
-                        if ($timePeriod == 'Last 12 Months')
-                            $selected = 'selected';
-                        echo "<option $selected value='Last 12 Months'>".__($guid, 'Last 12 Months', 'Free Learning').'</option>';
+	$form->setClass('noIntBorder fullWidth');
+	$form->addHiddenValue('q', '/modules/Free Learning/report_learningActivity.php');
 
-                        ?>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td colspan=2 class="right">
-                    <input type="hidden" name="q" value="/modules/<?php echo $gibbon->session->get('module') ?>/report_learningActivity.php">
-                    <input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
-                </td>
-            </tr>
-        </table>
-    </form>
-    <?php
+    $timePeriods = [
+        'Last 30 Days' => __m('Last 30 Days'),
+        'Last 12 Months' => __m('Last 12 Months'),
+    ];
+    $row = $form->addRow();
+        $row->addLabel('timePeriod', __m('Time Period'));
+        $row->addSelect('timePeriod')->fromArray($timePeriods)->selected($timePeriod)->placeholder();
 
+	$row = $form->addRow();
+		$row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+
+	echo $form->getOutput();
+
+    
     if ($timePeriod != '') {
         echo '<h2>';
         echo __($guid, 'Report Data');

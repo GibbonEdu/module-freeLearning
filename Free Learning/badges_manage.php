@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -50,34 +52,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         $search = $_GET['search'] ?? null;
 
-        echo "<h2 class='top'>";
-        echo __($guid, 'Search');
-        echo '</h2>';
-        ?>
-        <form method="get" action="<?php echo $gibbon->session->get('absoluteURL') ?>/index.php">
-            <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Search For'); ?></b><br/>
-                        <span style="font-size: 90%"><i><?php echo __($guid, 'Name, Category') ?></i></span>
-                    </td>
-                    <td class="right">
-                        <input name="search" id="search" maxlength=20 value="<?php echo $search ?>" type="text" style="width: 300px">
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan=2 class="right">
-                        <input type="hidden" name="q" value="/modules/<?php echo $gibbon->session->get('module') ?>/badges_manage.php">
-                        <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
-                        <?php
-                        echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.$gibbon->session->get('module')."/badges_manage.php'>Clear Search</a> "; ?>
-                        <input type="submit" value="Submit">
-                    </td>
-                </tr>
-            </table>
-        </form>
+        // FORM
+        $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form->setTitle(__('Filter'));
 
-        <?php
+        $form->setClass('noIntBorder fullWidth');
+        $form->addHiddenValue('q', '/modules/Free Learning/badges_manage.php');
+
+        $form->setTitle( __('Search'));
+
+        $row = $form->addRow();
+            $row->addLabel('search', __m('Search For'))->description(__m('Name, Category'));
+            $row->addTextField('search')->setValue($search);
+
+        $row = $form->addRow();
+            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+
+        echo $form->getOutput();
+
+        
         echo "<h2 class='top'>";
         echo __($guid, 'View');
         echo '</h2>';

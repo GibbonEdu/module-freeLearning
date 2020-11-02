@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -38,7 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         echo "<div class='success'>";
         echo __($guid, 'The Badges module is installed, active and available, so you can access this functionality.', 'Free Learning');
         echo '</div>';
-        
+
         $returns = array();
         $editLink = '';
         if (isset($_GET['editID'])) {
@@ -54,188 +56,63 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             echo '</div>';
         }
 
-        ?>
-        <form method="post" action="<?php echo $gibbon->session->get('absoluteURL').'/modules/Free Learning/badges_manage_addProcess.php?search='.$_GET['search'] ?>" enctype="multipart/form-data">
-            <table class='smallIntBorder' cellspacing='0' style="width: 100%">
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Badge', 'Free Learning') ?></b><br/>
-                        <span style="font-size: 90%"><i></i></span>
-                    </td>
-                    <td class="right">
-                        <?php
-                        try {
-                            $dataPurpose = array();
-                            $sqlPurpose = 'SELECT * FROM badgesBadge WHERE active=\'Y\' ORDER BY category, name';
-                            $resultPurpose = $connection2->prepare($sqlPurpose);
-                            $resultPurpose->execute($dataPurpose);
-                        } catch (PDOException $e) {
-                        }
+        $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/badges_manage_addProcess.php');
 
-                        echo "<select name='badgesBadgeID' id='badgesBadgeID' style='width: 302px'>";
-                        echo "<option value='Please select...'>Please select...</option>";
-                        $lastCategory = '';
-                        while ($rowPurpose = $resultPurpose->fetch()) {
-                            $currentCategory = $rowPurpose['category'];
-                            if ($currentCategory != $lastCategory) {
-                                echo "<optgroup label='--".$currentCategory."--'>";
-                            }
-                            echo "<option value='".$rowPurpose['badgesBadgeID']."'>".$rowPurpose['name'].'</option>';
-                            $lastCategory = $currentCategory;
-                        }
-                        echo '</select>';
-                        ?>
-                        <script type="text/javascript">
-                            var badgesBadgeID=new LiveValidation('badgesBadgeID');
-                            badgesBadgeID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "<?php echo __($guid, 'Select something!') ?>"});
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Active') ;?></b><br/>
-                        <span style="font-size: 90%"><i></i></span>
-                    </td>
-                    <td class="right">
-                        <select name="active" id="active" style="width: 302px">
-                            <option value="Y"><?php echo ynExpander($guid, 'Y') ;?></option>
-                            <option value="N"><?php echo ynExpander($guid, 'N') ;?></option>
-                        </select>
-                    </td>
-                </tr>
-                <tr class='break'>
-                    <td colspan=2>
-                        <h3><?php echo __($guid, 'Conditions', 'Free Learning') ?></h3>
-                        <p><?php echo __($guid, 'This award will automatically be awarded on unit completion, if all of the following conditions are met. Fields left blank will be disregarded.', 'Free Learning') ?></p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Units Completed - Total', 'Free Learning') ?></b><br/>
-                        <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-                    </td>
-                    <td class="right">
-                        <input name="unitsCompleteTotal" ID="unitsCompleteTotal" value="" maxlength=2 type="text" class="standardWidth">
-                        <script type="text/javascript">
-                            var unitsCompleteTotal=new LiveValidation('unitsCompleteTotal');
-                            unitsCompleteTotal.add(Validate.Numericality, { minimum: 0 } );
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Units Completed - This Year', 'Free Learning') ?></b><br/>
-                        <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-                    </td>
-                    <td class="right">
-                        <input name="unitsCompleteThisYear" ID="unitsCompleteThisYear" value="" maxlength=2 type="text" class="standardWidth">
-                        <script type="text/javascript">
-                            var unitsCompleteThisYear=new LiveValidation('unitsCompleteThisYear');
-                            unitsCompleteThisYear.add(Validate.Numericality, { minimum: 0 } );
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Units Completed - Department Spread') ?></b><br/>
-                        <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.') ?></span>
-                    </td>
-                    <td class="right">
-                        <input name="unitsCompleteDepartmentCount" ID="unitsCompleteDepartmentCount" value="" maxlength=2 type="text" class="standardWidth">
-                        <script type="text/javascript">
-                            var unitsCompleteDepartmentCount=new LiveValidation('unitsCompleteDepartmentCount');
-                            unitsCompleteDepartmentCount.add(Validate.Numericality, { minimum: 0 } );
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Units Completed - Individual') ?></b><br/>
-                        <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.') ?></span>
-                    </td>
-                    <td class="right">
-                        <input name="unitsCompleteIndividual" ID="unitsCompleteIndividual" value="" maxlength=2 type="text" class="standardWidth">
-                        <script type="text/javascript">
-                            var unitsCompleteIndividual=new LiveValidation('unitsCompleteIndividual');
-                            unitsCompleteIndividual.add(Validate.Numericality, { minimum: 0 } );
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b><?php echo __($guid, 'Units Completed - Group', 'Free Learning') ?></b><br/>
-                        <span class="emphasis small"><?php echo __($guid, 'Enter a number greater than zero, or leave blank.', 'Free Learning') ?></span>
-                    </td>
-                    <td class="right">
-                        <input name="unitsCompleteGroup" ID="unitsCompleteGroup" value="" maxlength=2 type="text" class="standardWidth">
-                        <script type="text/javascript">
-                            var unitsCompleteGroup=new LiveValidation('unitsCompleteGroup');
-                            unitsCompleteGroup.add(Validate.Numericality, { minimum: 0 } );
-                        </script>
-                    </td>
-                </tr>
-                <?php
-                $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
-                if ($difficulties != false) {
-                    $difficulties = explode(',', $difficulties);
-                    ?>
-                    <tr>
-                        <td>
-                            <b><?php echo __($guid, 'Difficulty Level Threshold', 'Free Learning') ?></b><br/>
-                            <span style="font-size: 90%"><i></i></span>
-                        </td>
-                        <td class="right">
-                            <select name="difficultyLevelMaxAchieved" id="difficultyLevelMaxAchieved" style="width: 302px">
-                                <option value=""></option>
-                                <?php
-                                for ($i = 0; $i < count($difficulties); ++$i) {
-                                    ?>
-                                    <option value="<?php echo __($guid, trim($difficulties[$i]), 'Free Learning') ?>"><?php echo __($guid, trim($difficulties[$i]), 'Free Learning') ?></option>
-                                <?php
+        $form->addHiddenValue('address', $_SESSION[$guid]['address']);
+        $form->addHiddenValue('q', "/modules/".$_SESSION[$guid]['module']."/badges_manage_add.php");
 
-                                }
-                                ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style='width: 275px'>
-                            <b><?php echo __($guid, 'Specific Unit Completion', 'Free Learning') ?></b><br/>
-                            <span style="font-size: 90%"><i><?php echo __($guid, 'Completing any of the selected units will grant badge.') ?><br/><?php echo __($guid, 'Use Control, Command and/or Shift to select multiple.') ?></i></span>
-                        </td>
-                        <td class="right">
-                            <select name="specificUnitsComplete[]" id="specificUnitsComplete[]" multiple style="width: 302px; height: 150px">
-                                <?php
-                                try {
-                                    $dataSelect = array();
-                                    $sqlSelect = 'SELECT freeLearningUnitID, name FROM freeLearningUnit WHERE active=\'Y\' ORDER BY name';
-                                    $resultSelect = $connection2->prepare($sqlSelect);
-                                    $resultSelect->execute($dataSelect);
-                                } catch (PDOException $e) {
-                                }
-                                while ($rowSelect = $resultSelect->fetch()) {
-                                    echo "<option value='".$rowSelect['freeLearningUnitID']."'>".$rowSelect['name'].'</option>';
-                                }
-                                ?>
-                                </optgroup>
-                            </select>
-                        </td>
-                    </tr>
-                    <?php
-                }
-                ?>
-                <tr>
-                    <td>
-                        <span style="font-size: 90%"><i><?php echo __($guid, '* denotes a required field'); ?></i></span>
-                    </td>
-                    <td class="right">
-                        <input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
-                        <input type="submit" value="Submit">
-                    </td>
-                </tr>
-            </table>
-        </form>
-        <?php
+        $data = array();
+        $sql = "SELECT badgesBadgeID AS value, name, category AS groupBy FROM badgesBadge WHERE active='Y' ORDER BY category, name";
+        $row = $form->addRow();
+            $row->addLabel('badgesBadgeID', __('Badge'));
+            $row->addSelect('badgesBadgeID')->fromQuery($pdo, $sql, $data, 'groupBy')->placeholder()->required();
+
+        $row = $form->addRow();
+            $row->addLabel('active', __('Active'));
+            $row->addYesNo('active')->required();
+
+        $row = $form->addRow()->addHeading(__m('Conditions'))
+            ->append(__m('This award will automatically be awarded on unit completion, if all of the following conditions are met. Fields left blank will be disregarded.'));
+
+        $row = $form->addRow();
+            $row->addLabel('unitsCompleteTotal', __m('Units Completed - Total'))->description(__m('Enter a number greater than zero, or leave blank.'));
+            $row->addNumber('unitsCompleteTotal')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+
+        $row = $form->addRow();
+            $row->addLabel('unitsCompleteThisYear', __m('Units Completed - This Year'))->description(__m('Enter a number greater than zero, or leave blank.'));
+            $row->addNumber('unitsCompleteThisYear')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+
+        $row = $form->addRow();
+            $row->addLabel('unitsCompleteDepartmentCount', __m('Units Completed - Department Spread'))->description(__m('Enter a number greater than zero, or leave blank.'));
+            $row->addNumber('unitsCompleteDepartmentCount')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+
+        $row = $form->addRow();
+            $row->addLabel('unitsCompleteIndividual', __m('Units Completed - Individual'))->description(__m('Enter a number greater than zero, or leave blank.'));
+            $row->addNumber('unitsCompleteIndividual')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+
+        $row = $form->addRow();
+            $row->addLabel('unitsCompleteGroup', __m('Units Completed - Group'))->description(__m('Enter a number greater than zero, or leave blank.'));
+            $row->addNumber('unitsCompleteGroup')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+
+        $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+        $difficultyOptions = ($difficultyOptions != false) ? explode(',', $difficultyOptions) : [];
+        $difficulties = [];
+        foreach ($difficultyOptions as $difficultyOption) {
+            $difficulties[$difficultyOption] = __m($difficultyOption);
+        }
+        $row = $form->addRow();
+            $row->addLabel('difficultyLevelMaxAchieved', __m('Difficulty Level Threshold'));
+            $row->addSelect('difficultyLevelMaxAchieved')->fromArray($difficulties)->placeholder();
+
+        $sql = 'SELECT freeLearningUnitID as value, name FROM freeLearningUnit ORDER BY name';
+        $row = $form->addRow();
+            $row->addLabel('specificUnitsComplete', __m('Specific Unit Completion'))->description('Completing any of the selected units will grant badge.');
+            $row->addSelect('specificUnitsComplete')->fromQuery($pdo, $sql, array())->selectMultiple();
+
+        $row = $form->addRow();
+            $row->addSubmit();
+
+        echo $form->getOutput();
     }
 }
 ?>
