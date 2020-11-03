@@ -24,6 +24,7 @@ use Gibbon\Tables\DataTable;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitOutcomeGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -170,121 +171,109 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $rowEnrol = $resultEnrol->fetch() ;
                     }
 
-                    echo "<table class='smallIntBorder' cellspacing='0' style='width: 100%'>";
-                    echo '<tr>';
-                    echo "<td style='width: 50%; vertical-align: middle'>";
-                    echo "<span style='font-size: 150%; font-weight: bold'>".$values['name'].'</span><br/>';
-                    echo '</td>';
-                    echo "<td style='width: 50%; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__('Time', 'Free Learning').'</span><br/>';
-                    $timing = null;
-                    $blocks = getBlocksArray($connection2, $freeLearningUnitID);
-                    if ($blocks != false) {
-                        foreach ($blocks as $block) {
-                            if ($block[0] == $values['freeLearningUnitID']) {
-                                if (is_numeric($block[2])) {
-                                    $timing += $block[2];
+
+                    // UNIT DETAILS TABLE
+                    $table = DataTable::createDetails('unitDetails');
+
+                    $table->addColumn('name', __('Name'));
+                    $table->addColumn('time', __m('Time'))
+                        ->format(function ($values) use ($connection2, $freeLearningUnitID) {
+                            $output = '';
+                            $timing = null;
+                            $blocks = getBlocksArray($connection2, $freeLearningUnitID);
+                            if ($blocks != false) {
+                                foreach ($blocks as $block) {
+                                    if ($block[0] == $values['freeLearningUnitID']) {
+                                        if (is_numeric($block[2])) {
+                                            $timing += $block[2];
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    }
-                    if (is_null($timing)) {
-                        echo '<i>'.__('N/A').'</i>';
-                    } else {
-                        echo '<i>';
+                            if (is_null($timing)) {
+                                $output = __('N/A');
+                            } else {
+                                $minutes = intval($timing);
+                                $relativeTime = __n('{count} min', '{count} mins', $minutes);
+                                if ($minutes > 60) {
+                                    $hours = round($minutes / 60, 1);
+                                    $relativeTime = Format::tooltip(__n('{count} hr', '{count} '.__m('hrs'), ceil($minutes / 60), ['count' => $hours]), $relativeTime);
+                                }
 
-                        $minutes = intval($timing);
-                        $relativeTime = __n('{count} min', '{count} mins', $minutes);
-                        if ($minutes > 60) {
-                            $hours = round($minutes / 60, 1);
-                            $relativeTime = Format::tooltip(__n('{count} hr', '{count} '.__m('hrs'), ceil($minutes / 60), ['count' => $hours]), $relativeTime);
-                        }
+                                $output = !empty($timing) ? $relativeTime : Format::small(__('N/A'));
+                            }
 
-                        echo !empty($timing) ? $relativeTime : Format::small(__('N/A'));
+                            return $output;
+                        });
+                    $table->addColumn('logo', __('Logo'))
+                        ->format(function ($values) use ($gibbon) {
+                            if ($values['logo'] == null) {
+                                return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
+                            } else {
+                                return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
+                            }
+                        });
+                    $table->addColumn('difficulty', __m('Difficulty'));
+                    $table->addColumn('prerequisites', __m('Prerequisites'))
+                        ->format(function ($values) use ($connection2) {
+                            $output = '';
+                            $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
+                            if ($prerequisitesActive != false) {
+                                $prerequisites = explode(',', $prerequisitesActive);
+                                $units = getUnitsArray($connection2);
+                                foreach ($prerequisites as $prerequisite) {
+                                    $output .= $units[$prerequisite][0].'<br/>';
+                                }
+                            } else {
+                                $output = __m('None');
+                            }
 
-                        echo '</i>';
-                    }
-                    echo '</td>';
-                    echo "<td style='width: 135%!important; vertical-align: top; text-align: right' rowspan=4>";
-                    if ($values['logo'] == null) {
-                        echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
-                    } else {
-                        echo "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
-                    }
-                    echo '</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo "<td style='padding-top: 15px; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__('Difficulty', 'Free Learning').'</span><br/>';
-                    echo '<i>'.$values['difficulty'].'<i>';
-                    echo '</td>';
-                    echo "<td style='padding-top: 15px; vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__('Prerequisites', 'Free Learning').'</span><br/>';
-                    $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
-                    if ($prerequisitesActive != false) {
-                        $prerequisites = explode(',', $prerequisitesActive);
-                        $units = getUnitsArray($connection2);
-                        foreach ($prerequisites as $prerequisite) {
-                            echo '<i>'.$units[$prerequisite][0].'</i><br/>';
-                        }
-                    } else {
-                        echo '<i>'.__('None', 'Free Learning').'<br/></i>';
-                    }
-                    echo '</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo "<td style='vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__('Departments', 'Free Learning').'</span><br/>';
-                    $learningAreas = getLearningAreas($connection2, $guid);
-                    if ($learningAreas == '') {
-                        echo '<i>'.__('No Learning Areas available.', 'Free Learning').'</i>';
-                    } else {
-                        for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                            if (is_numeric(strpos($values['gibbonDepartmentIDList'], $learningAreas[$i]))) {
-                                echo '<i>'.__($learningAreas[($i + 1)]).'</i><br/>';
+                            return $output;
+                        });
+                    $table->addColumn('departments', __('Departments'))
+                        ->format(function ($values) use ($connection2, $guid) {
+                            $output = '';
+                            $learningAreas = getLearningAreas($connection2, $guid);
+                            if ($learningAreas == '') {
+                                $output = __m('No Learning Areas available.');
+                            } else {
+                                for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+                                    if (is_numeric(strpos($values['gibbonDepartmentIDList'], $learningAreas[$i]))) {
+                                        $output .= __($learningAreas[($i + 1)]).'<br/>';
+                                    }
+                                }
                             }
-                        }
-                    }
-                    echo '</td>';
-                    echo "<td style='vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__('Authors', 'Free Learning').'</span><br/>';
-                    $authors = getAuthorsArray($connection2, $freeLearningUnitID);
-                    foreach ($authors as $author) {
-                        if ($author[3] == '') {
-                            echo '<i>'.$author[1].'</i><br/>';
-                        } else {
-                            echo "<i><a target='_blank' href='".$author[3]."'>".$author[1].'</a></i><br/>';
-                        }
-                    }
-                    echo '</td>';
-                    echo '</tr>';
-                    echo '<tr>';
-                    echo "<td style='vertical-align: top'>";
-                    echo "<span style='font-size: 115%; font-weight: bold'>".__('Groupings', 'Free Learning').'</span><br/>';
-                    if ($values['grouping'] != '') {
-                        $groupings = explode(',', $values['grouping']);
-                        foreach ($groupings as $grouping) {
-                            echo ucwords($grouping).'<br/>';
-                        }
-                    }
-                    echo '</td>';
-                    echo "<td style='vertical-align: top'>";
-                    if ($rowEnrol != null) {
-                        if ($rowEnrol['enrolmentMethod'] == 'schoolMentor' or $rowEnrol['enrolmentMethod'] == 'externalMentor') {
-                            echo "<span style='font-size: 115%; font-weight: bold'>".__('Mentor Contacts', 'Free Learning').'</span><br/>';
-                            if ($rowEnrol['enrolmentMethod'] == 'schoolMentor') {
-                                echo "<i>".formatName('', $rowEnrol['preferredName'], $rowEnrol['surname'], 'Student').'</i><br/>';
-                                echo "<i><a href='mailto:".$rowEnrol['email']."'>".$rowEnrol['email'].'</a></i><br/>';
-                            }
-                            else if ($rowEnrol['enrolmentMethod'] == 'externalMentor') {
-                                echo "<i>".$rowEnrol['nameExternalMentor'].'</i><br/>';
-                                echo "<i><a href='mailto:".$rowEnrol['emailExternalMentor']."'>".$rowEnrol['emailExternalMentor'].'</a></i><br/>';
-                            }
-                        }
-                    }
-                    echo '</td>';
-                    echo '</tr>';
-                    echo '</table>';
+                            return $output;
+                        });
+                        $table->addColumn('departments', __m('Authors'))
+                            ->format(function ($values) use ($connection2, $freeLearningUnitID) {
+                                $output = '';
+                                $authors = getAuthorsArray($connection2, $freeLearningUnitID);
+                                foreach ($authors as $author) {
+                                    if ($author[3] == '') {
+                                        $output .= $author[1].'<br/>';
+                                    } else {
+                                        $output .= "<a target='_blank' href='".$author[3]."'>".$author[1].'</a><br/>';
+                                    }
+                                }
+                                return $output;
+                            });
+
+                            $table->addColumn('groupings', __m('Groupings'))
+                                ->format(function ($values) use ($connection2, $freeLearningUnitID) {
+                                    $output = '';
+                                    $authors = getAuthorsArray($connection2, $freeLearningUnitID);
+                                    if ($values['grouping'] != '') {
+                                        $groupings = explode(',', $values['grouping']);
+                                        foreach ($groupings as $grouping) {
+                                            $output .= ucwords($grouping).'<br/>';
+                                        }
+                                    }
+                                    return $output;
+                                });
+
+                    echo $table->render([$values]);
+
 
                     $defaultTab = 3;
                     if (!$canManage) {
@@ -686,104 +675,30 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '</div>';
                     echo "<div id='tabs5'>";
                         //Spit out outcomes
-                        try {
-                            $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
-                            $sqlBlocks = "SELECT freeLearningUnitOutcome.*, scope, name, nameShort, category, gibbonYearGroupIDList FROM freeLearningUnitOutcome JOIN gibbonOutcome ON (freeLearningUnitOutcome.gibbonOutcomeID=gibbonOutcome.gibbonOutcomeID) WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y' ORDER BY sequenceNumber";
-                            $resultBlocks = $connection2->prepare($sqlBlocks);
-                            $resultBlocks->execute($dataBlocks);
-                        } catch (PDOException $e) {
-                            echo "<div class='error'>".$e->getMessage().'</div>';
-                        }
-                    if ($resultBlocks->rowCount() < 1) {
-                        echo "<div class='error'>";
-                        echo __('There are no records to display.');
-                        echo '</div>';
-                    } else {
-                        echo "<table cellspacing='0' style='width: 100%'>";
-                        echo "<tr class='head'>";
-                        echo '<th>';
-                        echo __('Scope', 'Free Learning');
-                        echo '</th>';
-                        echo '<th>';
-                        echo __('Category', 'Free Learning');
-                        echo '</th>';
-                        echo '<th>';
-                        echo __('Name');
-                        echo '</th>';
-                        echo '<th>';
-                        echo __('Year Groups');
-                        echo '</th>';
-                        echo '<th>';
-                        echo __('Actions');
-                        echo '</th>';
-                        echo '</tr>';
+                        $unitOutcomeGateway = $container->get(UnitOutcomeGateway::class);
 
-                        $count = 0;
-                        $rowNum = 'odd';
-                        while ($rowBlocks = $resultBlocks->fetch()) {
-                            if ($count % 2 == 0) {
-                                $rowNum = 'even';
-                            } else {
-                                $rowNum = 'odd';
-                            }
+                        $criteria = $unitOutcomeGateway->newQueryCriteria(true)
+                            ->fromPOST();
 
-                            //COLOR ROW BY STATUS!
-                            echo "<tr class=$rowNum>";
-                            echo '<td>';
-                            echo '<b>'.$rowBlocks['scope'].'</b><br/>';
-                            if ($rowBlocks['scope'] == 'Learning Area' and @$rowBlocks['gibbonDepartmentID'] != '') {
-                                try {
-                                    $dataLearningArea = array('gibbonDepartmentID' => $rowBlocks['gibbonDepartmentID']);
-                                    $sqlLearningArea = 'SELECT * FROM gibbonDepartment WHERE gibbonDepartmentID=:gibbonDepartmentID';
-                                    $resultLearningArea = $connection2->prepare($sqlLearningArea);
-                                    $resultLearningArea->execute($dataLearningArea);
-                                } catch (PDOException $e) {
-                                    echo "<div class='error'>".$e->getMessage().'</div>';
-                                }
-                                if ($resultLearningArea->rowCount() == 1) {
-                                    $rowLearningAreas = $resultLearningArea->fetch();
-                                    echo "<span style='font-size: 75%; font-style: italic'>".$rowLearningAreas['name'].'</span>';
-                                }
-                            }
-                            echo '</td>';
-                            echo '<td>';
-                            echo '<b>'.$rowBlocks['category'].'</b><br/>';
-                            echo '</td>';
-                            echo '<td>';
-                            echo '<b>'.$rowBlocks['nameShort'].'</b><br/>';
-                            echo "<span style='font-size: 75%; font-style: italic'>".$rowBlocks['name'].'</span>';
-                            echo '</td>';
-                            echo '<td>';
-                            echo getYearGroupsFromIDList($guid, $connection2, $rowBlocks['gibbonYearGroupIDList']);
-                            echo '</td>';
-                            echo '<td>';
-                            echo "<script type='text/javascript'>";
-                            echo '$(document).ready(function(){';
-                            echo "\$(\".description-$count\").hide();";
-                            echo "\$(\".show_hide-$count\").fadeIn(1000);";
-                            echo "\$(\".show_hide-$count\").click(function(){";
-                            echo "\$(\".description-$count\").fadeToggle(1000);";
-                            echo '});';
-                            echo '});';
-                            echo '</script>';
-                            if ($rowBlocks['content'] != '') {
-                                echo "<a title='".__('View Description', 'Free Learning')."' class='show_hide-$count' onclick='false' href='#'><img style='padding-left: 0px' src='".$gibbon->session->get('absoluteURL')."/themes/Default/img/page_down.png' alt='".__('Show Comment')."' onclick='return false;' /></a>";
-                            }
-                            echo '</td>';
-                            echo '</tr>';
-                            if ($rowBlocks['content'] != '') {
-                                echo "<tr class='description-$count' id='description-$count'>";
-                                echo '<td colspan=6>';
-                                echo $rowBlocks['content'];
-                                echo '</td>';
-                                echo '</tr>';
-                            }
-                            echo '</tr>';
+                        $outcomes = $unitOutcomeGateway->selectOutcomesByUnit($freeLearningUnitID)->fetchAll();
 
-                            ++$count;
-                        }
-                        echo '</table>';
-                    }
+                        $table = DataTable::createPaginated('outcomes', $criteria);
+
+                        $table->addExpandableColumn('content');
+                        $table->addColumn('scope', __('scope'));
+                        $table->addColumn('category', __('Category'));
+                        $table->addColumn('name', __('Name'))
+                            ->format(function($outcome) {
+                                $output = $outcome['nameShort']."<br/>";
+                                $output .= "<div class=\"text-xxs\">".$outcome['name']."</div>";
+                                return $output;
+                            });
+                        $table->addColumn('yearGroups', __('Year Groups'))
+                            ->format(function($outcome) use ($guid, $connection2) {
+                                return getYearGroupsFromIDList($guid, $connection2, $outcome['gibbonYearGroupIDList']);
+                            });
+
+                        echo $table->render($outcomes);
 
                     echo '</div>';
                     echo "<div id='tabs6'>";

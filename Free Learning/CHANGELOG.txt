@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v5.12.01
+-------
+Ongoing table OOficiation work
+
 v5.12.00
 -------
-Final form OOification
+OOification of Unit Add and Edit interfaces
 
 v5.11.02
 -------

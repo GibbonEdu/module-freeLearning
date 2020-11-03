@@ -1208,3 +1208,8 @@ ALTER TABLE `freeLearningUnitBlock` CHANGE `length` `length` INT(3) UNSIGNED NUL
 ++$count;
 $sql[$count][0] = '5.12.00';
 $sql[$count][1] = "";
+
+//v5.12.01
+++$count;
+$sql[$count][0] = '5.12.01';
+$sql[$count][1] = "";

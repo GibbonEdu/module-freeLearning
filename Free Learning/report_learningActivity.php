@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\View\View;
 use Gibbon\Forms\Form;
 
 //Module includes
@@ -59,7 +60,7 @@ else {
 
 	echo $form->getOutput();
 
-    
+
     if ($timePeriod != '') {
         echo '<h2>';
         echo __($guid, 'Report Data');
@@ -85,26 +86,8 @@ else {
             $rows = $result->fetchAll();
 
             //CREATE LEGEND
-            echo "<p style='margin-top: 20px; margin-bottom: 5px'><b>".__($guid, 'Legend').'</b></p>';
-            echo "<table class='noIntBorder' style='width: 100%;  border-spacing: 0; border-collapse: collapse;'>";
-                echo '<tr>';
-                    echo "<td style='vertical-align: middle!important; height: 35px; width: 25%'></td>";
-                    echo "<td style='vertical-align: middle!important; height: 35px; width: 25%'></td>";
-                    echo "<td style='vertical-align: middle!important; height: 35px; width: 25px; border-right-width: 0px!important'>";
-                        echo "<div style='width: 25px; height: 25px; border: 2px solid rgba(220,220,220,1); background-color: rgba(220,220,220,0.8) '></div>";
-                    echo '</td>';
-                    echo "<td style='vertical-align: middle!important; height: 35px; width: 25%'>";
-                        echo '<b>'.__($guid, 'Units Joined', 'Free Learning').'</b>';
-                    echo '</td>';
-                    echo "<td style='vertical-align: middle!important; height: 35px; width: 25px; border-right-width: 0px!important'>";
-                        echo "<div style='width: 25px; height: 25px; border: 2px solid rgba(151,187,205,1); background-color: rgba(151,187,205,0.8) '></div>";
-                    echo '</td>';
-                    echo "<td style='vertical-align: middle!important; height: 35px; width: 25%'>";
-                        echo '<b>'.__($guid, 'Units Approved', 'Free Learning').'</b>';
-                    echo '</td>';
-                    echo "<td style='vertical-align: middle!important; height: 35px; width: 25px; border-right-width: 0px!important'></td>";
-                echo '</tr>';
-            echo '</table>';
+            $templateView = new View($container->get('twig'));
+            echo $templateView->fetchFromTemplate('activityLegend.twig.html');
 
             //PLOT DATA
             echo '<script type="text/javascript" src="'.$gibbon->session->get('absoluteURL').'/lib/Chart.js/Chart.min.js"></script>';
@@ -184,12 +167,12 @@ else {
                     datasets : [
                         {
                             label: "Units Joined",
-                            fillColor : "rgba(220,220,220,0.2)",
-                            strokeColor : "rgba(220,220,220,1)",
-                            pointColor : "rgba(220,220,220,1)",
+                            fillColor : "rgba(253, 226, 255, 0.5)",
+                            strokeColor : "rgba(169, 60, 179,1)",
+                            pointColor : "rgba(169, 60, 179,1)",
                             pointStrokeColor : "#fff",
                             pointHighlightFill : "#fff",
-                            pointHighlightStroke : "rgba(220,220,220,1)",
+                            pointHighlightStroke : "rgba(169, 60, 179,1)",
                             data : [
                                 <?php
                                 $data = '';
@@ -209,12 +192,12 @@ else {
                         },
                         {
                             label: "Units Approved",
-                            fillColor : "rgba(151,187,205,0.2)",
-                            strokeColor : "rgba(151,187,205,1)",
-                            pointColor : "rgba(151,187,205,1)",
+                            fillColor : "rgba(198, 246, 213,0.5",
+                            strokeColor : "rgba(47, 133, 90,1)",
+                            pointColor : "rgba(47, 133, 90,1)",
                             pointStrokeColor : "#fff",
                             pointHighlightFill : "#fff",
-                            pointHighlightStroke : "rgba(151,187,205,1)",
+                            pointHighlightStroke : "rgba(47, 133, 90,1)",
                             data : [
                                 <?php
                                 $data = '';

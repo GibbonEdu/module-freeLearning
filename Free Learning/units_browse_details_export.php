@@ -216,7 +216,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $resourceContents = '';
                 $countBlock = 1;
                 while ($rowBlocks = $resultBlocks->fetch()) {
-                    //$output .= displayBlockContent($guid, $connection2, $rowBlocks['title'], $rowBlocks['type'], $rowBlocks['length'], $rowBlocks['contents'], $rowBlocks['teachersNotes']);
                     $output .= "<h3>".$countBlock.'. '.$rowBlocks['title']."</h3>";
                     $output .= "<hr style=\"padding-top: 20px\"/>";
                     $output .= "<p>".$rowBlocks['contents']."</p>";
