@@ -119,7 +119,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         foreach ($gibbonPersonIDMulti as $gibbonPersonID) {
                             //Write to database
                             try {
-                                $data = array('gibbonPersonID' => $gibbonPersonID, 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
+                                $data = array('gibbonPersonID' => substr($gibbonPersonID, 9), 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
                                 $sql = 'INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonID, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, gibbonCourseClassID=:gibbonCourseClassID, `grouping`=:grouping, status=:status';
                                 $result = $connection2->prepare($sql);
                                 $result->execute($data);

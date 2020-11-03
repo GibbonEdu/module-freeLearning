@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Prefab\DeleteForm;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -119,33 +121,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     echo '</div>';
                 } else {
                     //Let's go!
-                    ?>
-					<form method="post" action="<?php echo $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module')."/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view" ?>">
-						<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-							<tr>
-								<td>
-									<b><?php echo __($guid, 'Are you sure you want to delete this record?'); ?></b><br/>
-									<span style="font-size: 90%; color: #cc0000"><i><?php echo __($guid, 'This operation cannot be undone, and may lead to loss of vital data in your system. PROCEED WITH CAUTION!'); ?></i></span>
-								</td>
-								<td class="right">
 
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<input name="freeLearningUnitStudentID" id="freeLearningUnitStudentID" value="<?php echo $freeLearningUnitStudentID ?>" type="hidden">
-									<input name="freeLearningUnitID" id="freeLearningUnitID" value="<?php echo $freeLearningUnitID ?>" type="hidden">
-									<input type="hidden" name="address" value="<?php echo $gibbon->session->get('address') ?>">
-									<input type="submit" value="<?php echo __($guid, 'Yes'); ?>">
-								</td>
-								<td class="right">
-
-								</td>
-							</tr>
-						</table>
-					</form>
-					<?php
-
+                    $form = DeleteForm::createForm($gibbon->session->get('absoluteURL')."/modules/Free Learning/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view");
+                    $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+                    echo $form->getOutput();
                 }
             }
         }
