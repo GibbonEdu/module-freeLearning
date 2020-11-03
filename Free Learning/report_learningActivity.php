@@ -34,10 +34,6 @@ else {
     $page->breadcrumbs
          ->add(__m('Learning Activity'));
 
-    echo '<h2>';
-    echo __($guid, 'Choose Time Frame', 'Free Learning');
-    echo '</h2>';
-
     $timePeriod = $_GET['timePeriod'] ?? null;
 
     // FORM
