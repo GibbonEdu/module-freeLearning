@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\View\View;
 use Gibbon\Forms\Form;
+use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
+use Gibbon\Module\FreeLearning\Domain\BadgeGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -32,12 +36,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";
-        echo __($guid, 'This functionality requires the Badges module to be installed, active and available.', 'Free Learning');
+        echo __m('This functionality requires the Badges module to be installed, active and available.');
         echo '</div>';
     } else {
         //Acess denied
         echo "<div class='success'>";
-        echo __($guid, 'The Badges module is installed, active and available, so you can access this functionality.', 'Free Learning');
+        echo __m('The Badges module is installed, active and available, so you can access this functionality.');
         echo '</div>';
 
         if (isset($_GET['return'])) {
@@ -70,124 +74,47 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         echo $form->getOutput();
 
-        
-        echo "<h2 class='top'>";
-        echo __($guid, 'View');
-        echo '</h2>';
 
-        try {
-            $data = array();
-            $sql = 'SELECT freeLearningBadge.*, name, category, logo, description
-                FROM  freeLearningBadge
-                    JOIN badgesBadge ON (freeLearningBadge.badgesBadgeID=badgesBadge.badgesBadgeID)
-                ORDER BY category, name';
-            if ($search != '') {
-                $data = array('search1' => "%$search%", 'search2' => "%$search%");
-                $sql = 'SELECT freeLearningBadge.*, name, category, logo, description
-                    FROM  freeLearningBadge
-                        JOIN badgesBadge ON (freeLearningBadge.badgesBadgeID=badgesBadge.badgesBadgeID)
-                    WHERE (badgesBadge.name LIKE :search1 OR badgesBadge.category LIKE :search2)
-                    ORDER BY category, name';
-            }
-            $sqlPage = $sql.' LIMIT '.$gibbon->session->get('pagination').' OFFSET '.(($page - 1) * $gibbon->session->get('pagination'));
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
-        }
+        // TABLE
+        $badgeGateway = $container->get(BadgeGateway::class);
 
-        echo "<div class='linkTop'>";
-        echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/badges_manage_add.php&search=$search'>".__($guid, 'Add')."<img style='margin-left: 5px' title='".__($guid, 'Add')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/page_new.png'/></a>";
-        echo '</div>';
+        $criteria = $badgeGateway->newQueryCriteria(true)
+            ->fromPOST();
 
-        if ($result->rowCount() < 1) { echo "<div class='error'>";
-            echo __($guid, 'There are no badges to display.', 'Free Learning');
-            echo '</div>';
-        } else {
-            if ($result->rowCount() > $gibbon->session->get('pagination')) {
-                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'top', "search=$search");
-            }
+        $badges = $badgeGateway->selectBadges(false, $search);
 
-            echo "<table cellspacing='0' style='width: 100%'>";
-            echo "<tr class='head'>";
-            echo "<th style='width: 180px'>";
-            echo __($guid, 'Logo', 'Free Learning');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Name').'<br/>';
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Category');
-            echo '</th>';
-            echo "<th style='width: 120px'>";
-            echo __($guid, 'Actions');
-            echo '</th>';
-            echo '</tr>';
+        $table = DataTable::createPaginated('badges', $criteria);
 
-            $count = 0;
-            $rowNum = 'odd';
-            try {
-                $resultPage = $connection2->prepare($sqlPage);
-                $resultPage->execute($data);
-            } catch (PDOException $e) {
-                echo "<div class='error'>".$e->getMessage().'</div>';
-            }
-            while ($row = $resultPage->fetch()) {
-                if ($count % 2 == 0) {
-                    $rowNum = 'even';
+        $table->setTitle( __('View'));
+
+        $table->modifyRows(function ($badge, $row) {
+            return $badge['active'] == 'N' ? $row->addClass('error') : $row;
+        });
+
+        $table->addHeaderAction('add', __('Add'))
+           ->setURL('/modules/Free Learning/badges_manage_add.php')
+           ->displayLabel();
+
+        $table->addColumn('logo', __('Logo'))
+            ->format(function ($values) use ($gibbon) {
+                if ($values['logo'] == null) {
+                    return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
                 } else {
-                    $rowNum = 'odd';
+                    return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
                 }
-                ++$count;
+            });
+        $table->addColumn('name', __('Name'));
+        $table->addColumn('category', __('Category'));
 
-                if ($row['active'] == 'N') {
-                    $rowNum = 'error';
-                }
+        $table->addActionColumn()
+           ->addParam('freeLearningBadgeID')
+           ->addParam('search', $search)
+           ->format(function ($row, $actions) {
+               $actions->addAction('edit', __('Edit'))
+                   ->setURL('/modules/Free Learning/badges_manage_edit.php');
+           });
 
-                //COLOR ROW BY STATUS!
-                echo "<tr class=$rowNum>";
-                echo '<td>';
-                if ($row['logo'] != '') {
-                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/'.$row['logo']."'/>";
-                } else {
-                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_240_square.jpg'/>";
-                }
-                echo '</td>';
-                echo '<td>';
-                echo $row['name'];
-                echo '</td>';
-                echo '<td>';
-                echo $row['category'];
-                echo '</td>';
-                echo '<td>';
-                echo "<script type='text/javascript'>";
-                echo '$(document).ready(function(){';
-                echo "\$(\".comment-$count\").hide();";
-                echo "\$(\".show_hide-$count\").fadeIn(1000);";
-                echo "\$(\".show_hide-$count\").click(function(){";
-                echo "\$(\".comment-$count\").fadeToggle(1000);";
-                echo '});';
-                echo '});';
-                echo '</script>';
-                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$row['freeLearningBadgeID']."&search=$search'><img title='Edit' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/config.png'/></a> ";
-                if ($row['description'] != '') {
-                    echo "<a class='show_hide-$count' onclick='false' href='#'><img style='padding-right: 5px' src='".$gibbon->session->get('absoluteURL')."/themes/Default/img/page_down.png' title='Show Description' onclick='return false;' /></a>";
-                }
-                echo '</td>';
-                echo '</tr>';
-                if ($row['description'] != '') {
-                    echo "<tr class='comment-$count' id='comment-$count'>";
-                    echo "<td style='background-color: #fff' colspan=5>";
-                    echo nl2brr($row['description']);
-                    echo '</td>';
-                    echo '</tr>';
-                }
-            }
-            echo '</table>';
-
-            if ($result->rowCount() > $gibbon->session->get('pagination')) {
-                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'bottom', "search=$search");
-            }
-        }
+        echo $table->render($badges);
     }
 }
 ?>

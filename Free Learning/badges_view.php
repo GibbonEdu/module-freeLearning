@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\View\View;
+use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
+use Gibbon\Module\FreeLearning\Domain\BadgeGateway;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -30,101 +35,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_view.
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";
-        echo __($guid, 'This functionality requires the Badges module to be installed, active and available.', 'Free Learning');
+        echo __m('This functionality requires the Badges module to be installed, active and available.');
         echo '</div>';
     } else {
-        //Set pagination variable
-        $page = $_GET['page'] ?? null;
-        if ((!is_numeric($page)) or $page < 1) {
-            $page = 1;
-        }
+        $badgeGateway = $container->get(BadgeGateway::class);
 
-        echo "<h2 class='top'>";
-        echo 'View';
-        echo '</h2>';
+        $criteria = $badgeGateway->newQueryCriteria(true)
+            ->fromPOST();
 
-        try {
-            $data = array();
-            $sql = 'SELECT freeLearningBadge.*, name, category, logo, description
-                FROM  freeLearningBadge
-                    JOIN badgesBadge ON (freeLearningBadge.badgesBadgeID=badgesBadge.badgesBadgeID)
-                ORDER BY unitsCompleteTotal, unitsCompleteDepartmentCount, name';
-            $sqlPage = $sql.' LIMIT '.$gibbon->session->get('pagination').' OFFSET '.(($page - 1) * $gibbon->session->get('pagination'));
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
-        }
+        $badges = $badgeGateway->selectBadges();
 
+        $table = DataTable::createPaginated('badges', $criteria);
 
-        if ($result->rowCount() < 1) { echo "<div class='error'>";
-            echo __($guid, 'There are no badges to display.', 'Free Learning');
-            echo '</div>';
-        } else {
-            if ($result->rowCount() > $gibbon->session->get('pagination')) {
-                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'top');
-            }
-
-            echo "<table cellspacing='0' style='width: 100%'>";
-            echo "<tr class='head'>";
-            echo "<th style='width: 180px'>";
-            echo __($guid, 'Logo', 'Free Learning');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Name').'<br/>';
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Category');
-            echo '</th>';
-            echo "<th>";
-            echo __($guid, 'Description');
-            echo '</th>';
-            echo '</tr>';
-
-            $count = 0;
-            $rowNum = 'odd';
-            try {
-                $resultPage = $connection2->prepare($sqlPage);
-                $resultPage->execute($data);
-            } catch (PDOException $e) {
-                echo "<div class='error'>".$e->getMessage().'</div>';
-            }
-            while ($row = $resultPage->fetch()) {
-                if ($count % 2 == 0) {
-                    $rowNum = 'even';
+        $table->addColumn('logo', __('Logo'))
+            ->format(function ($values) use ($gibbon) {
+                if ($values['logo'] == null) {
+                    return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
                 } else {
-                    $rowNum = 'odd';
+                    return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
                 }
-                ++$count;
+            });
+        $table->addColumn('name', __('Name'));
+        $table->addColumn('category', __('Category'));
+        $table->addColumn('description', __('Description'));
 
-                if ($row['active'] == 'N') {
-                    $rowNum = 'error';
-                }
-
-                //COLOR ROW BY STATUS!
-                echo "<tr class=$rowNum>";
-                echo '<td>';
-                if ($row['logo'] != '') {
-                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/'.$row['logo']."'/>";
-                } else {
-                    echo "<img class='user' style='max-width: 150px' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_240_square.jpg'/>";
-                }
-                echo '</td>';
-                echo '<td>';
-                echo $row['name'];
-                echo '</td>';
-                echo '<td>';
-                echo $row['category'];
-                echo '</td>';
-                echo "<td>";
-                echo nl2brr($row['description']);
-                echo '</td>';
-            }
-            echo '</table>';
-
-            if ($result->rowCount() > $gibbon->session->get('pagination')) {
-                printPagination($guid, $result->rowCount(), $page, $gibbon->session->get('pagination'), 'bottom');
-            }
-        }
+        echo $table->render($badges);
     }
 }
 ?>
