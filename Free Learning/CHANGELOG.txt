@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.12.03
+-------
+Fixed error message on public units
+Improved Afrikaans translation
+
 v5.12.02
 -------
 Ongoing table OOficiation work

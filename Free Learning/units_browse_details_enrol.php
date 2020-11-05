@@ -25,7 +25,7 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == false) {
     // Access denied
-    $page->addError(__('You do not have access to this action.'));
+    echo Format::alert(__('You do not have access to this action.'));
 } else {
     // Get enrolment settings
     $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
