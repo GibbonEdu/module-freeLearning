@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.12.04
+-------
+Update the unit details layout and logo
+
 v5.12.03
 -------
 Fixed error message on public units

@@ -175,7 +175,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     // UNIT DETAILS TABLE
                     $table = DataTable::createDetails('unitDetails');
 
-                    $table->addColumn('name', __('Name'));
+                    $table->addColumn('name', '')->addClass('text-lg font-bold');
                     $table->addColumn('time', __m('Time'))
                         ->format(function ($values) use ($connection2, $freeLearningUnitID) {
                             $output = '';
@@ -205,7 +205,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             return $output;
                         });
-                    $table->addColumn('logo', __('Logo'))
+                    $table->addColumn('logo', '')
+                        ->addClass('row-span-3 text-right')
                         ->format(function ($values) use ($gibbon) {
                             if ($values['logo'] == null) {
                                 return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
