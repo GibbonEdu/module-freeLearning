@@ -49,7 +49,7 @@ if ($canManage and isset($_GET['gibbonPersonID'])) {
 
 $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
 
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
+if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
     //Fail 0
     $URL .= '&return=error0';
     header("Location: {$URL}");
@@ -122,6 +122,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         $proceed = true;
                     }
                 }
+
+                //Check to see if we are a mentor of this student
+                if ($row['enrolmentMethod'] == 'schoolMentor') { //Is teacher of this class?
+                    try {
+                        $dataMentor = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                        $sqlMentor = "SELECT freeLearningUnitStudentID FROM freeLearningUnitStudent WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID AND enrolmentMethod='schoolMentor' AND gibbonPersonIDSchoolMentor=:gibbonPersonID";
+                        $resultMentor = $connection2->prepare($sqlMentor);
+                        $resultMentor->execute($dataMentor);
+                    } catch (PDOException $e) {}
+                    if ($resultMentor->rowCount() > 0) {
+                        $proceed = true;
+                    }
+                }
+
+
 
                 if ($proceed == false) {
                     //Fail 0

@@ -276,9 +276,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo $table->render([$values]);
 
 
-                    $defaultTab = 3;
-                    if (!$canManage) {
-                        $defaultTab = 2;
+                    $defaultTab = 2;
+                    if ($canManage || isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php')) {
+                        $defaultTab = 3;
                     }
                     if (isset($_GET['tab'])) {
                         $defaultTab = $_GET['tab'];
@@ -289,7 +289,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '<ul>';
                     echo "<li><a href='#tabs0'>".__('Unit Overview', 'Free Learning').'</a></li>';
                     echo "<li><a href='#tabs1'>".__('Enrol', 'Free Learning').'</a></li>';
-                    if ($canManage) {
+                    if ($canManage || isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php')) {
                         echo "<li><a href='#tabs2'>".__('Manage Enrolment', 'Free Learning').'</a></li>';
                     }
                     echo "<li><a href='#tabs3'>".__('Content', 'Free Learning').'</a></li>';
@@ -329,7 +329,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         include './modules/Free Learning/units_browse_details_enrol.php';
                     echo '</div>';
 
-                    if ($canManage) {
+                    if ($canManage || isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php')) {
                         echo "<div id='tabs2'>";
                             //Check to see if we have access to manage all enrolments, or only those belonging to ourselves
                             $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/enrolment_manage.php', 'Manage Enrolment_all');

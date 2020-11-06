@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.12.05
+-------
+Improved separation of Browse and Manage in unit approval
+
 v5.12.04
 -------
 Update the unit details layout and logo
