@@ -82,7 +82,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 'foreignTable'   => 'freeLearningUnitStudent',
                 'foreignTableID' => $freeLearningUnitStudentID,
                 'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'), 
-                'gibbonPersonID' => $gibbonPersonID,
+                'gibbonPersonID' => null,
                 'comment'        => $commentApproval,
                 'type'           => $status,
                 'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',

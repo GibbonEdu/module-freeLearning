@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.12.06
+-------
+Fixed issue where approval discussion entries weren't showing up
+
 v5.12.05
 -------
 Improved separation of Browse and Manage in unit approval

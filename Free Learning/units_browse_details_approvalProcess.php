@@ -42,12 +42,12 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+$gibbonPersonID = '';
 if ($canManage and isset($_GET['gibbonPersonID'])) {
     $gibbonPersonID = $_GET['gibbonPersonID'];
 }
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
+$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&gibbonPersonID='.$gibbonPersonID.'&sidebar=true&tab=2&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
     //Fail 0
@@ -174,7 +174,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 'foreignTable'   => 'freeLearningUnitStudent',
                                 'foreignTableID' => $freeLearningUnitStudentID,
                                 'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'),
-                                'gibbonPersonID' => $gibbonPersonID,
+                                'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'),
                                 'comment'        => $commentApproval,
                                 'type'           => $status,
                                 'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
