@@ -153,6 +153,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $alert = Format::alert(__m('Collaborative Assessment is enabled: you will be giving feedback to all members of this group in one go.'), 'message');
     }
 
+    $gibbonHookID = $pdo->selectOne("SELECT gibbonHookID FROM gibbonHook 
+        JOIN gibbonModule ON (gibbonModule.gibbonModuleID=gibbonHook.gibbonModuleID) 
+        WHERE gibbonModule.name='Free Learning' AND gibbonHook.type='Student Profile'");
+
     // COMMENT FORM
     $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
     $form->setClass('blank');
@@ -163,6 +167,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     // DISCUSSION
     $logs = $unitStudentGateway->selectUnitStudentDiscussion($freeLearningUnitStudentID)->fetchAll();
+    $logs = array_map(function ($item) use ($gibbonHookID) {
+        $item['url'] = !empty($item['gibbonPersonID']) && $item['category'] == 'Student'
+            ? './index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$item['gibbonPersonID'].'&hook=Free Learning&module=Free Learning&action=Unit History By Student_all&gibbonHookID='.$gibbonHookID
+            : '';
+        return $item;
+    }, $logs);
+
     $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
         'title' => __('Comments'),
         'discussion' => $logs
