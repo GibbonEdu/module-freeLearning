@@ -74,34 +74,36 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
         } else {
             // Post Discussion
             $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
-            $discussionGateway = $container->get(DiscussionGateway::class);
-            $unitStudentGateway = $container->get(UnitStudentGateway::class);
-            
-                
-            $data = [
-                'foreignTable'   => 'freeLearningUnitStudent',
-                'foreignTableID' => $freeLearningUnitStudentID,
-                'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'), 
-                'gibbonPersonID' => null,
-                'comment'        => $commentApproval,
-                'type'           => $status,
-                'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
-            ];
 
-            if ($collaborativeAssessment == 'Y' AND !empty($values['collaborationKey'])) {
-                $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $values['collaborationKey']])->fetchAll();
-                foreach ($collaborators as $collaborator) {
-                    $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+            if ($values['enrolmentMethod'] == 'schoolMentor') {
+                $discussionGateway = $container->get(DiscussionGateway::class);
+                $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
+                $data = [
+                    'foreignTable'   => 'freeLearningUnitStudent',
+                    'foreignTableID' => $freeLearningUnitStudentID,
+                    'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'),
+                    'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'),
+                    'comment'        => $commentApproval,
+                    'type'           => $status,
+                    'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
+                ];
+
+                if ($collaborativeAssessment == 'Y' AND !empty($values['collaborationKey'])) {
+                    $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $values['collaborationKey']])->fetchAll();
+                    foreach ($collaborators as $collaborator) {
+                        $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+                        $discussionGateway->insert($data);
+                    }
+                } else {
+                    $collaborators = [$values];
                     $discussionGateway->insert($data);
                 }
-            } else {
-                $collaborators = [$values];
-                $discussionGateway->insert($data);
             }
 
             // Write to database
-            $unitStudentGateway = $container->get(UnitStudentGateway::class); 
-                        
+            $unitStudentGateway = $container->get(UnitStudentGateway::class);
+
             $data = [
                 'status' => $status,
                 'commentApproval' => $commentApproval,
