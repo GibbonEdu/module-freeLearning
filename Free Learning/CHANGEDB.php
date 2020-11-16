@@ -1243,3 +1243,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.12.07';
 $sql[$count][1] = "";
+
+//v5.12.08
+++$count;
+$sql[$count][0] = '5.12.08';
+$sql[$count][1] = "";
