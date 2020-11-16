@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.12.08
+-------
+Linked student names to student profiles in the Approval view
+Tweaked the fix to approval discussion entries
+
 v5.12.07
 -------
 Fixed issue where approval discussion entries weren't showing up...some more!

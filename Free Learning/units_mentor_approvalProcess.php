@@ -107,7 +107,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
             $data = [
                 'status' => $status,
                 'commentApproval' => $commentApproval,
-                'gibbonPersonIDApproval' => null,
+                'gibbonPersonIDApproval' => $gibbon->session->get('gibbonPersonID') ?? null,
                 'timestampCompleteApproved' => date('Y-m-d H:i:s')
             ];
 
