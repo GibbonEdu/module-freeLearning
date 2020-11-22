@@ -56,6 +56,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
+        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+
         // Get enrolment settings
         $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
         $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
@@ -64,14 +66,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             : 'N';
 
         //Check whether any enrolment methods are available
-        if ($enableSchoolMentorEnrolment != Y && $enableExternalMentorEnrolment != Y && $enableClassEnrolment != Y) {
+        if ($enableSchoolMentorEnrolment != 'Y' && $enableExternalMentorEnrolment != 'Y' && $enableClassEnrolment != 'Y') {
             //Fail 0
             $URL .= '&return=error0';
             header("Location: {$URL}");
             exit;
         }
-
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
 
         $freeLearningUnitID = $_POST['freeLearningUnitID'];
 
