@@ -39,7 +39,7 @@ if ($gibbon->session->exists('gibbonPersonID')) {
 }
 
 //Get params
-$freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
+$freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
 $showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
 $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
 $difficulty = $_GET['difficulty'] ?? '';
@@ -48,10 +48,10 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$response = $_POST['response'] ?? null;
-$reason = $_POST['reason'] ?? null;
-$freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? null;
-$confirmationKey = $_POST['confirmationKey'] ?? null;
+$response = $_REQUEST['response'] ?? null;
+$reason = $_REQUEST['reason'] ?? null;
+$freeLearningUnitStudentID = $_REQUEST['freeLearningUnitStudentID'] ?? null;
+$confirmationKey = $_REQUEST['confirmationKey'] ?? null;
 
 //Check to see if system settings are set from databases
 if (@$gibbon->session->get('systemSettingsSet') == false) {
