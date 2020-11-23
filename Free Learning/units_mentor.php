@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -55,7 +57,7 @@ $page->breadcrumbs
     ->add(__m('Browse Units'), 'units_browse.php', $urlParams);
 
 if (isset($_GET['return'])) {
-    returnProcess($guid, $_GET['return'], null, array('success0' => __($guid, 'Your request was completed successfully. Thank you for your time.', 'Free Learning'), 'success1' => __($guid, 'Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.', 'Free Learning')));
+    returnProcess($guid, $_GET['return'], null, array('success0' => __m('Your request was completed successfully. Thank you for your time.'), 'success1' => __m('Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.')));
 }
 
 if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
@@ -71,7 +73,7 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
 
     if ($result->rowCount() != 1) {
         echo "<div class='error'>";
-        echo __($guid, 'There are no records to display.');
+        echo __('There are no records to display.');
         echo '</div>';
     } else {
         $row = $result->fetch();
@@ -83,7 +85,7 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
         //Show choice for school mentor
         if ($mode == "internal" && $confirmationKey != '') {
             echo '<p>';
-            echo sprintf(__($guid, 'The following users at %1$s have requested your input into their %2$sFree Learning%3$s work, with the hope that you will be able to act as a "critical buddy" or mentor, offering feedback on their progress.', 'Free Learning'), $gibbon->session->get('systemName'), "<a target='_blank' href='http://rossparker.org'>", '</a>');
+            echo sprintf(__m('The following users at %1$s have requested your input into their %2$sFree Learning%3$s work, with the hope that you will be able to act as a "critical buddy" or mentor, offering feedback on their progress.'), $gibbon->session->get('systemName'), "<a target='_blank' href='http://rossparker.org'>", '</a>');
             echo '<br/>';
             echo '</p>';
 
@@ -103,7 +105,7 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
             }
             if ($resultConfCheck->rowCount() < 1) {
                 echo "<div class='error'>";
-                echo __($guid, 'An error occurred.');
+                echo __('An error occurred.');
                 echo '</div>';
             }
             else {
@@ -114,9 +116,42 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
                 }
                 echo '</ul>';
                 echo '<p style=\'margin-top: 20px\'>';
-                echo sprintf(__($guid, 'The unit you are being asked to advise on is called %1$s and is described as follows:', 'Free Learning'), '<b>'.$row['name'].'</b>').$row['blurb']."<br/><br/>";
-                echo sprintf(__($guid, 'Please %1$sclick here%2$s if you are able to get involved, or, %3$sclick here%4$s if you not in a position to help.', 'Free Learning'), "<a class='p-1 border border-solid border-green-500 text-green-500 bg-green-200' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_mentorProcess.php?response=Y&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>', "<a class='p-1 border border-solid border-red-500 text-red-500 bg-red-200' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_mentorProcess.php?response=N&freeLearningUnitStudentID=".$freeLearningUnitStudentID."&confirmationKey=$confirmationKey&freeLearningUnitID=$freeLearningUnitID'>", '</a>');
-                echo '</p>';
+                echo sprintf(__m('The unit you are being asked to advise on is called %1$s and is described as follows:'), '<b>'.$row['name'].'</b>').$row['blurb']."<br/><br/>";
+                echo __m('Please use the form below to indicate whether you would like to accept or decline this invitation.')."</br>";
+
+                $form = Form::create('action', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module')."/units_mentorProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+
+                $form->addHiddenValue('address', $gibbon->session->get('address'));
+                $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
+                $form->addHiddenValue('confirmationKey', $confirmationKey);
+                $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+
+                $responses = array(
+                    "Y" => __m("Accept"),
+                    "N" => __m("Decline")
+                );
+                $row = $form->addRow();
+                    $row->addLabel('response', __('Response'));
+                    $row->addSelect('response')->fromArray($responses)->placeholder()->required();
+
+                $form->toggleVisibilityByClass('reasons')->onSelect('response')->when('N');
+
+                $reasons = array(
+                    "Lack of time" => __m("Lack of time"),
+                    "Unfamiliar with this unit" => __m("Unfamiliar with this unit"),
+                    "Unfamiliar with this knowledge area" => __m("Unfamiliar with this knowledge area"),
+                    "Unfamiliar with Free Learning" => __m("Unfamiliar with Free Learning"),
+                    "Other" => __m("Other")
+                );
+                $row = $form->addRow()->addClass('reasons');;
+                    $row->addLabel('reason', __('Reason'));
+                    $row->addSelect('reason')->fromArray($reasons)->placeholder()->required();
+
+                $row = $form->addRow();
+                    $row->addFooter();
+                    $row->addSubmit();
+
+                echo $form->getOutput();
             }
         }
     }

@@ -39,7 +39,7 @@ if ($gibbon->session->exists('gibbonPersonID')) {
 }
 
 //Get params
-$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
+$freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
 $showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
 $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
 $difficulty = $_GET['difficulty'] ?? '';
@@ -48,9 +48,10 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$response = $_GET['response'] ?? null;
-$freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'] ?? null;
-$confirmationKey = $_GET['confirmationKey'] ?? null;
+$response = $_REQUEST['response'] ?? null;
+$reason = $_REQUEST['reason'] ?? null;
+$freeLearningUnitStudentID = $_REQUEST['freeLearningUnitStudentID'] ?? null;
+$confirmationKey = $_REQUEST['confirmationKey'] ?? null;
 
 //Check to see if system settings are set from databases
 if (@$gibbon->session->get('systemSettingsSet') == false) {
@@ -99,7 +100,7 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
             }
 
             //Notify student
-            $notificationText = sprintf(__($guid, 'Your mentorship request for the Free Learning unit %1$s has been accepted.', 'Free Learning'), $unit);
+            $notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been accepted.'), $unit);
             setNotification($connection2, $guid, $row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
 
             //Return to thanks page
@@ -119,7 +120,9 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
             }
 
             //Notify student
-            $notificationText = sprintf(__($guid, 'Your mentorship request for the Free Learning unit %1$s has been declined. Your enrolment has been deleted.', 'Free Learning'), $unit);
+            $notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been declined. Your enrolment has been deleted.'), $unit);
+            $notificationText .= (!empty($reason)) ? " ".sprintf(__m('The following reason was given: %1$s.'), $reason) : '' ;
+
             setNotification($connection2, $guid, $row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
 
             //Return to thanks page
