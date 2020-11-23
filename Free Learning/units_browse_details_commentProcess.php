@@ -71,7 +71,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         exit;
     }
 
-    // Insert discussion records        
+    // Insert discussion records
     $data = [
         'foreignTable'       => 'freeLearningUnitStudent',
         'foreignTableID'     => $freeLearningUnitStudentID,
@@ -94,7 +94,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     // Raise a new notification event
     $event = new NotificationEvent('Free Learning', 'Unit Comment');
-    
+
     $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
     if ($canManage && $roleCategory != 'Student') {
         $event->setNotificationText(sprintf(__m('A teacher has added a comment to your current unit (%1$s).'), $unit['name']));
@@ -108,7 +108,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $event->setNotificationText(sprintf(__m('A student has added a comment to their current unit (%1$s).'), $unit['name']));
         $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=$freeLearningUnitStudentID&sidebar=true");
 
-        if ($values['enrolmentMethod'] == 'class') { 
+        if ($values['enrolmentMethod'] == 'class') {
             // Attempt to notify teacher(s) of class
             $courseGateway = $container->get(CourseEnrolmentGateway::class);
             $teachers = $courseGateway->selectClassTeachersByStudent($gibbon->session->get('gibbonSchoolYearID'), $values['gibbonPersonIDStudent'], $values['gibbonCourseClassID'])->fetchAll();
@@ -116,11 +116,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             foreach ($teachers as $teacher) {
                 $event->addRecipient($teacher['gibbonPersonID']);
             }
-        } elseif ($values['enrolmentMethod'] == 'schoolMentor' && !empty($values['gibbonPersonIDSchoolMentor'])) { 
+        } elseif ($values['enrolmentMethod'] == 'schoolMentor' && !empty($values['gibbonPersonIDSchoolMentor'])) {
             // Attempt to notify school mentor
-            $event->addRecipient($teacher['gibbonPersonIDSchoolMentor']);
+            $event->addRecipient($values['gibbonPersonIDSchoolMentor']);
 
-        } elseif ($values['enrolmentMethod'] == 'externalMentor') { 
+        } elseif ($values['enrolmentMethod'] == 'externalMentor') {
             // Not available through the Mentor interface
         }
     }

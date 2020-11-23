@@ -32,8 +32,6 @@ class BadgeGateway extends QueryableGateway
 
     public function selectBadges($activeOnly = true, $search = '')
     {
-        $sql = "SELECT freeLearningBadge.*, name, category, logo, description FROM freeLearningBadge JOIN badgesBadge ON (freeLearningBadge.badgesBadgeID=badgesBadge.badgesBadgeID)";
-
         $query = $this
             ->newSelect()
             ->cols(['freeLearningBadge.*','name', 'category', 'logo', 'description'])
@@ -50,7 +48,5 @@ class BadgeGateway extends QueryableGateway
         }
 
         return $this->runSelect($query)->fetchAll();
-
-        //$sql .= " ORDER BY category, name";
     }
 }

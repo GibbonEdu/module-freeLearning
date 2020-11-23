@@ -223,8 +223,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $description .= '<p>'.sprintf(__m('You are currently enrolled in %1$s: when you are ready, use the form to submit evidence that you have completed the unit. Your class teacher or mentor will be notified, and will approve your unit completion in due course.'), $values['name']).'</p>';
             } elseif ($rowEnrol['status'] == 'Evidence Not Yet Approved') {
                 $description .= Format::alert(__m('Your evidence has not been approved. Please read the feedback below, adjust your evidence, and submit again:'), 'warning');
-
-
             }
             $form->setDescription($description);
 

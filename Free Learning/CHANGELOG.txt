@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.13.01
+-------
+Fixed Student select issue in Unit History By Student_myChildren
+Fixed issue preventing school mentor from being notified of a comment
+
 v5.13.00
 -------
 Added reasons to mentor decline
