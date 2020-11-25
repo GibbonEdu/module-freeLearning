@@ -166,7 +166,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 echo '</td>';
                 echo '<td>';
                 echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".formatName('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
-                $fields = unserialize($row['fields']);
+                $fields = json_decode($row['fields'], true);
                 if (!empty($fields[$customField])) {
                     $value = $fields[$customField];
                     if ($value != '') {

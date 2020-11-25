@@ -98,11 +98,13 @@ else {
     });
 
     $table->addColumn('enrolmentMethod', __m('Enrolment Method'))
+        ->notSortable()
         ->format(function($values) {
             return ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $values["enrolmentMethod"])).'<br/>';
         });
 
-    $table->addColumn('classMentor', __m('Class/Mentor'))
+    $table->addColumn('grouping', __m('Class/Mentor'))
+        ->sortable(['course', 'class', 'grouping'])
         ->description(__m('Grouping'))
         ->format(function($values) use (&$collaborationKeys) {
             $output = '';
@@ -143,7 +145,7 @@ else {
         });
 
     $table->addColumn('student', __('Student'))
-        ->notSortable()
+        ->sortable('gibbonPersonID')
         ->format(function($values) use ($guid, $customField) {
             $output = "";
             if ($values['category'] == 'Student') {
@@ -153,7 +155,7 @@ else {
                 $output .= formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true);
             }
             $output .= "<br/>";
-            $fields = unserialize($values['fields']);
+            $fields = json_decode($values['fields'], true);
             if (!empty($fields[$customField])) {
                 $value = $fields[$customField];
                 if ($value != '') {
