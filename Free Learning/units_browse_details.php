@@ -431,7 +431,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                     if (!$canViewStudents) {
                                         $output .= '<br/>'.Format::link('mailto:'.$student['email'], $student['email']);
                                     }
-                                    $fields = unserialize($student['fields']);
+                                    $fields = json_decode($student['fields'], true);
                                     if (!empty($fields[$customField])) {
                                         $output .= '<br/>'.Format::small($fields[$customField]);
                                     }
