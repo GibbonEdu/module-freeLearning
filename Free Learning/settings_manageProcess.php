@@ -34,6 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $unitOutlineTemplate = $_POST['unitOutlineTemplate'] ?? '';
     $learningAreaRestriction = $_POST['learningAreaRestriction'] ?? '';
     $customField = $_POST['customField'] ?? '';
+    $maxMapSize = $_POST['maxMapSize'] ?? '';
     $enableClassEnrolment = $_POST['enableClassEnrolment'] ?? '';
     $enableSchoolMentorEnrolment = $_POST['enableSchoolMentorEnrolment'] ?? '';
     $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'] ?? '';
@@ -56,6 +57,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'unitOutlineTemplate', $unitOutlineTemplate);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'learningAreaRestriction', $learningAreaRestriction);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'customField', $customField);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'maxMapSize', $maxMapSize);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableClassEnrolment', $enableClassEnrolment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableSchoolMentorEnrolment', $enableSchoolMentorEnrolment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableExternalMentorEnrolment', $enableExternalMentorEnrolment);

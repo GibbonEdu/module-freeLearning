@@ -197,7 +197,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         });
 
         // ADJUST VIEW BASED ON NUMBER OF UNITS
-        if ($units->count() > 99 && $view == "map") {
+        $maxMapSize = getSettingByScope($connection2, 'Free Learning', 'maxMapSize');
+        if ($units->count() > $maxMapSize && $view == "map") {
             $view = "grid";
         }
 
@@ -206,6 +207,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             'browseUnitsURL' => $browseUnitsURL,
             'publicUnits'    => $publicUnits,
             'gibbonPersonID' => $gibbonPersonID,
+            'view'           => $view,
+            'maxMapSize'     => $maxMapSize,
             'count'          => $units->count()
         ]);
 

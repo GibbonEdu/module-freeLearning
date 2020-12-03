@@ -70,6 +70,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addSelect($setting['name'])->fromQuery($pdo, $sql)->selected($setting['value'])->placeholder();
 
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'maxMapSize', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addNumber($setting['name'])->required()->setValue($setting['value'])->maxLength(3);
+
     $form->addRow()->addHeading(__m('Enrolment Settings'));
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'enableClassEnrolment', true);
