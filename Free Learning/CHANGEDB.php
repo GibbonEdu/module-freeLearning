@@ -1263,3 +1263,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.13.02';
 $sql[$count][1] = "";
+
+//v5.13.03
+++$count;
+$sql[$count][0] = '5.13.03';
+$sql[$count][1] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'maxMapSize', 'Maximum Map Size', 'How large should the biggest map be, before maps are disabled?', '99');end";

@@ -61,9 +61,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
 
-        $view = $_GET['view'] ?? 'list';
-        if ($view != 'grid' and $view != 'map') {
-            $view = 'list';
+        $view = $_GET['view'] ?? 'map';
+        if ($view != 'grid' and $view != 'list') {
+            $view = 'map';
         }
 
         // View the current user by default
@@ -91,7 +91,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ->filterBy('showInactive', $showInactive)
             ->filterBy('department', $gibbonDepartmentID)
             ->filterBy('difficulty', $difficulty)
-            ->pageSize($view == 'list' ? 25 : 0)
+            ->pageSize($view == 'list' ? 100 : 0)
             ->fromPOST();
 
         // FORM
@@ -148,13 +148,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         echo $form->getOutput();
 
-        // NAVIGATION BUTTONS
-        echo $templateView->fetchFromTemplate('unitButtons.twig.html', [
-            'browseUnitsURL' => $browseUnitsURL,
-            'publicUnits'    => $publicUnits,
-            'gibbonPersonID' => $gibbonPersonID
-        ]);
-
         // QUERY
         if ($highestAction == 'Browse Units_all' && !$viewingAsUser) {
             $units = $unitGateway->queryAllUnits($criteria, $gibbonPersonID, $publicUnits);
@@ -202,6 +195,22 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $unit['statusClass']  = '';
             }
         });
+
+        // ADJUST VIEW BASED ON NUMBER OF UNITS
+        $maxMapSize = getSettingByScope($connection2, 'Free Learning', 'maxMapSize');
+        if ($units->count() > $maxMapSize && $view == "map") {
+            $view = "grid";
+        }
+
+        // NAVIGATION BUTTONS
+        echo $templateView->fetchFromTemplate('unitButtons.twig.html', [
+            'browseUnitsURL' => $browseUnitsURL,
+            'publicUnits'    => $publicUnits,
+            'gibbonPersonID' => $gibbonPersonID,
+            'view'           => $view,
+            'maxMapSize'     => $maxMapSize,
+            'count'          => $units->count()
+        ]);
 
         if ($units->getResultCount() == 0) {
             echo Format::alert(__('There are no records to display.'), 'error');
