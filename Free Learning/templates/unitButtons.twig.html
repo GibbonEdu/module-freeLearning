@@ -11,17 +11,24 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
     <div class="flex justify-end items-center my-4">
         {% set buttonClass = 'bg-gray-100 text-gray-700 border-gray-500 hover:bg-gray-400 border -ml-px px-6 py-1 leading-normal' %}
 
-        <a class="{{ buttonClass }} rounded-l" href="{{ browseUnitsURL }}&view=list">
-            {{ __('List') }}
-            <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconList.png"/>
-        </a>
+        {% if count > 99 %}
+            <div class="{{ buttonClass }} rounded-r opacity-25 bg-red-300 hover:bg-red-300">
+                {{ __m('Map') }}
+                <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconMap.png"/>
+            </div>
+        {% else %}
+            <a class="{{ buttonClass }} rounded-r" href="{{ browseUnitsURL }}&view=map">
+                {{ __m('Map') }}
+                <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconMap.png"/>
+            </a>
+        {% endif %}
         <a class="{{ buttonClass }}" href="{{ browseUnitsURL }}&view=grid">
             {{ __('Grid') }}
             <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconGrid.png"/>
         </a>
-        <a class="{{ buttonClass }} rounded-r" href="{{ browseUnitsURL }}&view=map">
-            {{ __m('Map') }}
-            <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconMap.png"/>
+        <a class="{{ buttonClass }} rounded-l" href="{{ browseUnitsURL }}&view=list">
+            {{ __('List') }}
+            <img class="mt-1 -mb-1 w-5 h-5" src="{{ absoluteURL }}/modules/Free Learning/img/iconList.png"/>
         </a>
     </div>
 
