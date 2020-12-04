@@ -51,7 +51,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $availableParents = $_POST['availableParents'];
             $availableOther = $_POST['availableOther'];
             $sharedPublic = $_POST['sharedPublic'] ?? null;
-            $active = $_POST['active'];
+            $active = $_POST['active'] ?? 'N';
+            $editLock = $_POST['editLock'] ?? 'N';
             $gibbonYearGroupIDMinimum = $_POST['gibbonYearGroupIDMinimum'] ?? null;
             $grouping = (!empty($_POST['grouping']) && is_array($_POST['grouping'])) ? implode(",", $_POST['grouping']) : '';
             $freeLearningUnitIDPrerequisiteList = (!empty($_POST['freeLearningUnitIDPrerequisiteList']) && is_array($_POST['freeLearningUnitIDPrerequisiteList'])) ? implode(",", $_POST['freeLearningUnitIDPrerequisiteList']) : null;
@@ -60,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $schoolMentorCustom = (!empty($_POST['schoolMentorCustom']) && is_array($_POST['schoolMentorCustom'])) ? implode(",", $_POST['schoolMentorCustom']) : null;
             $schoolMentorCustomRole = $_POST['schoolMentorCustomRole'] ?? null;
 
-            if ($name == '' or $difficulty == '' or $active == '' or $availableStudents == '' or $availableStaff == '' or $availableParents == '' or $availableOther == '') {
+            if ($name == '' or $difficulty == '' or $active == '' or $editLock == '' or $availableStudents == '' or $availableStaff == '' or $availableParents == '' or $availableOther == '') {
                 //Fail 3
                 $URL .= '&return=error3';
                 header("Location: {$URL}");
@@ -87,8 +88,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 }
 
                 // Write to database
-                $data = array('name' => $name, 'course' => $course, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'studentReflectionText' => $studentReflectionText, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'schoolMentorCompletors' => $schoolMentorCompletors, 'schoolMentorCustom' => $schoolMentorCustom, 'schoolMentorCustomRole' => $schoolMentorCustomRole, 'outline' => $outline, 'gibbonPersonIDCreator' => $gibbon->session->get('gibbonPersonID'), 'timestamp' => date('Y-m-d H:i:s'));
-                $sql = 'INSERT INTO freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, studentReflectionText=:studentReflectionText, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, `grouping`=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp';
+                $data = array('name' => $name, 'course' => $course, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'studentReflectionText' => $studentReflectionText, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'editLock' => $editLock, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'schoolMentorCompletors' => $schoolMentorCompletors, 'schoolMentorCustom' => $schoolMentorCustom, 'schoolMentorCustomRole' => $schoolMentorCustomRole, 'outline' => $outline, 'gibbonPersonIDCreator' => $gibbon->session->get('gibbonPersonID'), 'timestamp' => date('Y-m-d H:i:s'));
+                $sql = 'INSERT INTO freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, studentReflectionText=:studentReflectionText, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, editLock=:editLock, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, `grouping`=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestamp=:timestamp';
                 $inserted = $pdo->insert($sql, $data);
 
                 if (empty($inserted)) {
