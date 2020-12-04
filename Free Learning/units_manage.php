@@ -112,7 +112,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->displayLabel();
 
         $table->modifyRows(function ($unit, $row) {
-            if ($unit['editLock'] == 'Y') $row->addClass('warning');
             if ($unit['active'] != 'Y') $row->addClass('error');
             return $row;
         });
@@ -129,7 +128,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             'access:other'    => __m('Available To Other'),
         ]);
 
-        $table->addColumn('name', __('Name'));
+        $table->addColumn('name', __('Name'))
+            ->format(function ($unit) {
+                $output = $unit["name"];
+                $output .= $unit["editLock"] == "Y" ? Format::tag(__('Locked'), 'dull ml-2') : '';
+                return $output;
+            });
+
         $table->addColumn('difficulty', __m('Difficulty'));
         $table->addColumn('learningArea', __m('Learning Areas'))
             ->format(function ($unit) {
@@ -139,8 +144,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             });
 
         $table->addColumn('active', __('Active'))->format(Format::using('yesNo', 'active'));
-
-        $table->addColumn('editLock', __('Locked'))->format(Format::using('yesNo', 'editLock'));
 
         // ACTIONS
         $canBrowseUnits = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
