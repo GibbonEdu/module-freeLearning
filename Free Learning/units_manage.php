@@ -36,7 +36,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         $page->breadcrumbs->add(__m('Manage Units'));
-        
+
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], null, null);
         }
@@ -61,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         $form->setClass('noIntBorder fullWidth');
         $form->addHiddenValue('q', '/modules/Free Learning/units_manage.php');
-    
+
         $learningAreas = $unitGateway->selectLearningAreasAndCourses($highestAction != 'Manage Units_all' ? $gibbon->session->get('gibbonPersonID') : null);
         $row = $form->addRow();
             $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
@@ -78,7 +78,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         $row = $form->addRow();
             $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
-        
+
         echo $form->getOutput();
 
 
@@ -110,7 +110,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $table->addHeaderAction('import', __('Import'))
             ->setURL('/modules/Free Learning/units_manage_import.php')
             ->displayLabel();
-            
+
         $table->modifyRows(function ($unit, $row) {
             if ($unit['active'] != 'Y') $row->addClass('error');
             return $row;
@@ -128,7 +128,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             'access:other'    => __m('Available To Other'),
         ]);
 
-        $table->addColumn('name', __('Name'));
+        $table->addColumn('name', __('Name'))
+            ->format(function ($unit) {
+                $output = $unit["name"];
+                $output .= $unit["editLock"] == "Y" ? Format::tag(__('Locked'), 'dull ml-2') : '';
+                return $output;
+            });
+
         $table->addColumn('difficulty', __m('Difficulty'));
         $table->addColumn('learningArea', __m('Learning Areas'))
             ->format(function ($unit) {
@@ -136,6 +142,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     ? $unit['learningArea']
                     : Format::small(__('None'));
             });
+
         $table->addColumn('active', __('Active'))->format(Format::using('yesNo', 'active'));
 
         // ACTIONS
@@ -145,7 +152,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->addParam('difficulty', $difficulty)
             ->addParam('name', $name)
             ->addParam('freeLearningUnitID')
-            ->format(function ($unit, $actions) use ($canBrowseUnits) {
+            ->format(function ($unit, $actions) use ($canBrowseUnits, $highestAction) {
                 if ($canBrowseUnits) {
                     $actions->addAction('view', __('View'))
                         ->addParam('sidebar', 'true')
@@ -153,8 +160,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         ->setURL('/modules/Free Learning/units_browse_details.php');
                 }
 
-                $actions->addAction('edit', __('Edit'))
-                        ->setURL('/modules/Free Learning/units_manage_edit.php');
+                if ($highestAction == "Manage Units_all" || $unit['editLock'] == "N") {
+                    $actions->addAction('edit', __('Edit'))
+                            ->setURL('/modules/Free Learning/units_manage_edit.php');
+                }
 
                 $actions->addAction('delete', __('Delete'))
                         ->setURL('/modules/Free Learning/units_manage_delete.php');

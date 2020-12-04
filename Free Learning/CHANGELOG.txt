@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.04
+-------
+Added Lock setting to units to prevent editing by users lacking Manage Units_all
+
 v5.13.03
 -------
 Switched to map as default view for less than 100 units

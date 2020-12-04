@@ -131,6 +131,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addYesNo('active')->required();
 
         $row = $form->addRow();
+            $row->addLabel('editLock', __('Edit Lock'))->description(__m('Restricts editing to users with Manage Units_all'));
+            $row->addYesNo('editLock')->selected('N')->required();
+
+        $row = $form->addRow();
             $row->addLabel('availableStudents', __m('Available To Students'))->description(__m('Should students be able to browse and enrol?'));
             $row->addYesNo('availableStudents')->required();
 

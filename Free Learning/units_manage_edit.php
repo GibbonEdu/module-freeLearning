@@ -91,6 +91,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         } else {
             //Let's go!
             $values = $result->fetch();
+
+            // Check edit lock
+            if ($highestAction != "Manage Units_all" && $values['editLock'] == "Y") {
+                echo "<div class='error'>";
+                echo __($guid, 'The specified record cannot be found.');
+                echo '</div>';
+                return;
+            }
+
             if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                 echo "<div class='linkTop'>";
                 echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Back to Search Results').'</a>';
@@ -181,6 +190,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row = $form->addRow();
                 $row->addLabel('active', __('Active'));
                 $row->addYesNo('active')->required();
+
+            $row = $form->addRow();
+                $row->addLabel('editLock', __('Edit Lock'))->description(__m('Restricts editing to users with Manage Units_all'));
+                $row->addYesNo('editLock')->required();
 
             $row = $form->addRow();
                 $row->addLabel('availableStudents', __m('Available To Students'))->description(__m('Should students be able to browse and enrol?'));
