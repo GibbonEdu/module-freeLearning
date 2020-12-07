@@ -1275,3 +1275,9 @@ $sql[$count][0] = '5.13.04';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnit` ADD `editLock` enum('Y','N') DEFAULT 'N' AFTER `active`;end
 ";
+
+//v5.13.05
+++$count;
+$sql[$count][0] = '5.13.05';
+$sql[$count][1] = "
+";

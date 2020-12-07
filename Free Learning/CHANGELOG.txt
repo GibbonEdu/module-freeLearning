@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.05
+-------
+Fix Work Pending Approval so class assistants don't see pending work
+
 v5.13.04
 -------
 Added Lock setting to units to prevent editing by users lacking Manage Units_all
