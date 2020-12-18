@@ -1281,9 +1281,3 @@ ALTER TABLE `freeLearningUnit` ADD `editLock` enum('Y','N') DEFAULT 'N' AFTER `a
 $sql[$count][0] = '5.13.05';
 $sql[$count][1] = "
 ";
-
-//v5.13.06
-++$count;
-$sql[$count][0] = '5.13.06';
-$sql[$count][1] = "
-";

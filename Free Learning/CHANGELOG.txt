@@ -1,9 +1,5 @@
 CHANGELOG
 =========
-v5.13.06
--------
-Adjusted mentorship by Specific Role to match to additional roles as well as primary role
-
 v5.13.05
 -------
 Fix Work Pending Approval so class assistants don't see pending work
