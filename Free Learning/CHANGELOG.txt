@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.07
+-------
+Amended Specific Role in unit mentorship to match against all roles, not just primary
+
 v5.13.06
 -------
 Fix list of classes in Enrol Multiple for users with Manage Units_learningAreas permission
