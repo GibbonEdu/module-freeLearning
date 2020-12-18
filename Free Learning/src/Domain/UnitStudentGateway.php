@@ -259,7 +259,7 @@ class UnitStudentGateway extends QueryableGateway
             $sql .= " UNION DISTINCT
             (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
                 FROM gibbonPerson
-                    JOIN gibbonRole ON (gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID)
+                    JOIN gibbonRole ON (FIND_IN_SET(gibbonRole.gibbonRoleID, gibbonPerson.gibbonRoleIDAll))
                 WHERE gibbonRoleID=:gibbonRoleID
                     AND status='Full')";
         }
