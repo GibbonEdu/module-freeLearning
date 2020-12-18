@@ -55,7 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $sharedPublic = $_POST['sharedPublic'] ?? null;
             $active = $_POST['active'] ?? 'N';
             $editLock = $_POST['editLock'] ?? 'N';
-            $gibbonYearGroupIDMinimum = $_POST['gibbonYearGroupIDMinimum'] ?? null;
+            $gibbonYearGroupIDMinimum = !empty($_POST['gibbonYearGroupIDMinimum']) ? $_POST['gibbonYearGroupIDMinimum'] : null;
             $grouping = (!empty($_POST['grouping']) && is_array($_POST['grouping'])) ? implode(",", $_POST['grouping']) : '';
             $freeLearningUnitIDPrerequisiteList = (!empty($_POST['freeLearningUnitIDPrerequisiteList']) && is_array($_POST['freeLearningUnitIDPrerequisiteList'])) ? implode(",", $_POST['freeLearningUnitIDPrerequisiteList']) : null;
             $outline = $_POST['outline'];
