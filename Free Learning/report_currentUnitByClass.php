@@ -109,10 +109,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 echo "<div class='error'>".$e->getMessage().'</div>';
             }
 
-            echo "<div class='linkTop'>";
-            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL').'/report.php?q=/modules/'.$gibbon->session->get('module')."/report_students_byRollGroup_print.php&gibbonCourseClassID=$gibbonCourseClassID'>".__($guid, 'Print')."<img style='margin-left: 5px' title='".__($guid, 'Print')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/print.png'/></a>";
-            echo '</div>';
-
             //Check for custom field
             $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
 

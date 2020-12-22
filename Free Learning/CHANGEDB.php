@@ -1306,3 +1306,9 @@ $sql[$count][0] = '5.13.09';
 $sql[$count][1] = "
 UPDATE freeLearningUnit SET gibbonYearGroupIDMinimum=NULL WHERE gibbonYearGroupIDMinimum=0;end
 ";
+
+//v5.13.10
+++$count;
+$sql[$count][0] = '5.13.10';
+$sql[$count][1] = "
+";
