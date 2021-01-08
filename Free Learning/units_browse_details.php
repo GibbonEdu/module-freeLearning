@@ -574,6 +574,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $resourceContents .= $block['contents'];
                             $blockCount++;
                         }
+
+                        // Enable p5js widgets in smart blocks
+                        if (stripos($resourceContents, '<script type="text/p5"') !== false) {
+                            echo '<script src="//toolness.github.io/p5.js-widget/p5-widget.js"></script>';
+                        }
                     }
 
                     echo '</div>';

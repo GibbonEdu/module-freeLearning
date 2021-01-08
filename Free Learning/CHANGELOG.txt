@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.11
+-------
+Enable script tags and p5js widgets in smart blocks
+
 v5.13.10
 -------
 Removed orphan print option from Current Unit by Class

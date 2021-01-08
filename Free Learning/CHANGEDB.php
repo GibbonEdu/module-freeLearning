@@ -1312,3 +1312,9 @@ UPDATE freeLearningUnit SET gibbonYearGroupIDMinimum=NULL WHERE gibbonYearGroupI
 $sql[$count][0] = '5.13.10';
 $sql[$count][1] = "
 ";
+
+//v5.13.11
+++$count;
+$sql[$count][0] = '5.13.11';
+$sql[$count][1] = "
+";
