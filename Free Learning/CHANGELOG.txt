@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.12
+-------
+Fixed missing comma in manifest file
+
 v5.13.11
 -------
 Enable script tags and p5js widgets in smart blocks
