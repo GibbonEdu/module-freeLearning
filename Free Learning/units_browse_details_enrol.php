@@ -145,24 +145,32 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         if (strpos($values['grouping'], 'Individual') !== false) {
             $groupings['Individual'] = __m('Individual');
         }
-        if (strpos($values['grouping'], 'Pairs') !== false) {
+        if (strpos($values['grouping'], 'Pairs') !== false OR strpos($values['grouping'], 'Threes') !== false OR strpos($values['grouping'], 'Fours') !== false OR strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group1')->onSelect('grouping')->when(['Pairs','Threes','Fours','Fives']);
-            $groupings['Pairs'] = __m('Pair');
+            if (strpos($values['grouping'], 'Pairs')) {
+                $groupings['Pairs'] = __m('Pair');
+            }
             $extraSlots = 1;
         }
-        if (strpos($values['grouping'], 'Threes') !== false) {
+        if (strpos($values['grouping'], 'Threes') !== false OR strpos($values['grouping'], 'Fours') !== false OR strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group2')->onSelect('grouping')->when(['Threes','Fours','Fives']);
-            $groupings['Threes'] = __m('Three');
+            if (strpos($values['grouping'], 'Three')) {
+                $groupings['Threes'] = __m('Three');
+            }
             $extraSlots = 2;
         }
-        if (strpos($values['grouping'], 'Fours') !== false) {
+        if (strpos($values['grouping'], 'Fours') !== false OR strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group3')->onSelect('grouping')->when(['Fours','Fives']);
-            $groupings['Fours'] = __m('Four');
+            if (strpos($values['grouping'], 'Four')) {
+                $groupings['Fours'] = __m('Four');
+            }
             $extraSlots = 3;
         }
         if (strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group4')->onSelect('grouping')->when(['Fives']);
-            $groupings['Fives'] = __m('Five');
+            if (strpos($values['grouping'], 'Four')) {
+                $groupings['Fives'] = __m('Five');
+            }
             $extraSlots = 4;
         }
 

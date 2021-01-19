@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.13
+-------
+Fixed enrolment issue with non-adjacent groupings (e.g. pairs and fours)
+
 v5.13.12
 -------
 Fixed missing comma in manifest file
