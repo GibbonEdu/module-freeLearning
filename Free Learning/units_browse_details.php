@@ -246,7 +246,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
                             return $output;
                         });
-                        $table->addColumn('departments', __m('Authors'))
+                        $table->addColumn('authors', __m('Authors'))
                             ->format(function ($values) use ($connection2, $freeLearningUnitID) {
                                 $output = '';
                                 $authors = getAuthorsArray($connection2, $freeLearningUnitID);
@@ -260,19 +260,24 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 return $output;
                             });
 
-                            $table->addColumn('groupings', __m('Groupings'))
-                                ->format(function ($values) use ($connection2, $freeLearningUnitID) {
-                                    $output = '';
-                                    $authors = getAuthorsArray($connection2, $freeLearningUnitID);
-                                    if ($values['grouping'] != '') {
-                                        $groupings = explode(',', $values['grouping']);
-                                        foreach ($groupings as $grouping) {
-                                            $output .= ucwords($grouping).'<br/>';
-                                        }
+                        $table->addColumn('groupings', __m('Groupings'))
+                            ->format(function ($values) use ($connection2, $freeLearningUnitID) {
+                                $output = '';
+                                $authors = getAuthorsArray($connection2, $freeLearningUnitID);
+                                if ($values['grouping'] != '') {
+                                    $groupings = explode(',', $values['grouping']);
+                                    foreach ($groupings as $grouping) {
+                                        $output .= ucwords($grouping).'<br/>';
                                     }
-                                    return $output;
-                                });
+                                }
+                                return $output;
+                            });
 
+                        $table->addColumn('gibbonYearGroupIDMinimum', __m('Minimum Year Group'))
+                            ->format(function ($values) use ($guid, $connection2) {
+                                return getYearGroupsFromIDList($guid, $connection2, $values["gibbonYearGroupIDMinimum"]);
+                            });
+                        
                     echo $table->render([$values]);
 
 

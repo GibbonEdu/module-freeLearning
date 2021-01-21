@@ -137,6 +137,7 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
                 $form->toggleVisibilityByClass('reasons')->onSelect('response')->when('N');
 
                 $reasons = array(
+                    "Incorrect teacher selected" => __m("Incorrect teacher selected"),
                     "Lack of time" => __m("Lack of time"),
                     "Unfamiliar with this unit" => __m("Unfamiliar with this unit"),
                     "Unfamiliar with this knowledge area" => __m("Unfamiliar with this knowledge area"),
