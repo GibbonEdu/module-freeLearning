@@ -159,7 +159,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
             $data = array('gibbonPersonID' => $gibbonPersonID);
             if ($summary == true) {
                 $sql = "SELECT
-                        freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea, freeLearningUnit.course AS flCourse, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined
+                        freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea, freeLearningUnit.course AS flCourse, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined
                     FROM
                         freeLearningUnit
                         JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
@@ -177,7 +177,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                     LIMIT 0, 8";
             } else {
                 $sql = "SELECT
-                    freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, 'freeLearningUnit.freeLearningUnitID', GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea, freeLearningUnit.course AS flCourse, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined
+                    freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, 'freeLearningUnit.freeLearningUnitID', GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea, freeLearningUnit.course AS flCourse, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined
                 FROM freeLearningUnit
                     JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                     LEFT JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID)
