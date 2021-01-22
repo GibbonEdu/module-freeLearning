@@ -117,7 +117,7 @@ class UnitExporter
             if ($file['type'] == 'url') {
                 // Handle images from url by downloading them firsy
                 $context  = stream_context_create(['ssl' => ['verify_peer' => false]]);
-                $fileContents = file_get_contents($file['location'], false, $context);
+                $fileContents = @file_get_contents($file['location'], false, $context);
 
                 if (empty($fileContents)) continue;
 

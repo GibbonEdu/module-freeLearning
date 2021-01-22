@@ -151,10 +151,18 @@ class UnitGateway extends QueryableGateway
 
     public function selectPrerequisiteIDsByNames($freeLearningUnitIDPrerequisiteList)
     {
-        $freeLearningUnitIDPrerequisiteList = is_array($freeLearningUnitIDPrerequisiteList) ? implode(',', $freeLearningUnitIDPrerequisiteList) : $freeLearningUnitIDPrerequisiteList;
-        
-        $data = ['freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList];
-        $sql = "SELECT freeLearningUnitID FROM freeLearningUnit WHERE FIND_IN_SET(name, :freeLearningUnitIDPrerequisiteList) ORDER BY FIND_IN_SET(freeLearningUnitID, :freeLearningUnitIDPrerequisiteList)";
+        $prerequisites = is_array($freeLearningUnitIDPrerequisiteList)? $freeLearningUnitIDPrerequisiteList : [$freeLearningUnitIDPrerequisiteList];
+
+        $data = [];
+        $where = [];
+        $count = 1;
+        foreach ($prerequisites as $prerequisite) {
+            $data["prereq$count"] = $prerequisite;
+            $where[] = "name=:prereq$count";
+            $count++;
+        }
+
+        $sql = "SELECT freeLearningUnitID FROM freeLearningUnit WHERE ".implode(' OR ', $where)." ORDER BY freeLearningUnitID";
 
         return $this->db()->select($sql, $data);
     }
@@ -218,7 +226,7 @@ class UnitGateway extends QueryableGateway
                 JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
                 WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID
                 AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID
-                AND gibbonCourseClassPerson.role='Teacher'
+                AND (gibbonCourseClassPerson.role='Teacher' OR gibbonCourseClassPerson.role='Assistant')
                 GROUP BY gibbonCourseClassPerson.gibbonCourseClassPersonID
                 ORDER BY gibbonCourseClassPerson.gibbonCourseClassID";
         return $this->db()->select($sql, $data);

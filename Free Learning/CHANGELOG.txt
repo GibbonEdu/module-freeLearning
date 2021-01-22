@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.13.15
+-------
+Added access for class Assistants to access and manage submissions
+Handle commas in unit names when importing unit prerequisites
+
 v5.13.14
 -------
 Added extra details to unit view interface header

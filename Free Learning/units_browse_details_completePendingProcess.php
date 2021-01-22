@@ -217,7 +217,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             if ($enrolmentMethod == 'class') { //Attempt to notify teacher(s) of class
                                 try {
                                     $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
-                                    $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND role='Teacher'";
+                                    $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
                                     $result = $connection2->prepare($sql);
                                     $result->execute($data);
                                 } catch (PDOException $e) { }
