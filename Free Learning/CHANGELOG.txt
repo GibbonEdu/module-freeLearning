@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.16
+-------
+Fixed enrolment issue with missing groupings
+
 v5.13.15
 -------
 Added access for class Assistants to access and manage submissions

@@ -147,28 +147,28 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
         if (strpos($values['grouping'], 'Pairs') !== false OR strpos($values['grouping'], 'Threes') !== false OR strpos($values['grouping'], 'Fours') !== false OR strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group1')->onSelect('grouping')->when(['Pairs','Threes','Fours','Fives']);
-            if (strpos($values['grouping'], 'Pairs')) {
+            if (strpos($values['grouping'], 'Pairs') !== false) {
                 $groupings['Pairs'] = __m('Pair');
             }
             $extraSlots = 1;
         }
         if (strpos($values['grouping'], 'Threes') !== false OR strpos($values['grouping'], 'Fours') !== false OR strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group2')->onSelect('grouping')->when(['Threes','Fours','Fives']);
-            if (strpos($values['grouping'], 'Three')) {
+            if (strpos($values['grouping'], 'Threes') !== false) {
                 $groupings['Threes'] = __m('Three');
             }
             $extraSlots = 2;
         }
         if (strpos($values['grouping'], 'Fours') !== false OR strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group3')->onSelect('grouping')->when(['Fours','Fives']);
-            if (strpos($values['grouping'], 'Four')) {
+            if (strpos($values['grouping'], 'Fours') !== false) {
                 $groupings['Fours'] = __m('Four');
             }
             $extraSlots = 3;
         }
         if (strpos($values['grouping'], 'Fives') !== false) {
             $form->toggleVisibilityByClass('group4')->onSelect('grouping')->when(['Fives']);
-            if (strpos($values['grouping'], 'Four')) {
+            if (strpos($values['grouping'], 'Fives') !== false) {
                 $groupings['Fives'] = __m('Five');
             }
             $extraSlots = 4;
