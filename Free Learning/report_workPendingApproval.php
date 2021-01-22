@@ -76,7 +76,7 @@ else {
         ->fromPOST();
 
     if (!empty($allMentors)) {
-         $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'));
+        $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'));
     }
     else {
         $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
@@ -140,8 +140,12 @@ else {
         });
 
     $table->addColumn('unit', __m('Unit'))
+        ->description(__m('Learning Area')."/".__m('Course'))
         ->format(function($values) use ($gibbon) {
-             return "<a href='" . $gibbon->session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a>" ;
+             $output = "<a href='" . $gibbon->session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
+             $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
+             $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
+             return $output;
         });
 
     $table->addColumn('student', __('Student'))

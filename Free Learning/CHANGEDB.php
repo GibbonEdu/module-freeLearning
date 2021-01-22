@@ -1348,3 +1348,9 @@ $sql[$count][1] = "
 $sql[$count][0] = '5.13.16';
 $sql[$count][1] = "
 ";
+
+//v5.13.17
+++$count;
+$sql[$count][0] = '5.13.17';
+$sql[$count][1] = "
+";

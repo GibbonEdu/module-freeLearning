@@ -66,7 +66,7 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
             $difficultyOrder = 'FIELD(difficulty';
             $difficulties = explode(',', $difficulties);
             foreach ($difficulties as $difficultyOption) {
-                $difficultyOrder .= ",'".__($guid, $difficultyOption, 'Free Learning')."'";
+                $difficultyOrder .= ",'".__m($difficultyOption)."'";
             }
             $difficultyOrder .= '), ';
         }
@@ -127,6 +127,8 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
 
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
+    $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
+
     $output = false;
 
     try {
@@ -150,15 +152,44 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
 
     if ($result->rowCount() != 1) {
         $output .= "<div class='error'>";
-        $output .= __($guid, 'The specified record does not exist.');
+        $output .= __('The specified record does not exist.');
         $output .= '</div>';
     } else {
         try {
             $data = array('gibbonPersonID' => $gibbonPersonID);
             if ($summary == true) {
-                $sql = "SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) LEFT JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Evidence Not Yet Approved' OR freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending') ORDER BY timestampJoined DESC, year DESC, status, unit LIMIT 0, 8";
+                $sql = "SELECT
+                        freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea, freeLearningUnit.course AS flCourse, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined
+                    FROM
+                        freeLearningUnit
+                        JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                        LEFT JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID)
+                        LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+                        LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
+                        LEFT JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%'))
+                    WHERE
+                        freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID AND
+                        (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Evidence Not Yet Approved' OR freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Complete - Pending')
+                    GROUP BY
+                        freeLearningUnitStudent.freeLearningUnitStudentID
+                    ORDER BY
+                        timestampJoined DESC, year DESC, status, unit
+                    LIMIT 0, 8";
             } else {
-                $sql = 'SELECT freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) LEFT  JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID ORDER BY timestampJoined DESC, year DESC, status, unit';
+                $sql = "SELECT
+                    freeLearningUnit.freeLearningUnitID, freeLearningUnitStudentID, enrolmentMethod, freeLearningUnit.name AS unit, 'freeLearningUnit.freeLearningUnitID', GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea, freeLearningUnit.course AS flCourse, freeLearningUnitStudent.status, gibbonSchoolYear.name AS year, evidenceLocation, evidenceType, commentStudent, commentApproval, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort AS class, timestampCompleteApproved, timestampJoined
+                FROM freeLearningUnit
+                    JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                    LEFT JOIN gibbonSchoolYear ON (freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID)
+                    LEFT JOIN gibbonCourseClass ON (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID)
+                    LEFT JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID)
+                    LEFT JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%'))
+                WHERE
+                    freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID
+                GROUP BY
+                    freeLearningUnitStudent.freeLearningUnitStudentID
+                ORDER BY
+                    timestampJoined DESC, year DESC, status, unit";
             }
             $result = $connection2->prepare($sql);
             $result->execute($data);
@@ -168,32 +199,33 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
 
         if ($result->rowCount() < 1) {
             $output .= "<div class='warning'>";
-            $output .= __($guid, 'There are no records to display.');
+            $output .= __('There are no records to display.');
             $output .= '</div>';
         } else {
             $output .= "<table cellspacing='0' style='width: 100%'>";
             $output .= "<tr class='head'>";
             $output .= '<th>';
-            $output .= __($guid, 'School Year').'<br/>';
-            $output .= "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Date').'</span>';
+            $output .= __('School Year').'<br/>';
+            $output .= "<span style='font-size: 85%; font-style: italic'>".__('Date').'</span>';
             $output .= '</th>';
             $output .= '<th>';
-            $output .= __($guid, 'Unit');
+            $output .= __('Unit').'<br/>';
+            $output .= "<span style='font-size: 85%; font-style: italic'>".__m('Learning Area')."/".__m('Course').'</span>';
             $output .= '</th>';
             $output .= '<th>';
-                $output .= __($guid, 'Enrolment Method', 'Free Learning').'<br/>';
+                $output .= __m('Enrolment Method').'<br/>';
             $output .= '</th>';
             $output .= '<th>';
-            $output .= __($guid, 'Class');
+            $output .= __('Class');
             $output .= '</th>';
             $output .= '<th>';
-            $output .= __($guid, 'Status');
+            $output .= __('Status');
             $output .= '</th>';
             $output .= '<th>';
-            $output .= __($guid, 'Evidence', 'Free Learning');
+            $output .= __m('Evidence');
             $output .= '</th>';
             $output .= "<th style='width: 70px!important'>";
-            $output .= __($guid, 'Actions');
+            $output .= __('Actions');
             $output .= '</th>';
             $output .= '</tr>';
 
@@ -219,7 +251,14 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                 }
                 $output .= '</td>';
                 $output .= '<td>';
-                $output .= "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$row['freeLearningUnitID']."&sidebar=true'>".$row['unit'].'</a>';
+                if ($canBrowse) {
+                    $output .= "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$row['freeLearningUnitID']."&sidebar=true'>".$row['unit'].'</a><br/>';
+                }
+                else {
+                    $output .= $row['unit']."<br/>";
+                }
+                $output .= !empty($row['learningArea']) ? '<div class="text-xxs">'.$row['learningArea'].'</div>' : '';
+                $output .= !empty($row['flCourse']) && ($row['learningArea'] != $row['flCourse']) ? '<div class="text-xxs">'.$row['flCourse'].'</div>' : '';
                 $output .= '</td>';
                 $output .= '<td>';
                     $output .= ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $row["enrolmentMethod"])).'<br/>';
@@ -228,7 +267,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                     if ($row["course"]!="" AND $row["class"]!="") {
                         $output .= $row["course"] . "." . $row["class"] ;
                     } else {
-                        $output .= "<i>" . __($guid, 'N/A') . "</i>" ;
+                        $output .= "<i>" . __('N/A') . "</i>" ;
                     }
                 $output .= "</td>" ;
                 $output .= '<td>';
@@ -237,9 +276,9 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                 $output .= '<td>';
                 if ($row['evidenceLocation'] != '') {
                     if ($row['evidenceType'] == 'Link') {
-                        $output .= "<a target='_blank' href='".$row['evidenceLocation']."'>".__($guid, 'View').'</>';
+                        $output .= "<a target='_blank' href='".$row['evidenceLocation']."'>".__('View').'</>';
                     } else {
-                        $output .= "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__($guid, 'View').'</>';
+                        $output .= "<a target='_blank' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['evidenceLocation']."'>".__('View').'</>';
                     }
                 }
                 $output .= '</td>';
@@ -254,7 +293,7 @@ function getStudentHistory($connection2, $guid, $gibbonPersonID, $summary = fals
                     $output .= '});';
                     $output .= '});';
                     $output .= '</script>';
-                    $output .= "<a title='".__($guid, 'Show Comment')."' class='show_hide-".$row['freeLearningUnitStudentID']."' onclick='false' href='#'><img style='padding-right: 5px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' alt='".__($guid, 'Show Comment')."' onclick='return false;' /></a>";
+                    $output .= "<a title='".__('Show Comment')."' class='show_hide-".$row['freeLearningUnitStudentID']."' onclick='false' href='#'><img style='padding-right: 5px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' alt='".__('Show Comment')."' onclick='return false;' /></a>";
                 }
                 $output .= '</td>';
                 $output .= '</tr>';
@@ -692,7 +731,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                 } catch (PDOException $e) {}
 
                 //Notify User
-                $notificationText = __($guid, 'Someone has granted you a badge.', 'Free Learning');
+                $notificationText = __m('Someone has granted you a badge.');
                 setNotification($connection2, $guid, $gibbonPersonID, $notificationText, 'Badges', "/index.php?q=/modules/Badges/badges_view.php&gibbonPersonID=$gibbonPersonID");
             }
         }

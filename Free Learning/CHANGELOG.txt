@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v5.13.17
+-------
+Adjusted legend ordering
+Updated Afrikaans translations
+Removed links from parent dashboard and Unit History By Student, if Browse Units is disabled
+Added Learning Area/Course under unit name in dashboard, Unit History By Student and Work Pending Approval
+
 v5.13.16
 -------
 Fixed enrolment issue with missing groupings
