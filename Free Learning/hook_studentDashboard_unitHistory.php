@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-global $gibbon;
+use Gibbon\Module\FreeLearning\Tables\UnitHistory;
+
+global $gibbon, $container;
 
 $returnInt = null;
 
@@ -37,7 +39,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= "<p style='margin-top: 20px'>";
     $returnInt .= __($guid, 'This table shows your recent results and enrolment for Free Learning:', 'Free Learning');
     $returnInt .= '</p>';
-    $returnInt .= getStudentHistory($connection2, $guid, $gibbonPersonID, true);
+
+    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
+    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
+
+    $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true);
+    $returnInt .= $table->getOutput();
 }
 
 return $returnInt;

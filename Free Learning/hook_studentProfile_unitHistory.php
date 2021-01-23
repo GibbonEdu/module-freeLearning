@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-global $gibbon;
+use Gibbon\Module\FreeLearning\Tables\UnitHistory;
+
+global $gibbon, $container;
 
 //Module includes
 require_once './modules/Free Learning/moduleFunctions.php';
@@ -26,5 +28,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
-    echo getStudentHistory($connection2, $guid, $gibbonPersonID);
+    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
+    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
+
+    $table = $container->get(UnitHistory::class)->create($gibbonPersonID);
+    echo $table->getOutput();
 }

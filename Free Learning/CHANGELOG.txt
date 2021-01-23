@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.13.18
+-------
+Refactored the Unit History by Student table, including profile and dashboard hooks
+
 v5.13.17
 -------
 Adjusted legend ordering

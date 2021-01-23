@@ -95,6 +95,60 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
+    public function queryUnitsByStudent(QueryCriteria $criteria, $gibbonPersonID)
+    {
+        $query = $this
+            ->newQuery()
+            ->cols([
+                'freeLearningUnit.freeLearningUnitID', 
+                'freeLearningUnitStudentID', 
+                'enrolmentMethod', 
+                'freeLearningUnit.name AS unit', 
+                "GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 
+                'freeLearningUnit.course AS flCourse', 
+                'freeLearningUnitStudent.status', 
+                'gibbonSchoolYear.name AS schoolYear', 
+                'evidenceLocation', 
+                'evidenceType', 
+                'commentStudent', 
+                'commentApproval', 
+                'gibbonCourse.nameShort AS course', 
+                'gibbonCourseClass.nameShort AS class', 
+                'timestampCompletePending', 
+                'timestampCompleteApproved', 
+                'timestampJoined',
+            ])
+            ->from('freeLearningUnit')
+            ->innerJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->leftJoin('gibbonSchoolYear', 'freeLearningUnitStudent.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID')
+            ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+            ->leftJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
+            ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
+            ->where('gibbonPerson.gibbonPersonID=:gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->where("gibbonPerson.status='Full'")
+            ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
+            ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
+            ->bindValue('today', date('Y-m-d'))
+            ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
+
+        $criteria->addFilterRules([
+            'department' => function ($query, $department) {
+                return $query
+                    ->where('gibbonDepartment.name = :department')
+                    ->bindValue('department', ucwords($department));
+            },
+
+            'status' => function ($query, $status) {
+                return $query
+                    ->where('freeLearningUnitStudent.status = :status')
+                    ->bindValue('status', ucwords($status));
+            },
+        ]);
+        return $this->runQuery($query, $criteria);
+    }
+
     public function queryEvidencePending(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null)
     {
         $query = $this
@@ -211,6 +265,21 @@ class UnitStudentGateway extends QueryableGateway
         }
 
         return $result;
+    }
+
+    public function selectLearningAreasByStudent($gibbonPersonID)
+    {
+        $data = ['gibbonPersonID' => $gibbonPersonID];
+        $sql = "SELECT DISTINCT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name
+                FROM freeLearningUnit
+                JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
+                WHERE freeLearningUnitStudent.gibbonPersonIDStudent = :gibbonPersonID
+                AND gibbonDepartment.type='Learning Area'
+                GROUP BY gibbonDepartment.gibbonDepartmentID
+                ORDER BY gibbonDepartment.name";
+
+        return $this->db()->select($sql, $data);
     }
 
     public function selectUnitCollaboratorsByKey($collaborationKey)

@@ -31,15 +31,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
     $page->breadcrumbs
          ->add(__m('Outcomes by Student'));
 
-    echo '<h2>';
-    echo __($guid, 'Choose Student', 'Free Learning');
-    echo '</h2>';
-
     $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
 
     // FORM
     $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
-    $form->setTitle(__('Filter'));
+    $form->setTitle(__m('Choose Student'));
 
     $form->setFactory(DatabaseFormFactory::create($pdo));
     $form->setClass('noIntBorder fullWidth');
