@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Module\FreeLearning\Tables\UnitHistory;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
@@ -30,12 +32,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         //Proceed!
-        $page->breadcrumbs
-             ->add(__m('Unit History by Student'));
+        $page->breadcrumbs->add(__m('Unit History by Student'));
 
-        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
-
-        //Check access for parents
-        echo getStudentHistory($connection2, $guid, $gibbonPersonID);
+        $table = $container->get(UnitHistory::class)->create($gibbon->session->get('gibbonPersonID'));
+        echo $table->getOutput();
     }
 }
