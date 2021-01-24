@@ -47,7 +47,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
     include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
-    $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true);
+    $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
+    $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse);
     $returnInt .= $table->getOutput();
 }
 

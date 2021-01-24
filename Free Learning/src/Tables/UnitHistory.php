@@ -30,7 +30,7 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
  * @version v5.13.18
  * @since   v5.13.18
  */
-class UnitHistory 
+class UnitHistory
 {
     protected $unitStudentGateway;
 
@@ -40,7 +40,7 @@ class UnitHistory
         $this->templateView = $templateView;
     }
 
-    public function create($gibbonPersonID, $summary = false)
+    public function create($gibbonPersonID, $summary = false, $canBrowse = true)
     {
         $criteria = $this->unitStudentGateway->newQueryCriteria()
             ->sortBy(['freeLearningUnitStudent.timestampJoined', 'schoolYear'], 'DESC')
@@ -52,8 +52,8 @@ class UnitHistory
         }
 
         $units = $this->unitStudentGateway->queryUnitsByStudent($criteria, $gibbonPersonID);
-        
-        $table = !$summary   
+
+        $table = !$summary
             ? DataTable::createPaginated('unitHistory', $criteria)->withData($units)
             : DataTable::create('unitHistory')->withData($units);
 
@@ -92,9 +92,13 @@ class UnitHistory
 
         $table->addColumn('unit', __('Unit'))
             ->description(__m('Learning Area').'/'.__m('Course'))
-            ->format(function($values) {
-                $url = './index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=' . $values['freeLearningUnitID'] . '&freeLearningUnitStudentID='.$values['freeLearningUnitStudentID'].'&sidebar=true';
-                $output = Format::link($url, $values['unit']);
+            ->format(function($values) use ($canBrowse) {
+                if ($canBrowse) {
+                    $url = './index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=' . $values['freeLearningUnitID'] . '&freeLearningUnitStudentID='.$values['freeLearningUnitStudentID'].'&sidebar=true';
+                    $output = Format::link($url, $values['unit']);
+                } else {
+                    $output = $values['unit'];
+                }
 
                 if (!empty($values['learningArea'])) {
                     $output .= '<br/>'.Format::small($values['learningArea']);
