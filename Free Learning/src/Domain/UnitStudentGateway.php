@@ -100,22 +100,22 @@ class UnitStudentGateway extends QueryableGateway
         $query = $this
             ->newQuery()
             ->cols([
-                'freeLearningUnit.freeLearningUnitID', 
-                'freeLearningUnitStudentID', 
-                'enrolmentMethod', 
-                'freeLearningUnit.name AS unit', 
-                "GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 
-                'freeLearningUnit.course AS flCourse', 
-                'freeLearningUnitStudent.status', 
-                'gibbonSchoolYear.name AS schoolYear', 
-                'evidenceLocation', 
-                'evidenceType', 
-                'commentStudent', 
-                'commentApproval', 
-                'gibbonCourse.nameShort AS course', 
-                'gibbonCourseClass.nameShort AS class', 
-                'timestampCompletePending', 
-                'timestampCompleteApproved', 
+                'freeLearningUnit.freeLearningUnitID',
+                'freeLearningUnitStudentID',
+                'enrolmentMethod',
+                'freeLearningUnit.name AS unit',
+                "GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea",
+                'freeLearningUnit.course AS flCourse',
+                'freeLearningUnitStudent.status',
+                'gibbonSchoolYear.name AS schoolYear',
+                'evidenceLocation',
+                'evidenceType',
+                'commentStudent',
+                'commentApproval',
+                'gibbonCourse.nameShort AS course',
+                'gibbonCourseClass.nameShort AS class',
+                'timestampCompletePending',
+                'timestampCompleteApproved',
                 'timestampJoined',
             ])
             ->from('freeLearningUnit')
@@ -181,6 +181,30 @@ class UnitStudentGateway extends QueryableGateway
             ->innerJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
             ->where('gibbonPerson.status=\'Full\' AND freeLearningUnitStudent.status=\'Complete - Pending\'  AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:date) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:date) AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+            ->bindValue('date', date("Y-m-d"))
+            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+            ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
+
+        if (!is_null($gibbonPersonID)) {
+            $query->where('freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID')
+                ->bindValue('gibbonPersonID', $gibbonPersonID);
+        }
+
+        return $this->runQuery($query, $criteria);
+    }
+
+    public function queryEnrolmentPending(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null)
+    {
+        $query = $this
+            ->newQuery()
+            ->cols(['enrolmentMethod', 'freeLearningUnit.name AS unit', 'freeLearningUnit.freeLearningUnitID', "GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnit.course AS flCourse', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.surname AS studentsurname', 'gibbonPerson.preferredName AS studentpreferredName', 'freeLearningUnitStudent.*', 'gibbonRole.category', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields'])
+            ->from('freeLearningUnit')
+            ->innerJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->innerJoin('gibbonRole', 'gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID')
+            ->innerJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+            ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
+            ->where('enrolmentMethod=\'schoolMentor\' AND gibbonPerson.status=\'Full\' AND freeLearningUnitStudent.status=\'Current - Pending\'  AND (gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:date) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:date) AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
             ->bindValue('date', date("Y-m-d"))
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);

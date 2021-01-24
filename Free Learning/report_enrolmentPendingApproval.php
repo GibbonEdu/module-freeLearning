@@ -26,9 +26,9 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 //Module includes
 include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 
-$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_workPendingApproval.php', $connection2);
+$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_enrolmentPendingApproval.php', $connection2);
 
-if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workPendingApproval.php")==FALSE) {
+if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_enrolmentPendingApproval.php")==FALSE) {
     //Acess denied
     print "<div class='error'>" ;
         print __("You do not have access to this action.") ;
@@ -37,25 +37,25 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workP
 else {
     //Proceed!
     $page->breadcrumbs
-         ->add(__m('Work Pending Approval'));
+         ->add(__m('Enrolment Pending Approval'));
 
     //Check for custom field
     $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
 
     print "<p>" ;
-        print __m('This report shows all work that is complete, but pending approval, in all of your classes.') ;
+        print __m('This report shows all units for which your mentorship has been requested, and is still pending.') ;
     print "<p>" ;
 
     //Filter
-    $allMentors = (isset($_GET['allMentors']) && $highestAction == 'Work Pending Approval_all') ? $_GET['allMentors'] : '';
+    $allMentors = (isset($_GET['allMentors']) && $highestAction == 'Enrolment Pending Approval_all') ? $_GET['allMentors'] : '';
     $search = $_GET['search'] ?? '';
 
-    if ($highestAction == 'Work Pending Approval_all') {
+    if ($highestAction == 'Enrolment Pending Approval_all') {
         $form = Form::create('search', $gibbon->session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__('Filter'));
         $form->setClass('noIntBorder fullWidth');
 
-        $form->addHiddenValue('q', '/modules/'.$gibbon->session->get('module').'/report_workPendingApproval.php');
+        $form->addHiddenValue('q', '/modules/'.$gibbon->session->get('module').'/report_enrolmentPendingApproval.php');
 
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'))->description(__('Include evidence pending for all mentors.'));
@@ -76,51 +76,30 @@ else {
         ->fromPOST();
 
     if (!empty($allMentors)) {
-        $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'));
+        $journey = $unitStudentGateway->queryEnrolmentPending($criteria, $gibbon->session->get('gibbonSchoolYearID'));
     }
     else {
-        $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
+        $journey = $unitStudentGateway->queryEnrolmentPending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
     }
 
-    $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
     $collaborationKeys = [];
 
-    // Get list of my classes before we start looping, for efficiency's sake
-    $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
     // Render table
     $table = DataTable::createPaginated('pending', $criteria);
 
     $table->setTitle(__('Data'));
 
     $table->modifyRows(function ($journey, $row) {
-        $row->addClass('pending');
+        $row->addClass('currentPending');
         return $row;
     });
 
-    $table->addColumn('enrolmentMethod', __m('Enrolment Method'))
-        ->notSortable()
-        ->format(function($values) {
-            return ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $values["enrolmentMethod"])).'<br/>';
-        });
-
-    $table->addColumn('grouping', __m('Class/Mentor'))
+    $table->addColumn('grouping', __m('Mentor'))
         ->sortable(['course', 'class', 'grouping'])
         ->description(__m('Grouping'))
         ->format(function($values) use (&$collaborationKeys) {
             $output = '';
-            if ($values['enrolmentMethod'] == 'class') {
-                if ($values['course'] != '' and $values['class'] != '') {
-                    $output .= $values['course'].'.'.$values['class'];
-                } else {
-                    $output .= '<i>'.__('N/A').'</i>';
-                }
-            }
-            else if ($values['enrolmentMethod'] == 'schoolMentor') {
-                $output .= formatName('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
-            }
-            else if ($values['enrolmentMethod'] == 'externalMentor') {
-                $output .= $values['nameExternalMentor'];
-            }
+            $output .= formatName('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
 
             $grouping = $values['grouping'];
             if ($values['collaborationKey'] != '') {
@@ -169,34 +148,19 @@ else {
             return $output;
         });
 
-    $table->addColumn('status', __m('Status'));
+    $table->addColumn('status', __m('Status'))
+        ->sortable(false);
 
-    $table->addColumn('timestampCompletePending', __m('When'))->format(Format::using('relativeTime', 'timestampCompletePending'));
+    $table->addColumn('timestampJoined', __m('When'))->format(Format::using('relativeTime', 'timestampJoined'));
 
     // ACTIONS
     $table->addActionColumn()
-        ->addParam('freeLearningUnitStudentID')
         ->addParam('freeLearningUnitID')
         ->addParam('sidebar', true)
-        ->format(function ($student, $actions) use ($manageAll, $myClasses, $gibbon) {
-            // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
-            $editEnrolment = $manageAll ? true : false;
-            if ($student['enrolmentMethod'] == 'class') {
-                // Is teacher of this class?
-                if (in_array($student['gibbonCourseClassID'], $myClasses)) {
-                    $editEnrolment = true;
-                }
-            } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $gibbon->session->get('gibbonPersonID')) {
-                // Is mentor of this student?
-                $editEnrolment = true;
-            }
-
-            if (!$editEnrolment) return;
-
-            if ($editEnrolment && ($student['status'] == 'Complete - Pending' or $student['status'] == 'Complete - Approved' or $student['status'] == 'Evidence Not Yet Approved')) {
-                $actions->addAction('edit', __('Edit'))
-                    ->setURL('/modules/Free Learning/units_browse_details_approval.php');
-            }
+        ->addParam('tab', 2)
+        ->format(function ($student, $actions) {
+            $actions->addAction('edit', __('Edit'))
+                ->setURL('/modules/Free Learning/units_browse_details.php');
         });
 
     echo $table->render($journey);
