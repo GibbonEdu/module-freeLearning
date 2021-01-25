@@ -28,8 +28,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
-    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
-    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
+    include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
+    include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
     $table = $container->get(UnitHistory::class)->create($gibbonPersonID);
     echo $table->getOutput();

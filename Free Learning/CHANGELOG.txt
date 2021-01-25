@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.14.01
+--------
+Fixed file includes for hooks to use include_once rather than include
+
 v5.14.00
 --------
 Added new Enrolment Pending Approval report

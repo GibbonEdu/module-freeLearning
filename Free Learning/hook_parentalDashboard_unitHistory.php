@@ -44,8 +44,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= __($guid, 'This table shows recent results and enrolment for Free Learning units studied by your child:', 'Free Learning');
     $returnInt .= '</p>';
 
-    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
-    include $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
+    include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
+    include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
     $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
     $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse);
