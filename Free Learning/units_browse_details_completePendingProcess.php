@@ -42,9 +42,7 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $canManage && isset($_GET['gibbonPersonID'])
-    ? $_GET['gibbonPersonID']
-    : $gibbon->session->get('gibbonPersonID');
+$gibbonPersonID = $gibbon->session->get('gibbonPersonID');
 
 $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
 
@@ -195,7 +193,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 'foreignTable'       => 'freeLearningUnitStudent',
                                 'foreignTableID'     => $freeLearningUnitStudentID,
                                 'gibbonModuleID'     => getModuleIDFromName($connection2, 'Free Learning'),
-                                'gibbonPersonID'     => $gibbonPersonID,
+                                'gibbonPersonID'     => $gibbon->session->get('gibbonPersonID'),
                                 'comment'            => $commentStudent,
                                 'type'               => 'Complete - Pending',
                                 'tag'                => 'pending',
