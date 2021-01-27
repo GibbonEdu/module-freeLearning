@@ -21,12 +21,13 @@ namespace Gibbon\Module\FreeLearning;
 
 use ZipArchive;
 use DOMDocument;
+use Gibbon\Domain\User\RoleGateway;
 use Gibbon\Contracts\Services\Session;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 
-class UnitExporter 
+class UnitExporter
 {
     protected $filename = 'FreeLearningUnits';
     protected $data = [];
@@ -35,13 +36,15 @@ class UnitExporter
     protected $unitGateway;
     protected $unitBlockGateway;
     protected $unitAuthorGateway;
+    protected $roleGateway;
     protected $session;
 
-    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, Session $session)
+    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, Session $session, RoleGateway $roleGateway)
     {
         $this->unitGateway = $unitGateway;
         $this->unitBlockGateway = $unitBlockGateway;
         $this->unitAuthorGateway = $unitAuthorGateway;
+        $this->roleGateway = $roleGateway;
         $this->session = $session;
     }
 
@@ -64,6 +67,12 @@ class UnitExporter
                 : ['type' => 'url', 'location' => $unit['logo']];
 
             $unit['logo'] = basename($logoPath);
+        }
+
+        //Deal with schoolMentorCustomRole
+        if (!empty($unit['schoolMentorCustomRole']) && $unit['schoolMentorCustomRole'] > 0) {
+            $role = $this->roleGateway->getRoleByID($unit['schoolMentorCustomRole']);
+            $unit['schoolMentorCustomRole'] = $role["name"];
         }
 
         // Extract images from unit outline
@@ -94,7 +103,7 @@ class UnitExporter
                 $blocks[$index]['contents'] = str_replace($src, basename($src), $blocks[$index]['contents']);
             }
         }
-        
+
         // Add unit details to data array
         $this->data['units'][] = [
             'name' => $unit['name'],

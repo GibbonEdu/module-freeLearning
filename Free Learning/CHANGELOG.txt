@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v5.14.03
+--------
+Improved import/export of Specific Role field in unit mentorship
+Added unit count to Map view
+Updated Afrikaans translations
+
 v5.14.02
 --------
 Fixed incorrect user listed on discussion items for users with Manage Units access

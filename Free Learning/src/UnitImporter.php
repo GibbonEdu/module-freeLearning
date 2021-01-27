@@ -20,12 +20,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace Gibbon\Module\FreeLearning;
 
 use ZipArchive;
+use Gibbon\Domain\User\RoleGateway;
 use Gibbon\Contracts\Services\Session;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 
-class UnitImporter 
+class UnitImporter
 {
     protected $gibbonDepartmentIDList;
     protected $course;
@@ -36,13 +37,15 @@ class UnitImporter
     protected $unitGateway;
     protected $unitBlockGateway;
     protected $unitAuthorGateway;
+    protected $roleGateway;
     protected $session;
 
-    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, Session $session)
+    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, Session $session, RoleGateway $roleGateway)
     {
         $this->unitGateway = $unitGateway;
         $this->unitBlockGateway = $unitBlockGateway;
         $this->unitAuthorGateway = $unitAuthorGateway;
+        $this->roleGateway = $roleGateway;
         $this->session = $session;
     }
 
@@ -129,6 +132,12 @@ class UnitImporter
         // Apply default values
         if (!empty($this->gibbonDepartmentIDList)) $unit['unit']['gibbonDepartmentIDList'] = $this->gibbonDepartmentIDList;
         if (!empty($this->course)) $unit['unit']['course'] = $this->course;
+
+        //Deal with schoolMentorCustomRole
+        if (!empty($unit['unit']['schoolMentorCustomRole'])) {
+            $role = $this->roleGateway->selectBy(['name' => $unit['unit']['schoolMentorCustomRole']])->fetch();
+            $unit['unit']['schoolMentorCustomRole'] = (!empty($role) && $role["gibbonRoleID"] > 0) ? $role["gibbonRoleID"] : null;
+        }
 
         // Get the uploaded logo URL
         if (!empty($unit['unit']['logo']) && !empty($this->files[$unit['unit']['logo']])) {

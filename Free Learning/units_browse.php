@@ -365,7 +365,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 // VISUAL MAP
                 echo '<p>';
                 echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.', 'Free Learning');
-                echo '</p>'; ?>
+                echo '</p>';
+                echo '<div class="text-xs py-2">';
+                    echo __m('{count} Records', ['count' => count($units)]);
+                echo '</div>';
+
+                ?>
                 <script type="text/javascript" src="<?php echo $gibbon->session->get('absoluteURL') ?>/lib/vis/dist/vis.js"></script>
                 <link href="<?php echo $gibbon->session->get('absoluteURL') ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 
