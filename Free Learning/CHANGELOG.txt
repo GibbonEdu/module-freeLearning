@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.14.04
+--------
+Added option, on by default, to determine whether or not unit Certificates are available
+
 v5.14.03
 --------
 Improved import/export of Specific Role field in unit mentorship

@@ -21,17 +21,20 @@ use Gibbon\Forms\Form;
 use Gibbon\FileUploader;
 use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == false) {
     // Access denied
     echo Format::alert(__('You do not have access to this action.'));
 } else {
+    $settingGateway = $container->get(SettingGateway::class);
+
     // Get enrolment settings
-    $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
-    $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+    $enableSchoolMentorEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableSchoolMentorEnrolment');
+    $enableExternalMentorEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableExternalMentorEnrolment');
     $enableClassEnrolment = $roleCategory == 'Student'
-        ? getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment')
+        ? $settingGateway->getSettingByScope('Free Learning', 'enableClassEnrolment')
         : 'N';
 
     //Check whether any enrolment methods are available
@@ -219,7 +222,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         } else {
             $description = '';
 
-            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+            $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
             if ($collaborativeAssessment == 'Y' AND  !empty($rowEnrol['collaborationKey'])) {
                 $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($rowEnrol['collaborationKey'])->fetchAll();
                 $collaborators = Format::nameListArray($collaborators, 'Student');
@@ -381,7 +384,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $form->setDescription(__m('Congratulations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') . $logContent );
 
         $evidenceLink = $rowEnrol['evidenceType'] == 'Link' ? $rowEnrol['evidenceLocation']: './'.$rowEnrol['evidenceLocation'];
-        $certificateLink = './modules/Free Learning/units_browse_details_enrol_certificate.php?freeLearningUnitID='.$freeLearningUnitID;
 
         $row = $form->addRow();
             $row->addLabel('statusLabel', __('Status'));
@@ -395,13 +397,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $row->addLabel('evidence', __m('Evidence'));
             $row->addContent(Format::link($evidenceLink, __m('View'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
 
-        $row = $form->addRow();
-            $row->addLabel('certificate', __m('Certificate of Completion'));
-            $row->addContent(Format::link($certificateLink, __m('Print Certificate'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
+        if ($settingGateway->getSettingByScope('Free Learning', 'certificatesAvailable') == "Y") {
+            $certificateLink = './modules/Free Learning/units_browse_details_enrol_certificate.php?freeLearningUnitID='.$freeLearningUnitID;
+            $row = $form->addRow();
+                $row->addLabel('certificate', __m('Certificate of Completion'));
+                $row->addContent(Format::link($certificateLink, __m('Print Certificate'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
+        }
 
         echo $form->getOutput();
-
-
 
     } elseif ($rowEnrol['status'] == 'Exempt') {
         // Exempt, let student know
