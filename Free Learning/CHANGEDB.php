@@ -1396,9 +1396,9 @@ $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'certificatesAvailable', 'Certificates Available', 'Should certificates be made available on unit completion?', 'Y');end
 ";
 
-//v5.14.05
+//v5.15.00
 ++$count;
-$sql[$count][0] = '5.14.05';
+$sql[$count][0] = '5.15.00';
 $sql[$count][1] = "
 UPDATE gibbonDiscussion JOIN freeLearningUnitStudent ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID) SET gibbonDiscussion.gibbonPersonIDTarget=freeLearningUnitStudent.gibbonPersonIDStudent WHERE gibbonDiscussion.foreignTable='freeLearningUnitStudent';end
 ";
