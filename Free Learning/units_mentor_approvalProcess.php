@@ -80,19 +80,21 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
                 $data = [
-                    'foreignTable'   => 'freeLearningUnitStudent',
-                    'foreignTableID' => $freeLearningUnitStudentID,
-                    'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'),
-                    'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'),
-                    'comment'        => $commentApproval,
-                    'type'           => $status,
-                    'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
+                    'foreignTable'         => 'freeLearningUnitStudent',
+                    'foreignTableID'       => $freeLearningUnitStudentID,
+                    'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
+                    'gibbonPersonID'       => $gibbon->session->get('gibbonPersonID'),
+                    'gibbonPersonIDTarget' => $values['gibbonPersonIDStudent'],
+                    'comment'              => $commentApproval,
+                    'type'                 => $status,
+                    'tag'                  => $status == 'Complete - Approved' ? 'success' : 'warning',
                 ];
 
                 if ($collaborativeAssessment == 'Y' AND !empty($values['collaborationKey'])) {
                     $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $values['collaborationKey']])->fetchAll();
                     foreach ($collaborators as $collaborator) {
                         $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+                        $data['gibbonPersonIDTarget'] = $collaborator['gibbonPersonIDStudent'];
                         $discussionGateway->insert($data);
                     }
                 } else {

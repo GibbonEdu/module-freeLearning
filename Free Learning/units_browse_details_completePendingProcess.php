@@ -190,21 +190,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $discussionGateway = $container->get(DiscussionGateway::class);
                             
                             $data = [
-                                'foreignTable'       => 'freeLearningUnitStudent',
-                                'foreignTableID'     => $freeLearningUnitStudentID,
-                                'gibbonModuleID'     => getModuleIDFromName($connection2, 'Free Learning'),
-                                'gibbonPersonID'     => $gibbon->session->get('gibbonPersonID'),
-                                'comment'            => $commentStudent,
-                                'type'               => 'Complete - Pending',
-                                'tag'                => 'pending',
-                                'attachmentType'     => $type,
-                                'attachmentLocation' => $location,
+                                'foreignTable'         => 'freeLearningUnitStudent',
+                                'foreignTableID'       => $freeLearningUnitStudentID,
+                                'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
+                                'gibbonPersonID'       => $gibbon->session->get('gibbonPersonID'),
+                                'gibbonPersonIDTarget' => $gibbon->session->get('gibbonPersonID'),
+                                'comment'              => $commentStudent,
+                                'type'                 => 'Complete - Pending',
+                                'tag'                  => 'pending',
+                                'attachmentType'       => $type,
+                                'attachmentLocation'   => $location,
                             ];
 
                             if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
                                 $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
                                 foreach ($collaborators as $collaborator) {
                                     $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+                                    $data['gibbonPersonIDTarget'] = $collaborator['gibbonPersonIDStudent'];
                                     $discussionGateway->insert($data);
                                 }
                             } else {
