@@ -171,19 +171,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
                             $data = [
-                                'foreignTable'   => 'freeLearningUnitStudent',
-                                'foreignTableID' => $freeLearningUnitStudentID,
-                                'gibbonModuleID' => getModuleIDFromName($connection2, 'Free Learning'),
-                                'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'),
-                                'comment'        => $commentApproval,
-                                'type'           => $status,
-                                'tag'            => $status == 'Complete - Approved' ? 'success' : 'warning',
+                                'foreignTable'         => 'freeLearningUnitStudent',
+                                'foreignTableID'       => $freeLearningUnitStudentID,
+                                'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
+                                'gibbonPersonID'       => $gibbon->session->get('gibbonPersonID'),
+                                'gibbonPersonIDTarget' => $gibbonPersonIDStudent,
+                                'comment'              => $commentApproval,
+                                'type'                 => $status,
+                                'tag'                  => $status == 'Complete - Approved' ? 'success' : 'warning',
                             ];
 
                             if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
                                 $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
                                 foreach ($collaborators as $collaborator) {
                                     $data['foreignTableID'] = $collaborator['freeLearningUnitStudentID'];
+                                    $data['gibbonPersonIDTarget'] = $collaborator['gibbonPersonIDStudent'];
                                     $discussionGateway->insert($data);
                                 }
                             } else {
