@@ -4,14 +4,11 @@ v5.15.01
 --------
 Simplify the Active and Inactive filters in Manage Units
 Update notification links to include student name and link to approval page
+Increase badge counts to three digits
 
 v5.15.00
 --------
 Added gibbonPersonIDTarget to discussion items
-
-v5.14.05
---------
-Increase badge counts to three digits
 
 v5.14.04
 --------
