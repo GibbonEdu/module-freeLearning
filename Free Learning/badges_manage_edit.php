@@ -99,23 +99,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
                 $row = $form->addRow();
                     $row->addLabel('unitsCompleteTotal', __m('Units Completed - Total'))->description(__m('Enter a number greater than zero, or leave blank.'));
-                    $row->addNumber('unitsCompleteTotal')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+                    $row->addNumber('unitsCompleteTotal')->decimalPlaces(0)->minimum(1)->maximum(999)->maxLength(3);
 
                 $row = $form->addRow();
                     $row->addLabel('unitsCompleteThisYear', __m('Units Completed - This Year'))->description(__m('Enter a number greater than zero, or leave blank.'));
-                    $row->addNumber('unitsCompleteThisYear')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+                    $row->addNumber('unitsCompleteThisYear')->decimalPlaces(0)->minimum(1)->maximum(999)->maxLength(3);
 
                 $row = $form->addRow();
                     $row->addLabel('unitsCompleteDepartmentCount', __m('Units Completed - Department Spread'))->description(__m('Enter a number greater than zero, or leave blank.'));
-                    $row->addNumber('unitsCompleteDepartmentCount')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+                    $row->addNumber('unitsCompleteDepartmentCount')->decimalPlaces(0)->minimum(1)->maximum(999)->maxLength(3);
 
                 $row = $form->addRow();
                     $row->addLabel('unitsCompleteIndividual', __m('Units Completed - Individual'))->description(__m('Enter a number greater than zero, or leave blank.'));
-                    $row->addNumber('unitsCompleteIndividual')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+                    $row->addNumber('unitsCompleteIndividual')->decimalPlaces(0)->minimum(1)->maximum(999)->maxLength(3);
 
                 $row = $form->addRow();
                     $row->addLabel('unitsCompleteGroup', __m('Units Completed - Group'))->description(__m('Enter a number greater than zero, or leave blank.'));
-                    $row->addNumber('unitsCompleteGroup')->decimalPlaces(0)->minimum(1)->maximum(99)->maxLength(2);
+                    $row->addNumber('unitsCompleteGroup')->decimalPlaces(0)->minimum(1)->maximum(999)->maxLength(3);
 
                 $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
                 $difficultyOptions = ($difficultyOptions != false) ? explode(',', $difficultyOptions) : [];

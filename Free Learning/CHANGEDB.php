@@ -1395,3 +1395,10 @@ $sql[$count][0] = '5.14.04';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'certificatesAvailable', 'Certificates Available', 'Should certificates be made available on unit completion?', 'Y');end
 ";
+
+//v5.14.05
+++$count;
+$sql[$count][0] = '5.14.05';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningBadge` CHANGE `unitsCompleteTotal` `unitsCompleteTotal` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteThisYear` `unitsCompleteThisYear` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteDepartmentCount` `unitsCompleteDepartmentCount` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteIndividual` `unitsCompleteIndividual` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteGroup` `unitsCompleteGroup` int(3) NULL DEFAULT NULL;end
+";

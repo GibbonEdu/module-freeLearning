@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.14.03';
+$version = '5.14.05';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -126,11 +126,11 @@ $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
   `freeLearningBadgeID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `badgesBadgeID` int(8) unsigned zerofill NOT NULL,
   `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  `unitsCompleteTotal` int(2) DEFAULT NULL,
-  `unitsCompleteThisYear` int(2) DEFAULT NULL,
-  `unitsCompleteDepartmentCount` int(2) DEFAULT NULL,
-  `unitsCompleteIndividual` int(2) DEFAULT NULL,
-  `unitsCompleteGroup` int(2) DEFAULT NULL,
+  `unitsCompleteTotal` int(3) DEFAULT NULL,
+  `unitsCompleteThisYear` int(3) DEFAULT NULL,
+  `unitsCompleteDepartmentCount` int(3) DEFAULT NULL,
+  `unitsCompleteIndividual` int(3) DEFAULT NULL,
+  `unitsCompleteGroup` int(3) DEFAULT NULL,
   `difficultyLevelMaxAchieved` varchar(255) DEFAULT NULL,
   `specificUnitsComplete` text DEFAULT NULL,
   PRIMARY KEY (`freeLearningBadgeID`)

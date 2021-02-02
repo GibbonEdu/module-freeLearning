@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.14.05
+--------
+Simplify the Active and Inactive filters in Manage Units
+Increase badge counts to three digits
+
 v5.14.04
 --------
 Added option, on by default, to determine whether or not unit Certificates are available
