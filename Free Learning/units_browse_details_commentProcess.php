@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Services\Format;
 use Gibbon\Comms\NotificationEvent;
+use Gibbon\Domain\User\UserGateway;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Domain\Timetable\CourseEnrolmentGateway;
@@ -106,8 +108,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&'.http_build_query($urlParams);
 
     } else {
+        $user = $container->get(UserGateway::class)->getByID($gibbon->session->get('gibbonPersonID'));
+        $studentName = Format::name('', $user['preferredName'], $user['surname'], 'Student', false, true);
+
         $event->addScope('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);
-        $event->setNotificationText(sprintf(__m('A student has added a comment to their current unit (%1$s).'), $unit['name']));
+        $event->setNotificationText(__m('{student} has added a comment to their current unit ({unit}).', ['student' => $studentName, 'unit' => $unit['name']]));
         $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=$freeLearningUnitStudentID&sidebar=true");
 
         if ($values['enrolmentMethod'] == 'class') {

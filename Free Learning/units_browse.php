@@ -53,7 +53,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         // Get params
         $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') && $highestAction == 'Browse Units_all';
-        $showInactive = $canManage && isset($_GET['showInactive'])
+        $showInactive = $canManage && !empty($_GET['showInactive'])
             ? $_GET['showInactive']
             : 'N';
 

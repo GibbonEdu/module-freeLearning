@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.15.01
+--------
+Simplify the Active and Inactive filters in Manage Units
+Update notification links to include student name and link to approval page
+
 v5.15.00
 --------
 Added gibbonPersonIDTarget to discussion items

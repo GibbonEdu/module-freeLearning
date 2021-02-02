@@ -58,7 +58,7 @@ class UnitGateway extends QueryableGateway
                   ->where("freeLearningUnit.active='Y'");
         }
 
-        if ($criteria->getFilterValue('showInactive') != 'Y') {
+        if ($criteria->getFilterValue('showInactive') == 'N') {
             $query->where("freeLearningUnit.active='Y'");
         }
 
@@ -111,7 +111,7 @@ class UnitGateway extends QueryableGateway
                 break;
         }
 
-        if ($criteria->getFilterValue('showInactive') != 'Y') {
+        if ($criteria->getFilterValue('showInactive') == 'N') {
             $query->where("freeLearningUnit.active='Y'");
         }
 

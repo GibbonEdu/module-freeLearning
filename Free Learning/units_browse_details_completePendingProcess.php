@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\View\View;
+use Gibbon\Services\Format;
 use Gibbon\Contracts\Comms\Mailer;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
@@ -98,7 +99,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $row = $result->fetch();
                     $name = $row['name'];
                     $confirmationKey = $row['confirmationKey'];
-                    $studentName = formatName('', $row['preferredName'], $row['surname'], 'Student', true);
+                    $studentName = Format::name('', $row['preferredName'], $row['surname'], 'Student', false, true);
                     $studentEmail = $row['email'];
                     $enrolmentMethod = $row['enrolmentMethod'];
                     $gibbonPersonIDSchoolMentor = $row['gibbonPersonIDSchoolMentor'];
@@ -215,21 +216,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
 
                             if ($enrolmentMethod == 'class') { //Attempt to notify teacher(s) of class
-                                try {
-                                    $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
-                                    $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
-                                    $result = $connection2->prepare($sql);
-                                    $result->execute($data);
-                                } catch (PDOException $e) { }
 
-                                $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
-                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=2";
+                                $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
+                                $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
+                                $result = $pdo->select($sql, $data);
+
+                                $text = __m('{student} has requested unit completion approval and feedback ({unit}).', ['student' => $studentName, 'unit' => $name]);
+                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&sidebar=true";
                                 while ($row = $result->fetch()) {
                                     setNotification($connection2, $guid, $row['gibbonPersonID'], $text, 'Free Learning', $actionLink);
                                 }
                             }
                             else if ($enrolmentMethod == 'schoolMentor' && $gibbonPersonIDSchoolMentor != '') { //Attempt to notify school mentor
-                                $text = sprintf(__($guid, 'A student has requested unit completion approval and feedback (%1$s).', 'Free Learning'), $name);
+                                $text = __m('{student} has requested unit completion approval and feedback ({unit}).', ['student' => $studentName, 'unit' => $name]);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey";
                                 setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $text, 'Free Learning', $actionLink);
                             }
