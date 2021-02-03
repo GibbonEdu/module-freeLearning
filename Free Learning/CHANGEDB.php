@@ -1402,3 +1402,9 @@ $sql[$count][0] = '5.14.05';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningBadge` CHANGE `unitsCompleteTotal` `unitsCompleteTotal` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteThisYear` `unitsCompleteThisYear` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteDepartmentCount` `unitsCompleteDepartmentCount` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteIndividual` `unitsCompleteIndividual` int(3) NULL DEFAULT NULL, CHANGE `unitsCompleteGroup` `unitsCompleteGroup` int(3) NULL DEFAULT NULL;end
 ";
+
+//v5.14.06
+++$count;
+$sql[$count][0] = '5.14.06';
+$sql[$count][1] = "
+";
