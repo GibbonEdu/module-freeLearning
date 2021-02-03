@@ -34,7 +34,7 @@ else {
     $page->breadcrumbs
          ->add(__m('Learning Activity'));
 
-    $timePeriod = $_GET['timePeriod'] ?? null;
+    $timePeriod = $_GET['timePeriod'] ?? 'Last 30 Days';
 
     // FORM
 	$form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
@@ -49,7 +49,7 @@ else {
     ];
     $row = $form->addRow();
         $row->addLabel('timePeriod', __m('Time Period'));
-        $row->addSelect('timePeriod')->fromArray($timePeriods)->selected($timePeriod)->placeholder();
+        $row->addSelect('timePeriod')->fromArray($timePeriods)->selected($timePeriod);
 
 	$row = $form->addRow();
 		$row->addSearchSubmit($gibbon->session, __('Clear Filters'));

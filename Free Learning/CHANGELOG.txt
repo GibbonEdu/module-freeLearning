@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.15.02
+--------
+Made 30 Days the default in Learning Activity report
+
 v5.15.01
 --------
 Simplify the Active and Inactive filters in Manage Units
