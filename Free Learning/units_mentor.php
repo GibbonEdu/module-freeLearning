@@ -142,6 +142,7 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
                     "Unfamiliar with this unit" => __m("Unfamiliar with this unit"),
                     "Unfamiliar with this knowledge area" => __m("Unfamiliar with this knowledge area"),
                     "Unfamiliar with Free Learning" => __m("Unfamiliar with Free Learning"),
+                    "Unit does not match student year group" => __m("Unit does not match student year group"),
                     "Other" => __m("Other")
                 );
                 $row = $form->addRow()->addClass('reasons');;
