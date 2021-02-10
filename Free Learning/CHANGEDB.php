@@ -1408,3 +1408,9 @@ ALTER TABLE `freeLearningBadge` CHANGE `unitsCompleteTotal` `unitsCompleteTotal`
 $sql[$count][0] = '5.14.06';
 $sql[$count][1] = "
 ";
+
+//v5.14.07
+++$count;
+$sql[$count][0] = '5.14.07';
+$sql[$count][1] = "
+";
