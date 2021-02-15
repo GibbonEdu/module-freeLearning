@@ -171,7 +171,7 @@ else {
 
     $table->addColumn('status', __m('Status'));
 
-    $table->addColumn('timestampCompletePending', __m('When'))->format(Format::using('relativeTime', 'timestampCompletePending'));
+    $table->addColumn('timestampCompletePending', __('When'))->format(Format::using('relativeTime', 'timestampCompletePending'));
 
     // ACTIONS
     $table->addActionColumn()

@@ -151,7 +151,7 @@ else {
     $table->addColumn('status', __m('Status'))
         ->sortable(false);
 
-    $table->addColumn('timestampJoined', __m('When'))->format(Format::using('relativeTime', 'timestampJoined'));
+    $table->addColumn('timestampJoined', __('When'))->format(Format::using('relativeTime', 'timestampJoined'));
 
     // ACTIONS
     $table->addActionColumn()
