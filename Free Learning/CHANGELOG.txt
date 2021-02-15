@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.14.08
+--------
+Fixed bug allowing a student to be selected multiple times as a collaborator
+Fixed translation of When
+
 v5.14.07
 --------
 "Unit does not match student year group" added as mentorship decline reason

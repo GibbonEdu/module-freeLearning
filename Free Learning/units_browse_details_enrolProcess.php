@@ -208,7 +208,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     }
                     $grouping = $_POST['grouping'];
                     $collaborators = $_POST['collaborators'] ?? [];
-
+                    $collaboratorsUnique = (count($collaborators)>0) ? (count($collaborators) === count(array_unique($collaborators))) : true;
 
                     $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
                     if ($roleCategory != 'Student') {
@@ -217,7 +217,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
                     $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
 
-                    if ($checkFail or $grouping == '' or ($enrolmentMethod == 'class' and $gibbonCourseClassID == '' and $enableClassEnrolment == 'N') or ($enrolmentMethod == 'schoolMentor' and $gibbonPersonIDSchoolMentor == '' and $enableSchoolMentorEnrolment == 'N') or ($enrolmentMethod == 'externalMentor' and $enableExternalMentorEnrolment == 'N' and ($emailExternalMentor == '' or $nameExternalMentor == ''))) {
+                    if ($checkFail or $grouping == '' or ($enrolmentMethod == 'class' and $gibbonCourseClassID == '' and $enableClassEnrolment == 'N') or ($enrolmentMethod == 'schoolMentor' and $gibbonPersonIDSchoolMentor == '' and $enableSchoolMentorEnrolment == 'N') or ($enrolmentMethod == 'externalMentor' and $enableExternalMentorEnrolment == 'N' and ($emailExternalMentor == '' or $nameExternalMentor == '')) or !$collaboratorsUnique) {
                         //Fail 3
                         $URL .= '&return=error3';
                         header("Location: {$URL}");
