@@ -34,6 +34,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorship_m
 
     $search = $_GET['search'] ?? '';
 
+    echo '<p>'.__m('This page allows you to pre-define the school mentors available for particular students. Students with specific mentors will choose from this list rather than the mentors available for a particular unit.').'</p>';
+    
     // QUERY
     $mentorshipGateway = $container->get(MentorshipGateway::class);
     $criteria = $mentorshipGateway->newQueryCriteria(true)
@@ -57,7 +59,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorship_m
 
     echo $form->getOutput();
 
-    $mentorship = $mentorshipGateway->queryMentorship($criteria, $gibbon->session->get('gibbonPersonID'));
+    $mentorship = $mentorshipGateway->queryMentorship($criteria, $gibbon->session->get('gibbonSchoolYearID'));
 
     $form = BulkActionForm::create('bulkAction', $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/mentorship_manageProcessBulk.php');
 
@@ -77,9 +79,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorship_m
     $table->addMetaData('bulkActions', $col);
 
     $table->addColumn('student', __('Student'))
+        ->sortable(['surname', 'preferredName'])
         ->format(function ($values) {
             return  Format::nameLinked($values['gibbonPersonID'], '', $values['preferredName'], $values['surname'], 'Student', true, true);
         });
+
+    $table->addColumn('rollGroup', __m('Roll Group'));
 
     $table->addColumn('mentors', __m('Mentors'));
 

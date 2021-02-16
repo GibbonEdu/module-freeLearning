@@ -35,14 +35,18 @@ class MentorshipGateway extends QueryableGateway
      * @param QueryCriteria $criteria
      * @return DataSet
      */
-    public function queryMentorship(QueryCriteria $criteria)
+    public function queryMentorship(QueryCriteria $criteria, $gibbonSchoolYearID)
     {
         $query = $this
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['freeLearningMentorship.gibbonPersonIDStudent', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.preferredName', 'gibbonPerson.surname', "COUNT(DISTINCT freeLearningMentorship.gibbonPersonIDSchoolMentor) AS mentors"])
-            ->innerJoin('gibbonPerson', "gibbonPerson.gibbonPersonID=freeLearningMentorship.gibbonPersonIDStudent")
+            ->cols(['freeLearningMentorship.gibbonPersonIDStudent', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.preferredName', 'gibbonPerson.surname', 'gibbonRollGroup.name as rollGroup', "COUNT(DISTINCT freeLearningMentorship.gibbonPersonIDSchoolMentor) AS mentors"])
+            ->innerJoin('gibbonPerson', 'gibbonPerson.gibbonPersonID=freeLearningMentorship.gibbonPersonIDStudent')
+            ->innerJoin('gibbonStudentEnrolment', 'gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID')
+            ->innerJoin('gibbonRollGroup', "gibbonRollGroup.gibbonRollGroupID=gibbonStudentEnrolment.gibbonRollGroupID")
+            ->where('gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID')
+            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->groupBy(['freeLearningMentorship.gibbonPersonIDStudent']);
 
         return $this->runQuery($query, $criteria);

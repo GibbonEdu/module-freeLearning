@@ -22,6 +22,7 @@ use Gibbon\FileUploader;
 use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Module\FreeLearning\Domain\MentorshipGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == false) {
@@ -121,8 +122,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $params['schoolMentorCompletors'] = $values['schoolMentorCompletors'];
             $params['schoolMentorCustom'] = $values['schoolMentorCustom'];
             $params['schoolMentorCustomRole'] = $values['schoolMentorCustomRole'];
-            $mentors = $unitStudentGateway->selectUnitMentors($freeLearningUnitID, $gibbonPersonID, $params)->fetchAll();
+
+            // Check if there are pre-defined mentors first
+            $mentors = $container->get(MentorshipGateway::class)->selectMentorsByStudent($gibbonPersonID)->fetchAll();
             $mentors = Format::nameListArray($mentors, 'Staff', true, true);
+
+            if (empty($mentors)) {
+                // Otherwise, load the selection of mentors for this unit
+                $mentors = $unitStudentGateway->selectUnitMentors($freeLearningUnitID, $gibbonPersonID, $params)->fetchAll();
+                $mentors = Format::nameListArray($mentors, 'Staff', true, true);
+            }
 
             $row = $form->addRow()->addClass('schoolMentorEnrolment');
                 $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'));
