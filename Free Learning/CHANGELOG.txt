@@ -2,7 +2,8 @@ CHANGELOG
 =========
 v5.15.05
 --------
-Added a Mentorship Overview report
+Added a Manage Mentorship page to manually assign mentorship
+Added a Mentorship Overview report to view mentor's students
 
 v5.15.04
 --------
