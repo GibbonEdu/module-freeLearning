@@ -241,6 +241,14 @@ class UnitStudentGateway extends QueryableGateway
                 ->bindValue('gibbonPersonID', $gibbonPersonID);
         }
 
+        $criteria->addFilterRules([
+            'status' => function ($query, $status) {
+                return $query
+                    ->where('freeLearningUnitStudent.status = :status')
+                    ->bindValue('status', ucwords($status));
+            },
+        ]);
+
         return $this->runQuery($query, $criteria);
     }
 

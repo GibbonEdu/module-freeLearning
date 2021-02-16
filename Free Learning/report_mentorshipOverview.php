@@ -55,7 +55,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
             $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
 
         $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Search'));
+            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
 
         echo $form->getOutput();
     }
@@ -84,6 +84,15 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         if ($student['status'] == 'Exempt') $row->addClass('success');
         return $row;
     });
+
+    $table->addMetaData('filterOptions', [
+        'status:Current - Pending'         => __('Status').': '.__m('Current - Pending'),
+        'status:Current'                   => __('Status').': '.__m('Current'),
+        'status:Evidence Not Yet Approved' => __('Status').': '.__m('Evidence Not Yet Approved'),
+        'status:Complete - Pending'        => __('Status').': '.__m('Complete - Pending'),
+        'status:Complete - Approved'       => __('Status').': '.__m('Complete - Approved'),
+        'status:Exempt'                    => __('Status').': '.__m('Exempt'),
+    ]);
 
     if ($highestAction == 'Mentorship Overview_all') {
         $table->addColumn('grouping', __m('Mentor'))
