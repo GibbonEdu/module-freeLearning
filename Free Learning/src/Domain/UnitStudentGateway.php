@@ -217,6 +217,33 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
+    public function queryMentorship(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null)
+    {
+        $query = $this
+            ->newQuery()
+            ->cols(['enrolmentMethod', 'freeLearningUnit.name AS unit', 'freeLearningUnit.freeLearningUnitID', "GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnit.course AS flCourse', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.surname AS studentsurname', 'gibbonPerson.preferredName AS studentpreferredName', 'freeLearningUnitStudent.*', 'gibbonRole.category', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', "(CASE WHEN freeLearningUnitStudent.status='Current - Pending' THEN 1 ELSE 0 END) as statusSort", "(CASE WHEN timestampCompletePending IS NOT NULL THEN timestampCompletePending ELSE timestampJoined END) as timestamp"])
+            ->from('freeLearningUnit')
+            ->innerJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->innerJoin('gibbonRole', 'gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID')
+            ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+            ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
+            ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+            ->where("(enrolmentMethod='schoolMentor' OR enrolmentMethod='externalMentor')")
+            ->where("gibbonPerson.status='Full'")
+            ->where("(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:date) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:date)")
+            ->bindValue('date', date("Y-m-d"))
+            ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
+
+        if (!is_null($gibbonPersonID)) {
+            $query->where("enrolmentMethod='schoolMentor' AND freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID")
+                ->bindValue('gibbonPersonID', $gibbonPersonID);
+        }
+
+        return $this->runQuery($query, $criteria);
+    }
+
     public function getUnitStudentDetailsByID($freeLearningUnitID, $gibbonPersonID = null, $freeLearningUnitStudentID = null)
     {
         $query = $this
