@@ -149,6 +149,12 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
                     $row->addLabel('reason', __('Reason'));
                     $row->addSelect('reason')->fromArray($reasons)->placeholder()->required();
 
+                $form->toggleVisibilityByClass('reasonOther')->onSelect('reason')->when('Other');
+
+                $row = $form->addRow()->addClass('reasonOther');;
+                    $row->addLabel('details', __('Details'));
+                    $row->addTextField('details')->maxLength(100)->required();
+
                 $row = $form->addRow();
                     $row->addFooter();
                     $row->addSubmit();

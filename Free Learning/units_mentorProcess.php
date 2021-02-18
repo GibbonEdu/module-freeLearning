@@ -50,6 +50,7 @@ if ($view != 'grid' and $view != 'map') {
 }
 $response = $_REQUEST['response'] ?? null;
 $reason = $_REQUEST['reason'] ?? null;
+$reason = ($reason == "Other" && !empty($_REQUEST['details'])) ? $_REQUEST['details'] : $reason;
 $freeLearningUnitStudentID = $_REQUEST['freeLearningUnitStudentID'] ?? null;
 $confirmationKey = $_REQUEST['confirmationKey'] ?? null;
 

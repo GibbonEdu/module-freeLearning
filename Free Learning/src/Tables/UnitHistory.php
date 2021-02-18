@@ -57,6 +57,18 @@ class UnitHistory
             ? DataTable::createPaginated('unitHistory', $criteria)->withData($units)
             : DataTable::create('unitHistory')->withData($units);
 
+        if (!$summary) {
+            $table->modifyRows(function ($student, $row) {
+                if ($student['status'] == 'Current - Pending') $row->setClass('currentPending');
+                if ($student['status'] == 'Current') $row->setClass('currentUnit');
+                if ($student['status'] == 'Evidence Not Yet Approved') $row->setClass('warning');
+                if ($student['status'] == 'Complete - Pending') $row->setClass('pending');
+                if ($student['status'] == 'Complete - Approved') $row->setClass('success');
+                if ($student['status'] == 'Exempt') $row->setClass('success');
+                return $row;
+            });
+        }
+
         $filterOptions = [
             'status:current - pending'         => __('Status') .': '.__m('Current - Pending'),
             'status:current'                   => __('Status') .': '.__m('Current'),
