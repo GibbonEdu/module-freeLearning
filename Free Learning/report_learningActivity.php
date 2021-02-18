@@ -65,9 +65,9 @@ else {
         try {
             $data = array();
             if ($timePeriod == 'Last 30 Days')
-                $sql = 'SELECT timestampJoined, timestampCompleteApproved FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL 30 DAY) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL 30 DAY)';
+                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL 30 DAY) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL 30 DAY)';
             else if ($timePeriod == 'Last 12 Months')
-                $sql = 'SELECT timestampJoined, timestampCompleteApproved FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL 12 MONTH) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL 12 MONTH)';
+                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL 12 MONTH) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL 12 MONTH)';
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) {
@@ -112,7 +112,7 @@ else {
                                     if (is_numeric(strpos($row['timestampJoined'], $m."-".$d))) {
                                         $countJoined++ ;
                                     }
-                                    if (is_numeric(strpos($row['timestampCompleteApproved'], $m."-".$d))) {
+                                    if (is_numeric(strpos($row['timestampCompleteApproved'], $m."-".$d)) && $row['status'] == 'Complete - Approved') {
                                         $countApproved++ ;
                                     }
                                 }
@@ -140,7 +140,7 @@ else {
                                     if (is_numeric(strpos($row['timestampJoined'], $Y."-".$m))) {
                                         $countJoined++ ;
                                     }
-                                    if (is_numeric(strpos($row['timestampCompleteApproved'], $Y."-".$m))) {
+                                    if (is_numeric(strpos($row['timestampCompleteApproved'], $Y."-".$m)) && $row['status'] == 'Complete - Approved') {
                                         $countApproved++ ;
                                     }
                                 }

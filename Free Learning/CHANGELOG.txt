@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.15.06
+--------
+Fixed bug in Learning Activity
+
 v5.15.05
 --------
 Added additional text field to mentor decline when Other selected
