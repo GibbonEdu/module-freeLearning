@@ -137,6 +137,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $nameExternalMentor = null;
                     if ($enrolmentMethod == 'class') {
                         $gibbonCourseClassID = $_POST['gibbonCourseClassID'];
+                    } elseif ($enrolmentMethod == 'schoolMentor' && !empty($_POST['mentorGroup'])) {
+                        $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
                     } elseif ($enrolmentMethod == 'schoolMentor') {
                         $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
                         try {

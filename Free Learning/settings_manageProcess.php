@@ -40,6 +40,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'] ?? '';
     $collaborativeAssessment = $_POST['collaborativeAssessment'] ?? '';
     $certificatesAvailable = $_POST['certificatesAvailable'] ?? '';
+    $certificateTemplate = $_POST['certificateTemplate'] ?? '';
+    $certificateOrientation = $_POST['certificateOrientation'] ?? '';
 
     $settingGateway = $container->get(SettingGateway::class);
 
@@ -64,6 +66,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableExternalMentorEnrolment', $enableExternalMentorEnrolment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'collaborativeAssessment', $collaborativeAssessment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificatesAvailable', $certificatesAvailable);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateTemplate', $certificateTemplate);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateOrientation', $certificateOrientation);
 
         $URL .= $partialFail
             ? '&return=error2'

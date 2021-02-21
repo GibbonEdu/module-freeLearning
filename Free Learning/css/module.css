@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 .currentPending {
-    border-color: #d69e2e;
+    border-color: #b3801b;
     background-color: #faf089;
-    color: #d69e2e;
+    color: #b3801b;
 }
 
 .vis-tooltip {

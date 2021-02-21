@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+v5.16.00
+--------
+Added a Manage Mentor Groups page to manually assign mentorship
+Added a Mentorship Overview report to view mentor's students
+Added a setting to customize the PDF certificate template
+Added CLI scripts for notifying mentors of pending requests & students of pending work
+Removed the Enrolment Pending Approval report
+
 v5.15.06
 --------
 Fixed bug in Learning Activity

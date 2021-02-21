@@ -17,22 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Mpdf\Mpdf;
+use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
 
 require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
 
-$tcpdfFile = '../../lib/tcpdf/tcpdf.php';
-if (is_file($tcpdfFile)) {
-    include $tcpdfFile;
-}
+$output = '';
 
 $settingGateway = $container->get(SettingGateway::class);
 
-$output = '';
-
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     //Acess denied
@@ -75,65 +72,53 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             } else {
                 $row = $result->fetch();
 
-                $output .= "<p></p><p></p>";
-                $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">This document certifies that</p>";
-                $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$row['officialName']."</h1>";
-                $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">has successfully completed</p>";
-                $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$row['name']."</h1>";
-                if (is_numeric($row['length']) && $row['length'] > 0) {
-                        $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">undertaking an estimated ".$row['length']." minutes work on</p>";
-                }
-                else {
-                    $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">on".$row['length']."</p>";
-                }
-                $output .= "<h1 style=\"font-style: italics; font-size: 300%; text-align: center\">".$gibbon->session->get('organisationName')."</h1>";
-                $output .= "<p style=\"font-style: italics; font-size: 150%; text-align: center\">Approved on ".dateConvertBack($guid, substr($row['timestampCompleteApproved'], 0, 10))."</p>";
-                $output .= "<p></p><p></p>";
-                $output .= "<div style=\"margin-top: -100px; text-align: center\"><img style=\"height: 100px; width: 400px; background-color: #ffffff ; border: 1px solid #000000 ; padding: 4px ; box-shadow: 2px 2px 2px rgba(50,50,50,0.35);\" src=\"".$gibbon->session->get('absoluteURL').'/'.$gibbon->session->get('organisationLogo')."\"/></div><br/>";
+                // Render the certificate based on the HTML template
+                $certificateTemplate = $settingGateway->getSettingByScope('Free Learning', 'certificateTemplate');
+                $template = $container->get('twig')->createTemplate($certificateTemplate);
+                $output = $template->render([
+                    'officialName'     => $row['officialName'],
+                    'preferredName'    => $row['preferredName'],
+                    'surname'          => $row['surname'],
+                    'unitName'         => $row['name'],
+                    'length'           => $row['length'],
+                    'dateComplete'     => Format::date($row['timestampCompleteApproved']),
+                    'organisationName' => $gibbon->session->get('organisationName'),
+                    'organisationLogo' => $gibbon->session->get('organisationLogo'),
+                ]);
             }
         }
     }
 }
 
-//Create PDF objects
-$pdf = new TCPDF ('P', 'mm', 'A4', true, 'UTF-8', false);
+// Create PDF objects
+$config = [
+    'mode' => 'utf-8',
+    'format' => [210, 297],
+    'orientation' => $settingGateway->getSettingByScope('Free Learning', 'certificateOrientation'),
+    
+    'margin_top' => 10,
+    'margin_bottom' => 10,
+    'margin_left' => 10,
+    'margin_right' => 10,
 
-$fontFile = $gibbon->session->get('absolutePath'). '/resources/assets/fonts/DroidSansFallback.ttf';
-if (is_file($fontFile)) {
-    $pdf->addTTFfont($fontFile, 'TrueTypeUnicode', '', 32);
-} else {
-    $pdf->addTTFfont('DroidSansFallback');
-}
+    'setAutoTopMargin' => 'stretch',
+    'setAutoBottomMargin' => 'stretch',
+    'autoMarginPadding' => 1,
+
+    'shrink_tables_to_fit' => 0,
+    'defaultPagebreakType' => 'cloneall',
+
+    'default_font' => 'helvetica',
+];
+
+$pdf = new Mpdf($config);
 
 $pdf->SetCreator($gibbon->session->get('organisationName'));
 $pdf->SetAuthor($gibbon->session->get('organisationName'));
 $pdf->SetTitle($gibbon->session->get('organisationName').' Free Learning');
 
-$pdf->SetHeaderData('', 0, $gibbon->session->get('organisationName'));
-
-$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-
-if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
-    require_once(dirname(__FILE__).'/lang/eng.php');
-    $pdf->setLanguageArray($l);
-}
-$pdf->SetFont('helvetica', '', 10);
-
 $pdf->AddPage();
 
-$pdf->writeHTML($output, true, 0, true, 0);
+$pdf->WriteHTML($output);
 
-$pdf->lastPage();
 $pdf->Output($gibbon->session->get('organisationName').' Free Learning.pdf', 'I');
-?>
