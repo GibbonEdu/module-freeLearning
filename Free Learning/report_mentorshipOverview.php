@@ -26,14 +26,18 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 // Module includes
 include './modules/Free Learning/moduleFunctions.php';
 
-$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_mentorshipOverview.php', $connection2);
-
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mentorshipOverview.php")==FALSE) {
     // Access denied
-    $page->addError(__("You do not have access to this action."));
+    $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
     $page->breadcrumbs->add(__m('Mentorship Overview'));
+
+    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_mentorshipOverview.php', $connection2);
+    if (empty($highestAction)) {
+        $page->addError(__('You do not have access to this action.'));
+        return;
+    }
 
     // Check for custom field
     $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
