@@ -92,6 +92,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addYesNo($setting['name'])->required()->selected($setting['value']);
 
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'autoAcceptMentorGroups', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
     $form->addRow()->addHeading(__m('Submissions Settings'));
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment', true);

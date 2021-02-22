@@ -38,6 +38,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $enableClassEnrolment = $_POST['enableClassEnrolment'] ?? '';
     $enableSchoolMentorEnrolment = $_POST['enableSchoolMentorEnrolment'] ?? '';
     $enableExternalMentorEnrolment = $_POST['enableExternalMentorEnrolment'] ?? '';
+    $autoAcceptMentorGroups = $_POST['autoAcceptMentorGroups'] ?? '';
     $collaborativeAssessment = $_POST['collaborativeAssessment'] ?? '';
     $certificatesAvailable = $_POST['certificatesAvailable'] ?? '';
     $certificateTemplate = $_POST['certificateTemplate'] ?? '';
@@ -64,6 +65,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableClassEnrolment', $enableClassEnrolment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableSchoolMentorEnrolment', $enableSchoolMentorEnrolment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableExternalMentorEnrolment', $enableExternalMentorEnrolment);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'autoAcceptMentorGroups', $autoAcceptMentorGroups);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'collaborativeAssessment', $collaborativeAssessment);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificatesAvailable', $certificatesAvailable);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateTemplate', $certificateTemplate);
