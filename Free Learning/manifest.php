@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.15.06';
+$version = '5.16.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -136,6 +136,25 @@ $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
   PRIMARY KEY (`freeLearningBadgeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
+$moduleTables[6] = "CREATE TABLE `freeLearningMentorGroup` (
+    `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT , 
+    `name` VARCHAR(90) NOT NULL ,  
+    `assignment` ENUM('Manual','Automatic') NOT NULL DEFAULT 'Manual', 
+    `gibbonPersonFieldID` INT(3) UNSIGNED ZEROFILL NULL, 
+    `fieldValue` VARCHAR(90) NULL, 
+    PRIMARY KEY (`freeLearningMentorGroupID`),
+    UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+$moduleTables[7] = "CREATE TABLE `freeLearningMentorGroupPerson` (
+    `freeLearningMentorGroupPersonID` INT(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT , 
+    `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL , 
+    `gibbonPersonID` INT(10) UNSIGNED ZEROFILL NOT NULL , 
+    `role` ENUM('Student','Mentor') NOT NULL DEFAULT 'Student', 
+    PRIMARY KEY (`freeLearningMentorGroupPersonID`), 
+    UNIQUE KEY `gibbonPersonID` (`gibbonPersonID`,`freeLearningMentorGroupID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
 //Settings
 //gibbonSettings entries
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'difficultyOptions', 'Difficulty Options', 'The range of difficulty options available when creating units, from lowest to highest, as a comma-separated list.', 'Low,Medium,High');";
@@ -150,9 +169,12 @@ $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`na
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'collaborativeAssessment', 'Collaborative Assessment', 'Should students be working together submit and assess together?', 'N');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'maxMapSize', 'Maximum Map Size', 'How large should the biggest map be, before maps are disabled?', '99');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'certificatesAvailable', 'Certificates Available', 'Should certificates be made available on unit completion?', 'Y');";
-$gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Evidence Submitted', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');end";
-$gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Unit Comment', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');end";
-$gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Unit Feedback', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');end";
+$gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Evidence Submitted', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');";
+$gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Unit Comment', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');";
+$gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Unit Feedback', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');";
+$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'certificateTemplate', 'Certificate Template', 'HTML and Twig template for PDF certificates.', '<div style=\"text-align: center;\">\r\n <img style=\"height: 100px; width: 400px; background-color: #ffffff; padding: 4px;\" src=\"{{ absoluteURL }}/{{ organisationLogo }}\" />\r\n</div>\r\n\r\n<div style=\"padding-top: 30mm; font-style: italic; font-size: 150%; text-align: center;\">\r\n <p style=\"\">This document certifies that</p>\r\n \r\n <h1 style=\"font-size: 220%;\">{{ officialName }}</h1>\r\n \r\n <p>has successfully completed</p>\r\n \r\n <h1 style=\"font-size: 220%;\">{{ unitName }}</h1>\r\n \r\n <p>{% if length > 0 %}</p>\r\n <p>undertaking an estimated {{ length }} minutes work on</p>\r\n <p>{% endif %}</p>\r\n \r\n <h1 style=\"font-size: 220%;\">{{ organisationName }} Free Learning</h1>\r\n \r\n <p>Approved on {{ dateComplete }}</p>\r\n</div>');";
+$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'certificateOrientation', 'Certificate Orientation', 'Page orientation for PDF certificates.', 'P');";
+$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'autoAcceptMentorGroups', 'Enable Mentor Group Auto Accept', 'Should mentorship requests that are part of a mentor group be automatically accepted?', 'Y');";
 
 
 //Action rows
@@ -443,13 +465,12 @@ $actionRows[16]['categoryPermissionStudent'] = 'N';
 $actionRows[16]['categoryPermissionParent'] = 'N';
 $actionRows[16]['categoryPermissionOther'] = 'N';
 
-$actionRows[17]['name'] = 'Enrolment Pending Approval_all';
+$actionRows[17]['name'] = 'Mentorship Overview_all';
 $actionRows[17]['precedence'] = '1';
 $actionRows[17]['category'] = 'Reports';
-$actionRows[17]['description'] = 'Allows a user to see all units for which mentorship has been requested, and is still pending.';
-$actionRows[17]['URLList'] = 'report_enrolmentPendingApproval.php';
-$actionRows[17]['entryURL'] = 'report_enrolmentPendingApproval.php';
-$actionRows[17]['entrySidebar'] = 'Y';
+$actionRows[17]['description'] = 'Allows a user to see mentorship for any units.';
+$actionRows[17]['URLList'] = 'report_mentorshipOverview.php';
+$actionRows[17]['entryURL'] = 'report_mentorshipOverview.php';
 $actionRows[17]['defaultPermissionAdmin'] = 'Y';
 $actionRows[17]['defaultPermissionTeacher'] = 'N';
 $actionRows[17]['defaultPermissionStudent'] = 'N';
@@ -460,13 +481,12 @@ $actionRows[17]['categoryPermissionStudent'] = 'N';
 $actionRows[17]['categoryPermissionParent'] = 'N';
 $actionRows[17]['categoryPermissionOther'] = 'N';
 
-$actionRows[18]['name'] = 'Enrolment Pending Approval_my';
-$actionRows[18]['precedence'] = '0';
+$actionRows[18]['name'] = 'Mentorship Overview_my';
+$actionRows[18]['precedence'] = '1';
 $actionRows[18]['category'] = 'Reports';
-$actionRows[18]['description'] = 'Allows a user to see units for which their mentorship has been requested, and is still pending.';
-$actionRows[18]['URLList'] = 'report_enrolmentPendingApproval.php';
-$actionRows[18]['entryURL'] = 'report_enrolmentPendingApproval.php';
-$actionRows[18]['entrySidebar'] = 'Y';
+$actionRows[18]['description'] = 'Allows a user to see units for which they are a mentor.';
+$actionRows[18]['URLList'] = 'report_mentorshipOverview.php';
+$actionRows[18]['entryURL'] = 'report_mentorshipOverview.php';
 $actionRows[18]['defaultPermissionAdmin'] = 'N';
 $actionRows[18]['defaultPermissionTeacher'] = 'Y';
 $actionRows[18]['defaultPermissionStudent'] = 'N';
@@ -476,6 +496,22 @@ $actionRows[18]['categoryPermissionStaff'] = 'Y';
 $actionRows[18]['categoryPermissionStudent'] = 'N';
 $actionRows[18]['categoryPermissionParent'] = 'N';
 $actionRows[18]['categoryPermissionOther'] = 'N';
+
+$actionRows[19]['name'] = 'Manage Mentor Groups';
+$actionRows[19]['precedence'] = '0';
+$actionRows[19]['category'] = 'Admin';
+$actionRows[19]['description'] = 'Allows a user to assign students to mentors automatically or manually.';
+$actionRows[19]['URLList'] = 'mentorGroups_manage.php,mentorGroups_manage_add.php,mentorGroups_manage.php,mentorGroups_manage_edit.php,mentorGroups_manage_delete.php';
+$actionRows[19]['entryURL'] = 'mentorGroups_manage.php';
+$actionRows[19]['defaultPermissionAdmin'] = 'Y';
+$actionRows[19]['defaultPermissionTeacher'] = 'N';
+$actionRows[19]['defaultPermissionStudent'] = 'N';
+$actionRows[19]['defaultPermissionParent'] = 'N';
+$actionRows[19]['defaultPermissionSupport'] = 'N';
+$actionRows[19]['categoryPermissionStaff'] = 'Y';
+$actionRows[19]['categoryPermissionStudent'] = 'N';
+$actionRows[19]['categoryPermissionParent'] = 'N';
+$actionRows[19]['categoryPermissionOther'] = 'N';
 
 $array = array();
 $array['toggleSettingName'] = 'publicUnits';

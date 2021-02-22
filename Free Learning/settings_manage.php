@@ -92,6 +92,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addYesNo($setting['name'])->required()->selected($setting['value']);
 
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'autoAcceptMentorGroups', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
     $form->addRow()->addHeading(__m('Submissions Settings'));
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment', true);
@@ -103,6 +108,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $form->toggleVisibilityByClass('certificate')->onSelect($setting['name'])->when('Y');
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'certificateOrientation', true);
+    $orientations = ['P' => __('Portrait'), 'L' => __('Landscape')];
+    $row = $form->addRow()->addClass('certificate');
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addSelect($setting['name'])->fromArray($orientations)->required()->selected($setting['value']);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'certificateTemplate', true);
+    $col = $form->addRow()->addClass('certificate')->addColumn();
+        $col->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $col->addCodeEditor($setting['name'])->setMode('twig')->setValue($setting['value']);
 
     $row = $form->addRow();
         $row->addFooter();

@@ -185,7 +185,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         // MENTORSHIP
         $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
         if ($enableSchoolMentorEnrolment == 'Y') {
-            $form->addRow()->addHeading(__m('Mentorship'));
+            $form->addRow()->addHeading(__m('Mentorship'))->append(__m('Determines who can act as a school mentor for this unit. These mentorship settings are overridden when a student is part of a mentor group.'));
 
             $row = $form->addRow();
                 $row->addLabel('schoolMentorCompletors', __m('Completors'))->description(__m('Allow students who have completed a unit to become a mentor?'));

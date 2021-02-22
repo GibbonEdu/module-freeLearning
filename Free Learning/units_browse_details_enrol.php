@@ -23,6 +23,7 @@ use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\Module\FreeLearning\Domain\MentorGroupPersonGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == false) {
     // Access denied
@@ -121,11 +122,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $params['schoolMentorCompletors'] = $values['schoolMentorCompletors'];
             $params['schoolMentorCustom'] = $values['schoolMentorCustom'];
             $params['schoolMentorCustomRole'] = $values['schoolMentorCustomRole'];
-            $mentors = $unitStudentGateway->selectUnitMentors($freeLearningUnitID, $gibbonPersonID, $params)->fetchAll();
-            $mentors = Format::nameListArray($mentors, 'Staff', true, true);
+
+            // Check if there are pre-defined mentors first
+            $mentorGroups = $container->get(MentorGroupPersonGateway::class)->selectMentorsByStudent($gibbonPersonID)->fetchGrouped();
+            
+            if (!empty($mentorGroups)) {
+                $mentors = array_map(function ($list) {
+                    return Format::nameListArray($list, 'Staff', true, true);
+                }, $mentorGroups);
+                $form->addHiddenValue('mentorGroup', 'Y');
+            } else {
+                // Otherwise, load the selection of mentors for this unit
+                $mentors = $unitStudentGateway->selectUnitMentors($freeLearningUnitID, $gibbonPersonID, $params)->fetchAll();
+                $mentors = Format::nameListArray($mentors, 'Staff', true, true);
+            }
 
             $row = $form->addRow()->addClass('schoolMentorEnrolment');
-                $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'));
+                $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'))->description(!empty($mentorGroups) ? __m('Mentors based on your assigned mentor groups.') : '');
                 $row->addSelectPerson('gibbonPersonIDSchoolMentor')->fromArray($mentors)->required()->placeholder();
         }
 

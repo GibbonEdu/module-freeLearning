@@ -59,6 +59,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
 
         // Get enrolment settings
+        $autoAcceptMentorGroups = getSettingByScope($connection2, 'Free Learning', 'autoAcceptMentorGroups');
         $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
         $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
         $enableClassEnrolment = $roleCategory == 'Student'
@@ -137,6 +138,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $nameExternalMentor = null;
                     if ($enrolmentMethod == 'class') {
                         $gibbonCourseClassID = $_POST['gibbonCourseClassID'];
+                    } elseif ($enrolmentMethod == 'schoolMentor' && !empty($_POST['mentorGroup'])) {
+                        $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
+                        if ($autoAcceptMentorGroups == 'Y') {
+                            $status = 'Current';
+                        }
                     } elseif ($enrolmentMethod == 'schoolMentor') {
                         $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
                         try {
@@ -379,7 +385,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 }
 
                                 //Notify internal mentors by gibbon
-                                if ($enrolmentMethod == 'schoolMentor') {
+                                if ($enrolmentMethod == 'schoolMentor' && $autoAcceptMentorGroups != 'Y') {
                                     $notificationText = sprintf(__($guid, 'A learner (or group of learners) has requested that you mentor them for the Free Learning unit %1$s.', 'Free Learning'), $unit);
                                     $actionLink = "/index.php?q=/modules/Free Learning/units_mentor.php&mode=internal&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey";
                                     setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', $actionLink);

@@ -26,18 +26,19 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 //Module includes
 include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
 
-$highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_workPendingApproval.php', $connection2);
-
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workPendingApproval.php")==FALSE) {
     //Acess denied
-    print "<div class='error'>" ;
-        print __("You do not have access to this action.") ;
-    print "</div>" ;
+    $page->addError(__('You do not have access to this action.'));
 }
 else {
     //Proceed!
-    $page->breadcrumbs
-         ->add(__m('Work Pending Approval'));
+    $page->breadcrumbs->add(__m('Work Pending Approval'));
+
+    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_workPendingApproval.php', $connection2);
+    if (empty($highestAction)) {
+        $page->addError(__('You do not have access to this action.'));
+        return;
+    }
 
     //Check for custom field
     $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
