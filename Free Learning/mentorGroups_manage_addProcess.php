@@ -42,7 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         'name'                => $_POST['name'] ?? '',
         'assignment'          => $_POST['assignment'] ?? '',
         'gibbonPersonFieldID' => $_POST['gibbonPersonFieldID'] ?? null,
-        'fieldValue'          => $_POST['fieldValue'] ?? null,
+        'fieldValue'          => $_POST['fieldValue'] ?? $_POST['fieldValueSelect'] ?? null,
     ];
 
     // Validate the required values are present

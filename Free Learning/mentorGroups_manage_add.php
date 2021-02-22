@@ -48,8 +48,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     }, []);
 
     // Get the available custom fields for automatic assignment
-    $fields = $container->get(UserFieldGateway::class)->selectBy(['active' => 'Y'], ['gibbonPersonFieldID', 'name'])->fetchKeyPair();
-    
+    $fields = $container->get(UserFieldGateway::class)->selectBy(['active' => 'Y'], ['gibbonPersonFieldID', 'name', 'type', 'options'])->fetchAll();
+    $allFields = $selectFields = $selectOptions = $chainedOptions =  [];
+    foreach ($fields as $field) {
+        $allFields[$field['gibbonPersonFieldID']] = $field['name'];
+
+        if ($field['type'] == 'select') {
+            $selectFields[$field['gibbonPersonFieldID']] = $field['name'];
+            $options = array_map('trim', explode(',',  $field['options']));
+            foreach ($options as $option) {
+                $selectOptions[$option] = $option;
+                $chainedOptions[$option] = $field['gibbonPersonFieldID'];
+            }
+        }
+    }
+
     $form = Form::create('mentorship', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/mentorGroups_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
     
@@ -72,11 +85,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     $form->toggleVisibilityByClass('automatic')->onSelect('assignment')->when('Automatic');
     $row = $form->addRow()->addClass('automatic');
         $row->addLabel('gibbonPersonFieldID', __('Custom Field'));
-        $row->addSelect('gibbonPersonFieldID')->fromArray($fields)->required()->placeholder();
+        $row->addSelect('gibbonPersonFieldID')->fromArray($allFields)->required()->placeholder();
 
-    $row = $form->addRow()->addClass('automatic');
+    $form->toggleVisibilityByClass('fieldText')->onSelect('gibbonPersonFieldID')->whenNot(array_keys($selectFields));
+    $row = $form->addRow()->addClass('fieldText');
         $row->addLabel('fieldValue', __('Custom Field Value'));
         $row->addTextField('fieldValue')->maxLength(90)->required();
+
+    $form->toggleVisibilityByClass('fieldSelect')->onSelect('gibbonPersonFieldID')->when(array_keys($selectFields));
+    $row = $form->addRow()->addClass('fieldSelect');
+        $row->addLabel('fieldValueSelect', __('Custom Field Value'));
+        $row->addSelect('fieldValueSelect')->fromArray($selectOptions)->chainedTo('gibbonPersonFieldID', $chainedOptions)->required();
 
     $form->toggleVisibilityByClass('manual')->onSelect('assignment')->when('Manual');
     $col = $form->addRow()->addClass('manual')->addColumn();
