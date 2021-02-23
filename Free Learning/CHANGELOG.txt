@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v5.14.11
+--------
+Added commenting on Complete - Approved units
+Updated Afrikaans translations
+Added Last 60/90/120 days to Learning Activity
+
 v5.14.10
 --------
 Fixed bug in Learning Activity
