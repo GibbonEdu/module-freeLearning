@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v5.16.01
+--------
+Added commenting on Complete - Approved units
+Updated Afrikaans translations
+Added Last 60/90/120 days to Learning Activity
+
 v5.16.00
 --------
 Added a Manage Mentor Groups page to manually assign mentorship

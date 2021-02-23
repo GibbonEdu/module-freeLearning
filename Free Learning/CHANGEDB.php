@@ -1457,3 +1457,9 @@ INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,
 DELETE FROM `gibbonAction` WHERE gibbonAction.gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning') AND (gibbonAction.name='Enrolment Pending Approval_my' OR gibbonAction.name='Enrolment Pending Approval_all');end
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'autoAcceptMentorGroups', 'Enable Mentor Group Auto Accept', 'Should mentorship requests that are part of a mentor group be automatically accepted?', 'Y');end
 ";
+
+//v5.16.01
+++$count;
+$sql[$count][0] = '5.16.01';
+$sql[$count][1] = "
+";

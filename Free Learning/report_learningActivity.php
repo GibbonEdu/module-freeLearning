@@ -14,29 +14,34 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
 use Gibbon\View\View;
 use Gibbon\Forms\Form;
 
-//Module includes
+// Module includes
 include "./modules/" . $gibbon->session->get('module') . "/moduleFunctions.php" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learningActivity.php")==FALSE) {
-    //Acess denied
+    // Acess denied
     print "<div class='error'>" ;
         print __($guid, "You do not have access to this action.") ;
     print "</div>" ;
-}
-else {
-    //Proceed!
+} else {
+    // Proceed!
     $page->breadcrumbs
-         ->add(__m('Learning Activity'));
+        ->add(__m('Learning Activity'));
 
     $timePeriod = $_GET['timePeriod'] ?? 'Last 30 Days';
 
-    // FORM
+    $timePeriodLookup = [
+        "Last 30 Days" => "30",
+        "Last 60 Days" => "60",
+        "Last 12 Months" => "12",
+    ];
+
+    //  FORM
 	$form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
 	$form->setTitle(__('Filter'));
 
@@ -45,6 +50,7 @@ else {
 
     $timePeriods = [
         'Last 30 Days' => __m('Last 30 Days'),
+        'Last 60 Days' => __m('Last 60 Days'),
         'Last 12 Months' => __m('Last 12 Months'),
     ];
     $row = $form->addRow();
@@ -56,7 +62,6 @@ else {
 
 	echo $form->getOutput();
 
-
     if ($timePeriod != '') {
         echo '<h2>';
         echo __($guid, 'Report Data');
@@ -64,10 +69,11 @@ else {
 
         try {
             $data = array();
-            if ($timePeriod == 'Last 30 Days')
-                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL 30 DAY) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL 30 DAY)';
-            else if ($timePeriod == 'Last 12 Months')
-                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL 12 MONTH) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL 12 MONTH)';
+            if (strpos($timePeriod, "Days") !== 0) {
+                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY)';
+            } else if (strpos($timePeriod, "Months") !== 0) {
+                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH)';
+            }
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) {
@@ -81,11 +87,11 @@ else {
         } else {
             $rows = $result->fetchAll();
 
-            //CREATE LEGEND
+            // CREATE LEGEND
             $templateView = new View($container->get('twig'));
             echo $templateView->fetchFromTemplate('activityLegend.twig.html');
 
-            //PLOT DATA
+            // PLOT DATA
             echo '<script type="text/javascript" src="'.$gibbon->session->get('absoluteURL').'/lib/Chart.js/Chart.min.js"></script>';
             echo "<p style='margin-top: 20px; margin-bottom: 5px'><b>".__($guid, 'Data').'</b></p>';
             echo '<div style="width:100%">';
@@ -101,9 +107,9 @@ else {
                     $countJoinedTotal = 0;
                     $countApprovedTotal = 0 ;
                     echo 'labels : [';
-                        if ($timePeriod == 'Last 30 Days') {
+                        if (strpos($timePeriod, "Days") !== 0) {
                             $days = array();
-                            for($i = 0; $i < 30; $i++) {
+                            for($i = 0; $i < $timePeriodLookup[$timePeriod]; $i++) {
                                 $countJoined = 0;
                                 $countApproved = 0 ;
                                 $d = date("d", strtotime('-'. $i .' days'));
@@ -118,20 +124,20 @@ else {
                                 }
                                 $countJoinedTotal += $countJoined;
                                 $countApprovedTotal += $countApproved;
-                                if ($i == 0)
+                                if ($i == 0) {
                                     array_unshift($days, array(0 => '(Today) '.$d.'/'.$m, 1 => $countJoined, 2 => $countApproved));
-                                else
+                                } else {
                                     array_unshift($days, array(0 => $d.'/'.$m, 1 => $countJoined, 2 => $countApproved));
+                                }
                             }
                             $labels = '';
                             foreach ($days AS $day) {
                                 $labels .= '"'.$day[0].'",';
                             }
                             echo substr($labels, 0, -1);
-                        }
-                        else if ($timePeriod == 'Last 12 Months') {
+                        } else if (strpos($timePeriod, "Months") !== 0) {
                             $months = array();
-                            for($i = 0; $i < 12; $i++) {
+                            for($i = 0; $i < $timePeriodLookup[$timePeriod]; $i++) {
                                 $countJoined = 0;
                                 $countApproved = 0 ;
                                 $m = date("m", strtotime('-'. $i .' months'));
@@ -146,10 +152,11 @@ else {
                                 }
                                 $countJoinedTotal += $countJoined;
                                 $countApprovedTotal += $countApproved;
-                                if ($i == 0)
+                                if ($i == 0) {
                                     array_unshift($months, array(0 => '(Today) '.$m.'/'.$Y, 1 => $countJoined, 2 => $countApproved));
-                                else
+                                } else {
                                     array_unshift($months, array(0 => $m.'/'.$Y, 1 => $countJoined, 2 => $countApproved));
+                                }
                             }
                             $labels = '';
                             foreach ($months AS $month) {
@@ -172,12 +179,11 @@ else {
                             data : [
                                 <?php
                                 $data = '';
-                                if ($timePeriod == 'Last 30 Days') {
+                                if (strpos($timePeriod, "Days") !== 0) {
                                     foreach ($days AS $day) {
                                         $data .= $day[1].',';
                                     }
-                                }
-                                else if ($timePeriod == 'Last 12 Months') {
+                                } else if (strpos($timePeriod, "Months") !== 0) {
                                     foreach ($months AS $month) {
                                         $data .= $month[1].',';
                                     }
@@ -197,12 +203,11 @@ else {
                             data : [
                                 <?php
                                 $data = '';
-                                if ($timePeriod == 'Last 30 Days') {
+                                if (strpos($timePeriod, "Days") !== 0) {
                                     foreach ($days AS $day) {
                                         $data .= $day[2].',';
                                     }
-                                }
-                                else if ($timePeriod == 'Last 12 Months') {
+                                } else if (strpos($timePeriod, "Months") !== 0) {
                                     foreach ($months AS $month) {
                                         $data .= $month[2].',';
                                     }

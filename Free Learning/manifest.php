@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.16.00';
+$version = '5.16.01';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -137,21 +137,21 @@ $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[6] = "CREATE TABLE `freeLearningMentorGroup` (
-    `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT , 
-    `name` VARCHAR(90) NOT NULL ,  
-    `assignment` ENUM('Manual','Automatic') NOT NULL DEFAULT 'Manual', 
-    `gibbonPersonFieldID` INT(3) UNSIGNED ZEROFILL NULL, 
-    `fieldValue` VARCHAR(90) NULL, 
+    `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT ,
+    `name` VARCHAR(90) NOT NULL ,
+    `assignment` ENUM('Manual','Automatic') NOT NULL DEFAULT 'Manual',
+    `gibbonPersonFieldID` INT(3) UNSIGNED ZEROFILL NULL,
+    `fieldValue` VARCHAR(90) NULL,
     PRIMARY KEY (`freeLearningMentorGroupID`),
     UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[7] = "CREATE TABLE `freeLearningMentorGroupPerson` (
-    `freeLearningMentorGroupPersonID` INT(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT , 
-    `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL , 
-    `gibbonPersonID` INT(10) UNSIGNED ZEROFILL NOT NULL , 
-    `role` ENUM('Student','Mentor') NOT NULL DEFAULT 'Student', 
-    PRIMARY KEY (`freeLearningMentorGroupPersonID`), 
+    `freeLearningMentorGroupPersonID` INT(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT ,
+    `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL ,
+    `gibbonPersonID` INT(10) UNSIGNED ZEROFILL NOT NULL ,
+    `role` ENUM('Student','Mentor') NOT NULL DEFAULT 'Student',
+    PRIMARY KEY (`freeLearningMentorGroupPersonID`),
     UNIQUE KEY `gibbonPersonID` (`gibbonPersonID`,`freeLearningMentorGroupID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
