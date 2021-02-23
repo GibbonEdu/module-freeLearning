@@ -385,19 +385,47 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     } elseif ($rowEnrol['status'] == 'Complete - Approved') {
         // Complete, show status and feedback from teacher.
 
+        $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+        $form->setClass('blank');
+        $form->setTitle(__m('Complete - Approved'));
+        $form->setDescription(__m('Congratulations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.'));
+
+        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
+        $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
+
+        // DISCUSSION
         $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
-        $logContent = $page->fetchFromTemplate('ui/discussion.twig.html', [
+        $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
             'title' => __('Comments'),
             'discussion' => $logs
-        ]);
+        ]));
 
-        $form = Form::create('enrol', '');
-        $form->setTitle(__m('Complete - Approved'));
+        // ADD COMMENT
+        $commentBox = $form->getFactory()->createColumn()->addClass('flex flex-col');
+        $commentBox->addTextArea('addComment')
+            ->placeholder(__m('Leave a comment'))
+            ->setClass('flex w-full')
+            ->setRows(3);
+        $commentBox->addButton(__m('Add Comment'))
+            ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
+            ->setClass('button rounded-sm right');
 
-        $form->setDescription(__m('Congratulations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.') . $logContent );
+        $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
+            'discussion' => [[
+                'surname' => $gibbon->session->get('surname'),
+                'preferredName' => $gibbon->session->get('preferredName'),
+                'image_240' => $gibbon->session->get('image_240'),
+                'comment' => $commentBox->getOutput(),
+            ]]
+        ]));
+
+        echo $form->getOutput();
 
         $evidenceLink = $rowEnrol['evidenceType'] == 'Link' ? $rowEnrol['evidenceLocation']: './'.$rowEnrol['evidenceLocation'];
 
+        $form = Form::create('enrol', '');
+        
         $row = $form->addRow();
             $row->addLabel('statusLabel', __('Status'));
             $row->addTextField('status')->readonly()->setValue($values['status']);
