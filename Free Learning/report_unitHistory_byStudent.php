@@ -49,6 +49,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $form->setClass('noIntBorder fullWidth');
         $form->addHiddenValue('q', '/modules/Free Learning/report_unitHistory_byStudent.php');
 
+        $disableParentEvidence = false;
         if ($highestAction == 'Unit History By Student_all') {
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __('Person'));
@@ -57,6 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                     ->placeholder()
                     ->selected($gibbonPersonID);
 		} elseif ($highestAction == 'Unit History By Student_myChildren') {
+            $disableParentEvidence = (getSettingByScope($connection2, 'Free Learning', 'disableParentEvidence') == "Y");
             $children = $container->get(StudentGateway::class)
                 ->selectAnyStudentsByFamilyAdult($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))
                 ->fetchAll();
@@ -88,7 +90,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         }
 
         $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
-        $table = $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse);
+        $table = $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence);
         $table->setTitle(__('Report Data'));
         echo $table->getOutput();
 

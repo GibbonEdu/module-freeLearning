@@ -1463,3 +1463,10 @@ INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,
 $sql[$count][0] = '5.16.01';
 $sql[$count][1] = "
 ";
+
+//v5.16.02
+++$count;
+$sql[$count][0] = '5.16.02';
+$sql[$count][1] = "
+INSERT INTO gibbonSetting (scope, name, nameDisplay, description, value) SELECT * FROM (SELECT 'Free Learning', 'disableParentEvidence', 'Disable Parent Evidence', 'Hide student evidence from parents?', 'N') AS tmp WHERE NOT EXISTS (SELECT name FROM gibbonSetting WHERE (name='disableParentEvidence' AND scope='Free Learning')) LIMIT 1;end
+";

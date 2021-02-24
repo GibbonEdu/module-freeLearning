@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.02
+--------
+Added setting to hide evidence from parents
+
 v5.16.01
 --------
 Added commenting on Complete - Approved units

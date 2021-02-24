@@ -43,11 +43,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $certificatesAvailable = $_POST['certificatesAvailable'] ?? '';
     $certificateTemplate = $_POST['certificateTemplate'] ?? '';
     $certificateOrientation = $_POST['certificateOrientation'] ?? '';
+    $disableParentEvidence = $_POST['disableParentEvidence'] ?? '';
 
     $settingGateway = $container->get(SettingGateway::class);
 
     //Validate Inputs
-    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '' or $collaborativeAssessment == '' or $certificatesAvailable == '') {
+    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '' or $collaborativeAssessment == '' or $certificatesAvailable == '' or $disableParentEvidence == '') {
         //Fail 3
         $URL .= '&return=error3';
         header("Location: {$URL}");
@@ -70,6 +71,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificatesAvailable', $certificatesAvailable);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateTemplate', $certificateTemplate);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateOrientation', $certificateOrientation);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableParentEvidence', $disableParentEvidence);
 
         $URL .= $partialFail
             ? '&return=error2'
