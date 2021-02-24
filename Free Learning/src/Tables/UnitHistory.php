@@ -40,7 +40,7 @@ class UnitHistory
         $this->templateView = $templateView;
     }
 
-    public function create($gibbonPersonID, $summary = false, $canBrowse = true)
+    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false)
     {
         $criteria = $this->unitStudentGateway->newQueryCriteria()
             ->sortBy(['freeLearningUnitStudent.timestampJoined', 'schoolYear'], 'DESC')
@@ -85,11 +85,17 @@ class UnitHistory
         $table->addMetaData('filterOptions', $filterOptions);
 
         $table->addExpandableColumn('commentStudent')
-            ->format(function ($values) {
+            ->format(function ($values) use ($disableParentEvidence) {
                 if ($values['status'] == 'Current' || $values['status'] == 'Current - Pending') return;
                 if (empty($values['commentStudent']) && empty($values['commentApproval'])) return;
 
                 $logs = $this->unitStudentGateway->selectUnitStudentDiscussion($values['freeLearningUnitStudentID'])->fetchAll();
+
+                if ($disableParentEvidence) {
+                    for ($i = 0; $i < count($logs); $i++) {
+                        $logs[$i]['attachmentLocation'] = null;
+                    }
+                }
 
                 return $this->templateView->fetchFromTemplate('ui/discussion.twig.html', [
                     'discussion' => $logs
@@ -134,18 +140,20 @@ class UnitHistory
 
         $table->addColumn('status', __('Status'));
 
-        $table->addColumn('evidence', __('Evidence'))
-            ->notSortable()
-            ->width('10%')
-            ->format(function ($values) {
-                if (empty($values['evidenceLocation'])) return;
+        if (!$disableParentEvidence) {
+            $table->addColumn('evidence', __('Evidence'))
+                ->notSortable()
+                ->width('10%')
+                ->format(function ($values) {
+                    if (empty($values['evidenceLocation'])) return;
 
-                $url = $values['evidenceType'] == 'Link'
-                    ? $values['evidenceLocation']
-                    : './'.$values['evidenceLocation'];
+                    $url = $values['evidenceType'] == 'Link'
+                        ? $values['evidenceLocation']
+                        : './'.$values['evidenceLocation'];
 
-                return Format::link($url, __('View'), ['target' => '_blank']);
-            });
+                    return Format::link($url, __('View'), ['target' => '_blank']);
+                });
+        }
 
         return $table;
     }

@@ -33,6 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= '</div>';
 } else {
     $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
+    $disableParentEvidence = (getSettingByScope($connection2, 'Free Learning', 'disableParentEvidence') == "Y");
 
     $returnInt .= "<div class='linkTop'>";
     $returnInt .= sprintf(__($guid, '%1$sView Showcase of Student Work%2$s', 'Free Learning'), "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
@@ -47,8 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
     include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
-    $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
-    $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse);
+    $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, $disableParentEvidence);
     $returnInt .= $table->getOutput();
 }
 
