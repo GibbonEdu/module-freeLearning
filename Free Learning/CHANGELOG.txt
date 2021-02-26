@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.03
+--------
+Made Status field in Unit History report translatable
+
 v5.16.02
 --------
 Added setting to hide evidence from parents
