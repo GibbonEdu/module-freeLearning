@@ -138,7 +138,7 @@ class UnitHistory
                 return !empty($values['class']) ? Format::courseClassName($values['course'], $values['class']) : Format::small(__('N/A'));
             });
 
-        $table->addColumn('status', __('Status'));
+        $table->addColumn('status', __('Status'))->translatable();
 
         if (!$disableParentEvidence) {
             $table->addColumn('evidence', __('Evidence'))
