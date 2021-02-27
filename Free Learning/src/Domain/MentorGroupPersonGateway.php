@@ -73,7 +73,7 @@ class MentorGroupPersonGateway extends QueryableGateway
                 WHERE freeLearningMentorGroup.assignment='Automatic'
                 AND mentorGroupPerson.role='Mentor'
                 AND mentor.status='Full'
-                AND student.fields LIKE CONCAT('%\"', LPAD(freeLearningMentorGroup.gibbonPersonFieldID, 3, '0'), '\":\"', freeLearningMentorGroup.fieldValue, '\"%')
+                AND student.fields LIKE CONCAT('%\"', LPAD(freeLearningMentorGroup.gibbonCustomFieldID, 4, '0'), '\":\"', freeLearningMentorGroup.fieldValue, '\"%')
             ) ORDER BY groupName, surname, preferredName";
 
         return $this->db()->select($sql, $data);

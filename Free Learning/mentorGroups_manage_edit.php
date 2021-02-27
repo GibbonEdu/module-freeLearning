@@ -21,7 +21,7 @@ use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Domain\User\UserGateway;
 use Gibbon\Forms\DatabaseFormFactory;
-use Gibbon\Domain\User\UserFieldGateway;
+use Gibbon\Domain\System\CustomFieldGateway;
 use Gibbon\Module\FreeLearning\Domain\MentorGroupGateway;
 use Gibbon\Module\FreeLearning\Domain\MentorGroupPersonGateway;
 
@@ -74,24 +74,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     }, []);
 
     // Get the available custom fields for automatic assignment
-    $fields = $container->get(UserFieldGateway::class)->selectBy(['active' => 'Y'], ['gibbonPersonFieldID', 'name', 'type', 'options'])->fetchAll();
+    $fields = $container->get(CustomFieldGateway::class)->selectBy(['active' => 'Y', 'context' => 'Person'], ['gibbonCustomFieldID', 'name', 'type', 'options'])->fetchAll();
     $allFields = $selectFields = $selectOptions = $chainedOptions =  [];
     foreach ($fields as $field) {
-        $allFields[$field['gibbonPersonFieldID']] = $field['name'];
+        $allFields[$field['gibbonCustomFieldID']] = $field['name'];
 
         if ($field['type'] == 'select') {
-            $selectFields[$field['gibbonPersonFieldID']] = $field['name'];
+            $selectFields[$field['gibbonCustomFieldID']] = $field['name'];
             $options = array_map('trim', explode(',',  $field['options']));
             foreach ($options as $option) {
                 $selectOptions[$option] = $option;
-                $chainedOptions[$option] = $field['gibbonPersonFieldID'];
+                $chainedOptions[$option] = $field['gibbonCustomFieldID'];
             }
         }
     }
 
     $form = Form::create('mentorship', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/mentorGroups_manage_editProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
-    
+
     $form->addHiddenValue('address', $gibbon->session->get('address'));
     $form->addHiddenValue('freeLearningMentorGroupID', $freeLearningMentorGroupID);
 
@@ -112,18 +112,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
 
     $form->toggleVisibilityByClass('automatic')->onSelect('assignment')->when('Automatic');
     $row = $form->addRow()->addClass('automatic');
-        $row->addLabel('gibbonPersonFieldID', __('Custom Field'));
-        $row->addSelect('gibbonPersonFieldID')->fromArray($allFields)->required()->placeholder();
+        $row->addLabel('gibbonCustomFieldID', __('Custom Field'));
+        $row->addSelect('gibbonCustomFieldID')->fromArray($allFields)->required()->placeholder();
 
-    $form->toggleVisibilityByClass('fieldText')->onSelect('gibbonPersonFieldID')->whenNot(array_keys($selectFields));
+    $form->toggleVisibilityByClass('fieldText')->onSelect('gibbonCustomFieldID')->whenNot(array_keys($selectFields));
     $row = $form->addRow()->addClass('fieldText');
         $row->addLabel('fieldValue', __('Custom Field Value'));
         $row->addTextField('fieldValue')->maxLength(90)->required()->setValue($values['fieldValue']);
 
-    $form->toggleVisibilityByClass('fieldSelect')->onSelect('gibbonPersonFieldID')->when(array_keys($selectFields));
+    $form->toggleVisibilityByClass('fieldSelect')->onSelect('gibbonCustomFieldID')->when(array_keys($selectFields));
     $row = $form->addRow()->addClass('fieldSelect');
         $row->addLabel('fieldValueSelect', __('Custom Field Value'));
-        $row->addSelect('fieldValueSelect')->fromArray($selectOptions)->chainedTo('gibbonPersonFieldID', $chainedOptions)->selected($values['fieldValue']);
+        $row->addSelect('fieldValueSelect')->fromArray($selectOptions)->chainedTo('gibbonCustomFieldID', $chainedOptions)->selected($values['fieldValue']);
 
     $form->toggleVisibilityByClass('manual')->onSelect('assignment')->when('Manual');
     $col = $form->addRow()->addClass('manual')->addColumn();
@@ -131,7 +131,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         $select = $col->addMultiSelect('students');
         $select->source()->fromArray($students);
         $select->destination()->fromArray($existingStudents);
-        
+
     $row = $form->addRow();
         $row->addFooter();
         $row->addSubmit();

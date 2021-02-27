@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.04
+--------
+Core v22 Custom Field compatibility
+
 v5.16.03
 --------
 Made Status field in Unit History report translatable

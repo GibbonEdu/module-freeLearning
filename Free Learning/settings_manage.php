@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addTextArea($setting['name'])->setValue($setting['value'])->setRows(8);
 
-    $sql = "SELECT gibbonPersonFieldID as value, name FROM gibbonPersonField WHERE active='Y'";
+    $sql = "SELECT gibbonCustomFieldID as value, name FROM gibbonCustomField WHERE context='Person' AND active='Y'";
     $setting = $settingGateway->getSettingByScope('Free Learning', 'customField', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));

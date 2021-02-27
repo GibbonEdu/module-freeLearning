@@ -43,7 +43,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     $data = [
         'name'                => $_POST['name'] ?? '',
         'assignment'          => $_POST['assignment'] ?? '',
-        'gibbonPersonFieldID' => $_POST['gibbonPersonFieldID'] ?? null,
+        'gibbonCustomFieldID' => $_POST['gibbonCustomFieldID'] ?? null,
         'fieldValue'          => $_POST['fieldValue'] ?? $_POST['fieldValueSelect'] ?? null,
     ];
 
@@ -102,7 +102,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         $inserted = $mentorGroupPersonGateway->insertAndUpdate($data, $data);
         $partialFail &= !$inserted;
     }
-    
+
     $URL .= $partialFail
         ? "&return=warning1"
         : "&return=success0&editID=$freeLearningMentorGroupID";

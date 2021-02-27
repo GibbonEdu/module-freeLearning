@@ -1475,3 +1475,11 @@ INSERT INTO gibbonSetting (scope, name, nameDisplay, description, value) SELECT 
 ++$count;
 $sql[$count][0] = '5.16.03';
 $sql[$count][1] = "";
+
+//v5.16.04
+++$count;
+$sql[$count][0] = '5.16.04';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningMentorGroup` CHANGE `gibbonPersonFieldID` `gibbonCustomFieldID` INT(4) UNSIGNED ZEROFILL NULL;end
+UPDATE gibbonSetting SET description='A custom field with context Person, to display under student names in Manage Enrolment.' WHERE scope='Free Learning' AND name='customField';end
+";
