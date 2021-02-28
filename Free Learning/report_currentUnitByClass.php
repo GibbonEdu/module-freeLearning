@@ -61,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 
     if ($gibbonCourseClassID != '') {
         echo '<h2>';
-        echo __($guid, 'Report Data');
+        echo __('Report Data');
         echo '</h2>';
 
         try {
@@ -75,11 +75,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 
         if ($result->rowCount() != 1) {
             echo "<div class='error'>";
-            echo __($guid, 'There are no records to display.');
+            echo __('There are no records to display.');
             echo '</div>';
         } else {
             $row = $result->fetch();
-            echo "<p style='margin-bottom: 0px'><b>".__($guid, 'Class').'</b>: '.$row['course'].'.'.$row['class'].'</p>';
+            echo "<p style='margin-bottom: 0px'><b>".__('Class').'</b>: '.$row['course'].'.'.$row['class'].'</p>';
 
             //Get data on blocks in an efficient manner
             $blocks = getBlocksArray($connection2);
@@ -115,31 +115,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             echo "<table class='mini' cellspacing='0' style='width: 100%'>";
             echo "<tr class='head'>";
             echo '<th>';
-            echo __($guid, 'Number');
+            echo __('Number');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Student');
+            echo __('Student');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Group', 'Free Learning');
+            echo __m('Group');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Unit').'<br/>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Status').'</span>';
+            echo __('Unit').'<br/>';
+            echo "<span style='font-size: 85%; font-style: italic'>".__m('Status').'</span>';
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Date Started', 'Free Learning');
+            echo __m('Date Started');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Days Since Started', 'Free Learning');
+            echo __m('Days Since Started');
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Length', 'Free Learning').'</br>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes').'</span>';
+            echo __m('Length').'</br>';
+            echo "<span style='font-size: 85%; font-style: italic'>".__('Minutes').'</span>';
             echo '</th>';
             echo '<th>';
-            echo __($guid, 'Time Spent', 'Free Learning').'</br>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes By Day\'s End', 'Free Learning').'</span>';
+            echo __m('Time Spent').'</br>';
+            echo "<span style='font-size: 85%; font-style: italic'>".__m('Minutes By Day\'s End').'</span>';
             echo '</th>';
             echo '</tr>';
 
@@ -184,7 +184,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     echo "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
                 }
                 echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
-                echo "<br/><span style='font-size: 85%; font-style: italic'>".$row['status'].'</span>';
+                echo "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status']).'</span>';
                 echo '</td>';
                 echo '<td>';
                 if ($row['timestampJoined'] != '') {
@@ -209,7 +209,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                             }
                         }
                         if (is_null($timing)) {
-                            echo '<i>'.__($guid, 'N/A').'</i>';
+                            echo '<i>'.__('N/A').'</i>';
                         } else {
                             echo $timing;
                         }
@@ -254,7 +254,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             if ($count == 0) {
                 echo "<tr class=$rowNum>";
                 echo '<td colspan=3>';
-                echo __($guid, 'There are no records to display.');
+                echo __('There are no records to display.');
                 echo '</td>';
                 echo '</tr>';
             }

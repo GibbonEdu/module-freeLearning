@@ -1483,3 +1483,8 @@ $sql[$count][1] = "
 ALTER TABLE `freeLearningMentorGroup` CHANGE `gibbonPersonFieldID` `gibbonCustomFieldID` INT(4) UNSIGNED ZEROFILL NULL;end
 UPDATE gibbonSetting SET description='A custom field with context Person, to display under student names in Manage Enrolment.' WHERE scope='Free Learning' AND name='customField';end
 ";
+
+//v5.16.05
+++$count;
+$sql[$count][0] = '5.16.05';
+$sql[$count][1] = "";

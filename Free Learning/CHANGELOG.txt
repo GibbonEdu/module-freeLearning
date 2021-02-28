@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.16.05
+--------
+Translation improvements
+Updated Afrikaans translations
+
 v5.16.04
 --------
 Core v22 Custom Field compatibility

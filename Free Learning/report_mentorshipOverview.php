@@ -47,12 +47,12 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     print '<p>';
 
     // Filter
-    $allMentors = !empty($_GET['allMentors']) && $highestAction == 'Mentorship Overview_all' 
-        ? $_GET['allMentors'] 
+    $allMentors = !empty($_GET['allMentors']) && $highestAction == 'Mentorship Overview_all'
+        ? $_GET['allMentors']
         : '';
 
-    $gibbonPersonID = !empty($_GET['gibbonPersonID']) && $highestAction == 'Mentorship Overview_all' 
-        ? $_GET['gibbonPersonID'] 
+    $gibbonPersonID = !empty($_GET['gibbonPersonID']) && $highestAction == 'Mentorship Overview_all'
+        ? $_GET['gibbonPersonID']
         : $gibbon->session->get('gibbonPersonID');
 
     if ($highestAction == 'Mentorship Overview_all') {
@@ -151,13 +151,13 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
                     $output .= '<br/>'.Format::small($value);
                 }
             }
-            
+
             return $output;
         });
 
     $table->addColumn('status', __m('Status'))
         ->format(function ($values) use (&$collaborationKeys) {
-            $output = $values['status'];
+            $output = __m($values['status']);
             $grouping = $values['grouping'];
 
             if ($values['collaborationKey'] != '') {
@@ -171,7 +171,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
                 }
                 $grouping .= " (".__m("Group")." ".$group.")";
             }
-            
+
             $output .= '<br/>' . Format::small($grouping);
 
             return $output;
@@ -200,7 +200,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
                 $actions->addAction('edit', __('Edit'))
                     ->setURL('/modules/Free Learning/units_browse_details_approval.php');
             }
-            
+
         });
 
     echo $table->render($mentorship);
