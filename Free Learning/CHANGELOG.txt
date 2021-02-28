@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.14.14
+--------
+Translation improvements
+Updated Afrikaans translations
+
 v5.14.13
 --------
 Made Status field in Unit History report translatable

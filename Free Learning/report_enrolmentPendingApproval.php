@@ -149,7 +149,10 @@ else {
         });
 
     $table->addColumn('status', __m('Status'))
-        ->sortable(false);
+        ->sortable(false)
+        ->format(function($values){
+            return __m($values['status']);
+        });
 
     $table->addColumn('timestampJoined', __('When'))->format(Format::using('relativeTime', 'timestampJoined'));
 

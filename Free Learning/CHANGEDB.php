@@ -1450,3 +1450,8 @@ INSERT INTO gibbonSetting (scope, name, nameDisplay, description, value) SELECT 
 ++$count;
 $sql[$count][0] = '5.14.13';
 $sql[$count][1] = "";
+
+//v5.14.14
+++$count;
+$sql[$count][0] = '5.14.14';
+$sql[$count][1] = "";
