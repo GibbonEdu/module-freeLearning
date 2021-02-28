@@ -184,7 +184,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     echo "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
                 }
                 echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
-                echo "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status']).'</span>';
+                echo "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status'] ?? '').'</span>';
                 echo '</td>';
                 echo '<td>';
                 if ($row['timestampJoined'] != '') {
