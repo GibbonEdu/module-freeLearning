@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.06
+--------
+Auto-linking of URLs in plain-text comments
+
 v5.16.05
 --------
 Translation improvements

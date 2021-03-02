@@ -416,6 +416,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                                     $logs = $unitStudentGateway->selectUnitStudentDiscussion($student['freeLearningUnitStudentID'])->fetchAll();
 
+                                    $logs = array_map(function ($item) {
+                                        $item['comment'] = Format::hyperlinkAll($item['comment']);
+                                        return $item;
+                                    }, $logs);
+                                    
                                     return $page->fetchFromTemplate('ui/discussion.twig.html', [
                                         'discussion' => $logs
                                     ]);

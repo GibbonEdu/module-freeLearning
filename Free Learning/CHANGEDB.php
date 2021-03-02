@@ -1488,3 +1488,8 @@ UPDATE gibbonSetting SET description='A custom field with context Person, to dis
 ++$count;
 $sql[$count][0] = '5.16.05';
 $sql[$count][1] = "";
+
+//v5.16.06
+++$count;
+$sql[$count][0] = '5.16.06';
+$sql[$count][1] = "";

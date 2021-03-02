@@ -92,7 +92,7 @@ if (!$block) {
                 $blockCount = 0;
                 foreach ($blocks as $block) {
                     echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
-                        'roleCategory' => 'Staff', 
+                        'roleCategory' => 'Staff',
                         'gibbonPersonID' => $gibbon->session->get('username') ?? '',
                         'blockCount' => $blockCount
                     ]);
@@ -116,7 +116,7 @@ if (!$block) {
                 $row = $form->addRow();
                     $row->addLabel('student', __('Students'));
                     $col = $row->addColumn()->setClass('flex-col');
-                
+
                 $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
                 foreach ($collaborators as $index => $collaborator) {
                     $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false));
@@ -137,6 +137,12 @@ if (!$block) {
 
             // DISCUSSION
             $logs = $unitStudentGateway->selectUnitStudentDiscussion($values['freeLearningUnitStudentID'])->fetchAll();
+
+            $logs = array_map(function ($item) {
+                $item['comment'] = Format::hyperlinkAll($item['comment']);
+                return $item;
+            }, $logs);
+
             $col = $form->addRow()->addColumn();
             $col->addLabel('comments', __m('Comments'));
             $col->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
@@ -146,7 +152,7 @@ if (!$block) {
             $col = $form->addRow()->addColumn();
                 $col->addLabel('commentApproval', __m('Mentor Comment'))->description(__m('Leave a comment on the student\'s progress.'));
                 $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required();
-                
+
             $statuses = [
                 'Complete - Approved' => __m('Complete - Approved'),
                 'Evidence Not Yet Approved' => __m('Evidence Not Yet Approved'),

@@ -91,6 +91,11 @@ class UnitHistory
 
                 $logs = $this->unitStudentGateway->selectUnitStudentDiscussion($values['freeLearningUnitStudentID'])->fetchAll();
 
+                $logs = array_map(function ($item) {
+                    $item['comment'] = Format::hyperlinkAll($item['comment']);
+                    return $item;
+                }, $logs);
+                
                 if ($disableParentEvidence) {
                     for ($i = 0; $i < count($logs); $i++) {
                         $logs[$i]['attachmentLocation'] = null;

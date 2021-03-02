@@ -125,7 +125,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             // Check if there are pre-defined mentors first
             $mentorGroups = $container->get(MentorGroupPersonGateway::class)->selectMentorsByStudent($gibbonPersonID)->fetchGrouped();
-            
+
             if (!empty($mentorGroups)) {
                 $mentors = array_map(function ($list) {
                     return Format::nameListArray($list, 'Staff', true, true);
@@ -252,6 +252,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             // DISCUSSION
             $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+
+            $logs = array_map(function ($item) {
+                $item['comment'] = Format::hyperlinkAll($item['comment']);
+                return $item;
+            }, $logs);
+
             $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
                 'title' => __('Comments'),
                 'discussion' => $logs
@@ -338,6 +344,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         // DISCUSSION
         $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+
+        $logs = array_map(function ($item) {
+            $item['comment'] = Format::hyperlinkAll($item['comment']);
+            return $item;
+        }, $logs);
+
         $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
             'title' => __('Comments'),
             'discussion' => $logs
@@ -396,6 +408,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         // DISCUSSION
         $logs = $unitStudentGateway->selectUnitStudentDiscussion($rowEnrol['freeLearningUnitStudentID'])->fetchAll();
+
+        $logs = array_map(function ($item) {
+            $item['comment'] = Format::hyperlinkAll($item['comment']);
+            return $item;
+        }, $logs);
+        
         $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
             'title' => __('Comments'),
             'discussion' => $logs
@@ -425,7 +443,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $evidenceLink = $rowEnrol['evidenceType'] == 'Link' ? $rowEnrol['evidenceLocation']: './'.$rowEnrol['evidenceLocation'];
 
         $form = Form::create('enrol', '');
-        
+
         $row = $form->addRow();
             $row->addLabel('statusLabel', __('Status'));
             $row->addTextField('status')->readonly()->setValue($values['status']);
