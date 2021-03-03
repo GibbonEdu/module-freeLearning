@@ -57,6 +57,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
             $selectFields[$field['gibbonCustomFieldID']] = $field['name'];
             $options = array_map('trim', explode(',',  $field['options']));
             foreach ($options as $option) {
+                if (substr($option, 0, 1) == '[') continue; // Skip optgroups
+                
                 $selectOptions[$option] = $option;
                 $chainedOptions[$option] = $field['gibbonCustomFieldID'];
             }

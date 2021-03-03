@@ -3,6 +3,7 @@ CHANGELOG
 v5.16.06
 --------
 Auto-linking of URLs in plain-text comments
+Fix missing notifications for school mentors
 
 v5.16.05
 --------

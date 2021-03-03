@@ -385,7 +385,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 }
 
                                 //Notify internal mentors by gibbon
-                                if ($enrolmentMethod == 'schoolMentor' && $autoAcceptMentorGroups != 'Y') {
+                                if ($enrolmentMethod == 'schoolMentor' && $status == 'Current - Pending') {
                                     $notificationText = sprintf(__($guid, 'A learner (or group of learners) has requested that you mentor them for the Free Learning unit %1$s.', 'Free Learning'), $unit);
                                     $actionLink = "/index.php?q=/modules/Free Learning/units_mentor.php&mode=internal&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey";
                                     setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', $actionLink);
