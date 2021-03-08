@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.16.07
+--------
+Fix custom field select in Add/Edit Mentor Group
+Fix duplicate student names in Free Learning Showcase
+
 v5.16.06
 --------
 Auto-linking of URLs in plain-text comments

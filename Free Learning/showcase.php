@@ -58,8 +58,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
 
         while ($rowWork = $resultWork->fetch()) {
             $students = '';
+            $studentList = [];
             if ($rowWork['grouping'] == 'Individual') { //Created by a single student
-                $students = $rowWork['preferredName'];
+                $studentList[] = $rowWork['preferredName'];
             } else { //Created by a group of students
                 try {
                     $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
@@ -69,12 +70,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 } catch (PDOException $e) {
                 }
                 while ($rowStudents = $resultStudents->fetch()) {
-                    $students .= $rowStudents['preferredName'].', ';
+                    $studentList[] = $rowStudents['preferredName'];
                 }
-                if ($students != '') {
-                    $students = substr($students, 0, -2);
-                    $students = preg_replace('/,([^,]*)$/', ' & \1', $students);
-                }
+            }
+            if (!empty($studentList)) {
+                $studentList = array_values(array_unique($studentList));
+                $last  = array_slice($studentList, -1);
+                $first = join(', ', array_slice($studentList, 0, -1));
+                $students = join(' & ', array_filter(array_merge(array($first), $last), 'strlen'));
             }
 
             echo "<h3 style='margin-bottom: 5px'>";

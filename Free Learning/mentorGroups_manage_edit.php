@@ -79,7 +79,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     foreach ($fields as $field) {
         $allFields[$field['gibbonCustomFieldID']] = $field['name'];
 
-        if ($field['type'] == 'select') {
+        if ($field['type'] == 'select' || $field['type'] == 'checkboxes' || $field['type'] == 'radio') {
             $selectFields[$field['gibbonCustomFieldID']] = $field['name'];
             $options = array_map('trim', explode(',',  $field['options']));
             foreach ($options as $option) {
@@ -117,15 +117,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         $row->addLabel('gibbonCustomFieldID', __('Custom Field'));
         $row->addSelect('gibbonCustomFieldID')->fromArray($allFields)->required()->placeholder();
 
-    $form->toggleVisibilityByClass('fieldText')->onSelect('gibbonCustomFieldID')->whenNot(array_keys($selectFields));
     $row = $form->addRow()->addClass('fieldText');
         $row->addLabel('fieldValue', __('Custom Field Value'));
         $row->addTextField('fieldValue')->maxLength(90)->required()->setValue($values['fieldValue']);
 
-    $form->toggleVisibilityByClass('fieldSelect')->onSelect('gibbonCustomFieldID')->when(array_keys($selectFields));
-    $row = $form->addRow()->addClass('fieldSelect');
-        $row->addLabel('fieldValueSelect', __('Custom Field Value'));
-        $row->addSelect('fieldValueSelect')->fromArray($selectOptions)->chainedTo('gibbonCustomFieldID', $chainedOptions)->selected($values['fieldValue']);
+    if (!empty($selectFields)) {
+        $form->toggleVisibilityByClass('fieldText')->onSelect('gibbonCustomFieldID')->whenNot(array_keys($selectFields));
+        $form->toggleVisibilityByClass('fieldSelect')->onSelect('gibbonCustomFieldID')->when(array_keys($selectFields));
+        $row = $form->addRow()->addClass('fieldSelect');
+            $row->addLabel('fieldValueSelect', __('Custom Field Value'));
+            $row->addSelect('fieldValueSelect')->fromArray($selectOptions)->chainedTo('gibbonCustomFieldID', $chainedOptions)->selected($values['fieldValue']);
+    } else {
+        $form->toggleVisibilityByClass('fieldText')->onSelect('assignment')->when('Automatic');
+    }
 
     $form->toggleVisibilityByClass('manual')->onSelect('assignment')->when('Manual');
     $col = $form->addRow()->addClass('manual')->addColumn();
