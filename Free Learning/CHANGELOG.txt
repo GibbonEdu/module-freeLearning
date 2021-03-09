@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.16.08
+-------
+Added time to on-hover title in map view
+Added Enrolled Courses option to foreground current year's courses in Learning Areas & Courses drop down
+
 v5.16.07
 --------
 Fix custom field select in Add/Edit Mentor Group

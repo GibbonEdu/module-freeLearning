@@ -25,6 +25,7 @@ use Gibbon\Tables\DataTable;
 use Gibbon\Tables\View\GridView;
 use Gibbon\Domain\Students\StudentGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -103,7 +104,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $view);
 
-        $learningAreas = $unitGateway->selectLearningAreasAndCourses();
+        $learningAreas = $unitGateway->selectLearningAreasAndCourses(null, $gibbon->session->get('gibbonPersonID'), $gibbon->session->get('gibbonSchoolYearID'));
         $row = $form->addRow();
             $row->addLabel('gibbonDepartmentID', __m('Learning Area & Course'));
             $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
@@ -278,9 +279,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $relativeTime = Format::tooltip(__n('{count} hr', '{count} '.__m('hrs'), ceil($minutes / 60), ['count' => $hours]), $relativeTime);
                         }
 
-                        return !empty($unit['length'])
-                            ? $relativeTime
-                            : Format::small(__('N/A'));
+                        return !empty($unit['length']) ? $relativeTime : Format::small(__('N/A'));
                     });
 
                 $table->addColumn('grouping', __m('Grouping'))
@@ -394,9 +393,19 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     } else {
                         $image = 'undefined';
                     }
+
+                    $minutes = intval($unit['length']);
+                    $relativeTime = __n('{count} min', '{count} mins', $minutes);
+                    if ($minutes > 60) {
+                        $hours = round($minutes / 60, 1);
+                        $relativeTime = Format::tooltip(__n('{count} hr', '{count} '.__m('hrs'), ceil($minutes / 60), ['count' => $hours]), $relativeTime);
+                    }
+
+                    $time = !empty($unit['length']) ? $relativeTime : __('N/A');
+
                     $titleTemp = $string = trim(preg_replace('/\s\s+/', ' ', $unit['blurb']));
                     $title = '<div class="text-base font-bold">'.addSlashes($unit['name']).'</div>';
-                    $title .= '<div class="text-xs text-gray-600 italic mb-2">'.addSlashes($unit['difficulty']).'</div>';
+                    $title .= '<div class="text-xs text-gray-600 italic mb-2">'.__m('Difficulty').": ".addSlashes($unit['difficulty'])." | ".__m("Length").": ".$time.'</div>';
 
                     if ($unit['active'] != 'Y') {
                         $title .= '<span class="z-10 tag error block absolute right-0 top-0 mt-2 mr-2">'.__('Not Active').'</span>';

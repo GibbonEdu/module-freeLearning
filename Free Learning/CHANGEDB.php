@@ -1499,3 +1499,7 @@ $sql[$count][1] = "";
 $sql[$count][0] = '5.16.07';
 $sql[$count][1] = "";
 
+//v5.16.08
+++$count;
+$sql[$count][0] = '5.16.08';
+$sql[$count][1] = "";
