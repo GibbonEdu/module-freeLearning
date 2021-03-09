@@ -232,31 +232,53 @@ class UnitGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
-    public function selectLearningAreasAndCourses($gibbonPersonID = null)
+    public function selectLearningAreasAndCourses($gibbonPersonIDStaff = null, $gibbonPersonIDStudent = null, $gibbonSchoolYearID = null)
     {
-        if (!empty($gibbonPersonID)) {
-            $data = ['gibbonPersonID' => $gibbonPersonID];
-            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, '".__m("Learning Area")."' as groupBy
+        $data = [];
+        $sql = '';
+
+        if (!empty($gibbonPersonIDStudent) AND !empty($gibbonSchoolYearID)) {
+            $data['gibbonPersonID'] = $gibbonPersonIDStudent;
+            $data['gibbonSchoolYearID'] = $gibbonSchoolYearID;
+            $sql .= "(SELECT DISTINCT
+                course as value,
+                course as name,
+                '".__m("Enrolled Courses")."' as groupBy
+            FROM
+                freeLearningUnit
+                JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+            WHERE
+                active='Y'
+                AND NOT course IS NULL
+                AND NOT course=''
+                AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
+                AND freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID
+            ORDER BY
+                course) UNION ALL ";
+        }
+
+        if (!empty($gibbonPersonIDStaff)) {
+            $data['gibbonPersonID'] = $gibbonPersonIDStaff;
+            $sql .= "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, '".__m("Learning Area")."' as groupBy
                     FROM freeLearningUnit
                     JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
                     JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
                     WHERE gibbonDepartment.type='Learning Area' AND gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID
                     AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')
                     GROUP BY gibbonDepartment.gibbonDepartmentID
-                    ORDER BY gibbonDepartment.name)";
+                    ORDER BY gibbonDepartment.name) UNION ALL ";
         } else {
-            $data = [];
-            $sql = "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, '".__m("Learning Area")."' as groupBy
+            $sql .= "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, '".__m("Learning Area")."' as groupBy
                     FROM freeLearningUnit
                     JOIN gibbonDepartment ON (FIND_IN_SET(gibbonDepartment.gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList))
                     WHERE type='Learning Area'
                     GROUP BY gibbonDepartment.gibbonDepartmentID
-                    ORDER BY gibbonDepartment.name)";
+                    ORDER BY gibbonDepartment.name) UNION ALL ";
         }
 
-        $sql .= " UNION ALL
+        $sql .= "
         (SELECT DISTINCT course as value, course as name, '".__m("Course")."' as groupBy FROM freeLearningUnit WHERE active='Y' AND NOT course IS NULL AND NOT course='' ORDER BY course)
-        ORDER BY groupBy DESC, name";
+        ORDER BY FIELD(groupBy, 'Enrolled Courses', 'Learning Area', 'Course'), name";
 
         return $this->db()->select($sql, $data);
     }

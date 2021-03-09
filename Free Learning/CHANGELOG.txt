@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.14.15
+-------
+Added time to on-hover title in map view
+Added Enrolled Courses option to foreground current year's courses in Learning Areas & Courses drop down
+
 v5.14.14
 --------
 Translation improvements
