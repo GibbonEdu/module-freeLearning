@@ -370,6 +370,22 @@ class UnitStudentGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
+    public function selectCoursesByStudent($gibbonPersonIDStudent, $gibbonSchoolYearID)
+    {
+        $data = ['gibbonPersonID' => $gibbonPersonIDStudent, 'gibbonSchoolYearID' => $gibbonSchoolYearID, 'groupBy' => __m('Enrolled Courses')];
+        $sql = "SELECT DISTINCT course as value, course as name, :groupBy as groupBy
+            FROM freeLearningUnit
+            JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+            WHERE active='Y'
+            AND NOT course IS NULL
+            AND NOT course=''
+            AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
+            AND freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID
+            ORDER BY course";
+        
+        return $this->db()->select($sql, $data);
+    }
+
     public function selectUnitCollaboratorsByKey($collaborationKey)
     {
         $query = $this

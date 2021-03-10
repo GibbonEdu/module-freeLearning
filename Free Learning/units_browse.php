@@ -86,6 +86,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         // CRITERIA
         $unitGateway = $container->get(UnitGateway::class);
+        $unitStudentGateway = $container->get(UnitStudentGateway::class);
         $criteria = $unitGateway->newQueryCriteria()
             ->searchBy($unitGateway->getSearchableColumns(), $name)
             ->sortBy(['difficultyOrder', 'name'])
@@ -104,10 +105,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $view);
 
-        $learningAreas = $unitGateway->selectLearningAreasAndCourses(null, $gibbon->session->get('gibbonPersonID'), $gibbon->session->get('gibbonSchoolYearID'));
+        $courses = $unitStudentGateway->selectCoursesByStudent($gibbon->session->get('gibbonPersonID'), $gibbon->session->get('gibbonSchoolYearID'));
+        $learningAreas = $unitGateway->selectLearningAreasAndCourses();
         $row = $form->addRow();
             $row->addLabel('gibbonDepartmentID', __m('Learning Area & Course'));
-            $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
+            $row->addSelect('gibbonDepartmentID')
+                ->fromResults($courses, 'groupBy')
+                ->fromResults($learningAreas, 'groupBy')
+                ->selected($gibbonDepartmentID)
+                ->placeholder();
 
         $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
         $difficulties = array_map('trim', explode(',', $difficultyOptions));

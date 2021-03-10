@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.09
+-------
+Updated queries for the Learning Areas & Courses drop down
+
 v5.16.08
 -------
 Added time to on-hover title in map view
