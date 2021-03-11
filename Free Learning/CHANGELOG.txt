@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.14.16
+-------
+Improved translation of parent and student dashboard
+Updated Afrikaans translations
+
 v5.14.15
 -------
 Added time to on-hover title in map view
