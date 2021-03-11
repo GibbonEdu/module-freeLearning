@@ -95,7 +95,7 @@ class UnitHistory
                     $item['comment'] = Format::hyperlinkAll($item['comment']);
                     return $item;
                 }, $logs);
-                
+
                 if ($disableParentEvidence) {
                     for ($i = 0; $i < count($logs); $i++) {
                         $logs[$i]['attachmentLocation'] = null;
@@ -133,7 +133,7 @@ class UnitHistory
                 return $output;
             });
 
-        $table->addColumn('enrolmentMethod', __m('Enrolment Method'))
+        $table->addColumn('enrolmentMethod', __('Enrolment Method', [], "Free Learning")) // DON'T CHANGE TRANSLATION CALL!!!
             ->format(function ($values) {
                 return ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $values["enrolmentMethod"]));
             });
@@ -143,10 +143,13 @@ class UnitHistory
                 return !empty($values['class']) ? Format::courseClassName($values['course'], $values['class']) : Format::small(__('N/A'));
             });
 
-        $table->addColumn('status', __('Status'))->translatable();
+        $table->addColumn('status', __('Status'))
+            ->format(function ($values) {
+                return __($values['status'], [], "Free Learning"); // DON'T CHANGE TRANSLATION CALL!!!
+            });
 
         if (!$disableParentEvidence) {
-            $table->addColumn('evidence', __('Evidence'))
+            $table->addColumn('evidence', __('Evidence', [], "Free Learning")) // DON'T CHANGE TRANSLATION CALL!!!
                 ->notSortable()
                 ->width('10%')
                 ->format(function ($values) {
