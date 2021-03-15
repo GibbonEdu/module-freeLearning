@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.14.17
+-------
+Fixed Learning Activity report bug
+
 v5.14.16
 -------
 Improved translation of parent and student dashboard

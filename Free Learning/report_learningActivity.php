@@ -69,9 +69,9 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 
         try {
             $data = array();
-            if (strpos($timePeriod, "Days") !== 0) {
+            if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
                 $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY)';
-            } else if (strpos($timePeriod, "Months") !== 0) {
+            } else if ($timePeriod == "Last 12 Months") {
                 $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH)';
             }
             $result = $connection2->prepare($sql);
@@ -107,7 +107,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                     $countJoinedTotal = 0;
                     $countApprovedTotal = 0 ;
                     echo 'labels : [';
-                        if (strpos($timePeriod, "Days") !== 0) {
+                        if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
                             $days = array();
                             for($i = 0; $i < $timePeriodLookup[$timePeriod]; $i++) {
                                 $countJoined = 0;
@@ -135,7 +135,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                                 $labels .= '"'.$day[0].'",';
                             }
                             echo substr($labels, 0, -1);
-                        } else if (strpos($timePeriod, "Months") !== 0) {
+                        } else if ($timePeriod == "Last 12 Months") {
                             $months = array();
                             for($i = 0; $i < $timePeriodLookup[$timePeriod]; $i++) {
                                 $countJoined = 0;
@@ -179,11 +179,11 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                             data : [
                                 <?php
                                 $data = '';
-                                if (strpos($timePeriod, "Days") !== 0) {
+                                if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
                                     foreach ($days AS $day) {
                                         $data .= $day[1].',';
                                     }
-                                } else if (strpos($timePeriod, "Months") !== 0) {
+                                } else if ($timePeriod == "Last 12 Months") {
                                     foreach ($months AS $month) {
                                         $data .= $month[1].',';
                                     }
@@ -203,11 +203,11 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                             data : [
                                 <?php
                                 $data = '';
-                                if (strpos($timePeriod, "Days") !== 0) {
+                                if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
                                     foreach ($days AS $day) {
                                         $data .= $day[2].',';
                                     }
-                                } else if (strpos($timePeriod, "Months") !== 0) {
+                                } else if ($timePeriod == "Last 12 Months") {
                                     foreach ($months AS $month) {
                                         $data .= $month[2].',';
                                     }
