@@ -278,7 +278,7 @@ class UnitGateway extends QueryableGateway
 
         $sql .= "
         (SELECT DISTINCT course as value, course as name, '".__m("Course")."' as groupBy FROM freeLearningUnit WHERE active='Y' AND NOT course IS NULL AND NOT course='' ORDER BY course)
-        ORDER BY FIELD(groupBy, 'Enrolled Courses', 'Learning Area', 'Course'), name";
+        ORDER BY FIELD(groupBy, :learningArea, :course), name";
 
         return $this->db()->select($sql, $data);
     }
