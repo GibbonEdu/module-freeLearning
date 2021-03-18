@@ -107,7 +107,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                     //Get Inputs
                     $status = 'Complete - Pending';
-                    $commentStudent = $_POST['commentStudent'];
+                    $commentStudent = $_POST['commentStudent'] ?? '';
+                    $commentStudent = nl2br($commentStudent);
                     $type = $_POST['type'];
                     $link = (!empty($_POST['link'])) ? trim($_POST['link']) : null;
                     $gibbonCourseClassID = $row['gibbonCourseClassID'];

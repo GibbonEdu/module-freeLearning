@@ -29,6 +29,7 @@ $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
 $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';
 $gibbonPersonID = $_POST['gibbonPersonID'] ?? $gibbon->session->get('gibbonPersonID');
 $comment = $_POST['addComment'] ?? '';
+$comment = nl2br($comment);
 
 $urlParams = [
     'freeLearningUnitStudentID' => $freeLearningUnitStudentID,
