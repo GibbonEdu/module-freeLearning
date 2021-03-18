@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.13
+-------
+Enabled line breaks for comments
+
 v5.16.12
 -------
 Translation improvements
