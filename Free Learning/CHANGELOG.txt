@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.14
+-------
+Added Individual Needs flag against student names in Approval and Work Pending Approval 
+
 v5.16.13
 -------
 Enabled line breaks for comments

@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
+use Gibbon\Domain\IndividualNeeds\INGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
@@ -151,7 +152,8 @@ else {
 
     $table->addColumn('student', __('Student'))
         ->sortable('gibbonPersonID')
-        ->format(function($values) use ($guid, $customField) {
+        ->format(function($values) use ($container, $connection2, $guid, $customField) {
+            // Name
             $output = "";
             if ($values['category'] == 'Student') {
                 $output .= "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $values["gibbonPersonID"] . "'>" . formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true) . "</a>";
@@ -160,13 +162,29 @@ else {
                 $output .= formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true);
             }
             $output .= "<br/>";
+            // Custom fields
             $fields = json_decode($values['fields'], true);
             if (!empty($fields[$customField])) {
                 $value = $fields[$customField];
                 if ($value != '') {
-                    $output .= "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
+                    $output .= Format::small($value);
                 }
             }
+
+            //Individual Needs
+            if (isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) {
+                $gateway = $container->get(INGateway::class);
+                $criteria = $gateway
+                  ->newQueryCriteria()
+                  ->filterBy('gibbonPersonID', $values['gibbonPersonID'])
+                  ->fromPOST();
+                $personalDescriptors = $gateway->queryIndividualNeedsPersonDescriptors($criteria)->toArray();
+
+                if (count($personalDescriptors) > 0) {
+                    $output .= Format::small(__('Individual Needs'));
+                }
+            }
+
             return $output;
         });
 

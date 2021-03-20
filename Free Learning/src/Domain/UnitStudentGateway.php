@@ -266,8 +266,8 @@ class UnitStudentGateway extends QueryableGateway
             ->where("gibbonPerson.status='Full'")
             ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
             ->where("(
-                (freeLearningUnitStudent.status='Current' AND freeLearningUnitStudent.timestampJoined < DATE_SUB(:today, INTERVAL 31 DAY)) 
-                OR (freeLearningUnitStudent.status='Evidence Not Yet Approved' AND freeLearningUnitStudent.timestampCompletePending < DATE_SUB(:today, INTERVAL 31 DAY)) 
+                (freeLearningUnitStudent.status='Current' AND freeLearningUnitStudent.timestampJoined < DATE_SUB(:today, INTERVAL 31 DAY))
+                OR (freeLearningUnitStudent.status='Evidence Not Yet Approved' AND freeLearningUnitStudent.timestampCompletePending < DATE_SUB(:today, INTERVAL 31 DAY))
                 )
             ")
             ->bindValue('today', date('Y-m-d'))
@@ -285,7 +285,7 @@ class UnitStudentGateway extends QueryableGateway
     {
         $query = $this
             ->newSelect()
-            ->cols(['freeLearningUnit.*','freeLearningUnitStudent.*', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240'])
+            ->cols(['freeLearningUnit.*','freeLearningUnitStudent.*', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240', '(SELECT count(*) FROM gibbonINPersonDescriptor WHERE gibbonINPersonDescriptor.gibbonPersonID=freeLearningUnitStudent.gibbonPersonIDStudent GROUP BY gibbonINPersonDescriptor.gibbonPersonID) AS inCount'])
             ->from('freeLearningUnitStudent')
             ->innerJoin('freeLearningUnit', 'freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID')
             ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
@@ -382,7 +382,7 @@ class UnitStudentGateway extends QueryableGateway
             AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
             AND freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID
             ORDER BY course";
-        
+
         return $this->db()->select($sql, $data);
     }
 
@@ -390,7 +390,7 @@ class UnitStudentGateway extends QueryableGateway
     {
         $query = $this
             ->newSelect()
-            ->cols(['freeLearningUnitStudent.*', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240'])
+            ->cols(['freeLearningUnitStudent.*', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240', '(SELECT count(*) FROM gibbonINPersonDescriptor WHERE gibbonINPersonDescriptor.gibbonPersonID=freeLearningUnitStudent.gibbonPersonIDStudent GROUP BY gibbonINPersonDescriptor.gibbonPersonID) AS inCount'])
             ->from('freeLearningUnitStudent')
             ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
             ->where('freeLearningUnitStudent.collaborationKey = :collaborationKey')
