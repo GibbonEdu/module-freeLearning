@@ -49,7 +49,7 @@ if (!$block) {
         //Check student & confirmation key
         try {
             $data = array('freeLearningUnitStudentID' => $freeLearningUnitStudentID, 'confirmationKey' => $confirmationKey) ;
-            $sql = 'SELECT freeLearningUnitStudent.*, freeLearningUnit.name AS unit, surname, preferredName
+            $sql = 'SELECT freeLearningUnitStudent.*, freeLearningUnit.name AS unit, surname, preferredName, (SELECT count(*) FROM gibbonINPersonDescriptor WHERE gibbonINPersonDescriptor.gibbonPersonID=freeLearningUnitStudent.gibbonPersonIDStudent GROUP BY gibbonINPersonDescriptor.gibbonPersonID) AS inCount
                 FROM freeLearningUnitStudent
                     JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                     JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
@@ -92,7 +92,7 @@ if (!$block) {
                 $blockCount = 0;
                 foreach ($blocks as $block) {
                     echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
-                        'roleCategory' => 'Staff', 
+                        'roleCategory' => 'Staff',
                         'gibbonPersonID' => $gibbon->session->get('username') ?? '',
                         'blockCount' => $blockCount
                     ]);
@@ -116,15 +116,17 @@ if (!$block) {
                 $row = $form->addRow();
                     $row->addLabel('student', __('Students'));
                     $col = $row->addColumn()->setClass('flex-col');
-                
+
                 $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
                 foreach ($collaborators as $index => $collaborator) {
-                    $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false));
+                    $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
+                    $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false).$in);
                 }
             } else {
+                $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
                 $row = $form->addRow();
                     $row->addLabel('student', __('Student'));
-                    $row->addTextField('student')->readonly()->setValue(Format::name('', $values['preferredName'], $values['surname'], 'Student', false));
+                    $row->addTextField('student')->readonly()->setValue(Format::name('', $values['preferredName'], $values['surname'], 'Student', false).$in);
             }
 
             $submissionLink = $values['evidenceType'] == 'Link'
@@ -146,7 +148,7 @@ if (!$block) {
             $col = $form->addRow()->addColumn();
                 $col->addLabel('commentApproval', __m('Mentor Comment'))->description(__m('Leave a comment on the student\'s progress.'));
                 $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required();
-                
+
             $statuses = [
                 'Complete - Approved' => __m('Complete - Approved'),
                 'Evidence Not Yet Approved' => __m('Evidence Not Yet Approved'),

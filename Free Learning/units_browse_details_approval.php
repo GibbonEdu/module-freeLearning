@@ -153,8 +153,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $alert = Format::alert(__m('Collaborative Assessment is enabled: you will be giving feedback to all members of this group in one go.'), 'message');
     }
 
-    $gibbonHookID = $pdo->selectOne("SELECT gibbonHookID FROM gibbonHook 
-        JOIN gibbonModule ON (gibbonModule.gibbonModuleID=gibbonHook.gibbonModuleID) 
+    $gibbonHookID = $pdo->selectOne("SELECT gibbonHookID FROM gibbonHook
+        JOIN gibbonModule ON (gibbonModule.gibbonModuleID=gibbonHook.gibbonModuleID)
         WHERE gibbonModule.name='Free Learning' AND gibbonHook.type='Student Profile'");
 
     // COMMENT FORM
@@ -222,12 +222,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
         foreach ($collaborators as $index => $collaborator) {
-            $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false));
+            $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
+            $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false).$in);
         }
     } else {
+        $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
         $row = $form->addRow();
             $row->addLabel('student', __('Student'));
-            $row->addTextField('student')->readonly()->setValue(Format::name('', $values['preferredName'], $values['surname'], 'Student', false));
+            $row->addTextField('student')->readonly()->setValue(Format::name('', $values['preferredName'], $values['surname'], 'Student', false).$in);
     }
 
     $submissionLink = $values['evidenceType'] == 'Link'
