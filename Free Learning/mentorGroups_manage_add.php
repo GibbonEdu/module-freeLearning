@@ -48,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     }, []);
 
     // Get the available custom fields for automatic assignment
-    $fields = $container->get(CustomFieldGateway::class)->selectBy(['active' => 'Y', 'context' => 'Person'], ['gibbonCustomFieldID', 'name', 'type', 'options'])->fetchAll();
+    $fields = $container->get(CustomFieldGateway::class)->selectBy(['active' => 'Y', 'context' => 'User'], ['gibbonCustomFieldID', 'name', 'type', 'options'])->fetchAll();
     $allFields = $selectFields = $selectOptions = $chainedOptions =  [];
     foreach ($fields as $field) {
         $allFields[$field['gibbonCustomFieldID']] = $field['name'];
