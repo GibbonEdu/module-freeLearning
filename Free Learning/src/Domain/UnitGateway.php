@@ -234,7 +234,10 @@ class UnitGateway extends QueryableGateway
 
     public function selectLearningAreasAndCourses($gibbonPersonIDStaff = null, $gibbonPersonIDStudent = null, $gibbonSchoolYearID = null)
     {
-        $data = [];
+        $data = [
+            'learningArea' => __m("Learning Area"),
+            'course' => __m("Course")
+        ];
         $sql = '';
 
         if (!empty($gibbonPersonIDStudent) AND !empty($gibbonSchoolYearID)) {

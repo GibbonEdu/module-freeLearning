@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v5.14.21
+-------
+Fixed Learning Areas & Courses issue
+
 v5.14.20
 -------
-Added Individual Needs flag against student names in Approval and Work Pending Approval 
+Added Individual Needs flag against student names in Approval and Work Pending Approval
 
 v5.14.19
 -------
