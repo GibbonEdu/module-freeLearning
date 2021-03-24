@@ -1,12 +1,16 @@
 CHANGELOG
 =========
+v5.16.16
+-------
+Added bulk unit duplicate
+
 v5.16.15
 -------
 Updated custom field context in Mentor Groups
 
 v5.16.14
 -------
-Added Individual Needs flag against student names in Approval and Work Pending Approval 
+Added Individual Needs flag against student names in Approval and Work Pending Approval
 
 v5.16.13
 -------

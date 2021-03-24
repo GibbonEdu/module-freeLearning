@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Module\FreeLearning\UnitExporter;
+use Gibbon\Module\FreeLearning\UnitDuplicator;
 
 $_POST['address'] = '/modules/Free Learning/units_manage.php';
 
@@ -60,12 +61,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $exporter->output();
         exit;
 
+    } else if ($action == 'Duplicate') {
+
+        $duplicator = $container->get(UnitDuplicator::class);
+
+        foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
+            $partialFail = $duplicator->duplicateUnit($freeLearningUnitID);
+        }
+
     } else {
         $URL .= '&return=error1';
         header("Location: {$URL}");
         exit;
     }
-    
+
     $URL .= $partialFail
         ? '&return=warning1'
         : '&return=success0';
