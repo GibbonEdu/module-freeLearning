@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.17
+-------
+Minimum core version
+
 v5.16.16
 -------
 Added bulk unit duplicate

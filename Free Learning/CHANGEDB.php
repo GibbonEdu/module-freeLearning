@@ -1543,3 +1543,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.16.16';
 $sql[$count][1] = "";
+
+//v5.16.17
+++$count;
+$sql[$count][0] = '5.16.17';
+$sql[$count][1] = "";
