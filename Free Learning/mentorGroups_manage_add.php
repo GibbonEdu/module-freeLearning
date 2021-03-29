@@ -58,7 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
             $options = array_map('trim', explode(',',  $field['options']));
             foreach ($options as $option) {
                 if (substr($option, 0, 1) == '[') continue; // Skip optgroups
-                
+
                 $selectOptions[$option] = $option;
                 $chainedOptions[$option] = $field['gibbonCustomFieldID'];
             }
@@ -72,7 +72,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
 
     $row = $form->addRow();
         $row->addLabel('name', __m('Group Name'));
-        $row->addTextField('name')->maxLength(90)->required();
+        $row->addTextField('name')->maxLength(100)->required();
 
     $col = $form->addRow()->addColumn();
         $col->addLabel('mentors', __('Mentors'));
@@ -91,7 +91,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
 
     $row = $form->addRow()->addClass('fieldText');
         $row->addLabel('fieldValue', __('Custom Field Value'));
-        $row->addTextField('fieldValue')->maxLength(90)->required();
+        $row->addTextField('fieldValue')->maxLength(100)->required();
 
     if (!empty($selectFields)) {
         $form->toggleVisibilityByClass('fieldText')->onSelect('gibbonCustomFieldID')->whenNot(array_keys($selectFields));

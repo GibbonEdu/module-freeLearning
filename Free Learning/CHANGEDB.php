@@ -1548,3 +1548,11 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.16.17';
 $sql[$count][1] = "";
+
+//v5.16.18
+++$count;
+$sql[$count][0] = '5.16.18';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningMentorGroup` CHANGE `name` `name` VARCHAR(100) NOT NULL;end
+ALTER TABLE `freeLearningMentorGroup` CHANGE `fieldValue` `fieldValue` VARCHAR(100) NULL;end
+";

@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.16.17';
+$version = '5.16.18';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -138,10 +138,10 @@ $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
 
 $moduleTables[6] = "CREATE TABLE `freeLearningMentorGroup` (
     `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT ,
-    `name` VARCHAR(90) NOT NULL ,
+    `name` VARCHAR(100) NOT NULL ,
     `assignment` ENUM('Manual','Automatic') NOT NULL DEFAULT 'Manual',
     `gibbonCustomFieldID` INT(4) UNSIGNED ZEROFILL NULL,
-    `fieldValue` VARCHAR(90) NULL,
+    `fieldValue` VARCHAR(100) NULL,
     PRIMARY KEY (`freeLearningMentorGroupID`),
     UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
