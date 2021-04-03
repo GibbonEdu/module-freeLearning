@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.19
+--------
+New Student Progress By Class report
+
 v5.16.18
 -------
 Extended name field in Mentor Groups

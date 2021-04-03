@@ -228,6 +228,36 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
+    public function queryStudentProgressByStudent(QueryCriteria $criteria, $gibbonCourseClassID, $gibbonSchoolYearID)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['gibbonPerson.gibbonPersonID',
+                'surname',
+                'preferredName',
+                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Approved\' THEN 1 ELSE 0 END) as completeApprovedCount',
+                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Pending\' THEN 1 ELSE 0 END) as completePendingCount',
+                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Current\' THEN 1 ELSE 0 END) as currentCount',
+                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Current - Pending\' THEN 1 ELSE 0 END) as currentPendingCount',
+                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Evidence Not Yet Approved\' THEN 1 ELSE 0 END) as evidenceNotYetApprovedCount',
+                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Exempt\' THEN 1 ELSE 0 END) as exemptCount',
+                'COUNT(*) as totalCount',
+                ])
+            ->from('gibbonPerson')
+            ->innerJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role=\'Student\'')
+            ->leftJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID OR enrolmentMethod=\'schoolMentor\' OR enrolmentMethod=\'externalMentor\') AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+            ->leftJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->where('gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID')
+            ->where("gibbonPerson.status='Full'")
+            ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
+            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+            ->bindValue('gibbonCourseClassID', $gibbonCourseClassID)
+            ->bindValue('today', date('Y-m-d'))
+            ->groupBy(['gibbonPerson.gibbonPersonID']);
+
+        return $this->runQuery($query, $criteria);
+    }
+
     public function selectEnrolmentPending($gibbonSchoolYearID, $gibbonPersonID = null)
     {
         $query = $this

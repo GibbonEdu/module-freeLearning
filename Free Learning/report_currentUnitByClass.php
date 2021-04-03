@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\Timetable\CourseGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -64,22 +65,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
         echo __('Report Data');
         echo '</h2>';
 
-        try {
-            $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
-            $sql = 'SELECT gibbonCourseClassID, gibbonCourse.nameShort AS course, gibbonCourseClass.nameShort as class FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonCourseClassID=:gibbonCourseClassID';
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            echo "<div class='error'>".$e->getMessage().'</div>';
-        }
+        $courseGateway = $container->get(CourseGateway::class);
+        $values = $courseGateway->getCourseClassByID($gibbonCourseClassID);
 
-        if ($result->rowCount() != 1) {
+        if (!is_array($values)) {
             echo "<div class='error'>";
             echo __('There are no records to display.');
             echo '</div>';
         } else {
-            $row = $result->fetch();
-            echo "<p style='margin-bottom: 0px'><b>".__('Class').'</b>: '.$row['course'].'.'.$row['class'].'</p>';
+            echo "<p style='margin-bottom: 0px'><b>".__('Class').'</b>: '.$values['courseNameShort'].'.'.$values['nameShort'].'</p>';
 
             //Get data on blocks in an efficient manner
             $blocks = getBlocksArray($connection2);
