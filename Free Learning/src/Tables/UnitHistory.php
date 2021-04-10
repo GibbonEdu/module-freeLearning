@@ -87,9 +87,9 @@ class UnitHistory
                 ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
 
             echo $chart->render();
-        }
 
-        echo "<h3>".__('Details')."</h3>";
+            echo "<h3>".__('Details')."</h3>";
+        }
 
         if (!$summary) {
             $table->modifyRows(function ($student, $row) {
