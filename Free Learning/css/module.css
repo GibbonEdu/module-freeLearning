@@ -24,15 +24,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 .pending {
-    border-color: #78529e;
-    background-color: #dcc5f4;
-    color: #633f86;
+    border-color: #78529E;
+    background-color: #DCC5f4;
+    color: #633F86;
 }
 
 .currentPending {
     border-color: #b3801b;
-    background-color: #faf089;
-    color: #b3801b;
+    background-color: #FAF089;
+    color: #B3801B;
 }
 
 .vis-tooltip {

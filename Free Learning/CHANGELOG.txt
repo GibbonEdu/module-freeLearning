@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.20
+--------
+Added summary graph to Student UnitHistory table
+
 v5.16.19
 --------
 New Student Progress By Class report
