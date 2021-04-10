@@ -80,7 +80,7 @@ class UnitHistory
                         'position' => 'right',
                     ]
                 ])
-                ->setLabels([__m('Current - Pending')." (".$unitStats['Current - Pending'].")", __m('Current')." (".$unitStats['Current'].")", __m('Complete - Pending')." (".$unitStats['Complete - Pending'].")", __m('Evidence Not Yet Approved')." (".$unitStats['Evidence Not Yet Approved'].")", __m('Complete - Approved')." (".$unitStats['Complete - Approved'].")"])
+                ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
                 ->setColors(['#FAF089', '#FDE2FF', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
 
             $chart->addDataset('pie')
