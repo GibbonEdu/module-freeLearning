@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace Gibbon\Module\FreeLearning\Tables;
 
 use Gibbon\View\View;
+use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
@@ -56,6 +57,39 @@ class UnitHistory
         $table = !$summary
             ? DataTable::createPaginated('unitHistory', $criteria)->withData($units)
             : DataTable::create('unitHistory')->withData($units);
+
+        // Render chart
+        if (!$summary) {
+            echo "<h3>".__('Overview')."</h3>";
+
+            $unitStats = [
+                "Current - Pending" => 0,
+                "Current" => 0,
+                "Complete - Pending" => 0,
+                "Evidence Not Yet Approved" => 0,
+                "Complete - Approved" => 0
+            ];
+            foreach ($units as $unit) {
+                ++$unitStats[$unit['status']];
+            }
+
+            $chart = Chart::create('unitStats', 'doughnut')
+                ->setOptions([
+                    'height' => 80,
+                    'legend' => [
+                        'position' => 'right',
+                    ]
+                ])
+                ->setLabels([__m('Current - Pending')." (".$unitStats['Current - Pending'].")", __m('Current')." (".$unitStats['Current'].")", __m('Complete - Pending')." (".$unitStats['Complete - Pending'].")", __m('Evidence Not Yet Approved')." (".$unitStats['Evidence Not Yet Approved'].")", __m('Complete - Approved')." (".$unitStats['Complete - Approved'].")"])
+                ->setColors(['#FAF089', '#FDE2FF', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+
+            $chart->addDataset('pie')
+                ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
+
+            echo $chart->render();
+
+            echo "<h3>".__('Details')."</h3>";
+        }
 
         if (!$summary) {
             $table->modifyRows(function ($student, $row) {

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.14.22
+--------
+Added summary graph to Student UnitHistory table
+
 v5.14.21
 -------
 Fixed Learning Areas & Courses issue

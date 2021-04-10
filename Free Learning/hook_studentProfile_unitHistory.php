@@ -31,6 +31,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
     include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
+    $page->stylesheets->add('module-freeLearning', 'modules/Free Learning/css/module.css');
     $table = $container->get(UnitHistory::class)->create($gibbonPersonID);
     echo $table->getOutput();
 }

@@ -36,6 +36,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         //Proceed!
+        $page->scripts->add('chart');
+
         $page->breadcrumbs
              ->add(__m('Unit History By Student'));
 
@@ -91,7 +93,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
         $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
         $table = $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence);
-        $table->setTitle(__('Report Data'));
         echo $table->getOutput();
 
     }
