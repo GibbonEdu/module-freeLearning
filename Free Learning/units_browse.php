@@ -329,19 +329,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     ->addParam('name', $name)
                     ->addParam('freeLearningUnitID')
                     ->format(function ($unit, $actions) use ($highestAction, $viewingAsUser) {
-                        if ($highestAction == 'Browse Units_all' && !$viewingAsUser) {
-                            $actions->addAction('view', __('View'))
+                        $actions->addAction('view', __('View'))
                                 ->addParam('sidebar', 'true')
-                                ->addParam('showInactive', 'Y')
+                                ->addParam('showInactive', $highestAction == 'Browse Units_all' && !$viewingAsUser ? 'Y' : 'N')
                                 ->setURL('/modules/Free Learning/units_browse_details.php');
-                        }
-
-                        if (($highestAction == 'Browse Units_prerequisites' || $viewingAsUser) && ($unit['prerequisitesMet'] == 'Y' || empty($unit['prerequisites']))) {
-                            $actions->addAction('view', __('View'))
-                                ->addParam('sidebar', 'true')
-                                ->addParam('showInactive', 'Y')
-                                ->setURL('/modules/Free Learning/units_browse_details.php');
-                        }
                     });
 
                 echo $table->render($units);

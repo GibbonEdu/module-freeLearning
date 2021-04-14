@@ -1570,3 +1570,8 @@ INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`
 ++$count;
 $sql[$count][0] = '5.16.20';
 $sql[$count][1] = "";
+
+//v5.16.21
+++$count;
+$sql[$count][0] = '5.16.21';
+$sql[$count][1] = "";
