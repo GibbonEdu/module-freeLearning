@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.21
+--------
+Enable viewing basic unit details even if prerequisites are not met
+
 v5.16.20
 --------
 Added summary graph to Student UnitHistory table

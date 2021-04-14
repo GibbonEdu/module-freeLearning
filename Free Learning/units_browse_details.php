@@ -114,186 +114,179 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo '</div>';
                 }
 
-                $proceed = false;
+                $prerequisitesMet = false;
                 if ($highestAction == 'Browse Units_all') {
-                    $proceed = true;
+                    $prerequisitesMet = true;
                 } elseif ($highestAction == 'Browse Units_prerequisites') {
                     if ($values['freeLearningUnitIDPrerequisiteList'] == null or $values['freeLearningUnitIDPrerequisiteList'] == '') {
-                        $proceed = true;
+                        $prerequisitesMet = true;
                     } else {
                         $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
                         $prerequisitesMet = prerequisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
-                        if ($prerequisitesMet) {
-                            $proceed = true;
-                        }
                     }
                 }
 
-                if ($proceed == false) {
-                    echo "<div class='warning'>";
-                    echo __('You do not have access to this unit, as you have not yet met the prerequisites for it.', 'Free Learning');
+                //Let's go!
+                if ($canManage || $browseAll) {
+                    echo "<div class='linkTop'>";
+                    if ($canManage) {
+                        echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__('Edit')."<img style='margin: 0 0 -4px 3px' title='".__('Edit')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/config.png'/></a>";
+                    }
+                    if ($canManage & $browseAll) {
+                        echo " | ";
+                    }
+                    if ($browseAll) {
+                        echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__('Download')."<img style='margin: 0 0 -4px 3px' title='".__('Download')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/download.png'/></a> | ";
+
+                        echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_manageProcessBulk.php?action=Export&freeLearningUnitID=$freeLearningUnitID&name=".$values['name']."'>".__('Export')."<img style='margin: 0 0 -4px 3px' title='".__('Export')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/delivery2.png'/></a>";
+                    }
                     echo '</div>';
-                } else {
-                    //Let's go!
-                    if ($canManage || $browseAll) {
-                        echo "<div class='linkTop'>";
-                        if ($canManage) {
-                            echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__('Edit')."<img style='margin: 0 0 -4px 3px' title='".__('Edit')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/config.png'/></a>";
+                }
+
+                //Get enrolment Details
+                try {
+                    $dataEnrol = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbonPersonID);
+                    $sqlEnrol = 'SELECT freeLearningUnitStudent.*, gibbonPerson.surname, gibbonPerson.email, gibbonPerson.preferredName
+                        FROM freeLearningUnitStudent
+                        LEFT JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID)
+                        WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
+                            AND gibbonPersonIDStudent=:gibbonPersonID
+                            AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Yet Approved\')';
+                    $resultEnrol = $connection2->prepare($sqlEnrol);
+                    $resultEnrol->execute($dataEnrol);
+                } catch (PDOException $e) {
+                    echo "<div class='error'>".$e->getMessage().'</div>';
+                }
+
+                $rowEnrol = null;
+                if ($resultEnrol->rowCount()==1) { //ENROL NOW
+                    $rowEnrol = $resultEnrol->fetch() ;
+                }
+
+
+                // UNIT DETAILS TABLE
+                $table = DataTable::createDetails('unitDetails');
+
+                $table->addColumn('name', '')->addClass('text-lg font-bold');
+                $table->addColumn('time', __m('Time'))
+                    ->format(function ($values) use ($connection2, $freeLearningUnitID) {
+                        $output = '';
+                        $timing = null;
+                        $blocks = getBlocksArray($connection2, $freeLearningUnitID);
+                        if ($blocks != false) {
+                            foreach ($blocks as $block) {
+                                if ($block[0] == $values['freeLearningUnitID']) {
+                                    if (is_numeric($block[2])) {
+                                        $timing += $block[2];
+                                    }
+                                }
+                            }
                         }
-                        if ($canManage & $browseAll) {
-                            echo " | ";
+                        if (is_null($timing)) {
+                            $output = __('N/A');
+                        } else {
+                            $minutes = intval($timing);
+                            $relativeTime = __n('{count} min', '{count} mins', $minutes);
+                            if ($minutes > 60) {
+                                $hours = round($minutes / 60, 1);
+                                $relativeTime = Format::tooltip(__n('{count} hr', '{count} '.__m('hrs'), ceil($minutes / 60), ['count' => $hours]), $relativeTime);
+                            }
+
+                            $output = !empty($timing) ? $relativeTime : Format::small(__('N/A'));
                         }
-                        if ($browseAll) {
-                            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__('Download')."<img style='margin: 0 0 -4px 3px' title='".__('Download')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/download.png'/></a> | ";
 
-                            echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL')."/modules/Free Learning/units_manageProcessBulk.php?action=Export&freeLearningUnitID=$freeLearningUnitID&name=".$values['name']."'>".__('Export')."<img style='margin: 0 0 -4px 3px' title='".__('Export')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/delivery2.png'/></a>";
+                        return $output;
+                    });
+                $table->addColumn('logo', '')
+                    ->addClass('row-span-3 text-right')
+                    ->format(function ($values) use ($gibbon) {
+                        if ($values['logo'] == null) {
+                            return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
+                        } else {
+                            return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
                         }
-                        echo '</div>';
-                    }
+                    });
+                $table->addColumn('difficulty', __m('Difficulty'));
+                $table->addColumn('prerequisites', __m('Prerequisites'))
+                    ->format(function ($values) use ($connection2) {
+                        $output = '';
+                        $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
+                        if ($prerequisitesActive != false) {
+                            $prerequisites = explode(',', $prerequisitesActive);
+                            $units = getUnitsArray($connection2);
+                            foreach ($prerequisites as $prerequisite) {
+                                $output .= $units[$prerequisite][0].'<br/>';
+                            }
+                        } else {
+                            $output = __m('None');
+                        }
 
-                    //Get enrolment Details
-                    try {
-                        $dataEnrol = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbonPersonID);
-                        $sqlEnrol = 'SELECT freeLearningUnitStudent.*, gibbonPerson.surname, gibbonPerson.email, gibbonPerson.preferredName
-                            FROM freeLearningUnitStudent
-                            LEFT JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID)
-                            WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
-                                AND gibbonPersonIDStudent=:gibbonPersonID
-                                AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Yet Approved\')';
-                        $resultEnrol = $connection2->prepare($sqlEnrol);
-                        $resultEnrol->execute($dataEnrol);
-                    } catch (PDOException $e) {
-                        echo "<div class='error'>".$e->getMessage().'</div>';
-                    }
-
-                    $rowEnrol = null;
-                    if ($resultEnrol->rowCount()==1) { //ENROL NOW
-                        $rowEnrol = $resultEnrol->fetch() ;
-                    }
-
-
-                    // UNIT DETAILS TABLE
-                    $table = DataTable::createDetails('unitDetails');
-
-                    $table->addColumn('name', '')->addClass('text-lg font-bold');
-                    $table->addColumn('time', __m('Time'))
+                        return $output;
+                    });
+                $table->addColumn('departments', __('Departments'))
+                    ->format(function ($values) use ($connection2, $guid) {
+                        $output = '';
+                        $learningAreas = getLearningAreas($connection2, $guid);
+                        if ($learningAreas == '') {
+                            $output = __m('No Learning Areas available.');
+                        } else {
+                            for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
+                                if (is_numeric(strpos($values['gibbonDepartmentIDList'], $learningAreas[$i]))) {
+                                    $output .= __($learningAreas[($i + 1)]).'<br/>';
+                                }
+                            }
+                        }
+                        return $output;
+                    });
+                    $table->addColumn('authors', __m('Authors'))
                         ->format(function ($values) use ($connection2, $freeLearningUnitID) {
                             $output = '';
-                            $timing = null;
-                            $blocks = getBlocksArray($connection2, $freeLearningUnitID);
-                            if ($blocks != false) {
-                                foreach ($blocks as $block) {
-                                    if ($block[0] == $values['freeLearningUnitID']) {
-                                        if (is_numeric($block[2])) {
-                                            $timing += $block[2];
-                                        }
-                                    }
+                            $authors = getAuthorsArray($connection2, $freeLearningUnitID);
+                            foreach ($authors as $author) {
+                                if ($author[3] == '') {
+                                    $output .= $author[1].'<br/>';
+                                } else {
+                                    $output .= "<a target='_blank' href='".$author[3]."'>".$author[1].'</a><br/>';
                                 }
                             }
-                            if (is_null($timing)) {
-                                $output = __('N/A');
-                            } else {
-                                $minutes = intval($timing);
-                                $relativeTime = __n('{count} min', '{count} mins', $minutes);
-                                if ($minutes > 60) {
-                                    $hours = round($minutes / 60, 1);
-                                    $relativeTime = Format::tooltip(__n('{count} hr', '{count} '.__m('hrs'), ceil($minutes / 60), ['count' => $hours]), $relativeTime);
-                                }
-
-                                $output = !empty($timing) ? $relativeTime : Format::small(__('N/A'));
-                            }
-
                             return $output;
                         });
-                    $table->addColumn('logo', '')
-                        ->addClass('row-span-3 text-right')
-                        ->format(function ($values) use ($gibbon) {
-                            if ($values['logo'] == null) {
-                                return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
-                            } else {
-                                return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$values['logo']."'/><br/>";
-                            }
-                        });
-                    $table->addColumn('difficulty', __m('Difficulty'));
-                    $table->addColumn('prerequisites', __m('Prerequisites'))
-                        ->format(function ($values) use ($connection2) {
+
+                    $table->addColumn('groupings', __m('Groupings'))
+                        ->format(function ($values) use ($connection2, $freeLearningUnitID) {
                             $output = '';
-                            $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
-                            if ($prerequisitesActive != false) {
-                                $prerequisites = explode(',', $prerequisitesActive);
-                                $units = getUnitsArray($connection2);
-                                foreach ($prerequisites as $prerequisite) {
-                                    $output .= $units[$prerequisite][0].'<br/>';
-                                }
-                            } else {
-                                $output = __m('None');
-                            }
-
-                            return $output;
-                        });
-                    $table->addColumn('departments', __('Departments'))
-                        ->format(function ($values) use ($connection2, $guid) {
-                            $output = '';
-                            $learningAreas = getLearningAreas($connection2, $guid);
-                            if ($learningAreas == '') {
-                                $output = __m('No Learning Areas available.');
-                            } else {
-                                for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                                    if (is_numeric(strpos($values['gibbonDepartmentIDList'], $learningAreas[$i]))) {
-                                        $output .= __($learningAreas[($i + 1)]).'<br/>';
-                                    }
+                            $authors = getAuthorsArray($connection2, $freeLearningUnitID);
+                            if ($values['grouping'] != '') {
+                                $groupings = explode(',', $values['grouping']);
+                                foreach ($groupings as $grouping) {
+                                    $output .= ucwords($grouping).'<br/>';
                                 }
                             }
                             return $output;
                         });
-                        $table->addColumn('authors', __m('Authors'))
-                            ->format(function ($values) use ($connection2, $freeLearningUnitID) {
-                                $output = '';
-                                $authors = getAuthorsArray($connection2, $freeLearningUnitID);
-                                foreach ($authors as $author) {
-                                    if ($author[3] == '') {
-                                        $output .= $author[1].'<br/>';
-                                    } else {
-                                        $output .= "<a target='_blank' href='".$author[3]."'>".$author[1].'</a><br/>';
-                                    }
-                                }
-                                return $output;
-                            });
 
-                        $table->addColumn('groupings', __m('Groupings'))
-                            ->format(function ($values) use ($connection2, $freeLearningUnitID) {
-                                $output = '';
-                                $authors = getAuthorsArray($connection2, $freeLearningUnitID);
-                                if ($values['grouping'] != '') {
-                                    $groupings = explode(',', $values['grouping']);
-                                    foreach ($groupings as $grouping) {
-                                        $output .= ucwords($grouping).'<br/>';
-                                    }
-                                }
-                                return $output;
-                            });
+                    $table->addColumn('gibbonYearGroupIDMinimum', __m('Minimum Year Group'))
+                        ->format(function ($values) use ($guid, $connection2) {
+                            return getYearGroupsFromIDList($guid, $connection2, $values["gibbonYearGroupIDMinimum"]);
+                        });
 
-                        $table->addColumn('gibbonYearGroupIDMinimum', __m('Minimum Year Group'))
-                            ->format(function ($values) use ($guid, $connection2) {
-                                return getYearGroupsFromIDList($guid, $connection2, $values["gibbonYearGroupIDMinimum"]);
-                            });
-
-                    echo $table->render([$values]);
+                echo $table->render([$values]);
 
 
-                    $defaultTab = 2;
-                    if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php' && $roleCategory == 'Staff'))) {
-                        $defaultTab = 3;
-                    }
-                    if (isset($_GET['tab'])) {
-                        $defaultTab = $_GET['tab'];
-                    }
+                $defaultTab = 2;
+                if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php' && $roleCategory == 'Staff'))) {
+                    $defaultTab = 3;
+                }
+                if (isset($_GET['tab'])) {
+                    $defaultTab = $_GET['tab'];
+                }
 
-                    echo "<div id='tabs' style='margin: 20px 0'>";
-                    //Tab links
-                    echo '<ul>';
-                    echo "<li><a href='#tabs0'>".__('Unit Overview', 'Free Learning').'</a></li>';
-                    echo "<li><a href='#tabs1'>".__('Enrol', 'Free Learning').'</a></li>';
+                echo "<div id='tabs' style='margin: 20px 0'>";
+                //Tab links
+                echo '<ul>';
+                echo "<li><a href='#tabs0'>".__('Unit Overview', 'Free Learning').'</a></li>';
+                echo "<li><a href='#tabs1'>".__('Enrol', 'Free Learning').'</a></li>';
+                if ($prerequisitesMet) {
                     if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php' && $roleCategory == 'Staff'))) {
                         echo "<li><a href='#tabs2'>".__('Manage Enrolment', 'Free Learning').'</a></li>';
                     }
@@ -301,33 +294,40 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo "<li><a href='#tabs4'>".__('Resources', 'Free Learning').'</a></li>';
                     echo "<li><a href='#tabs5'>".__('Outcomes', 'Free Learning').'</a></li>';
                     echo "<li><a href='#tabs6'>".__('Exemplar Work', 'Free Learning').'</a></li>';
-                    echo '</ul>';
+                }
+                echo '</ul>';
 
-                    //Tabs
-                    echo "<div id='tabs0'>";
+                //Tabs
+                echo "<div id='tabs0'>";
+                echo '<h3>';
+                echo __('Blurb', 'Free Learning');
+                echo '</h3>';
+                echo '<p>';
+                echo $values['blurb'];
+                echo '</p>';
+                if ($values['license'] != '') {
+                    echo '<h4>';
+                    echo __('License', 'Free Learning');
+                    echo '</h4>';
+                    echo '<p>';
+                    echo __('This work is shared under the following license:', 'Free Learning').' '.$values['license'];
+                    echo '</p>';
+                }
+                if ($values['outline'] != '') {
                     echo '<h3>';
-                    echo __('Blurb', 'Free Learning');
+                    echo 'Outline';
                     echo '</h3>';
                     echo '<p>';
-                    echo $values['blurb'];
+                    echo $values['outline'];
                     echo '</p>';
-                    if ($values['license'] != '') {
-                        echo '<h4>';
-                        echo __('License', 'Free Learning');
-                        echo '</h4>';
-                        echo '<p>';
-                        echo __('This work is shared under the following license:', 'Free Learning').' '.$values['license'];
-                        echo '</p>';
-                    }
-                    if ($values['outline'] != '') {
-                        echo '<h3>';
-                        echo 'Outline';
-                        echo '</h3>';
-                        echo '<p>';
-                        echo $values['outline'];
-                        echo '</p>';
-                    }
+                }
+                echo '</div>';
+
+                if (!$prerequisitesMet) {
+                    echo "<div id='tabs1'>";
+                    echo Format::alert(__('You do not have access to this unit, as you have not yet met the prerequisites for it.', 'Free Learning'), 'warning');
                     echo '</div>';
+                } else {
 
                     echo "<div id='tabs1'>";
                         //Enrolment screen spun into separate file for ease of coding
@@ -802,20 +802,22 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                     }
                     echo '</div>';
-                    echo '</div>';
 
-                    echo "<script type='text/javascript'>
-                        $( \"#tabs\" ).tabs({
-                                active: $defaultTab,
-                                ajaxOptions: {
-                                    error: function( xhr, status, index, anchor ) {
-                                        $( anchor.hash ).html(
-                                            \"Couldn't load this tab.\" );
-                                    }
-                                }
-                            });
-                    </script>";
                 }
+                echo '</div>';
+
+                echo "<script type='text/javascript'>
+                    $( \"#tabs\" ).tabs({
+                            active: $defaultTab,
+                            ajaxOptions: {
+                                error: function( xhr, status, index, anchor ) {
+                                    $( anchor.hash ).html(
+                                        \"Couldn't load this tab.\" );
+                                }
+                            }
+                        });
+                </script>";
+                
             }
         }
     }
