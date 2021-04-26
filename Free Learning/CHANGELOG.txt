@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.22
+--------
+Made My Unit History available to roles with category Other
+
 v5.16.21
 --------
 Enable viewing basic unit details even if prerequisites are not met

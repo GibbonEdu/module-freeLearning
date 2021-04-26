@@ -1575,3 +1575,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.16.21';
 $sql[$count][1] = "";
+
+//v5.16.22
+++$count;
+$sql[$count][0] = '5.16.22';
+$sql[$count][1] = "
+UPDATE gibbonAction SET categoryPermissionOther='Y' WHERE name='My Unit History' AND gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning');end
+";
