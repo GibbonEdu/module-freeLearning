@@ -1582,3 +1582,8 @@ $sql[$count][0] = '5.16.22';
 $sql[$count][1] = "
 UPDATE gibbonAction SET categoryPermissionOther='Y' WHERE name='My Unit History' AND gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning');end
 ";
+
+//v5.16.23
+++$count;
+$sql[$count][0] = '5.16.23';
+$sql[$count][1] = "";
