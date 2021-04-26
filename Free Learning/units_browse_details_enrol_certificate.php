@@ -52,7 +52,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             try {
                 $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
-                $sql = "SELECT freeLearningUnit.name, officialName, surname, preferredName, (SELECT sum(length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) AS length, timestampCompleteApproved
+                $sql = "SELECT freeLearningUnitStudent.freeLearningUnitStudentID, freeLearningUnit.name, freeLearningUnit.blurb, officialName, surname, preferredName, firstName, (SELECT sum(length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) AS length, timestampCompleteApproved
                     FROM freeLearningUnit
                         JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                         JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
@@ -76,12 +76,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $certificateTemplate = $settingGateway->getSettingByScope('Free Learning', 'certificateTemplate');
                 $template = $container->get('twig')->createTemplate($certificateTemplate);
                 $output = $template->render([
+                    'freeLearningUnitStudentID' => $row['freeLearningUnitStudentID'],
                     'officialName'     => $row['officialName'],
                     'preferredName'    => $row['preferredName'],
+                    'firstName'        => $row['firstName'],
                     'surname'          => $row['surname'],
                     'unitName'         => $row['name'],
+                    'unitBlurb'        => $row['blurb'],
                     'length'           => $row['length'],
                     'dateComplete'     => Format::date($row['timestampCompleteApproved']),
+                    'dateCompleteYMD'  => $row['timestampCompleteApproved'],
                     'organisationName' => $gibbon->session->get('organisationName'),
                     'organisationLogo' => $gibbon->session->get('organisationLogo'),
                 ]);
@@ -108,7 +112,7 @@ $config = [
     'shrink_tables_to_fit' => 0,
     'defaultPagebreakType' => 'cloneall',
 
-    'default_font' => 'helvetica',
+    'default_font' => 'DejaVuSans',
 ];
 
 $pdf = new Mpdf($config);
