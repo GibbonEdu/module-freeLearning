@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.24
+--------
+Add additional filter options to the UnitGateway
+
 v5.16.23
 --------
 Add additional variables to the certificate template

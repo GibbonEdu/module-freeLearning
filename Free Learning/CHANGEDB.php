@@ -1587,3 +1587,8 @@ UPDATE gibbonAction SET categoryPermissionOther='Y' WHERE name='My Unit History'
 ++$count;
 $sql[$count][0] = '5.16.23';
 $sql[$count][1] = "";
+
+//v5.16.24
+++$count;
+$sql[$count][0] = '5.16.24';
+$sql[$count][1] = "";

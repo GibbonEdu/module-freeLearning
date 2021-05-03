@@ -274,6 +274,17 @@ class UnitGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
+    public function selectCoursesByStudent($gibbonPersonID)
+    {
+        $data = ['gibbonPersonID' => $gibbonPersonID];
+        $sql = "SELECT freeLearningUnit.course FROM freeLearningUnitStudent
+                JOIN freeLearningUnit ON (freeLearningUnit.freeLearningUnitID=freeLearningUnitStudent.freeLearningUnitID)
+                WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID
+                GROUP BY freeLearningUnit.course";
+
+        return $this->db()->select($sql, $data);
+    }
+
     protected function getSharedFilterRules()
     {
         return [
@@ -287,6 +298,12 @@ class UnitGateway extends QueryableGateway
                 return $query
                     ->where('(FIND_IN_SET(:department, freeLearningUnit.gibbonDepartmentIDList) OR course = :department)')
                     ->bindValue('department', $department);
+            },
+            'course' => function ($query, $course) {
+                $course = is_array($course) ? implode(',', $course) : $course;
+                return $query
+                    ->where("FIND_IN_SET(freeLearningUnit.course, :course) AND freeLearningUnit.course <> ''")
+                    ->bindValue('course', $course);
             },
             'difficulty' => function ($query, $difficulty) {
                 return $query
