@@ -20,11 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
+use Gibbon\Forms\Prefab\BulkActionForm;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 // Module includes
-include './modules/Free Learning/moduleFunctions.php';
+require_once __DIR__ . '/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mentorshipOverview.php")==FALSE) {
     // Access denied
@@ -72,6 +73,12 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         echo $form->getOutput();
     }
 
+    $form = BulkActionForm::create('bulkAction', $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/report_mentorshipOverviewProcessBulk.php');
+
+    $bulkActions = ['Approve' => __('Approve')];
+    $col = $form->createBulkActionColumn($bulkActions);
+        $col->addSubmit(__('Go'));
+
     // DATA TABLE
     $unitGateway = $container->get(UnitGateway::class);
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
@@ -84,7 +91,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $collaborationKeys = [];
 
-    $table = DataTable::createPaginated('mentorship', $criteria);
+    $table = $form->addRow()->addDataTable('mentorship', $criteria)->withData($mentorship);
     $table->setTitle(__('Data'));
 
     $table->modifyRows(function ($student, $row) {
@@ -96,6 +103,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         if ($student['status'] == 'Exempt') $row->addClass('success');
         return $row;
     });
+
+    $table->addMetaData('bulkActions', $col);
 
     $table->addMetaData('filterOptions', [
         'status:Current - Pending'         => __('Status').': '.__m('Current - Pending'),
@@ -203,5 +212,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
         });
 
-    echo $table->render($mentorship);
+    $table->addCheckboxColumn('freeLearningUnitStudentID')
+        ->format(function ($values) {
+            if ($values['status'] != 'Current - Pending') return ' ';
+        });
+
+    echo $form->getOutput();
 }

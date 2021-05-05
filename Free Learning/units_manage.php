@@ -87,7 +87,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $units = $unitGateway->queryUnitsByLearningAreaStaff($criteria, $gibbon->session->get('gibbonPersonID'));
         }
 
-
         $form = BulkActionForm::create('bulkAction', $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/units_manageProcessBulk.php');
 
         $bulkActions = ['Export' => __('Export'), 'Duplicate' => __('Duplicate')];

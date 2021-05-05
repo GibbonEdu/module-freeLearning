@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.25
+--------
+Added bulk mentor request approval via Mentorship Overview
+
 v5.16.24
 --------
 Add additional filter options to the UnitGateway
