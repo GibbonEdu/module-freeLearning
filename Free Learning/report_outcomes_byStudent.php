@@ -43,7 +43,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 
     $row = $form->addRow();
         $row->addLabel('gibbonPersonID', __('Student'));
-        $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), array("allStudents" => false, "byName" => true, "byRoll" => true))->required()->placeholder()->selected($gibbonPersonID);
+        $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), array("allStudents" => false, "byName" => true, "byForm" => true))->required()->placeholder()->selected($gibbonPersonID);
 
     $row = $form->addRow();
         $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
@@ -62,7 +62,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
         $gibbonYearGroupIDWhere = '';
         try {
             $data = array('gibbonPersonID' => $gibbonPersonID);
-            $sql = 'SELECT gibbonRollGroup.name AS rollGroup, gibbonSchoolYear.name AS schoolYear, gibbonStudentEnrolment.gibbonYearGroupID FROM gibbonStudentEnrolment JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) JOIN gibbonSchoolYear ON (gibbonStudentEnrolment.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) WHERE gibbonPersonID=:gibbonPersonID ORDER BY gibbonStudentEnrolment.gibbonSchoolYearID';
+            $sql = 'SELECT gibbonFormGroup.name AS formGroup, gibbonSchoolYear.name AS schoolYear, gibbonStudentEnrolment.gibbonYearGroupID FROM gibbonStudentEnrolment JOIN gibbonFormGroup ON (gibbonStudentEnrolment.gibbonFormGroupID=gibbonFormGroup.gibbonFormGroupID) JOIN gibbonSchoolYear ON (gibbonStudentEnrolment.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) WHERE gibbonPersonID=:gibbonPersonID ORDER BY gibbonStudentEnrolment.gibbonSchoolYearID';
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) {

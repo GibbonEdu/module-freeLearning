@@ -55,7 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         if ($highestAction == 'Unit History By Student_all') {
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __('Person'));
-                $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), ['allStudents' => false, 'byName' => true, 'byRoll' => true])
+                $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), ['allStudents' => false, 'byName' => true, 'byForm' => true])
                     ->required()
                     ->placeholder()
                     ->selected($gibbonPersonID);

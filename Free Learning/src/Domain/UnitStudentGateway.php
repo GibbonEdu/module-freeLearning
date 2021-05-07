@@ -479,10 +479,10 @@ class UnitStudentGateway extends QueryableGateway
     {
         if ($roleCategory == 'Student') {
             $data = ['gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbonPersonID, 'gibbonYearGroupIDMinimum' => $params['gibbonYearGroupIDMinimum'], 'prerequisiteList' => $params['freeLearningUnitIDPrerequisiteList'], 'prerequisiteCount' => $prerequisiteCount, 'freeLearningUnitID' => $params['freeLearningUnitID']];
-            $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonRollGroup.name AS rollGroup, prerequisites.count, currentUnit.completed
+            $sql = "SELECT gibbonPerson.gibbonPersonID, preferredName, surname, gibbonFormGroup.name AS FormGroup, prerequisites.count, currentUnit.completed
             FROM gibbonPerson
             JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=gibbonPerson.gibbonPersonID)
-            JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID)
+            JOIN gibbonFormGroup ON (gibbonStudentEnrolment.gibbonFormGroupID=gibbonFormGroup.gibbonFormGroupID)
             LEFT JOIN (
                 SELECT COUNT(*) as count, freeLearningUnitStudent.gibbonPersonIDStudent
                 FROM freeLearningUnitStudent
