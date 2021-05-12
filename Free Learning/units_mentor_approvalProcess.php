@@ -62,6 +62,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
         $gibbonPersonIDStudent = $values['gibbonPersonIDStudent'] ?? '';
         $commentApproval = $_POST['commentApproval'] ?? '';
         $commentApproval = trim(preg_replace('/^<p>|<\/p>$/i', '', $commentApproval));
+        $badgesBadgeID = $_POST['badgesBadgeID'] ?? '';
 
         //Validation
         if ($commentApproval == '') {
@@ -126,6 +127,17 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                     $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                     setNotification($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
                     grantBadges($connection2, $guid, $collaborator['gibbonPersonIDStudent']);
+                }
+
+                // Deal with manually granted badges
+                $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
+                if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !is_null($badgesBadgeID)) {
+                    foreach ($collaborators as $collaborator) {
+                        $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $collaborator['gibbonPersonIDStudent'], 'comment' => '', 'gibbonPersonIDCreator' => $gibbon->session->get('gibbonPersonID',''));
+                        $sql = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
+                        $result = $connection2->prepare($sql);
+                        $result->execute($data);
+                    }
                 }
 
                 $URL .= '&return=success0';

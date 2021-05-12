@@ -164,6 +164,17 @@ if (!$block) {
                 $row->addLabel('status', __('Status'));
                 $row->addSelect('status')->fromArray($statuses)->required()->placeholder()->selected($values['status']);
 
+            $form->toggleVisibilityByClass('approved')->onSelect('status')->when('Complete - Approved');
+            
+            $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
+            if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
+                $data = [];
+                $sql = "SELECT badgesBadgeID as value, name FROM badgesBadge WHERE active='Y' ORDER BY name";
+                $row = $form->addRow()->addClass('approved');
+                    $row->addLabel('badgesBadgeID', __m('Badge'))->description(__m('Manually grant a badge'));
+                    $row->addSelect('badgesBadgeID')->fromQuery($pdo, $sql, $data)->placeholder();
+            }
+
             $row = $form->addRow();
                 $row->addFooter();
                 $row->addSubmit();

@@ -14,7 +14,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
@@ -24,16 +24,16 @@ use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
-// Module includes
+//  Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
-    // Access denied
+    //  Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
-    // Get action with highest precedence
+    //  Get action with highest precedence
     $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
@@ -43,7 +43,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
     $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') && $highestAction == 'Browse Units_all';
 
-    // Get params
+    //  Get params
     $freeLearningUnitStudentID = $_GET['freeLearningUnitStudentID'] ?? '';
     $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
     $gibbonPersonID = $canManage && !empty($_GET['gibbonPersonID'])
@@ -75,13 +75,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         returnProcess($guid, $_GET['return'], null, null);
     }
 
-    // Check that the required values are present
+    //  Check that the required values are present
     if (empty($freeLearningUnitID) || empty($freeLearningUnitStudentID)) {
         $page->addError(__('You have not specified one or more required parameters.'));
         return;
     }
 
-    // Check that the record exists
+    //  Check that the record exists
     $values = $unitStudentGateway->getUnitStudentDetailsByID($freeLearningUnitID, null, $freeLearningUnitStudentID);
     if (empty($values)) {
         $page->addError(__('The selected record does not exist, or you do not have access to it.'));
@@ -92,7 +92,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $values['departments'] = $unitGateway->selectUnitDepartmentsByID($freeLearningUnitID)->fetchAll(PDO::FETCH_COLUMN, 0);
 
     $proceed = false;
-    //Check to see if we have access to manage all enrolments, or only those belonging to ourselves
+    // Check to see if we have access to manage all enrolments, or only those belonging to ourselves
     $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/enrolment_manage.php', 'Manage Enrolment_all');
     if ($manageAll == true) {
         $proceed = true;
@@ -110,8 +110,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
     }
 
-    //Check to see if class is in one teacher teachers
-    if ($values['enrolmentMethod'] == 'class') { //Is teacher of this class?
+    // Check to see if class is in one teacher teachers
+    if ($values['enrolmentMethod'] == 'class') { // Is teacher of this class?
         try {
             $dataClasses = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'gibbonCourseClassID' => $values['gibbonCourseClassID']);
             $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClass.gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
@@ -128,7 +128,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         return;
     }
 
-    // DETAILS TABLE
+    //  DETAILS TABLE
     $table = DataTable::createDetails('personal');
     $table->addHeaderAction('edit', __('Edit'))
         ->setURL('/modules/Free Learning/units_manage_edit.php')
@@ -157,7 +157,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         JOIN gibbonModule ON (gibbonModule.gibbonModuleID=gibbonHook.gibbonModuleID)
         WHERE gibbonModule.name='Free Learning' AND gibbonHook.type='Student Profile'");
 
-    // COMMENT FORM
+    //  COMMENT FORM
     $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
     $form->setClass('blank');
 
@@ -165,7 +165,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
     $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
 
-    // DISCUSSION
+    //  DISCUSSION
     $logs = $unitStudentGateway->selectUnitStudentDiscussion($freeLearningUnitStudentID)->fetchAll();
 
     $logs = array_map(function ($item) {
@@ -185,7 +185,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         'discussion' => $logs
     ]));
 
-    // ADD COMMENT
+    //  ADD COMMENT
     $commentBox = $form->getFactory()->createColumn()->addClass('flex flex-col');
     $commentBox->addTextArea('addComment')
         ->placeholder(__m('Leave a comment'))
@@ -206,12 +206,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     echo $form->getOutput();
 
-    // Not ready for approval
+    //  Not ready for approval
     if ($values['status'] == 'Current' || $values['status'] == 'Evidence Not Yet Approved') {
         return;
     }
 
-    // FORM
+    //  FORM
     $form = Form::create('approval', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_approvalProcess.php?'.http_build_query($urlParams));
     $form->setTitle(__m('Unit Complete Approval'));
     $form->setDescription($alert.'<p>'.__m('Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.').'</p>');
@@ -260,9 +260,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $row->addLabel('status', __('Status'));
         $row->addSelect('status')->fromArray($statuses)->required()->placeholder()->selected($values['status']);
 
-    $form->toggleVisibilityByClass('exemplar')->onSelect('status')->when('Complete - Approved');
+    $form->toggleVisibilityByClass('approved')->onSelect('status')->when('Complete - Approved');
 
-    $row = $form->addRow()->addClass('exemplar');
+    $row = $form->addRow()->addClass('approved');
         $row->addLabel('exemplarWork', __m('Exemplar Work'))->description(__m('Work and comments will be made viewable to other users.'));
         $row->addYesNo('exemplarWork')->required()->selected($values['exemplarWork'] ?? 'N');
 
@@ -281,6 +281,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $row = $form->addRow()->addClass('exemplarYes');
         $row->addLabel('exemplarWorkEmbed', __m('Exemplar Work Embed'))->description(__m('Include embed code, otherwise link to work will be used.'));
         $row->addTextField('exemplarWorkEmbed')->maxLength(255)->setValue($values['exemplarWorkEmbed']);
+
+    $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
+    if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
+        $data = [];
+        $sql = "SELECT badgesBadgeID as value, name FROM badgesBadge WHERE active='Y' ORDER BY name";
+        $row = $form->addRow()->addClass('approved');
+            $row->addLabel('badgesBadgeID', __m('Badge'))->description(__m('Manually grant a badge'));
+            $row->addSelect('badgesBadgeID')->fromQuery($pdo, $sql, $data)->placeholder();
+    }
 
     $row = $form->addRow();
         $row->addFooter();

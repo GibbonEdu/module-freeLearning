@@ -1602,3 +1602,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.16.26';
 $sql[$count][1] = "";
+
+//v5.16.27
+++$count;
+$sql[$count][0] = '5.16.27';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableManualBadges', 'Enable Manual Badges', 'Allow badges to be granted by hand during unit approval?', 'N');end
+";

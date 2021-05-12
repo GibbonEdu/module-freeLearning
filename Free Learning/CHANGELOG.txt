@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.16.27
+--------
+Added an option (off by default) to allow badges to be manually granted during approval
+Fixed bug preventing authors without website from being added
+
 v5.16.26
 --------
 Change Roll Groups to Form Groups, requires v22.0.00

@@ -101,7 +101,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $AI = str_pad($inserted, 10, '0', STR_PAD_LEFT);
 
                 // Write author to database
-                $data = array('freeLearningUnitID' => $AI, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'surname' => $gibbon->session->get('surname'), 'preferredName' => $gibbon->session->get('preferredName'), 'website' => $gibbon->session->get('website'));
+                $data = array('freeLearningUnitID' => $AI, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'surname' => $gibbon->session->get('surname'), 'preferredName' => $gibbon->session->get('preferredName'), 'website' => $gibbon->session->get('website') ?? '');
                 $sql = 'INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website';
 
                 $inserted = $pdo->insert($sql, $data);
