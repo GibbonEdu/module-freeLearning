@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.28
+--------
+Improved Mentor Overview report
+
 v5.16.27
 --------
 Added an option (off by default) to allow badges to be manually granted during approval

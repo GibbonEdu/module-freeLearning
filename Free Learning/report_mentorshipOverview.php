@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Forms\Prefab\BulkActionForm;
@@ -43,18 +44,21 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     // Check for custom field
     $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
 
-    print '<p>';
-        print __m('This report shows all units for which your mentorship has been requested.');
-    print '<p>';
-
     // Filter
     $allMentors = !empty($_GET['allMentors']) && $highestAction == 'Mentorship Overview_all'
         ? $_GET['allMentors']
         : '';
 
-    $gibbonPersonID = !empty($_GET['gibbonPersonID']) && $highestAction == 'Mentorship Overview_all'
-        ? $_GET['gibbonPersonID']
-        : $gibbon->session->get('gibbonPersonID');
+    if ($highestAction == 'Mentorship Overview_all' && $allMentors == "on") {
+        $gibbonPersonID = null;
+    }
+    else if ($highestAction == 'Mentorship Overview_all' && !empty($_GET['gibbonPersonIDSchoolMentor'])) {
+        $gibbonPersonID = $_GET['gibbonPersonIDSchoolMentor'];
+    }
+    else {
+        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+    }
+
 
     if ($highestAction == 'Mentorship Overview_all') {
         $form = Form::create('search', $gibbon->session->get('absoluteURL').'/index.php', 'get');
@@ -66,6 +70,14 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'));
             $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
+
+        $form->toggleVisibilityByClass('mentor')->onCheckbox('allMentors')->whenNot('on');
+
+        $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
+        $sql = "SELECT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name FROM gibbonPerson JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
+        $row = $form->addRow()->addClass('mentor');
+            $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'))->description(!empty($mentorGroups) ? __m('Mentors based on your assigned mentor groups.') : '');
+            $row->addSelectPerson('gibbonPersonIDSchoolMentor')->fromQuery($pdo, $sql, $data)->placeholder()->selected($gibbonPersonID);
 
         $row = $form->addRow();
             $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
@@ -89,10 +101,51 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $mentorship = $unitStudentGateway->queryMentorship($criteria, $gibbon->session->get('gibbonSchoolYearID'), !empty($allMentors) ? null : $gibbonPersonID);
 
+    // Render chart
+    $page->scripts->add('chart');
+
+    echo "<h3>".__('Overview')."</h3>";
+
+    $unitStats = [
+        "Current - Pending" => 0,
+        "Current" => 0,
+        "Complete - Pending" => 0,
+        "Evidence Not Yet Approved" => 0,
+        "Complete - Approved" => 0
+    ];
+    $unitsComplete = 0;
+    $unitsCompleteWaitTime = 0;
+    foreach ($mentorship as $unit) {
+        $unitStats[$unit['status']] ++;
+        if ($unit['status'] == "Complete - Approved") {
+            $unitsComplete ++;
+            $unitsCompleteWaitTime += $unit['waitInDays'];
+        }
+    }
+
+    $chart = Chart::create('unitStats', 'doughnut')
+        ->setOptions([
+            'height' => 80,
+            'legend' => [
+                'position' => 'right',
+            ]
+        ])
+        ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
+        ->setColors(['#FAF089', '#FDE2FF', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+
+    $chart->addDataset('pie')
+        ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
+
+    echo $chart->render();
+
+    if ($unitsComplete > 0 ){
+        echo "<hr class='mt-4 mb-4'/><div class='w-auto'><p class='text-center'>".__("Mean Wait Time (In Days)").": <b>".number_format($unitsCompleteWaitTime/$unitsComplete, 1)."</b></p></div>";
+    }
+
     $collaborationKeys = [];
 
     $table = $form->addRow()->addDataTable('mentorship', $criteria)->withData($mentorship);
-    $table->setTitle(__('Data'));
+    $table->setTitle(__('Details'));
 
     $table->modifyRows(function ($student, $row) {
         if ($student['status'] == 'Current - Pending') $row->addClass('currentPending');
@@ -188,6 +241,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $table->addColumn('timestamp', __('When'))
         ->format(Format::using('relativeTime', 'timestamp'));
+
+    $table->addColumn('waitInDays', __('Wait Time'))
+        ->description(__m('In Days'));
+
 
     // ACTIONS
     $table->addActionColumn()
