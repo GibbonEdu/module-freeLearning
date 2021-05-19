@@ -1614,3 +1614,8 @@ INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,
 ++$count;
 $sql[$count][0] = '5.16.28';
 $sql[$count][1] = "";
+
+//v5.16.29
+++$count;
+$sql[$count][0] = '5.16.29';
+$sql[$count][1] = "";

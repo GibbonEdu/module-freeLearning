@@ -274,7 +274,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
 
                 $defaultTab = 2;
-                if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php' && $roleCategory == 'Staff'))) {
+                if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') && $roleCategory == 'Staff')) {
                     $defaultTab = 3;
                 }
                 if (isset($_GET['tab'])) {
@@ -287,7 +287,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo "<li><a href='#tabs0'>".__('Unit Overview', 'Free Learning').'</a></li>';
                 echo "<li><a href='#tabs1'>".__('Enrol', 'Free Learning').'</a></li>';
                 if ($prerequisitesMet) {
-                    if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php' && $roleCategory == 'Staff'))) {
+                    if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') && $roleCategory == 'Staff')) {
                         echo "<li><a href='#tabs2'>".__('Manage Enrolment', 'Free Learning').'</a></li>';
                     }
                     echo "<li><a href='#tabs3'>".__('Content', 'Free Learning').'</a></li>';
@@ -334,7 +334,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         include './modules/Free Learning/units_browse_details_enrol.php';
                     echo '</div>';
 
-                    if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php' && $roleCategory == 'Staff'))) {
+                    if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') && $roleCategory == 'Staff')) {
                         echo "<div id='tabs2'>";
                             //Check to see if we have access to manage all enrolments, or only those belonging to ourselves
                             $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/enrolment_manage.php', 'Manage Enrolment_all');
@@ -420,7 +420,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         $item['comment'] = Format::hyperlinkAll($item['comment']);
                                         return $item;
                                     }, $logs);
-                                    
+
                                     return $page->fetchFromTemplate('ui/discussion.twig.html', [
                                         'discussion' => $logs
                                     ]);
@@ -715,7 +715,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             });
 
                         echo $table->render($outcomes);
-
                     echo '</div>';
                     echo "<div id='tabs6'>";
                         //Spit out exemplar work
@@ -817,7 +816,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             }
                         });
                 </script>";
-                
+
             }
         }
     }

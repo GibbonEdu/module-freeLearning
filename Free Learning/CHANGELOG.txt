@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.29
+--------
+Manage Enrolment Bug Fix
+
 v5.16.28
 --------
 Improved Mentor Overview report
