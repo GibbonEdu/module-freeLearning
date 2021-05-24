@@ -122,7 +122,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
 
         $row = $form->addRow();
-            $row->addLabel('name', __('Name'));
+            $row->addLabel('name', __m('Unit Name'));
             $row->addTextField('name')->setValue($criteria->getSearchText());
 
         if ($canManage) {
@@ -233,7 +233,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     return $row;
                 });
 
-                $table->addColumn('name', __('Name'))
+                $table->addColumn('name', __m('Unit Name'))
                     ->description(__('Status'))
                     ->context('primary')
                     ->width('15%')

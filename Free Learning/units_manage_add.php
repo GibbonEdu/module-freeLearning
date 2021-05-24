@@ -69,7 +69,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $form->addRow()->addHeading(__m('Unit Basics'));
 
         $row = $form->addRow();
-            $row->addLabel('name', __('Name'));
+            $row->addLabel('name', __m('Unit Name'));
             $row->addTextField('name')->maxLength(40)->required();
 
         $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');

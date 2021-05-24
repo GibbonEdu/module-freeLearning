@@ -72,7 +72,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
 
         $row = $form->addRow();
-            $row->addLabel('name', __('Name'));
+            $row->addLabel('name', __m('Unit Name'));
             $row->addTextField('name')->setValue($criteria->getSearchText());
 
         $row = $form->addRow();
@@ -125,7 +125,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             'access:other'    => __m('Available To Other'),
         ]);
 
-        $table->addColumn('name', __('Name'))
+        $table->addColumn('name', __m('Unit Name'))
             ->format(function ($unit) {
                 $output = $unit["name"];
                 $output .= $unit["editLock"] == "Y" ? Format::tag(__('Locked'), 'dull ml-2') : '';
