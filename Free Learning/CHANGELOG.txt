@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.31
+--------
+Fixed bug preventing addition of authors on Major Edit
+
 v5.16.30
 --------
 Changed "Name" to "Unit Name" in Brows and Manage Units

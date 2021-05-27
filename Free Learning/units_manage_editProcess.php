@@ -156,7 +156,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         }
                         if ($result->rowCount() < 1) {
                             try {
-                                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'surname' => $gibbon->session->get('surname'), 'preferredName' => $gibbon->session->get('preferredName'), 'website' => $gibbon->session->get('website'));
+                                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'surname' => $gibbon->session->get('surname'), 'preferredName' => $gibbon->session->get('preferredName'), 'website' => $gibbon->session->get('website') ?? '');
                                 $sql = 'INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website';
                                 $result = $connection2->prepare($sql);
                                 $result->execute($data);
@@ -266,7 +266,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             $resultRemove = $connection2->prepare($sqlRemove);
                             $resultRemove->execute($dataRemove);
                         } catch (PDOException $e) {
-                            echo $e->getMessage();
                             $partialFail = true;
                         }
                     }
