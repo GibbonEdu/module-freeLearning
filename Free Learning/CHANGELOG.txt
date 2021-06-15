@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.32
+--------
+Refactored session variables and null coalesce
+
 v5.16.31
 --------
 Fixed bug preventing addition of authors on Major Edit
