@@ -47,7 +47,7 @@ if ($canManage and isset($_GET['gibbonPersonID'])) {
     $gibbonPersonID = $_GET['gibbonPersonID'];
 }
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&gibbonPersonID='.$gibbonPersonID.'&sidebar=true&tab=2&view='.$view;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&gibbonPersonID='.$gibbonPersonID.'&sidebar=true&tab=2&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
     // Fail 0
@@ -59,10 +59,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
-        $freeLearningUnitID = $_POST['freeLearningUnitID'];
-        $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'];
+        $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
+        $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';
 
         if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
             // Fail 3
@@ -113,7 +113,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 // Check to see if class is in one teacher teachers
                 if ($row['enrolmentMethod'] == 'class') { // Is teacher of this class?
                     try {
-                        $dataClasses = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'gibbonCourseClassID' => $row['gibbonCourseClassID']);
+                        $dataClasses = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $session->get('gibbonPersonID'), 'gibbonCourseClassID' => $row['gibbonCourseClassID']);
                         $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClass.gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
                         $resultClasses = $connection2->prepare($sqlClasses);
                         $resultClasses->execute($dataClasses);
@@ -126,7 +126,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 // Check to see if we are a mentor of this student
                 if ($row['enrolmentMethod'] == 'schoolMentor') { // Is teacher of this class?
                     try {
-                        $dataMentor = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                        $dataMentor = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
                         $sqlMentor = "SELECT freeLearningUnitStudentID FROM freeLearningUnitStudent WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID AND enrolmentMethod='schoolMentor' AND gibbonPersonIDSchoolMentor=:gibbonPersonID";
                         $resultMentor = $connection2->prepare($sqlMentor);
                         $resultMentor->execute($dataMentor);
@@ -142,10 +142,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     header("Location: {$URL}");
                 } else {
                     // Get Inputs
-                    $status = $_POST['status'];
+                    $status = $_POST['status'] ?? '';
 
                     // Get the comment and strip the wrapping paragraph tags
-                    $commentApproval = $_POST['commentApproval'];
+                    $commentApproval = $_POST['commentApproval'] ?? '';
                     $commentApproval = trim(preg_replace('/^<p>|<\/p>$/i', '', $commentApproval));
 
                     $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'];
@@ -173,7 +173,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 'foreignTable'         => 'freeLearningUnitStudent',
                                 'foreignTableID'       => $freeLearningUnitStudentID,
                                 'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
-                                'gibbonPersonID'       => $gibbon->session->get('gibbonPersonID'),
+                                'gibbonPersonID'       => $session->get('gibbonPersonID'),
                                 'gibbonPersonIDTarget' => $gibbonPersonIDStudent,
                                 'comment'              => $commentApproval,
                                 'type'                 => $status,
@@ -200,7 +200,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                 // Move attached image  file, if there is one
                                 if (!empty($_FILES['file']['tmp_name'])) {
-                                    $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
+                                    $fileUploader = new Gibbon\FileUploader($pdo, $session);
                                     $fileUploader->getFileExtensions('Graphics/Design');
 
                                     $file = $_FILES['file'] ?? null;
@@ -224,7 +224,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 'exemplarWorkLicense' => $exemplarWorkLicense,
                                 'exemplarWorkEmbed' => $exemplarWorkEmbed,
                                 'commentApproval' => $commentApproval,
-                                'gibbonPersonIDApproval' => $gibbon->session->get('gibbonPersonID'),
+                                'gibbonPersonIDApproval' => $session->get('gibbonPersonID'),
                                 'timestampCompleteApproved' => date('Y-m-d H:i:s')
                             ];
 
@@ -264,7 +264,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
                             if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !is_null($badgesBadgeID)) {
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
-                                    $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonIDStudent, 'comment' => '', 'gibbonPersonIDCreator' => $gibbon->session->get('gibbonPersonID',''));
+                                    $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonIDStudent, 'comment' => '', 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
                                     $sql = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                                     $result = $connection2->prepare($sql);
                                     $result->execute($data);
@@ -282,7 +282,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             // Write to database
                             $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
                             try {
-                                $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => '', 'exemplarWorkLicense' => '', 'commentApproval' => $commentApproval, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $gibbon->session->get('gibbonPersonID'), 'timestampCompleteApproved' => date('Y-m-d H:i:s'));
+                                $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => '', 'exemplarWorkLicense' => '', 'commentApproval' => $commentApproval, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $session->get('gibbonPersonID'), 'timestampCompleteApproved' => date('Y-m-d H:i:s'));
                                 if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
                                     $data['collaborationKey'] = $row['collaborationKey'];
                                     $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE collaborationKey=:collaborationKey';

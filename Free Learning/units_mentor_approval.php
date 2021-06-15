@@ -93,7 +93,7 @@ if (!$block) {
                 foreach ($blocks as $block) {
                     echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
                         'roleCategory' => 'Staff',
-                        'gibbonPersonID' => $gibbon->session->get('username') ?? '',
+                        'gibbonPersonID' => $session->get('username') ?? '',
                         'blockCount' => $blockCount
                     ]);
                     $resourceContents .= $block['contents'];
@@ -103,11 +103,11 @@ if (!$block) {
 
 
             // FORM
-            $form = Form::create('approval', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_mentor_approvalProcess.php');
+            $form = Form::create('approval', $session->get('absoluteURL').'/modules/Free Learning/units_mentor_approvalProcess.php');
             $form->setTitle(__m('Feedback Form'));
             $form->setDescription(__m('Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.').'</p>');
 
-            $form->addHiddenValue('address', $gibbon->session->get('address'));
+            $form->addHiddenValue('address', $session->get('address'));
             $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
             $form->addHiddenValue('freeLearningUnitStudentID', $values['freeLearningUnitStudentID']);
             $form->addHiddenValue('confirmationKey', $confirmationKey);
@@ -131,7 +131,7 @@ if (!$block) {
 
             $submissionLink = $values['evidenceType'] == 'Link'
                 ? $values['evidenceLocation']
-                : $gibbon->session->get('absoluteURL').'/'.$values['evidenceLocation'];
+                : $session->get('absoluteURL').'/'.$values['evidenceLocation'];
 
             $row = $form->addRow();
                 $row->addLabel('submission', __m('Submission'));

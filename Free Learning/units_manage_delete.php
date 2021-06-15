@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             return;
         }
 
-        $form = DeleteForm::createForm($gibbon->session->get('absoluteURL')."/modules/Free Learning/units_manage_deleteProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view", true);
+        $form = DeleteForm::createForm($session->get('absoluteURL')."/modules/Free Learning/units_manage_deleteProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view", true);
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
         echo $form->getOutput();
     }

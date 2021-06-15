@@ -37,22 +37,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
 
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? '';
 
-    $form = Form::create('filter', $gibbon->session->get('absoluteURL') . '/index.php', 'get');
+    $form = Form::create('filter', $session->get('absoluteURL') . '/index.php', 'get');
     $form->setFactory(DatabaseFormFactory::create($pdo));
     $form->setClass('noIntBorder fullWidth');
     $form->setTitle(__m('Choose Class'));
 
-    $form->addHiddenValue('q', '/modules/' . $gibbon->session->get('module') . '/report_studentProgressByClass.php');
+    $form->addHiddenValue('q', '/modules/' . $session->get('module') . '/report_studentProgressByClass.php');
 
     $row = $form->addRow();
         $row->addLabel('gibbonCourseClassID', __('Class'));
-        $row->addSelectClass('gibbonCourseClassID', $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))
+        $row->addSelectClass('gibbonCourseClassID', $session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))
             ->required()
             ->selected($gibbonCourseClassID)
             ->placeholder();
 
     $row = $form->addRow();
-    $row->addSearchSubmit($gibbon->session);
+    $row->addSearchSubmit($session);
 
     echo $form->getOutput();
 
@@ -77,7 +77,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
                 ->sortBy('surname', 'preferredName', 'gibbonPersonID')
                 ->fromPOST();
 
-            $values = $unitStudentGateway->queryStudentProgressByStudent($criteria, $gibbonCourseClassID, $gibbon->session->get('gibbonSchoolYearID'));
+            $values = $unitStudentGateway->queryStudentProgressByStudent($criteria, $gibbonCourseClassID, $session->get('gibbonSchoolYearID'));
 
             $table = DataTable::createPaginated('progress', $criteria);
 

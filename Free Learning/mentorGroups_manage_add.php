@@ -33,7 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         ->add(__m('Add Mentor Group'));
 
     if (!empty($_GET['editID'])) {
-        $page->return->setEditLink($_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Free Learning/mentorGroups_manage_edit.php&freeLearningMentorGroupID='.$_GET['editID']);
+        $page->return->setEditLink($session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage_edit.php&freeLearningMentorGroupID='.$_GET['editID']);
     }
 
     // Get a list of potential mentors
@@ -65,10 +65,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         }
     }
 
-    $form = Form::create('mentorship', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/mentorGroups_manage_addProcess.php');
+    $form = Form::create('mentorship', $session->get('absoluteURL').'/modules/'.$session->get('module').'/mentorGroups_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
 
     $row = $form->addRow();
         $row->addLabel('name', __m('Group Name'));

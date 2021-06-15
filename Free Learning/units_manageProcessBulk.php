@@ -24,7 +24,7 @@ $_POST['address'] = '/modules/Free Learning/units_manage.php';
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
 
 // Override the ini to keep this process alive
 ini_set('memory_limit', '2048M');

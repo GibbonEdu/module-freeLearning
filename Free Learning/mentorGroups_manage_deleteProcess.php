@@ -24,7 +24,7 @@ require_once '../../gibbon.php';
 
 $freeLearningMentorGroupID = $_POST['freeLearningMentorGroupID'] ?? '';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups_manage_delete.php') == false) {
     $URL .= '&return=error0';

@@ -40,7 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         return;
     }
 
-    $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+    $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
     $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') && $highestAction == 'Browse Units_all';
 
     //  Get params
@@ -48,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
     $gibbonPersonID = $canManage && !empty($_GET['gibbonPersonID'])
         ? $_GET['gibbonPersonID']
-        : $gibbon->session->get('gibbonPersonID');
+        : $session->get('gibbonPersonID');
 
     $urlParams = [
         'freeLearningUnitStudentID' => $freeLearningUnitStudentID,
@@ -97,7 +97,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($manageAll == true) {
         $proceed = true;
     }
-    else if ($values['enrolmentMethod'] == 'schoolMentor' && $values['gibbonPersonIDSchoolMentor'] == $gibbon->session->get('gibbonPersonID')) {
+    else if ($values['enrolmentMethod'] == 'schoolMentor' && $values['gibbonPersonIDSchoolMentor'] == $session->get('gibbonPersonID')) {
         $proceed = true;
     } else {
         $learningAreas = getLearningAreas($connection2, $guid, true);
@@ -113,7 +113,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     // Check to see if class is in one teacher teachers
     if ($values['enrolmentMethod'] == 'class') { // Is teacher of this class?
         try {
-            $dataClasses = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'gibbonCourseClassID' => $values['gibbonCourseClassID']);
+            $dataClasses = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $session->get('gibbonPersonID'), 'gibbonCourseClassID' => $values['gibbonCourseClassID']);
             $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClass.gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
             $resultClasses = $connection2->prepare($sqlClasses);
             $resultClasses->execute($dataClasses);
@@ -158,10 +158,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         WHERE gibbonModule.name='Free Learning' AND gibbonHook.type='Student Profile'");
 
     //  COMMENT FORM
-    $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+    $form = Form::create('enrolComment', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
     $form->setClass('blank');
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
     $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
     $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
 
@@ -197,9 +197,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
         'discussion' => [[
-            'surname' => $gibbon->session->get('surname'),
-            'preferredName' => $gibbon->session->get('preferredName'),
-            'image_240' => $gibbon->session->get('image_240'),
+            'surname' => $session->get('surname'),
+            'preferredName' => $session->get('preferredName'),
+            'image_240' => $session->get('image_240'),
             'comment' => $commentBox->getOutput(),
         ]]
     ]));
@@ -212,12 +212,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     }
 
     //  FORM
-    $form = Form::create('approval', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_approvalProcess.php?'.http_build_query($urlParams));
+    $form = Form::create('approval', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_approvalProcess.php?'.http_build_query($urlParams));
     $form->setTitle(__m('Unit Complete Approval'));
     $form->setDescription($alert.'<p>'.__m('Use the table below to indicate student completion, based on the evidence shown on the previous page. Leave the student a comment in way of feedback.').'</p>');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
     $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
     $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
 
@@ -240,7 +240,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $submissionLink = $values['evidenceType'] == 'Link'
         ? $values['evidenceLocation']
-        : $gibbon->session->get('absoluteURL').'/'.$values['evidenceLocation'];
+        : $session->get('absoluteURL').'/'.$values['evidenceLocation'];
 
     $row = $form->addRow();
         $row->addLabel('submission', __m('Submission'));
@@ -272,7 +272,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $row->addLabel('exemplarWorkThumb', __m('Exemplar Work Thumbnail Image'))->description(__('150x150px jpg/png/gif'));
         $row->addFileUpload('file')
             ->accepts('.jpg,.jpeg,.gif,.png')
-            ->setAttachment('exemplarWorkThumb', $gibbon->session->get('absoluteURL'), $values['exemplarWorkThumb']);
+            ->setAttachment('exemplarWorkThumb', $session->get('absoluteURL'), $values['exemplarWorkThumb']);
 
     $row = $form->addRow()->addClass('exemplarYes');
         $row->addLabel('exemplarWorkLicense', __m('Exemplar Work Thumbnail Image Credit'))->description(__m('Credit and license for image used above.'));

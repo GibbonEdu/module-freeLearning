@@ -21,7 +21,7 @@ require_once '../../gibbon.php';
 
 
 $freeLearningUnitID = $_GET['freeLearningUnitID'];
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'];
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'];
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_edit.php') == false) {
     //Fail 0
@@ -40,18 +40,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         } else {
             //Proceed!
             //Validate Inputs
-            $name = $_POST['name'];
-            $difficulty = $_POST['difficulty'];
-            $blurb = $_POST['blurb'];
+            $name = $_POST['name'] ?? '';
+            $difficulty = $_POST['difficulty'] ?? '';
+            $blurb = $_POST['blurb'] ?? '';
             $studentReflectionText = $_POST['studentReflectionText'] ?? '';
             $gibbonDepartmentIDList = (!empty($_POST['gibbonDepartmentIDList']) && is_array($_POST['gibbonDepartmentIDList'])) ? implode(",", $_POST['gibbonDepartmentIDList']) : null;
             $course = $_POST['course'] ?? null;
-            $license = $_POST['license'];
+            $license = $_POST['license'] ?? '';
             $majorEdit = $_POST['majorEdit'] ?? null;
-            $availableStudents = $_POST['availableStudents'];
-            $availableStaff = $_POST['availableStaff'];
-            $availableParents = $_POST['availableParents'];
-            $availableOther = $_POST['availableOther'];
+            $availableStudents = $_POST['availableStudents'] ?? '';
+            $availableStaff = $_POST['availableStaff'] ?? '';
+            $availableParents = $_POST['availableParents'] ?? '';
+            $availableOther = $_POST['availableOther'] ?? '';
             $sharedPublic = $_POST['sharedPublic'] ?? null;
             $active = $_POST['active'] ?? 'N';
             $editLock = $_POST['editLock'] ?? 'N';
@@ -76,7 +76,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         $data = array('freeLearningUnitID' => $freeLearningUnitID);
                         $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
                     } elseif ($highestAction == 'Manage Units_learningAreas') {
-                        $data = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
+                        $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
                         $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID ORDER BY difficulty, name";
                     }
                     $result = $connection2->prepare($sql);
@@ -106,7 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     $attachment = null;
 
                     if (!empty($_FILES['file']['tmp_name'])) {
-                        $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
+                        $fileUploader = new Gibbon\FileUploader($pdo, $session);
                         $fileUploader->getFileExtensions('Graphics/Design');
 
                         $file = $_FILES['file'] ?? null;
@@ -119,7 +119,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         }
 
                         if ($attachment != null) {
-                            $attachment = $gibbon->session->get('absoluteURL').'/'.$attachment;
+                            $attachment = $session->get('absoluteURL').'/'.$attachment;
                         }
                     } else {
                         if (empty($_POST['logo'])) {
@@ -147,7 +147,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     //Write author to database for major edits only
                     if ($majorEdit == 'Y') {
                         try {
-                            $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
+                            $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $session->get('gibbonPersonID'));
                             $sql = 'SELECT * FROM freeLearningUnitAuthor WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonID=:gibbonPersonID';
                             $result = $connection2->prepare($sql);
                             $result->execute($data);
@@ -156,7 +156,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         }
                         if ($result->rowCount() < 1) {
                             try {
-                                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'surname' => $gibbon->session->get('surname'), 'preferredName' => $gibbon->session->get('preferredName'), 'website' => $gibbon->session->get('website') ?? '');
+                                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $session->get('gibbonPersonID'), 'surname' => $session->get('surname'), 'preferredName' => $session->get('preferredName'), 'website' => $session->get('website') ?? '');
                                 $sql = 'INSERT INTO freeLearningUnitAuthor SET freeLearningUnitID=:freeLearningUnitID, gibbonPersonID=:gibbonPersonID, surname=:surname, preferredName=:preferredName, website=:website';
                                 $result = $connection2->prepare($sql);
                                 $result->execute($data);

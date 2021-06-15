@@ -23,7 +23,7 @@ $_POST['address'] = '/modules/Free Learning/mentorGroups_manage.php';
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups_manage.php') == false) {
     $URL .= '&return=error0';

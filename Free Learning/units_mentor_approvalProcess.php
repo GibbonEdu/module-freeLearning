@@ -30,7 +30,7 @@ $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? null;
 $confirmationKey = $_POST['confirmationKey'] ?? null;
 
 //Set return URL
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_mentor_approval.php&sidebar=true&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_mentor_approval.php&sidebar=true&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey';
 
 if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmationKey == '') {
     $URL .= '&return=error3';
@@ -84,7 +84,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                     'foreignTable'         => 'freeLearningUnitStudent',
                     'foreignTableID'       => $freeLearningUnitStudentID,
                     'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
-                    'gibbonPersonID'       => $gibbon->session->get('gibbonPersonID'),
+                    'gibbonPersonID'       => $session->get('gibbonPersonID'),
                     'gibbonPersonIDTarget' => $values['gibbonPersonIDStudent'],
                     'comment'              => $commentApproval,
                     'type'                 => $status,
@@ -110,7 +110,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
             $data = [
                 'status' => $status,
                 'commentApproval' => $commentApproval,
-                'gibbonPersonIDApproval' => $gibbon->session->get('gibbonPersonID') ?? null,
+                'gibbonPersonIDApproval' => $session->get('gibbonPersonID') ?? null,
                 'timestampCompleteApproved' => date('Y-m-d H:i:s')
             ];
 
@@ -133,7 +133,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
                 if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !is_null($badgesBadgeID)) {
                     foreach ($collaborators as $collaborator) {
-                        $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $collaborator['gibbonPersonIDStudent'], 'comment' => '', 'gibbonPersonIDCreator' => $gibbon->session->get('gibbonPersonID',''));
+                        $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $collaborator['gibbonPersonIDStudent'], 'comment' => '', 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
                         $sql = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                         $result = $connection2->prepare($sql);
                         $result->execute($data);

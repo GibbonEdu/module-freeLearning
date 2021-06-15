@@ -22,7 +22,7 @@ require_once '../../gibbon.php';
 require_once  './moduleFunctions.php';
 
 $freeLearningBadgeID = $_GET['freeLearningBadgeID'];
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/badges_manage_edit.php&freeLearningBadgeID=$freeLearningBadgeID&search=".$_GET['search'];
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/badges_manage_edit.php&freeLearningBadgeID=$freeLearningBadgeID&search=".$_GET['search'];
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manage_edit.php') == false) {
     //Fail 0
@@ -64,32 +64,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                 $row = $result->fetch();
 
                 //Proceed!
-                $badgesBadgeID = $_POST['badgesBadgeID'];
-                $active = $_POST['active'];
-                $unitsCompleteTotal = null;
-                if ($_POST['unitsCompleteTotal'] != '') {
-                    $unitsCompleteTotal = $_POST['unitsCompleteTotal'];
-                }
-                $unitsCompleteThisYear = null;
-                if ($_POST['unitsCompleteThisYear'] != '') {
-                    $unitsCompleteThisYear = $_POST['unitsCompleteThisYear'];
-                }
-                $unitsCompleteDepartmentCount = null;
-                if ($_POST['unitsCompleteDepartmentCount'] != '') {
-                    $unitsCompleteDepartmentCount = $_POST['unitsCompleteDepartmentCount'];
-                }
-                $unitsCompleteIndividual = null;
-                if ($_POST['unitsCompleteIndividual'] != '') {
-                    $unitsCompleteIndividual = $_POST['unitsCompleteIndividual'];
-                }
-                $unitsCompleteGroup = null;
-                if ($_POST['unitsCompleteGroup'] != '') {
-                    $unitsCompleteGroup = $_POST['unitsCompleteGroup'];
-                }
-                $difficultyLevelMaxAchieved = null;
-                if ($_POST['difficultyLevelMaxAchieved'] != '') {
-                    $difficultyLevelMaxAchieved = $_POST['difficultyLevelMaxAchieved'];
-                }
+                $badgesBadgeID = $_POST['badgesBadgeID'] ?? '';
+                $active = $_POST['active'] ?? '';
+                $unitsCompleteTotal = $_POST['unitsCompleteTotal'] ?? null;
+                $unitsCompleteThisYear = $_POST['unitsCompleteThisYear'] ??  null;
+                $unitsCompleteDepartmentCount = $_POST['unitsCompleteDepartmentCount'] ?? null;
+                $unitsCompleteIndividual = $_POST['unitsCompleteIndividual'] ?? null;
+                $unitsCompleteGroup = $_POST['unitsCompleteGroup'] ?? null;
+                $difficultyLevelMaxAchieved = $_POST['difficultyLevelMaxAchieved'] ?? null;
                 $specificUnitsCompleteList = null;
                 if (isset($_POST['specificUnitsComplete'])) {
                     $specificUnitsComplete = $_POST['specificUnitsComplete'];

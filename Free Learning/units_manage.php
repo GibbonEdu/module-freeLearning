@@ -55,13 +55,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->fromPOST();
 
         // FORM
-        $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__('Filter'));
 
         $form->setClass('noIntBorder fullWidth');
         $form->addHiddenValue('q', '/modules/Free Learning/units_manage.php');
 
-        $learningAreas = $unitGateway->selectLearningAreasAndCourses($highestAction != 'Manage Units_all' ? $gibbon->session->get('gibbonPersonID') : null);
+        $learningAreas = $unitGateway->selectLearningAreasAndCourses($highestAction != 'Manage Units_all' ? $session->get('gibbonPersonID') : null);
         $row = $form->addRow();
             $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
             $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
@@ -76,18 +76,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addTextField('name')->setValue($criteria->getSearchText());
 
         $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+            $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
 
 
         if ($highestAction == 'Manage Units_all') {
-            $units = $unitGateway->queryAllUnits($criteria, $gibbon->session->get('gibbonPersonID'));
+            $units = $unitGateway->queryAllUnits($criteria, $session->get('gibbonPersonID'));
         } else {
-            $units = $unitGateway->queryUnitsByLearningAreaStaff($criteria, $gibbon->session->get('gibbonPersonID'));
+            $units = $unitGateway->queryUnitsByLearningAreaStaff($criteria, $session->get('gibbonPersonID'));
         }
 
-        $form = BulkActionForm::create('bulkAction', $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/units_manageProcessBulk.php');
+        $form = BulkActionForm::create('bulkAction', $session->get('absoluteURL').'/modules/Free Learning/units_manageProcessBulk.php');
 
         $bulkActions = ['Export' => __('Export'), 'Duplicate' => __('Duplicate')];
         $col = $form->createBulkActionColumn($bulkActions);

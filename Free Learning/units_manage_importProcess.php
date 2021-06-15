@@ -22,7 +22,7 @@ use Gibbon\Module\FreeLearning\UnitImporter;
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
 
 // Override the ini to keep this process alive
 ini_set('memory_limit', '2048M');
@@ -44,7 +44,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         exit;
     }
 
-    $fileUploader = new FileUploader($pdo, $gibbon->session);
+    $fileUploader = new FileUploader($pdo, $session);
     $zipFile = $fileUploader->uploadFromPost($_FILES['file']);
 
     if (empty($zipFile)) {
@@ -57,7 +57,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     $importer->setDefaults($gibbonDepartmentIDList, $course);
     $importer->setOverride($override == 'Y');
 
-    $success = $importer->importFromFile($gibbon->session->get('absolutePath').'/'.$zipFile);
+    $success = $importer->importFromFile($session->get('absolutePath').'/'.$zipFile);
 
 
     $URL .= !$success

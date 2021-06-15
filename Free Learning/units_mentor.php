@@ -27,9 +27,9 @@ $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 $highestAction = false;
 $canManage = false;
 $gibbonPersonID ='';
-if ($gibbon->session->exists('gibbonPersonID')) {
+if ($session->exists('gibbonPersonID')) {
     $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse.php', $connection2);
-    $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+    $gibbonPersonID = $session->get('gibbonPersonID');
     $canManage = false;
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
         $canManage = true;
@@ -60,7 +60,7 @@ if (isset($_GET['return'])) {
     returnProcess($guid, $_GET['return'], null, array('success0' => __m('Your request was completed successfully. Thank you for your time.'), 'success1' => __m('Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.')));
 }
 
-if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
+if ($freeLearningUnitID != '' && $session->exists('gibbonPersonID')) {
     //Check unit
     try {
         $data = array('freeLearningUnitID' => $freeLearningUnitID) ;
@@ -85,7 +85,7 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
         //Show choice for school mentor
         if ($mode == "internal" && $confirmationKey != '') {
             echo '<p>';
-            echo sprintf(__m('The following users at %1$s have requested your input into their %2$sFree Learning%3$s work, with the hope that you will be able to act as a "critical buddy" or mentor, offering feedback on their progress.'), $gibbon->session->get('systemName'), "<a target='_blank' href='http://rossparker.org'>", '</a>');
+            echo sprintf(__m('The following users at %1$s have requested your input into their %2$sFree Learning%3$s work, with the hope that you will be able to act as a "critical buddy" or mentor, offering feedback on their progress.'), $session->get('systemName'), "<a target='_blank' href='http://rossparker.org'>", '</a>');
             echo '<br/>';
             echo '</p>';
 
@@ -119,9 +119,9 @@ if ($freeLearningUnitID != '' && $gibbon->session->exists('gibbonPersonID')) {
                 echo sprintf(__m('The unit you are being asked to advise on is called %1$s and is described as follows:'), '<b>'.$row['name'].'</b>').$row['blurb']."<br/><br/>";
                 echo __m('Please use the form below to indicate whether you would like to accept or decline this invitation.')."</br>";
 
-                $form = Form::create('action', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module')."/units_mentorProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+                $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_mentorProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
 
-                $form->addHiddenValue('address', $gibbon->session->get('address'));
+                $form->addHiddenValue('address', $session->get('address'));
                 $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
                 $form->addHiddenValue('confirmationKey', $confirmationKey);
                 $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);

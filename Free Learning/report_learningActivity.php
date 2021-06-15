@@ -21,7 +21,7 @@ use Gibbon\View\View;
 use Gibbon\Forms\Form;
 
 // Module includes
-include "./modules/" . $gibbon->session->get('module') . "/moduleFunctions.php" ;
+include "./modules/" . $session->get('module') . "/moduleFunctions.php" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learningActivity.php")==FALSE) {
     // Acess denied
@@ -42,7 +42,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
     ];
 
     //  FORM
-	$form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+	$form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
 	$form->setTitle(__('Filter'));
 
 	$form->setClass('noIntBorder fullWidth');
@@ -58,7 +58,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
         $row->addSelect('timePeriod')->fromArray($timePeriods)->selected($timePeriod);
 
 	$row = $form->addRow();
-		$row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+		$row->addSearchSubmit($session, __('Clear Filters'));
 
 	echo $form->getOutput();
 
@@ -92,7 +92,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
             echo $templateView->fetchFromTemplate('activityLegend.twig.html');
 
             // PLOT DATA
-            echo '<script type="text/javascript" src="'.$gibbon->session->get('absoluteURL').'/lib/Chart.js/Chart.min.js"></script>';
+            echo '<script type="text/javascript" src="'.$session->get('absoluteURL').'/lib/Chart.js/Chart.min.js"></script>';
             echo "<p style='margin-top: 20px; margin-bottom: 5px'><b>".__($guid, 'Data').'</b></p>';
             echo '<div style="width:100%">';
             echo '<div>';

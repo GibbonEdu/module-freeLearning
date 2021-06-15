@@ -36,7 +36,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         
         $page->breadcrumbs->add(__m('Unit History by Student'));
 
-        $table = $container->get(UnitHistory::class)->create($gibbon->session->get('gibbonPersonID'));
+        $table = $container->get(UnitHistory::class)->create($session->get('gibbonPersonID'));
         echo $table->getOutput();
     }
 }

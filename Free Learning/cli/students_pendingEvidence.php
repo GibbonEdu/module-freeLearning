@@ -47,7 +47,7 @@ ini_set('max_execution_time', 1800);
 set_time_limit(1800);
 
 
-$gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+$gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 $notificationSender = $container->get(NotificationSender::class);
 
 // Get the list of students with current enrolments older than 31 days
@@ -72,7 +72,7 @@ $actionText .= __('Send Fail Count').': '.$sendReport['emailFailed'];
 $actionLink = '/index.php?q=/modules/Free Learning/report_mentorshipOverview.php';
 
 $notificationSender = $container->get(NotificationSender::class);
-$notificationSender->addNotification($gibbon->session->get('organisationAdministrator'), $actionText, 'Free Learning', $actionLink);
+$notificationSender->addNotification($session->get('organisationAdministrator'), $actionText, 'Free Learning', $actionLink);
 $notificationSender->sendNotifications();
 
 // Output the result to terminal

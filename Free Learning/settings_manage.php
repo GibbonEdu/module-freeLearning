@@ -38,9 +38,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $settingGateway = $container->get(SettingGateway::class);
 
     // FORM
-    $form = Form::create('settings', $gibbon->session->get('absoluteURL').'/modules/Free Learning/settings_manageProcess.php');
+    $form = Form::create('settings', $session->get('absoluteURL').'/modules/Free Learning/settings_manageProcess.php');
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
 
     $form->addRow()->addHeading(__m('General Settings'));
 

@@ -24,7 +24,7 @@ $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
 $canEdit = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php');
 
-if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.php') == true or ($publicUnits == 'Y' and !$gibbon->session->exists('username')))) {
+if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.php') == true or ($publicUnits == 'Y' and !$session->exists('username')))) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
@@ -46,14 +46,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
         $resultWork->execute($dataWork);
     } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
     }
-    $sqlPage = $sqlWork.' LIMIT '.$gibbon->session->get('pagination').' OFFSET '.(($page - 1) * $gibbon->session->get('pagination'));
+    $sqlPage = $sqlWork.' LIMIT '.$session->get('pagination').' OFFSET '.(($page - 1) * $session->get('pagination'));
 
     if ($resultWork->rowCount() < 1) { echo "<div class='error'>";
         echo __($guid, 'There are no records to display.');
         echo '</div>';
     } else {
-        if ($resultWork->rowCount() > $gibbon->session->get('pagination')) {
-            printPagination($guid, $resultWork->rowCount(), $page, $gibbon->session->get('pagination'), 'top', '');
+        if ($resultWork->rowCount() > $session->get('pagination')) {
+            printPagination($guid, $resultWork->rowCount(), $page, $session->get('pagination'), 'top', '');
         }
 
         while ($rowWork = $resultWork->fetch()) {
@@ -88,7 +88,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
             echo '</p>';
             if ($canEdit) {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID='.$rowWork['freeLearningUnitID'].'&freeLearningUnitStudentID='.$rowWork['freeLearningUnitStudentID']."&sidebar=true'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/config.png'/></a>";
+                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID='.$rowWork['freeLearningUnitID'].'&freeLearningUnitStudentID='.$rowWork['freeLearningUnitStudentID']."&sidebar=true'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$session->get('gibbonThemeName')."/img/config.png'/></a>";
                 echo '</div>';
             }
             echo "<table style='width: 100%'>";
@@ -104,7 +104,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                     echo "<img style='height: 150px; width: 150px; opacity: 1.0' class='user' src='".$rowWork['logo']."'/><br/>";
                 }
                 else {
-                    echo "<img style='height: 150px; width: 150px; opacity: 1.0' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_240_square.jpg'/><br/>";
+                    echo "<img style='height: 150px; width: 150px; opacity: 1.0' class='user' src='".$session->get('absoluteURL').'/themes/'.$session->get('gibbonThemeName')."/img/anonymous_240_square.jpg'/><br/>";
                 }
             }
             echo '</td>';
@@ -116,15 +116,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
                     echo "<p>";
                     if ($rowWork['evidenceType'] == 'File') { //It's a file
-                        echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
+                        echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
                     } else { //It's a link
-                        echo "<a target='_blank' href='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
+                        echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
                     }
                     echo '</p>';
                 } else { //Not an image
                     echo '<p class=\'button\'>';
                     if ($rowWork['evidenceType'] == 'File') { //It's a file
-                        echo "<a class='button' target='_blank' href='".$gibbon->session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
+                        echo "<a class='button' target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                     } else { //It's a link
                         echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
                     }
@@ -156,8 +156,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
             echo '</tr>';
             echo '</table>';
         }
-        if ($resultWork->rowCount() > $gibbon->session->get('pagination')) {
-            printPagination($guid, $resultWork->rowCount(), $page, $gibbon->session->get('pagination'), 'bottom', '');
+        if ($resultWork->rowCount() > $session->get('pagination')) {
+            printPagination($guid, $resultWork->rowCount(), $page, $session->get('pagination'), 'bottom', '');
         }
     }
 }
