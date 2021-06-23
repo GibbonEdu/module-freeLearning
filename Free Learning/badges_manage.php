@@ -96,7 +96,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
            ->displayLabel();
 
         $table->addColumn('logo', __('Logo'))
-            ->format(function ($values) use ($gibbon) {
+            ->format(function ($values) use ($session) {
                 if ($values['logo'] == null) {
                     return "<img style='margin: 5px; height: 125px; width: 125px' class='user' src='".$session->get('absoluteURL').'/themes/'.$session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
                 } else {
