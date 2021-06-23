@@ -66,12 +66,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                 //Proceed!
                 $badgesBadgeID = $_POST['badgesBadgeID'] ?? '';
                 $active = $_POST['active'] ?? '';
-                $unitsCompleteTotal = $_POST['unitsCompleteTotal'] ?? null;
-                $unitsCompleteThisYear = $_POST['unitsCompleteThisYear'] ??  null;
-                $unitsCompleteDepartmentCount = $_POST['unitsCompleteDepartmentCount'] ?? null;
-                $unitsCompleteIndividual = $_POST['unitsCompleteIndividual'] ?? null;
-                $unitsCompleteGroup = $_POST['unitsCompleteGroup'] ?? null;
-                $difficultyLevelMaxAchieved = $_POST['difficultyLevelMaxAchieved'] ?? null;
+                $unitsCompleteTotal = !empty($_POST['unitsCompleteTotal']) ? $_POST['unitsCompleteTotal'] : null;
+                $unitsCompleteThisYear = !empty($_POST['unitsCompleteThisYear']) ? $_POST['unitsCompleteThisYear'] :  null;
+                $unitsCompleteDepartmentCount = !empty($_POST['unitsCompleteDepartmentCount']) ? $_POST['unitsCompleteDepartmentCount'] : null;
+                $unitsCompleteIndividual = !empty($_POST['unitsCompleteIndividual']) ? $_POST['unitsCompleteIndividual'] : null;
+                $unitsCompleteGroup = !empty($_POST['unitsCompleteGroup']) ? $_POST['unitsCompleteGroup'] : null;
+                $difficultyLevelMaxAchieved = !empty($_POST['difficultyLevelMaxAchieved']) ? $_POST['difficultyLevelMaxAchieved'] : null;
                 $specificUnitsCompleteList = null;
                 if (isset($_POST['specificUnitsComplete'])) {
                     $specificUnitsComplete = $_POST['specificUnitsComplete'];

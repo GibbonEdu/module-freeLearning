@@ -43,16 +43,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         $returns = array();
         $editLink = '';
+        $search = $_GET['search'] ?? '';
         if (isset($_GET['editID'])) {
-            $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$_GET['editID'].'&search='.$_GET['search'];
+            $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$_GET['editID'].'&search='.$search;
         }
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], $editLink, null);
         }
 
-        if ($_GET['search'] != '') {
+        if ($search != '') {
             echo "<div class='linkTop'>";
-            echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__($guid, 'Back to Search Results')."</a>";
+            echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$search."'>".__($guid, 'Back to Search Results')."</a>";
             echo '</div>';
         }
 

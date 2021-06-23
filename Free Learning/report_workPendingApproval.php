@@ -143,7 +143,7 @@ else {
 
     $table->addColumn('unit', __m('Unit'))
         ->description(__m('Learning Area')."/".__m('Course'))
-        ->format(function($values) use ($gibbon) {
+        ->format(function($values) use ($session) {
              $output = "<a href='" . $session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
              $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
              $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
@@ -197,7 +197,7 @@ else {
         ->addParam('freeLearningUnitStudentID')
         ->addParam('freeLearningUnitID')
         ->addParam('sidebar', true)
-        ->format(function ($student, $actions) use ($manageAll, $myClasses, $gibbon) {
+        ->format(function ($student, $actions) use ($manageAll, $myClasses, $session) {
             // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
             $editEnrolment = $manageAll ? true : false;
             if ($student['enrolmentMethod'] == 'class') {

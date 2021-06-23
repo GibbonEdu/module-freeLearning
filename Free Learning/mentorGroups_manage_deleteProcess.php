@@ -48,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     }
 
     $deleted = $mentorGroupGateway->delete($freeLearningMentorGroupID);
-    $deleted &= $mentorGroupPersonGateway->deleteWhere(['freeLearningMentorGroupID' => $freeLearningMentorGroupID]);
+    $mentorGroupPersonGateway->deleteWhere(['freeLearningMentorGroupID' => $freeLearningMentorGroupID]);
 
     $URL .= !$deleted
         ? '&return=error2'

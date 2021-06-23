@@ -516,7 +516,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->addParam('gibbonPersonID', $gibbonPersonID)
                                 ->addParam('view', $view)
                                 ->addParam('sidebar', 'true')
-                                ->format(function ($student, $actions) use ($manageAll, $enrolmentType, $myClasses, $gibbon) {
+                                ->format(function ($student, $actions) use ($manageAll, $enrolmentType, $myClasses, $session) {
                                     // Check to see if we can edit this class's enrolment (e.g. we have $manageAll or this is one of our classes or we are the mentor)
                                     $editEnrolment = $manageAll ? true : false;
                                     if ($student['enrolmentMethod'] == 'class') {
