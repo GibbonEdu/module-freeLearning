@@ -44,7 +44,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
 
         // FORM
-        $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__m('Choose Student'));
 
         $form->setFactory(DatabaseFormFactory::create($pdo));
@@ -55,14 +55,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         if ($highestAction == 'Unit History By Student_all') {
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __('Person'));
-                $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), ['allStudents' => false, 'byName' => true, 'byForm' => true])
+                $row->addSelectStudent('gibbonPersonID', $session->get('gibbonSchoolYearID'), ['allStudents' => false, 'byName' => true, 'byForm' => true])
                     ->required()
                     ->placeholder()
                     ->selected($gibbonPersonID);
 		} elseif ($highestAction == 'Unit History By Student_myChildren') {
             $disableParentEvidence = (getSettingByScope($connection2, 'Free Learning', 'disableParentEvidence') == "Y");
             $children = $container->get(StudentGateway::class)
-                ->selectAnyStudentsByFamilyAdult($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))
+                ->selectAnyStudentsByFamilyAdult($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))
                 ->fetchAll();
             $children = Format::nameListArray($children, 'Student', false, true);
 
@@ -76,7 +76,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 		}
 
         $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+            $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
 

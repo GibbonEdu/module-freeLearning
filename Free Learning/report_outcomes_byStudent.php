@@ -34,7 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
     $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
 
     // FORM
-    $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+    $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
     $form->setTitle(__m('Choose Student'));
 
     $form->setFactory(DatabaseFormFactory::create($pdo));
@@ -43,10 +43,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 
     $row = $form->addRow();
         $row->addLabel('gibbonPersonID', __('Student'));
-        $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), array("allStudents" => false, "byName" => true, "byForm" => true))->required()->placeholder()->selected($gibbonPersonID);
+        $row->addSelectStudent('gibbonPersonID', $session->get('gibbonSchoolYearID'), array("allStudents" => false, "byName" => true, "byForm" => true))->required()->placeholder()->selected($gibbonPersonID);
 
     $row = $form->addRow();
-        $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+        $row->addSearchSubmit($session, __('Clear Filters'));
 
     echo $form->getOutput();
 
@@ -167,11 +167,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $output .= '</td>';
                     $output .= '<td>';
                     if (isset($outcomesMet[$rowOutcomes['gibbonOutcomeID']][0]) == false) {
-                        $output .= "<img title='".__($guid, 'Outcome not met', 'Free Learning')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/iconCross.png'/> ";
+                        $output .= "<img title='".__($guid, 'Outcome not met', 'Free Learning')."' src='./themes/".$session->get('gibbonThemeName')."/img/iconCross.png'/> ";
                         $outcomesNotMet[$outcomesNotMetCount] = $rowOutcomes['gibbonOutcomeID'];
                         ++$outcomesNotMetCount;
                     } else {
-                        $output .= "<img title='".__($guid, 'Outcome met in units:', 'Free Learning').' '.htmlPrep($outcomesMet[$rowOutcomes['gibbonOutcomeID']][1])."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/iconTick.png'/> x".$outcomesMet[$rowOutcomes['gibbonOutcomeID']][0];
+                        $output .= "<img title='".__($guid, 'Outcome met in units:', 'Free Learning').' '.htmlPrep($outcomesMet[$rowOutcomes['gibbonOutcomeID']][1])."' src='./themes/".$session->get('gibbonThemeName')."/img/iconTick.png'/> x".$outcomesMet[$rowOutcomes['gibbonOutcomeID']][0];
                     }
                     $output .= '</td>';
                     $output .= '</tr>';
@@ -192,7 +192,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                 try {
                     $dataRecommend['gibbonPersonID'] = $gibbonPersonID;
                     $dataRecommend['gibbonPersonID2'] = $gibbonPersonID;
-                    $dataRecommend['gibbonSchoolYearID'] = $gibbon->session->get('gibbonSchoolYearID');
+                    $dataRecommend['gibbonSchoolYearID'] = $session->get('gibbonSchoolYearID');
                     $sqlRecommend = "SELECT DISTINCT freeLearningUnitStudent.status, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
                         FROM freeLearningUnit
                         JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
@@ -262,7 +262,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                         echo $rowRecommend['status'];
                         echo "<div style='font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>".$rowRecommend['name'].'</div><br/>';
                         if ($rowRecommend['logo'] == null) {
-                            echo "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
+                            echo "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$session->get('absoluteURL').'/themes/'.$session->get('gibbonThemeName')."/img/anonymous_125.jpg'/><br/>";
                         } else {
                             echo "<img style='margin-bottom: 10px; height: 125px; width: 125px' class='user' src='".$rowRecommend['logo']."'/><br/>";
                         }
@@ -335,7 +335,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                         }
                         echo '</td>';
                         echo '<td>';
-                        echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.$gibbon->session->get('module').'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$rowRecommend['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='><img title='".__($guid, 'View')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/plus.png'/></a> ";
+                        echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/'.$session->get('module').'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$rowRecommend['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='><img title='".__($guid, 'View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a> ";
                         echo '</td>';
                         echo '</tr>';
                     }

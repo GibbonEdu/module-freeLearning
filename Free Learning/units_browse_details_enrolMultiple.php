@@ -32,7 +32,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
         //Get params
         $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
@@ -45,7 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         if ($view != 'grid' and $view != 'map') {
             $view = 'list';
         }
-        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+        $gibbonPersonID = $session->get('gibbonPersonID');
         if ($canManage and isset($_GET['gibbonPersonID'])) {
             $gibbonPersonID = $_GET['gibbonPersonID'];
         }
@@ -66,7 +66,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             echo '</div>';
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $gibbon->session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
+                $unitList = getUnitList($connection2, $guid, $session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
@@ -86,9 +86,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     returnProcess($guid, $_GET['return'], null, null);
                 }
 
-                $form = Form::create('action', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module')."/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID=$freeLearningUnitID&showInactive=$showInactive&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+                $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID=$freeLearningUnitID&showInactive=$showInactive&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
 
-                $form->addHiddenValue('address', $gibbon->session->get('address'));
+                $form->addHiddenValue('address', $session->get('address'));
 
                 $row = $form->addRow();
                     $row->addLabel('unit', __('Unit'));
@@ -96,17 +96,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                 $highestAction2 = getHighestGroupedAction($guid, '/modules/Free Learning/units_manage.php', $connection2);
                 if ($highestAction2 == 'Manage Units_all') {
-                    $data = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
+                    $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
                     $sql = "SELECT gibbonCourseClassID AS value, CONCAT(gibbonCourse.nameShort, '.', gibbonCourseClass.nameShort, ' (', gibbonCourse.name, ')') AS name FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name";
                 } else {
-                    $data = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
+                    $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $session->get('gibbonPersonID'));
                     $sql = "SELECT gibbonCourseClass.gibbonCourseClassID AS value, CONCAT(gibbonCourse.nameShort, '.', gibbonCourseClass.nameShort, ' (', gibbonCourse.name, ')') AS name FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourse.gibbonCourseID=gibbonCourseClass.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE (role='Teacher' OR role='Assistant') AND gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonPersonID=:gibbonPersonID ORDER BY name";
                 }
                 $row = $form->addRow();
                     $row->addLabel('gibbonCourseClassID', __m('Class'));
                     $row->addSelect('gibbonCourseClassID')->fromQuery($pdo, $sql, $data)->required()->placeholder();
 
-                $data = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
+                $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
                 $sql = "SELECT CONCAT(gibbonCourseClassID, '-', gibbonPerson.gibbonPersonID) AS value, CONCAT(gibbonFormGroup.name, ' - ', surname, ', ', preferredName) AS name, gibbonCourseClassID FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonFormGroup ON (gibbonStudentEnrolment.gibbonFormGroupID=gibbonFormGroup.gibbonFormGroupID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID) WHERE role='Student' AND status='Full' AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."') AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."') AND gibbonFormGroup.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY name, surname, preferredName";
 
                 $classList = $pdo->select($sql, $data)->fetchAll();

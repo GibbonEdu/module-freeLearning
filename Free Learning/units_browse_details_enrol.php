@@ -46,8 +46,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     // Check ability to enrol
     $proceed = false;
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
-    $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
+    $gibbonPersonID = $session->get('gibbonPersonID');
 
     if ($highestAction == 'Browse Units_all') {
         $proceed = true;
@@ -75,11 +75,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if (empty($rowEnrol)) {
 
         // ENROL NOW
-        $form = Form::create('enrol', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_enrolProcess.php?'.http_build_query($urlParams));
+        $form = Form::create('enrol', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_enrolProcess.php?'.http_build_query($urlParams));
         $form->setTitle(__m('Enrol Now'));
         $form->setFactory(DatabaseFormFactory::create($pdo));
 
-        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
 
         $enrolmentMethodSelected = '';
@@ -222,11 +222,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     } elseif ($rowEnrol['status'] == 'Current' or $rowEnrol['status'] == 'Current - Pending' or $rowEnrol['status'] == 'Evidence Not Yet Approved') {
         // Currently enrolled, allow to set status to complete and submit feedback...or previously submitted evidence not accepted
 
-        $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+        $form = Form::create('enrolComment', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
         $form->setClass('blank');
         $form->setTitle(__m('Currently Enrolled'));
 
-        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
         $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
 
@@ -276,9 +276,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                 $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
                     'discussion' => [[
-                        'surname' => $gibbon->session->get('surname'),
-                        'preferredName' => $gibbon->session->get('preferredName'),
-                        'image_240' => $gibbon->session->get('image_240'),
+                        'surname' => $session->get('surname'),
+                        'preferredName' => $session->get('preferredName'),
+                        'image_240' => $session->get('image_240'),
                         'comment' => $commentBox->getOutput(),
                     ]]
                 ]));
@@ -287,9 +287,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             echo $form->getOutput();
 
             // SUBMIT EVIDENCE
-            $form = Form::create('enrol', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_completePendingProcess.php?'.http_build_query($urlParams));
+            $form = Form::create('enrol', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_completePendingProcess.php?'.http_build_query($urlParams));
 
-            $form->addHiddenValue('address', $gibbon->session->get('address'));
+            $form->addHiddenValue('address', $session->get('address'));
             $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
             $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
 
@@ -331,12 +331,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     } elseif ($rowEnrol['status'] == 'Complete - Pending') {
         // Waiting for teacher feedback
 
-        $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+        $form = Form::create('enrolComment', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
         $form->setClass('blank');
         $form->setTitle(__m('Complete - Pending Approval'));
         $form->setDescription(__m('Your evidence, shown below, has been submitted to your teacher/mentor for approval. This screen will show a teacher comment, once approval has been given.'));
 
-        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
         $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
 
@@ -368,9 +368,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
                 'discussion' => [[
-                    'surname' => $gibbon->session->get('surname'),
-                    'preferredName' => $gibbon->session->get('preferredName'),
-                    'image_240' => $gibbon->session->get('image_240'),
+                    'surname' => $session->get('surname'),
+                    'preferredName' => $session->get('preferredName'),
+                    'image_240' => $session->get('image_240'),
                     'comment' => $commentBox->getOutput(),
                 ]]
             ]));
@@ -397,12 +397,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     } elseif ($rowEnrol['status'] == 'Complete - Approved') {
         // Complete, show status and feedback from teacher.
 
-        $form = Form::create('enrolComment', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
+        $form = Form::create('enrolComment', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
         $form->setClass('blank');
         $form->setTitle(__m('Complete - Approved'));
         $form->setDescription(__m('Congratulations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.'));
 
-        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
         $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
 
@@ -431,9 +431,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
             'discussion' => [[
-                'surname' => $gibbon->session->get('surname'),
-                'preferredName' => $gibbon->session->get('preferredName'),
-                'image_240' => $gibbon->session->get('image_240'),
+                'surname' => $session->get('surname'),
+                'preferredName' => $session->get('preferredName'),
+                'image_240' => $session->get('image_240'),
                 'comment' => $commentBox->getOutput(),
             ]]
         ]));

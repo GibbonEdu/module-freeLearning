@@ -25,7 +25,7 @@ use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 //Module includes
-include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
+include "./modules/" . $session->get('module') . "/moduleFunctions.php" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_workPendingApproval.php")==FALSE) {
     //Acess denied
@@ -53,18 +53,18 @@ else {
     $search = $_GET['search'] ?? '';
 
     if ($highestAction == 'Work Pending Approval_all') {
-        $form = Form::create('search', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__('Filter'));
         $form->setClass('noIntBorder fullWidth');
 
-        $form->addHiddenValue('q', '/modules/'.$gibbon->session->get('module').'/report_workPendingApproval.php');
+        $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_workPendingApproval.php');
 
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'))->description(__('Include evidence pending for all mentors.'));
             $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
 
         $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Search'));
+            $row->addSearchSubmit($session, __('Clear Search'));
 
         echo $form->getOutput();
     }
@@ -78,17 +78,17 @@ else {
         ->fromPOST();
 
     if (!empty($allMentors)) {
-        $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'));
+        $journey = $unitStudentGateway->queryEvidencePending($criteria, $session->get('gibbonSchoolYearID'));
     }
     else {
-        $journey = $unitStudentGateway->queryEvidencePending($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'));
+        $journey = $unitStudentGateway->queryEvidencePending($criteria, $session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'));
     }
 
     $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
     $collaborationKeys = [];
 
     // Get list of my classes before we start looping, for efficiency's sake
-    $myClasses = $unitGateway->selectRelevantClassesByTeacher($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
+    $myClasses = $unitGateway->selectRelevantClassesByTeacher($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
     // Render table
     $table = DataTable::createPaginated('pending', $criteria);
 
@@ -144,7 +144,7 @@ else {
     $table->addColumn('unit', __m('Unit'))
         ->description(__m('Learning Area')."/".__m('Course'))
         ->format(function($values) use ($gibbon) {
-             $output = "<a href='" . $gibbon->session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
+             $output = "<a href='" . $session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
              $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
              $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
              return $output;
@@ -205,7 +205,7 @@ else {
                 if (in_array($student['gibbonCourseClassID'], $myClasses)) {
                     $editEnrolment = true;
                 }
-            } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $gibbon->session->get('gibbonPersonID')) {
+            } elseif ($student['enrolmentMethod'] == 'schoolMentor' && $student['gibbonPersonIDSchoolMentor'] == $session->get('gibbonPersonID')) {
                 // Is mentor of this student?
                 $editEnrolment = true;
             }

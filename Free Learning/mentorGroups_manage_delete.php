@@ -39,6 +39,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         return;
     }
 
-    $form = DeleteForm::createForm($gibbon->session->get('absoluteURL').'/modules/Free Learning/mentorGroups_manage_deleteProcess.php');
+    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Free Learning/mentorGroups_manage_deleteProcess.php');
     echo $form->getOutput();
 }

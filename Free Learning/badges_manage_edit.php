@@ -75,14 +75,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
                 if ($_GET['search'] != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__($guid, 'Back to Search Results')."</a>";
+                    echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__($guid, 'Back to Search Results')."</a>";
                     echo '</div>';
                 }
 
-                $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module']."/badges_manage_editProcess.php?freeLearningBadgeID=$freeLearningBadgeID");
+                $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/badges_manage_editProcess.php?freeLearningBadgeID=$freeLearningBadgeID");
 
-                $form->addHiddenValue('address', $_SESSION[$guid]['address']);
-                $form->addHiddenValue('q', "/modules/".$_SESSION[$guid]['module']."/badges_manage_add.php");
+                $form->addHiddenValue('address', $session->get('address'));
+                $form->addHiddenValue('q', "/modules/".$session->get('module')."/badges_manage_add.php");
 
                 $data = array();
                 $sql = "SELECT badgesBadgeID AS value, name, category AS groupBy FROM badgesBadge WHERE active='Y' ORDER BY category, name";

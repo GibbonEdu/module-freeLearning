@@ -21,7 +21,7 @@ use Gibbon\Domain\System\SettingGateway;
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/settings_manage.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/settings_manage.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_manage') == false) {
     //Fail 0

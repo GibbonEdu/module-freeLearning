@@ -56,16 +56,16 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $gibbonPersonID = $_GET['gibbonPersonIDSchoolMentor'];
     }
     else {
-        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+        $gibbonPersonID = $session->get('gibbonPersonID');
     }
 
 
     if ($highestAction == 'Mentorship Overview_all') {
-        $form = Form::create('search', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__('Filter'));
         $form->setClass('noIntBorder fullWidth');
 
-        $form->addHiddenValue('q', '/modules/'.$gibbon->session->get('module').'/report_mentorshipOverview.php');
+        $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_mentorshipOverview.php');
 
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'));
@@ -80,12 +80,12 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
             $row->addSelectPerson('gibbonPersonIDSchoolMentor')->fromQuery($pdo, $sql, $data)->placeholder()->selected($gibbonPersonID);
 
         $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+            $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
     }
 
-    $form = BulkActionForm::create('bulkAction', $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/report_mentorshipOverviewProcessBulk.php');
+    $form = BulkActionForm::create('bulkAction', $session->get('absoluteURL').'/modules/Free Learning/report_mentorshipOverviewProcessBulk.php');
 
     $bulkActions = ['Approve' => __('Approve')];
     $col = $form->createBulkActionColumn($bulkActions);
@@ -99,7 +99,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         ->sortBy(['statusSort', 'timestamp'], 'DESC')
         ->fromPOST();
 
-    $mentorship = $unitStudentGateway->queryMentorship($criteria, $gibbon->session->get('gibbonSchoolYearID'), !empty($allMentors) ? null : $gibbonPersonID);
+    $mentorship = $unitStudentGateway->queryMentorship($criteria, $session->get('gibbonSchoolYearID'), !empty($allMentors) ? null : $gibbonPersonID);
 
     // Render chart
     $page->scripts->add('chart');
@@ -188,8 +188,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $table->addColumn('unit', __m('Unit'))
         ->description(__m('Learning Area')."/".__m('Course'))
-        ->format(function($values) use ($gibbon) {
-             $output = "<a href='" . $gibbon->session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
+        ->format(function($values) use ($session) {
+             $output = "<a href='" . $session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
              $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
              $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
              return $output;

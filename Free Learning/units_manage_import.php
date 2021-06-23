@@ -28,11 +28,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         ->add(__m('Manage Units'), 'units_manage.php')
         ->add(__m('Import Units'));
 
-    $form = Form::create('importUnits', $gibbon->session->get('absoluteURL').'/modules/Free Learning/units_manage_importProcess.php');
+    $form = Form::create('importUnits', $session->get('absoluteURL').'/modules/Free Learning/units_manage_importProcess.php');
     $form->setTitle(__m('Import Units'));
     $form->setDescription(__m('This page lets you import zip archives that have been created with the unit export tool.'));
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
-    $form->addHiddenValue('gibbonSchoolYearID', $gibbon->session->get('gibbonSchoolYearID'));
+    $form->addHiddenValue('address', $session->get('address'));
+    $form->addHiddenValue('gibbonSchoolYearID', $session->get('gibbonSchoolYearID'));
 
     $row = $form->addRow();
         $row->addLabel('file', __('ZIP File'));

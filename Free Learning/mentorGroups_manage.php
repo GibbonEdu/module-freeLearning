@@ -44,7 +44,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         ->fromPOST();
 
     // FORM
-    $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+    $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
     $form->setTitle(__('Filter'));
 
     $form->setClass('noIntBorder fullWidth');
@@ -55,13 +55,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         $row->addTextField('search')->setValue($criteria->getSearchText());
 
     $row = $form->addRow();
-        $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+        $row->addSearchSubmit($session, __('Clear Filters'));
 
     echo $form->getOutput();
 
     $mentorship = $mentorGroupGateway->queryMentorGroups($criteria);
 
-    $form = BulkActionForm::create('bulkAction', $_SESSION[$guid]['absoluteURL'].'/modules/Free Learning/mentorGroups_manageProcessBulk.php');
+    $form = BulkActionForm::create('bulkAction', $session->get('absoluteURL').'/modules/Free Learning/mentorGroups_manageProcessBulk.php');
 
     $bulkActions = ['Delete' => __('Delete')];
     $col = $form->createBulkActionColumn($bulkActions);

@@ -51,7 +51,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         } else {
 
             try {
-                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
+                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $session->get('gibbonPersonID'));
                 $sql = "SELECT freeLearningUnitStudent.freeLearningUnitStudentID, freeLearningUnit.name, freeLearningUnit.blurb, officialName, surname, preferredName, firstName, (SELECT sum(length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) AS length, timestampCompleteApproved
                     FROM freeLearningUnit
                         JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
@@ -86,8 +86,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     'length'           => $row['length'],
                     'dateComplete'     => Format::date($row['timestampCompleteApproved']),
                     'dateCompleteYMD'  => $row['timestampCompleteApproved'],
-                    'organisationName' => $gibbon->session->get('organisationName'),
-                    'organisationLogo' => $gibbon->session->get('organisationLogo'),
+                    'organisationName' => $session->get('organisationName'),
+                    'organisationLogo' => $session->get('organisationLogo'),
                 ]);
             }
         }
@@ -117,12 +117,12 @@ $config = [
 
 $pdf = new Mpdf($config);
 
-$pdf->SetCreator($gibbon->session->get('organisationName'));
-$pdf->SetAuthor($gibbon->session->get('organisationName'));
-$pdf->SetTitle($gibbon->session->get('organisationName').' Free Learning');
+$pdf->SetCreator($session->get('organisationName'));
+$pdf->SetAuthor($session->get('organisationName'));
+$pdf->SetTitle($session->get('organisationName').' Free Learning');
 
 $pdf->AddPage();
 
 $pdf->WriteHTML($output);
 
-$pdf->Output($gibbon->session->get('organisationName').' Free Learning.pdf', 'I');
+$pdf->Output($session->get('organisationName').' Free Learning.pdf', 'I');

@@ -47,7 +47,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $returns = array();
         $editLink = '';
         if (isset($_GET['editID'])) {
-            $editLink = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID='.$_GET['editID'].'&gibbonDepartmentID='.$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'];
+            $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID='.$_GET['editID'].'&gibbonDepartmentID='.$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'];
         }
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], $editLink, $returns);
@@ -55,14 +55,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
             echo "<div class='linkTop'>";
-            echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>".__($guid, 'Back to Search Results').'</a>';
+            echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>".__($guid, 'Back to Search Results').'</a>';
             echo '</div>';
         }
 
-        $form = Form::create('action', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module')."/units_manage_addProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+        $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_addProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
         $form->setFactory(FreeLearningFormFactory::create($pdo));
 
-        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('address', $session->get('address'));
 
 
         // UNIT BASICS
@@ -225,7 +225,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->addClass('advanced addBlock');
 
         $row = $form->addRow()->addClass('advanced');
-            $customBlocks = $row->addFreeLearningSmartBlocks('smart', $gibbon->session, $guid)
+            $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid)
                 ->addToolInput($blockCreator);
 
         for ($i=0 ; $i<5 ; $i++) {

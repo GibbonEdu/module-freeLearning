@@ -36,14 +36,14 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+$gibbonPersonID = $session->get('gibbonPersonID');
 if ($canManage and isset($_GET['gibbonPersonID'])) {
     $gibbonPersonID = $_GET['gibbonPersonID'];
 }
 
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_delete.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
-$URLDelete = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_delete.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
+$URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_delete.php') == false and !$canManage) {
     //Fail 0
@@ -55,10 +55,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
-        $freeLearningUnitID = $_POST['freeLearningUnitID'];
-        $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'];
+        $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
+        $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';
 
         if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
             //Fail 3
@@ -106,7 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 //Check to see if class is in one teacher teachers
                 if ($row['enrolmentMethod'] == 'class') { //Is teacher of this class?
                     try {
-                        $dataClasses = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'gibbonCourseClassID' => $row['gibbonCourseClassID']);
+                        $dataClasses = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $session->get('gibbonPersonID'), 'gibbonCourseClassID' => $row['gibbonCourseClassID']);
                         $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClass.gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
                         $resultClasses = $connection2->prepare($sqlClasses);
                         $resultClasses->execute($dataClasses);

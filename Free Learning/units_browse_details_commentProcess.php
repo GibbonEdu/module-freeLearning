@@ -29,7 +29,7 @@ require_once '../../gibbon.php';
 
 $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
 $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';
-$gibbonPersonID = $_POST['gibbonPersonID'] ?? $gibbon->session->get('gibbonPersonID');
+$gibbonPersonID = $_POST['gibbonPersonID'] ?? $session->get('gibbonPersonID');
 $comment = $_POST['addComment'] ?? '';
 $comment = nl2br($comment);
 
@@ -45,7 +45,7 @@ $urlParams = [
     'gibbonPersonID'            => $gibbonPersonID,
 ];
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&tab=1&'.http_build_query($urlParams);
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&tab=1&'.http_build_query($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     $URL .= '&return=error0';
@@ -56,7 +56,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
     $discussionGateway = $container->get(DiscussionGateway::class);
     $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
-    $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+    $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
     // Validate the required values
     if (empty($freeLearningUnitID) || empty($freeLearningUnitStudentID) || empty($comment)) {
@@ -79,7 +79,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         'foreignTable'         => 'freeLearningUnitStudent',
         'foreignTableID'       => $freeLearningUnitStudentID,
         'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
-        'gibbonPersonID'       => $gibbon->session->get('gibbonPersonID'),
+        'gibbonPersonID'       => $session->get('gibbonPersonID'),
         'gibbonPersonIDTarget' => $values['gibbonPersonIDStudent'],
         'comment'              => $comment,
         'type'                 => 'Comment',
@@ -106,10 +106,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1");
         $event->addRecipient($values['gibbonPersonIDStudent']);
 
-        $URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&'.http_build_query($urlParams);
+        $URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&'.http_build_query($urlParams);
 
     } else {
-        $user = $container->get(UserGateway::class)->getByID($gibbon->session->get('gibbonPersonID'));
+        $user = $container->get(UserGateway::class)->getByID($session->get('gibbonPersonID'));
         $studentName = Format::name('', $user['preferredName'], $user['surname'], 'Student', false, true);
 
         $event->addScope('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);
@@ -119,7 +119,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         if ($values['enrolmentMethod'] == 'class') {
             // Attempt to notify teacher(s) of class
             $courseGateway = $container->get(CourseEnrolmentGateway::class);
-            $teachers = $courseGateway->selectClassTeachersByStudent($gibbon->session->get('gibbonSchoolYearID'), $values['gibbonPersonIDStudent'], $values['gibbonCourseClassID'])->fetchAll();
+            $teachers = $courseGateway->selectClassTeachersByStudent($session->get('gibbonSchoolYearID'), $values['gibbonPersonIDStudent'], $values['gibbonCourseClassID'])->fetchAll();
 
             foreach ($teachers as $teacher) {
                 $event->addRecipient($teacher['gibbonPersonID']);
@@ -134,7 +134,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     }
 
     // Send any notifications
-    $event->sendNotifications($pdo, $gibbon->session);
+    $event->sendNotifications($pdo, $session);
 
     $URL .= "&return=success0";
     header("Location: {$URL}");

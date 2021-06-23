@@ -76,7 +76,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $data = array('freeLearningUnitID' => $freeLearningUnitID);
                 $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
             } elseif ($highestAction == 'Manage Units_learningAreas') {
-                $data = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
+                $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
                 $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID ORDER BY difficulty, name";
             }
             $result = $connection2->prepare($sql);
@@ -102,7 +102,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
             if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Back to Search Results').'</a>';
+                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Back to Search Results').'</a>';
                 echo '</div>';
             }
 
@@ -110,14 +110,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 if ($values['active'] == 'N') $showInactive = 'Y';
 
                 echo "<div class='linkTop'>";
-                echo "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/plus.png'/></a>";
+                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a>";
                 echo '</div>';
             }
 
-            $form = Form::create('action', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module')."/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+            $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
             $form->setFactory(FreeLearningFormFactory::create($pdo));
 
-            $form->addHiddenValue('address', $gibbon->session->get('address'));
+            $form->addHiddenValue('address', $session->get('address'));
 
 
             // UNIT BASICS
@@ -266,7 +266,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $form->addRow()->addHeading(__('Outcomes'))->append(__('Link this unit to outcomes (defined in the Manage Outcomes section of the Planner), and track which outcomes are being met in which units, classes and courses.'));
             $allowOutcomeEditing = getSettingByScope($connection2, 'Planner', 'allowOutcomeEditing');
             $row = $form->addRow();
-                $customBlocks = $row->addFreeLearningOutcomeBlocks('outcome', $gibbon->session, implode(",", $values['gibbonDepartmentIDList']), $allowOutcomeEditing);
+                $customBlocks = $row->addFreeLearningOutcomeBlocks('outcome', $session, implode(",", $values['gibbonDepartmentIDList']), $allowOutcomeEditing);
 
             $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
             $sqlBlocks = "SELECT freeLearningUnitOutcome.*, scope, name, category FROM freeLearningUnitOutcome JOIN gibbonOutcome ON (freeLearningUnitOutcome.gibbonOutcomeID=gibbonOutcome.gibbonOutcomeID) WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y' ORDER BY sequenceNumber";
@@ -301,7 +301,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 ->addClass('addBlock');
 
             $row = $form->addRow();
-                $customBlocks = $row->addFreeLearningSmartBlocks('smart', $gibbon->session, $guid)
+                $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid)
                     ->addToolInput($blockCreator);
 
             $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);

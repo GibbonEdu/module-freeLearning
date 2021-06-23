@@ -35,16 +35,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? '';
     $sort = $_GET['sort'] ?? 'unit';
 
-    $form = Form::create('filter', $gibbon->session->get('absoluteURL') . '/index.php', 'get');
+    $form = Form::create('filter', $session->get('absoluteURL') . '/index.php', 'get');
     $form->setFactory(DatabaseFormFactory::create($pdo));
     $form->setClass('noIntBorder fullWidth');
     $form->setTitle(__m('Choose Class'));
 
-    $form->addHiddenValue('q', '/modules/' . $gibbon->session->get('module') . '/report_currentUnitByClass.php');
+    $form->addHiddenValue('q', '/modules/' . $session->get('module') . '/report_currentUnitByClass.php');
 
     $row = $form->addRow();
         $row->addLabel('gibbonCourseClassID', __('Class'));
-        $row->addSelectClass('gibbonCourseClassID', $gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))
+        $row->addSelectClass('gibbonCourseClassID', $session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))
             ->required()
             ->selected($gibbonCourseClassID)
             ->placeholder();
@@ -55,7 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
         $row->addSelect('sort')->fromArray($sortOptions)->selected($sort);
 
     $row = $form->addRow();
-    $row->addSearchSubmit($gibbon->session);
+    $row->addSearchSubmit($session);
 
     echo $form->getOutput();
 
@@ -155,7 +155,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 echo $count;
                 echo '</td>';
                 echo '<td>';
-                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".formatName('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
+                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".formatName('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
                 $fields = json_decode($row['fields'], true);
                 if (!empty($fields[$customField])) {
                     $value = $fields[$customField];
@@ -177,7 +177,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 if ($row['enrolmentMethod'] == "schoolMentor" || $row['enrolmentMethod'] == "externalMentor") {
                     echo "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
                 }
-                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
+                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
                 echo "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status'] ?? '').'</span>';
                 echo '</td>';
                 echo '<td>';

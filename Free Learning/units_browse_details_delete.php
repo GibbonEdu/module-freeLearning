@@ -41,7 +41,7 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+$gibbonPersonID = $session->get('gibbonPersonID');
 if ($canManage and isset($_GET['gibbonPersonID'])) {
     $gibbonPersonID = $_GET['gibbonPersonID'];
 }
@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
 
         if (isset($_GET['return'])) {
@@ -88,7 +88,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 if ($manageAll == true) {
                     $proceed = true;
                 }
-                else if ($row['enrolmentMethod'] == 'schoolMentor' && $row['gibbonPersonIDSchoolMentor'] == $gibbon->session->get('gibbonPersonID')) {
+                else if ($row['enrolmentMethod'] == 'schoolMentor' && $row['gibbonPersonIDSchoolMentor'] == $session->get('gibbonPersonID')) {
                     $proceed = true;
                 } else {
                     $learningAreas = getLearningAreas($connection2, $guid, true);
@@ -105,7 +105,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 //Check to see if class is in one teacher teachers
                 if ($row['enrolmentMethod'] == 'class') { //Is teacher of this class?
                     try {
-                        $dataClasses = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'gibbonCourseClassID' => $row['gibbonCourseClassID']);
+                        $dataClasses = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonPersonID' => $session->get('gibbonPersonID'), 'gibbonCourseClassID' => $row['gibbonCourseClassID']);
                         $sqlClasses = "SELECT gibbonCourseClass.gibbonCourseClassID FROM gibbonCourse JOIN gibbonCourseClass ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND gibbonCourseClass.gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
                         $resultClasses = $connection2->prepare($sqlClasses);
                         $resultClasses->execute($dataClasses);
@@ -122,7 +122,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 } else {
                     //Let's go!
 
-                    $form = DeleteForm::createForm($gibbon->session->get('absoluteURL')."/modules/Free Learning/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view");
+                    $form = DeleteForm::createForm($session->get('absoluteURL')."/modules/Free Learning/units_browse_details_deleteProcess.php?freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view");
                     $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
                     echo $form->getOutput();
                 }

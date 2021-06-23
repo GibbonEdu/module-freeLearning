@@ -27,7 +27,7 @@ require_once '../../gibbon.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
-$highestAction = getHighestGroupedAction($guid, $gibbon->session->get('address'), $connection2);
+$highestAction = getHighestGroupedAction($guid, $session->get('address'), $connection2);
 
 //Get params
 $freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
@@ -43,9 +43,9 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+$gibbonPersonID = $session->get('gibbonPersonID');
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=1&view='.$view;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     // Fail 0
@@ -57,14 +57,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error6';
         header("Location: {$URL}");
     } else {
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
         if ($highestAction == false || empty($roleCategory)) {
             // Fail 0
             $URL .= '&return=error0';
             header("Location: {$URL}");
         } else {
-            $freeLearningUnitID = $_POST['freeLearningUnitID'];
-            $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'];
+            $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
+            $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';
 
             if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
                 //Fail 3
@@ -110,7 +110,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $status = 'Complete - Pending';
                     $commentStudent = $_POST['commentStudent'] ?? '';
                     $commentStudent = nl2br($commentStudent);
-                    $type = $_POST['type'];
+                    $type = $_POST['type'] ?? '';
                     $link = (!empty($_POST['link'])) ? trim($_POST['link']) : null;
                     $gibbonCourseClassID = $row['gibbonCourseClassID'];
 
@@ -148,12 +148,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                 //Move attached image  file, if there is one
                                 if (!empty($_FILES['file']['tmp_name'])) {
-                                    $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
+                                    $fileUploader = new Gibbon\FileUploader($pdo, $session);
 
                                     $file = $_FILES['file'] ?? null;
 
                                     // Upload the file, return the /uploads relative path
-                                    $location = $fileUploader->uploadFromPost($file, $gibbon->session->get('username'));
+                                    $location = $fileUploader->uploadFromPost($file, $session->get('username'));
 
                                     if (empty($location)) {
                                         $partialFail = true;
@@ -190,13 +190,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             // Insert discussion records
                             $discussionGateway = $container->get(DiscussionGateway::class);
-                            
+
                             $data = [
                                 'foreignTable'         => 'freeLearningUnitStudent',
                                 'foreignTableID'       => $freeLearningUnitStudentID,
                                 'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
-                                'gibbonPersonID'       => $gibbon->session->get('gibbonPersonID'),
-                                'gibbonPersonIDTarget' => $gibbon->session->get('gibbonPersonID'),
+                                'gibbonPersonID'       => $session->get('gibbonPersonID'),
+                                'gibbonPersonIDTarget' => $session->get('gibbonPersonID'),
                                 'comment'              => $commentStudent,
                                 'type'                 => 'Complete - Pending',
                                 'tag'                  => 'pending',
@@ -233,19 +233,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey";
                                 setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $text, 'Free Learning', $actionLink);
                             }
-                            elseif ($enrolmentMethod == 'externalMentor' && $emailExternalMentor != '') { 
+                            elseif ($enrolmentMethod == 'externalMentor' && $emailExternalMentor != '') {
                                 // Attempt to notify external mentors
-                                
-                                $subject = sprintf(__m('Request For Mentor Feedback via %1$s at %2$s'), $gibbon->session->get('systemName'), $gibbon->session->get('organisationNameShort'));
+
+                                $subject = sprintf(__m('Request For Mentor Feedback via %1$s at %2$s'), $session->get('systemName'), $session->get('organisationNameShort'));
                                 $buttonURL = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey";
 
                                 $body = $container->get(View::class)->fetchFromTemplate('mentorSubmit.twig.html', [
                                     'roleCategoryFull' => $roleCategory == 'Staff' ? __m('member of staff') : __(strtolower($roleCategory)),
                                     'unitName' => $name,
                                     'studentName' => $studentName,
-                                    'organisationNameShort' => $gibbon->session->get('organisationNameShort'),
-                                    'organisationAdministratorName' => $gibbon->session->get('organisationAdministratorName'),
-                                    'organisationAdministratorEmail' => $gibbon->session->get('organisationAdministratorEmail'),
+                                    'organisationNameShort' => $session->get('organisationNameShort'),
+                                    'organisationAdministratorName' => $session->get('organisationAdministratorName'),
+                                    'organisationAdministratorEmail' => $session->get('organisationAdministratorEmail'),
                                 ]);
 
                                 // Attempt email send

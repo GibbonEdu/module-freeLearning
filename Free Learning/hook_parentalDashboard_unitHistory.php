@@ -36,17 +36,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $disableParentEvidence = (getSettingByScope($connection2, 'Free Learning', 'disableParentEvidence') == "Y");
 
     $returnInt .= "<div class='linkTop'>";
-    $returnInt .= sprintf(__($guid, '%1$sView Showcase of Student Work%2$s', 'Free Learning'), "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
+    $returnInt .= sprintf(__($guid, '%1$sView Showcase of Student Work%2$s', 'Free Learning'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
     if ($canBrowse) {
-        $returnInt .= " | ".sprintf(__($guid, '%1$sBrowse Units%2$s', 'Free Learning'), "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
+        $returnInt .= " | ".sprintf(__($guid, '%1$sBrowse Units%2$s', 'Free Learning'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
     }
     $returnInt .= '</div>';
     $returnInt .= "<p style='margin-top: 20px'>";
     $returnInt .= __($guid, 'This table shows recent results and enrolment for Free Learning units studied by your child:', 'Free Learning');
     $returnInt .= '</p>';
 
-    include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
-    include_once $gibbon->session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
+    include_once $session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
+    include_once $session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
     $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, $disableParentEvidence);
     $returnInt .= $table->getOutput();

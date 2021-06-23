@@ -23,7 +23,7 @@ use Gibbon\Module\FreeLearning\Domain\MentorGroupPersonGateway;
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage_add.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage_add.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups_manage_add.php') == false) {
     $URL .= '&return=error0';

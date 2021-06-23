@@ -32,17 +32,17 @@ require_once __DIR__ . '/moduleFunctions.php';
 
 $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 
-if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and !$gibbon->session->exists('username')))) {
+if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and !$session->exists('username')))) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
     //Get action with highest precendence
-    if ($publicUnits == 'Y' and !$gibbon->session->exists('username')) {
+    if ($publicUnits == 'Y' and !$session->exists('username')) {
         $highestAction = 'Browse Units_all';
         $roleCategory = null ;
     } else {
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
     }
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
@@ -68,7 +68,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
 
         // View the current user by default
-        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+        $gibbonPersonID = $session->get('gibbonPersonID');
         $viewingAsUser = false;
 
         // Allow viewing other users based on permissions/role
@@ -80,7 +80,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         // Setup default URLs
         $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'gibbonPersonID');
 
-        $defaultImage = $gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName').'/img/anonymous_125.jpg';
+        $defaultImage = $session->get('absoluteURL').'/themes/'.$session->get('gibbonThemeName').'/img/anonymous_125.jpg';
         $viewUnitURL = "./index.php?q=/modules/Free Learning/units_browse_details.php&".http_build_query($urlParams)."&view=$view&sidebar=true";
         $browseUnitsURL = "./index.php?q=/modules/Free Learning/units_browse.php&".http_build_query($urlParams)."&sidebar=false";
 
@@ -97,7 +97,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ->fromPOST();
 
         // FORM
-        $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__('Filter'));
         $form->setFactory(DatabaseFormFactory::create($pdo));
 
@@ -105,7 +105,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $view);
 
-        $courses = $unitStudentGateway->selectCoursesByStudent($gibbon->session->get('gibbonPersonID'), $gibbon->session->get('gibbonSchoolYearID'));
+        $courses = $unitStudentGateway->selectCoursesByStudent($session->get('gibbonPersonID'), $session->get('gibbonSchoolYearID'));
         $learningAreas = $unitGateway->selectLearningAreasAndCourses();
         $row = $form->addRow();
             $row->addLabel('gibbonDepartmentID', __m('Learning Area & Course'));
@@ -133,10 +133,10 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __m('View As'));
-                $row->addSelectUsers('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), ['includeStudents' => true])->selected($gibbonPersonID);
+                $row->addSelectUsers('gibbonPersonID', $session->get('gibbonSchoolYearID'), ['includeStudents' => true])->selected($gibbonPersonID);
         } elseif ($roleCategory == 'Parent') {
             // Allow parents to view the map for their children
-            $children = $container->get(StudentGateway::class)->selectActiveStudentsByFamilyAdult($gibbon->session->get('gibbonSchoolYearID'), $gibbon->session->get('gibbonPersonID'))->fetchAll();
+            $children = $container->get(StudentGateway::class)->selectActiveStudentsByFamilyAdult($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))->fetchAll();
             $children = Format::nameListArray($children, 'Student', false, true);
 
             if (empty($children[$gibbonPersonID])) {
@@ -145,13 +145,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __m('View As'));
-                $row->addSelectPerson('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'), ['includeStudents' => true])
+                $row->addSelectPerson('gibbonPersonID', $session->get('gibbonSchoolYearID'), ['includeStudents' => true])
                     ->fromArray($children)
                     ->selected($gibbonPersonID);
         }
 
         $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+            $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
 
@@ -159,7 +159,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         if ($highestAction == 'Browse Units_all' && !$viewingAsUser) {
             $units = $unitGateway->queryAllUnits($criteria, $gibbonPersonID, $publicUnits);
         } else {
-            $units = $unitGateway->queryUnitsByPrerequisites($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbonPersonID, !$viewingAsUser ? $roleCategory : '');
+            $units = $unitGateway->queryUnitsByPrerequisites($criteria, $session->get('gibbonSchoolYearID'), $gibbonPersonID, !$viewingAsUser ? $roleCategory : '');
         }
 
         // Join a set of author data per unit
@@ -367,8 +367,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '</div>';
 
                 ?>
-                <script type="text/javascript" src="<?php echo $gibbon->session->get('absoluteURL') ?>/lib/vis/dist/vis.js"></script>
-                <link href="<?php echo $gibbon->session->get('absoluteURL') ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+                <script type="text/javascript" src="<?php echo $session->get('absoluteURL') ?>/lib/vis/dist/vis.js"></script>
+                <link href="<?php echo $session->get('absoluteURL') ?>/lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 
                 <div id="map" class="w-full border rounded shadow-inner mb-4" style="height: 800px;"></div>
 
@@ -385,7 +385,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         if ($unit['logo'] != '') {
                             $image = $unit['logo'];
                         } else {
-                            $image = $gibbon->session->get('absoluteURL').'/themes/'.$gibbon->session->get('gibbonThemeName').'/img/anonymous_240_square.jpg';
+                            $image = $session->get('absoluteURL').'/themes/'.$session->get('gibbonThemeName').'/img/anonymous_240_square.jpg';
                         }
                     } else {
                         $image = 'undefined';
@@ -533,7 +533,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     network.on( 'click', function(properties) {
                         var nodeNo = properties.nodes ;
                         if (nodeNo != '') {
-                            window.location = '<?php echo $gibbon->session->get('absoluteURL') ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&showInactive=<?php echo $showInactive; ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
+                            window.location = '<?php echo $session->get('absoluteURL') ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&showInactive=<?php echo $showInactive; ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
                         }
                     });
                 </script>

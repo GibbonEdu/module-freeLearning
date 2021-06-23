@@ -22,7 +22,7 @@ $_POST['address'] = '/modules/Free Learning/report_mentorshipOverview.php';
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Free Learning/report_mentorshipOverview.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/report_mentorshipOverview.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_mentorshipOverview.php') == false) {
     $URL .= '&return=error0';
