@@ -22,6 +22,7 @@ use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Forms\Prefab\BulkActionForm;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
+use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -44,6 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
+        $gibbonYearGroupIDMinimum = $_GET['gibbonYearGroupIDMinimum'] ?? '';
 
         // QUERY
         $unitGateway = $container->get(UnitGateway::class);
@@ -52,10 +54,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->sortBy('name')
             ->filterBy('department', $gibbonDepartmentID)
             ->filterBy('difficulty', $difficulty)
+            ->filterBy('gibbonYearGroupIDMinimum', $gibbonYearGroupIDMinimum)
             ->fromPOST();
 
         // FORM
         $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
+        $form->setFactory(FreeLearningFormFactory::create($pdo));
         $form->setTitle(__('Filter'));
 
         $form->setClass('noIntBorder fullWidth');
@@ -74,6 +78,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $row = $form->addRow();
             $row->addLabel('name', __m('Unit Name'));
             $row->addTextField('name')->setValue($criteria->getSearchText());
+
+        $row = $form->addRow();
+            $row->addLabel('gibbonYearGroupIDMinimum', __m('Minimum Year Group'));
+            $row->addSelectYearGroup('gibbonYearGroupIDMinimum')->placeholder()->selected($gibbonYearGroupIDMinimum);
 
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
@@ -101,6 +109,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->addParam('gibbonDepartmentID', $gibbonDepartmentID)
             ->addParam('difficulty', $difficulty)
             ->addParam('name', $name)
+            ->addParam('gibbonYearGroupIDMinimum', $gibbonYearGroupIDMinimum)
             ->setURL('/modules/Free Learning/units_manage_add.php')
             ->displayLabel()
             ->append(' | ');
@@ -148,6 +157,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->addParam('gibbonDepartmentID', $gibbonDepartmentID)
             ->addParam('difficulty', $difficulty)
             ->addParam('name', $name)
+            ->addParam('gibbonYearGroupIDMinimum', $gibbonYearGroupIDMinimum)
             ->addParam('freeLearningUnitID')
             ->format(function ($unit, $actions) use ($canBrowseUnits, $highestAction) {
                 if ($canBrowseUnits) {

@@ -62,6 +62,11 @@ class UnitGateway extends QueryableGateway
             $query->where("freeLearningUnit.active='Y'");
         }
 
+        if ($criteria->getFilterValue('gibbonYearGroupIDMinimum') != '') {
+            $query->bindValue('gibbonYearGroupIDMinimum', $criteria->getFilterValue('gibbonYearGroupIDMinimum'));
+            $query->where("freeLearningUnit.gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum");
+        }
+
         $criteria->addFilterRules($this->getSharedFilterRules());
 
         return $this->runQuery($query, $criteria);
@@ -133,6 +138,11 @@ class UnitGateway extends QueryableGateway
             ->where('gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID')
             ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->groupBy(['freeLearningUnit.freeLearningUnitID']);
+
+        if ($criteria->getFilterValue('gibbonYearGroupIDMinimum') != '') {
+            $query->bindValue('gibbonYearGroupIDMinimum', $criteria->getFilterValue('gibbonYearGroupIDMinimum'));
+            $query->where("freeLearningUnit.gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum");
+        }
 
         $criteria->addFilterRules($this->getSharedFilterRules());
 

@@ -21,7 +21,7 @@ require_once '../../gibbon.php';
 
 
 $freeLearningUnitID = $_GET['freeLearningUnitID'];
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'];
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'];
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_edit.php') == false) {
     //Fail 0
@@ -204,7 +204,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     $sequenceNumber = 0;
                     $dataRemove = array();
                     $whereRemove = '';
-                    if (count($order) < 0) {
+                    if (is_numeric($order) && count($order) < 0) {
                         //Fail 3
                         $URL .= '&addReturn=error3';
                         header("Location: {$URL}");

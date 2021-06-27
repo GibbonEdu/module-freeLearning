@@ -36,7 +36,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
+        $gibbonYearGroupIDMinimum = $_GET['gibbonYearGroupIDMinimum'] ?? '';
         $view = $_GET['view'] ?? '';
+
+        $urlParams = compact('view', 'name', 'gibbonYearGroupIDMinimum', 'difficulty', 'gibbonDepartmentID', 'freeLearningUnitID');
 
         if (empty($freeLearningUnitID)) {
             $page->addError(__('You have not specified one or more required parameters.'));
@@ -50,7 +53,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             return;
         }
 
-        $form = DeleteForm::createForm($session->get('absoluteURL')."/modules/Free Learning/units_manage_deleteProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view", true);
+        $form = DeleteForm::createForm($session->get('absoluteURL')."/modules/Free Learning/units_manage_deleteProcess.php?".http_build_query($urlParams), true);
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
         echo $form->getOutput();
     }
