@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v5.16.33
+--------
+Added Minimum Year Group filter to Manage Units
+Fixed post-refactor session issue
+Updated Afrikaans translations
+Edit process PHP notice fix
+
 v5.16.32
 --------
 Refactored session variables and null coalesce

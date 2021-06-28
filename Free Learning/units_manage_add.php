@@ -35,10 +35,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
+        $gibbonYearGroupIDMinimum = $_GET['gibbonYearGroupIDMinimum'] ?? '';
         $view = $_GET['view'] ?? '';
 
         //Proceed!
-        $urlParams = compact('gibbonDepartmentID', 'difficulty', 'name', 'view');
+        $urlParams = compact('gibbonDepartmentID', 'difficulty', 'name', 'gibbonYearGroupIDMinimum', 'view');
 
         $page->breadcrumbs
              ->add(__m('Manage Units'), 'units_manage.php', $urlParams)
@@ -47,19 +48,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $returns = array();
         $editLink = '';
         if (isset($_GET['editID'])) {
-            $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID='.$_GET['editID'].'&gibbonDepartmentID='.$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'];
+            $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage_edit.php&'.http_build_query($urlParams);
         }
         if (isset($_GET['return'])) {
             returnProcess($guid, $_GET['return'], $editLink, $returns);
         }
 
-        if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
+        if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
             echo "<div class='linkTop'>";
-            echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view'>".__($guid, 'Back to Search Results').'</a>';
+            echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__($guid, 'Back to Search Results').'</a>';
             echo '</div>';
         }
 
-        $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_addProcess.php?gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+        $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_addProcess.php?".http_build_query($urlParams));
         $form->setFactory(FreeLearningFormFactory::create($pdo));
 
         $form->addHiddenValue('address', $session->get('address'));

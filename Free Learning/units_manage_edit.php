@@ -45,10 +45,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
+        $gibbonYearGroupIDMinimum = $_GET['gibbonYearGroupIDMinimum'] ?? '';
         $view = $_GET['view'] ?? '';
 
         //Proceed!
-        $urlParams = compact('view', 'name', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
+        $urlParams = compact('view', 'name', 'gibbonYearGroupIDMinimum', 'difficulty', 'gibbonDepartmentID', 'showInactive', 'freeLearningUnitID');
 
         $page->breadcrumbs
              ->add(__m('Manage Units'), 'units_manage.php', $urlParams)
@@ -100,9 +101,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 return;
             }
 
-            if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
+            if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'Back to Search Results').'</a>';
+                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__($guid, 'Back to Search Results').'</a>';
                 echo '</div>';
             }
 
@@ -110,11 +111,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 if ($values['active'] == 'N') $showInactive = 'Y';
 
                 echo "<div class='linkTop'>";
-                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&view=$view'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a>";
+                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&".http_build_query($urlParams)."'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a>";
                 echo '</div>';
             }
 
-            $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_editProcess.php?freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
+            $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_editProcess.php?".http_build_query($urlParams));
             $form->setFactory(FreeLearningFormFactory::create($pdo));
 
             $form->addHiddenValue('address', $session->get('address'));
