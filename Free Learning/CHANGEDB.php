@@ -1639,3 +1639,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.16.33';
 $sql[$count][1] = "";
+
+//v5.16.34
+++$count;
+$sql[$count][0] = '5.16.34';
+$sql[$count][1] = "";

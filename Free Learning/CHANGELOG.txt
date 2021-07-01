@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.34
+--------
+Translation improvement
+
 v5.16.33
 --------
 Added Minimum Year Group filter to Manage Units

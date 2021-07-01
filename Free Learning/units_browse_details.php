@@ -259,7 +259,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             if ($values['grouping'] != '') {
                                 $groupings = explode(',', $values['grouping']);
                                 foreach ($groupings as $grouping) {
-                                    $output .= ucwords($grouping).'<br/>';
+                                    $output .= __m(ucwords($grouping)).'<br/>';
                                 }
                             }
                             return $output;
