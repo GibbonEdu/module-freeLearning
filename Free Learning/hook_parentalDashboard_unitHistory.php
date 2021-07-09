@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Module\FreeLearning\Tables\UnitHistory;
 
-global $gibbon, $container;
+global $gibbon, $container, $page;
 
 $returnInt = null;
 
@@ -48,8 +48,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     include_once $session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
     include_once $session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
-    $table = $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, $disableParentEvidence);
-    $returnInt .= $table->getOutput();
+    $page->stylesheets->add('module-freeLearning', 'modules/Free Learning/css/module.css');
+    $returnInt .= $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, $disableParentEvidence);
 }
 
 return $returnInt;

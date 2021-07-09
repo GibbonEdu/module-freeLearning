@@ -58,9 +58,10 @@ class UnitHistory
             ? DataTable::createPaginated('unitHistory', $criteria)->withData($units)
             : DataTable::create('unitHistory')->withData($units);
 
-        // Render chart
+        $output = '';
         if (!$summary) {
-            echo "<h3>".__('Overview')."</h3>";
+            // Render chart
+            $output .= "<h3>".__('Overview')."</h3>";
 
             $unitStats = [
                 "Current - Pending" => 0,
@@ -86,22 +87,20 @@ class UnitHistory
             $chart->addDataset('pie')
                 ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
 
-            echo $chart->render();
+            $output .= $chart->render();
 
-            echo "<h3>".__('Details')."</h3>";
+            $output .= "<h3>".__('Details')."</h3>";
         }
 
-        if (!$summary) {
-            $table->modifyRows(function ($student, $row) {
-                if ($student['status'] == 'Current - Pending') $row->setClass('currentPending');
-                if ($student['status'] == 'Current') $row->setClass('currentUnit');
-                if ($student['status'] == 'Evidence Not Yet Approved') $row->setClass('warning');
-                if ($student['status'] == 'Complete - Pending') $row->setClass('pending');
-                if ($student['status'] == 'Complete - Approved') $row->setClass('success');
-                if ($student['status'] == 'Exempt') $row->setClass('success');
-                return $row;
-            });
-        }
+        $table->modifyRows(function ($student, $row) {
+            if ($student['status'] == 'Current - Pending') $row->setClass('currentPending');
+            if ($student['status'] == 'Current') $row->setClass('currentUnit');
+            if ($student['status'] == 'Evidence Not Yet Approved') $row->setClass('warning');
+            if ($student['status'] == 'Complete - Pending') $row->setClass('pending');
+            if ($student['status'] == 'Complete - Approved') $row->setClass('success');
+            if ($student['status'] == 'Exempt') $row->setClass('success');
+            return $row;
+        });
 
         $filterOptions = [
             'status:current - pending'         => __('Status') .': '.__m('Current - Pending'),
@@ -197,6 +196,6 @@ class UnitHistory
                 });
         }
 
-        return $table;
+        return $output.$table->getOutput();
     }
 }

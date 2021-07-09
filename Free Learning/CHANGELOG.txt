@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.35
+--------
+Added table colouring to dashboard tables
+
 v5.16.34
 --------
 Translation improvement
