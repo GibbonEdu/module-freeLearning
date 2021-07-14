@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.16.36
+--------
+Fixed Parent Dashboard PHP error
+Fixed Unit History by Student PHP error
+
 v5.16.35
 --------
 Added table colouring to dashboard tables

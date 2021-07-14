@@ -92,8 +92,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         }
 
         $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
-        $table = $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence);
-        echo $table->getOutput();
-
+        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence);
     }
 }

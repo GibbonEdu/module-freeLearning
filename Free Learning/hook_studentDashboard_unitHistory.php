@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Module\FreeLearning\Tables\UnitHistory;
 
-global $gibbon, $container, $page;
+global $session, $container, $page;
 
 $returnInt = null;
 
