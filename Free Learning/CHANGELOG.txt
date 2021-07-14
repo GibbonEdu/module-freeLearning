@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.37
+--------
+Fixed broken edit link in Manage Units > Add Unit
+
 v5.16.36
 --------
 Fixed Parent Dashboard PHP error
