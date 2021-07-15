@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.16.38
+--------
+Added chart to Parent and Student Dashboard
+Fixed Unit History by Student PHP error (student view)
+
 v5.16.37
 --------
 Fixed broken edit link in Manage Units > Add Unit

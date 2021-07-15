@@ -37,12 +37,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= sprintf(__($guid, '%1$sBrowse Units%2$s', 'Free Learning'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
     $returnInt .= '</div>';
     $returnInt .= "<p style='margin-top: 20px'>";
-    $returnInt .= __($guid, 'This table shows your recent results and enrolment for Free Learning:', 'Free Learning');
+    $returnInt .= __m('This tab shows your recent results and enrolment for Free Learning.');
+    if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_my.php')) {
+        $returnInt .= " ".__m('Complete unit history information can be {link}viewed here{linkEnd}.', ['link' => "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/report_unitHistory_my.php'>", 'linkEnd' => '</a>']);
+    }
     $returnInt .= '</p>';
 
     include_once $session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
     include_once $session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
+    $page->scripts->add('chart');
     $page->stylesheets->add('module-freeLearning', 'modules/Free Learning/css/module.css');
     $returnInt .= $container->get(UnitHistory::class)->create($gibbonPersonID, true);
 }

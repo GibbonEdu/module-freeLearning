@@ -69,3 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
 }
+
+canvas#unitStats {
+    max-width: 100%
+}

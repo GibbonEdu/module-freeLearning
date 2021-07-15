@@ -42,12 +42,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     }
     $returnInt .= '</div>';
     $returnInt .= "<p style='margin-top: 20px'>";
-    $returnInt .= __($guid, 'This table shows recent results and enrolment for Free Learning units studied by your child:', 'Free Learning');
+    $returnInt .= __m('This tab shows recent results and enrolment for Free Learning units studied by your child.');
+    if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_byStudent.php')) {
+        $returnInt .= " ".__m('Complete unit history information can be {link}viewed here{linkEnd}.', ['link' => "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/report_unitHistory_byStudent.php&gibbonPersonID=$gibbonPersonID'>", 'linkEnd' => '</a>']);
+    }
     $returnInt .= '</p>';
 
     include_once $session->get('absolutePath').'/modules/Free Learning/src/Tables/UnitHistory.php';
     include_once $session->get('absolutePath').'/modules/Free Learning/src/Domain/UnitStudentGateway.php';
 
+    $page->scripts->add('chart');
     $page->stylesheets->add('module-freeLearning', 'modules/Free Learning/css/module.css');
     $returnInt .= $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, $disableParentEvidence);
 }

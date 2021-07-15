@@ -59,38 +59,36 @@ class UnitHistory
             : DataTable::create('unitHistory')->withData($units);
 
         $output = '';
-        if (!$summary) {
-            // Render chart
-            $output .= "<h3>".__('Overview')."</h3>";
+        // Render chart
+        $output .= "<h3>".__('Overview')."</h3>";
 
-            $unitStats = [
-                "Current - Pending" => 0,
-                "Current" => 0,
-                "Complete - Pending" => 0,
-                "Evidence Not Yet Approved" => 0,
-                "Complete - Approved" => 0
-            ];
-            foreach ($units as $unit) {
-                ++$unitStats[$unit['status']];
-            }
-
-            $chart = Chart::create('unitStats', 'doughnut')
-                ->setOptions([
-                    'height' => 80,
-                    'legend' => [
-                        'position' => 'right',
-                    ]
-                ])
-                ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
-                ->setColors(['#FAF089', '#FDE2FF', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
-
-            $chart->addDataset('pie')
-                ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
-
-            $output .= $chart->render();
-
-            $output .= "<h3>".__('Details')."</h3>";
+        $unitStats = [
+            "Current - Pending" => 0,
+            "Current" => 0,
+            "Complete - Pending" => 0,
+            "Evidence Not Yet Approved" => 0,
+            "Complete - Approved" => 0
+        ];
+        foreach ($units as $unit) {
+            ++$unitStats[$unit['status']];
         }
+
+        $chart = Chart::create('unitStats', 'doughnut')
+            ->setOptions([
+                'height' => 80,
+                'legend' => [
+                    'position' => 'right',
+                ]
+            ])
+            ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
+            ->setColors(['#FAF089', '#FDE2FF', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+
+        $chart->addDataset('pie')
+            ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
+
+        $output .= $chart->render();
+
+        $output .= "<h3>".__('Details')."</h3>";
 
         $table->modifyRows(function ($student, $row) {
             if ($student['status'] == 'Current - Pending') $row->setClass('currentPending');
