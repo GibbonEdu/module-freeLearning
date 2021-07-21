@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.16.NEXT
+--------
+My Unit History Breadcrumb fix
+Updated Afrikaans translations
+
 v5.16.38
 --------
 Added chart to Parent and Student Dashboard
