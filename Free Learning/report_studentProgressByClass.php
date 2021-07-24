@@ -35,7 +35,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
     $page->breadcrumbs
          ->add(__m('Student Progress by Class'));
 
-    $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? '';
+    $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? null;
+    $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? null;
+
+    echo "<p>".__m("This report returns all enrolments from the specified class, as well as all school and external mentorship enrolments from the current school year.")."</p>";
 
     $form = Form::create('filter', $session->get('absoluteURL') . '/index.php', 'get');
     $form->setFactory(DatabaseFormFactory::create($pdo));
@@ -50,6 +53,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
             ->required()
             ->selected($gibbonCourseClassID)
             ->placeholder();
+
+    $sql = "SELECT gibbonDepartmentID as value, name FROM gibbonDepartment WHERE type='Learning Area' ORDER BY name";
+    $row = $form->addRow();
+        $row->addLabel('gibbonDepartmentID', __('Learning Area'));
+        $row->addSelect('gibbonDepartmentID')->fromQuery($pdo, $sql)->placeholder()->selected($gibbonDepartmentID);
 
     $row = $form->addRow();
     $row->addSearchSubmit($session);
@@ -77,7 +85,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
                 ->sortBy('surname', 'preferredName', 'gibbonPersonID')
                 ->fromPOST();
 
-            $values = $unitStudentGateway->queryStudentProgressByStudent($criteria, $gibbonCourseClassID, $session->get('gibbonSchoolYearID'));
+            $values = $unitStudentGateway->queryStudentProgressByStudent($criteria, $gibbonCourseClassID, $session->get('gibbonSchoolYearID'), $gibbonDepartmentID);
 
             $table = DataTable::createPaginated('progress', $criteria);
 

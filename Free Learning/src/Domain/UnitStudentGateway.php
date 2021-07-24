@@ -197,23 +197,25 @@ class UnitStudentGateway extends QueryableGateway
     {
         $query = $this
             ->newQuery()
-            ->cols(['enrolmentMethod', 'freeLearningUnit.name AS unit', 'freeLearningUnit.freeLearningUnitID', "GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnit.course AS flCourse', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.surname AS studentsurname', 'gibbonPerson.preferredName AS studentpreferredName', 'freeLearningUnitStudent.*', 'gibbonRole.category', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', "(CASE WHEN freeLearningUnitStudent.status='Current - Pending' THEN 1 ELSE 0 END) as statusSort", "(CASE WHEN timestampCompletePending IS NOT NULL THEN timestampCompletePending ELSE timestampJoined END) as timestamp", "ROUND(AVG(((UNIX_TIMESTAMP(timestampCompleteApproved)-UNIX_TIMESTAMP(timestampCompletePending))/(60*60*24))), 1) AS waitInDays"])
+            ->cols(['enrolmentMethod', 'freeLearningUnit.name AS unit', 'freeLearningUnit.freeLearningUnitID', "GROUP_CONCAT(DISTINCT gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnit.course AS flCourse', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.surname AS studentsurname', 'gibbonPerson.preferredName AS studentpreferredName', 'freeLearningUnitStudent.*', 'gibbonRole.category', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'teacher.surname AS teachersurname', 'teacher.preferredName AS teacherpreferredName', 'teacher.gibbonPersonID AS teachergibbonPersonID', 'gibbonPerson.fields', "(CASE WHEN freeLearningUnitStudent.status='Current - Pending' THEN 1 ELSE 0 END) as statusSort", "(CASE WHEN timestampCompletePending IS NOT NULL THEN timestampCompletePending ELSE timestampJoined END) as timestamp", "ROUND(AVG(((UNIX_TIMESTAMP(timestampCompleteApproved)-UNIX_TIMESTAMP(timestampCompletePending))/(60*60*24))), 1) AS waitInDays"])
             ->from('freeLearningUnit')
             ->innerJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
             ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
             ->innerJoin('gibbonRole', 'gibbonPerson.gibbonRoleIDPrimary=gibbonRole.gibbonRoleID')
             ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+            ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+            ->leftJoin('gibbonCourseClassPerson', 'role=\'teacher\' AND gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+            ->leftJoin('gibbonPerson AS teacher', 'gibbonCourseClassPerson.gibbonPersonID=teacher.gibbonPersonID')
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
             ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
-            ->where("(enrolmentMethod='schoolMentor' OR enrolmentMethod='externalMentor')")
             ->where("gibbonPerson.status='Full'")
             ->where("(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:date) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:date)")
             ->bindValue('date', date("Y-m-d"))
             ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
 
         if (!is_null($gibbonPersonID)) {
-            $query->where("enrolmentMethod='schoolMentor' AND freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID")
+            $query->where("(enrolmentMethod='schoolMentor' AND mentor.gibbonPersonID=:gibbonPersonID) OR (enrolmentMethod='class' AND teacher.gibbonPersonID=:gibbonPersonID)")
                 ->bindValue('gibbonPersonID', $gibbonPersonID);
         }
 
@@ -228,22 +230,37 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function queryStudentProgressByStudent(QueryCriteria $criteria, $gibbonCourseClassID, $gibbonSchoolYearID)
+    public function queryStudentProgressByStudent(QueryCriteria $criteria, $gibbonCourseClassID, $gibbonSchoolYearID, $gibbonDepartmentID)
     {
         $query = $this
-            ->newSelect()
-            ->cols(['gibbonPerson.gibbonPersonID',
-                'surname',
-                'preferredName',
-                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Approved\' THEN 1 ELSE 0 END) as completeApprovedCount',
-                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Pending\' THEN 1 ELSE 0 END) as completePendingCount',
-                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Current\' THEN 1 ELSE 0 END) as currentCount',
-                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Current - Pending\' THEN 1 ELSE 0 END) as currentPendingCount',
-                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Evidence Not Yet Approved\' THEN 1 ELSE 0 END) as evidenceNotYetApprovedCount',
-                'SUM(CASE WHEN freeLearningUnitStudent.status = \'Exempt\' THEN 1 ELSE 0 END) as exemptCount',
-                'COUNT(*) as totalCount',
+            ->newSelect();
+            if (empty($gibbonDepartmentID)) {
+                $query->cols(['gibbonPerson.gibbonPersonID',
+                    'surname',
+                    'preferredName',
+                    'SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Approved\' THEN 1 ELSE 0 END) AS completeApprovedCount',
+                    'SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Pending\' THEN 1 ELSE 0 END) AS completePendingCount',
+                    'SUM(CASE WHEN freeLearningUnitStudent.status = \'Current\' THEN 1 ELSE 0 END) AS currentCount',
+                    'SUM(CASE WHEN freeLearningUnitStudent.status = \'Current - Pending\' THEN 1 ELSE 0 END) AS currentPendingCount',
+                    'SUM(CASE WHEN freeLearningUnitStudent.status = \'Evidence Not Yet Approved\' THEN 1 ELSE 0 END) AS evidenceNotYetApprovedCount',
+                    'SUM(CASE WHEN freeLearningUnitStudent.status = \'Exempt\' THEN 1 ELSE 0 END) AS exemptCount',
+                    'SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Approved\' THEN 1 ELSE 0 END)+SUM(CASE WHEN freeLearningUnitStudent.status = \'Complete - Pending\' THEN 1 ELSE 0 END)+SUM(CASE WHEN freeLearningUnitStudent.status = \'Current\' THEN 1 ELSE 0 END)+SUM(CASE WHEN freeLearningUnitStudent.status = \'Current - Pending\' THEN 1 ELSE 0 END)+SUM(CASE WHEN freeLearningUnitStudent.status = \'Evidence Not Yet Approved\' THEN 1 ELSE 0 END)+SUM(CASE WHEN freeLearningUnitStudent.status = \'Exempt\' THEN 1 ELSE 0 END) as totalCount',
+                ]);
+            } else {
+                $query->cols(['gibbonPerson.gibbonPersonID',
+                    'surname',
+                    'preferredName',
+                    'SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Complete - Approved\' THEN 1 ELSE 0 END) AS completeApprovedCount',
+                    'SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Complete - Pending\' THEN 1 ELSE 0 END) AS completePendingCount',
+                    'SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Current\' THEN 1 ELSE 0 END) AS currentCount',
+                    'SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Current - Pending\' THEN 1 ELSE 0 END) AS currentPendingCount',
+                    'SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Evidence Not Yet Approved\' THEN 1 ELSE 0 END) AS evidenceNotYetApprovedCount',
+                    'SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Exempt\' THEN 1 ELSE 0 END) AS exemptCount',
+                    'SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Complete - Approved\' THEN 1 ELSE 0 END)+SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Complete - Pending\' THEN 1 ELSE 0 END)+SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Current\' THEN 1 ELSE 0 END)+SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Current - Pending\' THEN 1 ELSE 0 END)+SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Evidence Not Yet Approved\' THEN 1 ELSE 0 END)+SUM(CASE WHEN FIND_IN_SET(:gibbonDepartmentID, freeLearningUnit.gibbonDepartmentIDList) AND freeLearningUnitStudent.status = \'Exempt\' THEN 1 ELSE 0 END) as totalCount'
                 ])
-            ->from('gibbonPerson')
+                    ->bindValue('gibbonDepartmentID', $gibbonDepartmentID);
+            }
+        $query->from('gibbonPerson')
             ->innerJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role=\'Student\'')
             ->leftJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID OR enrolmentMethod=\'schoolMentor\' OR enrolmentMethod=\'externalMentor\') AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
             ->leftJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
@@ -402,7 +419,7 @@ class UnitStudentGateway extends QueryableGateway
 
     public function selectCoursesByStudent($gibbonPersonIDStudent, $gibbonSchoolYearID)
     {
-        $data = ['gibbonPersonID' => $gibbonPersonIDStudent, 'gibbonSchoolYearID' => $gibbonSchoolYearID, 'groupBy' => __m('Enrolled Courses')];
+        $data = ['gibbonPersonID' => $gibbonPersonIDStudent, 'gibbonSchoolYearID' => $gibbonSchoolYearID, 'groupBy' => __m('Enrolled Course')];
         $sql = "SELECT DISTINCT course as value, course as name, :groupBy as groupBy
             FROM freeLearningUnit
             JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)

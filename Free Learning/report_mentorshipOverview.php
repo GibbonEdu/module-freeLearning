@@ -59,6 +59,11 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $gibbonPersonID = $session->get('gibbonPersonID');
     }
 
+    if ($highestAction == 'Mentorship Overview_all') {
+        echo "<p>".__m('This report offers a summary of all mentor activity, including enrolments by class.')."</p>";
+    } else {
+        echo "<p>".__m('This report offers a summary of all of your mentor activity, including enrolments by class.')."</p>";
+    }
 
     if ($highestAction == 'Mentorship Overview_all') {
         $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
@@ -74,10 +79,16 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $form->toggleVisibilityByClass('mentor')->onCheckbox('allMentors')->whenNot('on');
 
         $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
-        $sql = "SELECT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name FROM gibbonPerson JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
+        $sql = "SELECT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'School Mentor' AS groupBy FROM gibbonPerson JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
+        $data2 = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
+        $sql2 = "SELECT DISTINCT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'Class Teacher' AS groupBy FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonCourseClass ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID AND role='Teacher' ORDER BY surname, preferredName";
         $row = $form->addRow()->addClass('mentor');
             $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'))->description(!empty($mentorGroups) ? __m('Mentors based on your assigned mentor groups.') : '');
-            $row->addSelectPerson('gibbonPersonIDSchoolMentor')->fromQuery($pdo, $sql, $data)->placeholder()->selected($gibbonPersonID);
+            $row->addSelectPerson('gibbonPersonIDSchoolMentor')
+                ->fromQuery($pdo, $sql, $data, 'groupBy')
+                ->fromQuery($pdo, $sql2, $data2, 'groupBy')
+                ->placeholder()
+                ->selected($gibbonPersonID);
 
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
@@ -97,6 +108,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $criteria = $unitStudentGateway->newQueryCriteria(true)
         ->sortBy(['statusSort', 'timestamp'], 'DESC')
+        ->pageSize(0)
         ->fromPOST();
 
     $mentorship = $unitStudentGateway->queryMentorship($criteria, $session->get('gibbonSchoolYearID'), !empty($allMentors) ? null : $gibbonPersonID);
@@ -111,7 +123,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         "Current" => 0,
         "Complete - Pending" => 0,
         "Evidence Not Yet Approved" => 0,
-        "Complete - Approved" => 0
+        "Complete - Approved" => 0,
+        "Exempt" => 0
     ];
     $unitsComplete = 0;
     $unitsCompleteWaitTime = 0;
@@ -176,6 +189,9 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
                 if ($values['enrolmentMethod'] == 'schoolMentor') {
                     $name = Format::name('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
                     $output = Format::link('./index.php?q=/modules/Free Learning/report_mentorshipOverview.php&gibbonPersonID='.$values['gibbonPersonIDSchoolMentor'], $name);
+                } else if ($values['enrolmentMethod'] == 'class') {
+                    $name = Format::name('', $values['teacherpreferredName'], $values['teachersurname'], 'Student', false);
+                    $output = Format::link('./index.php?q=/modules/Free Learning/report_mentorshipOverview.php&gibbonPersonID='.$values['teachergibbonPersonID'], $name);
                 } else if ($values['enrolmentMethod'] == 'externalMentor') {
                     $output = $values['nameExternalMentor'];
                 }
@@ -255,9 +271,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         ->addParam('sidebar', true)
         ->format(function ($values, $actions) use ($allMentors, $gibbonPersonID) {
 
-            if ($values['enrolmentMethod'] != 'schoolMentor' && $values['enrolmentMethod'] != 'externalMentor') return;
-
-            if (empty($allMentors) && $values['gibbonPersonIDSchoolMentor'] != $gibbonPersonID) return;
+            if (empty($allMentors) && $values['gibbonPersonIDSchoolMentor'] != $gibbonPersonID && $values['teachergibbonPersonID'] != $gibbonPersonID) return;
 
             if ($values['status'] == 'Current - Pending') {
                 $actions->addAction('view', __('View'))

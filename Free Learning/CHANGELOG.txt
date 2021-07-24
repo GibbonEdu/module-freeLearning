@@ -1,7 +1,11 @@
 CHANGELOG
 =========
-v5.16.NEXT
+v5.16.39
 --------
+Added option (off by default) to hide Learning Areas from filters in Browse Units
+Added optional Learning Area filter to Student Progress by Class
+Fixed 0+0=1 bug in Student Progress by Class
+Expanded Mentorship Overview to include class enrolments
 My Unit History Breadcrumb fix
 Updated Afrikaans translations
 

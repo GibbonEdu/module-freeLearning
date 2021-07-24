@@ -105,10 +105,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $view);
 
+        $disableLearningAreas = getSettingByScope($connection2, 'Free Learning', 'disableLearningAreas');
         $courses = $unitStudentGateway->selectCoursesByStudent($session->get('gibbonPersonID'), $session->get('gibbonSchoolYearID'));
-        $learningAreas = $unitGateway->selectLearningAreasAndCourses();
+        $learningAreas = $unitGateway->selectLearningAreasAndCourses(null, $disableLearningAreas);
         $row = $form->addRow();
-            $row->addLabel('gibbonDepartmentID', __m('Learning Area & Course'));
+            if ($disableLearningAreas != 'Y') {
+                $row->addLabel('gibbonDepartmentID', __m('Learning Area & Course'));
+            } else {
+                $row->addLabel('gibbonDepartmentID', __('Course'));
+            }
             $row->addSelect('gibbonDepartmentID')
                 ->fromResults($courses, 'groupBy')
                 ->fromResults($learningAreas, 'groupBy')
