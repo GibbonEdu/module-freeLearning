@@ -1671,3 +1671,8 @@ $sql[$count][0] = '5.16.39';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableLearningAreas', 'Disable Learning Areas', 'Remove Learning Areas from Browse Units filters?', 'N');end
 ";
+
+//v5.16.40
+++$count;
+$sql[$count][0] = '5.16.40';
+$sql[$count][1] = "";

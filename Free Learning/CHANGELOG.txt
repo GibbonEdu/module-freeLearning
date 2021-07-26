@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.40
+--------
+Improved performance of Mentorship Overview for All Mentors
+
 v5.16.39
 --------
 Added option (off by default) to hide Learning Areas from filters in Browse Units

@@ -108,51 +108,55 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $criteria = $unitStudentGateway->newQueryCriteria(true)
         ->sortBy(['statusSort', 'timestamp'], 'DESC')
-        ->pageSize(0)
         ->fromPOST();
+    if (!empty($gibbonPersonID)) {
+        $criteria->pageSize(0);
+    }
 
     $mentorship = $unitStudentGateway->queryMentorship($criteria, $session->get('gibbonSchoolYearID'), !empty($allMentors) ? null : $gibbonPersonID);
 
-    // Render chart
-    $page->scripts->add('chart');
+    // Render chart for individuals
+    if (!empty($gibbonPersonID)) {
+        $page->scripts->add('chart');
 
-    echo "<h3>".__('Overview')."</h3>";
+        echo "<h3>".__('Overview')."</h3>";
 
-    $unitStats = [
-        "Current - Pending" => 0,
-        "Current" => 0,
-        "Complete - Pending" => 0,
-        "Evidence Not Yet Approved" => 0,
-        "Complete - Approved" => 0,
-        "Exempt" => 0
-    ];
-    $unitsComplete = 0;
-    $unitsCompleteWaitTime = 0;
-    foreach ($mentorship as $unit) {
-        $unitStats[$unit['status']] ++;
-        if ($unit['status'] == "Complete - Approved") {
-            $unitsComplete ++;
-            $unitsCompleteWaitTime += $unit['waitInDays'];
+        $unitStats = [
+            "Current - Pending" => 0,
+            "Current" => 0,
+            "Complete - Pending" => 0,
+            "Evidence Not Yet Approved" => 0,
+            "Complete - Approved" => 0,
+            "Exempt" => 0
+        ];
+        $unitsComplete = 0;
+        $unitsCompleteWaitTime = 0;
+        foreach ($mentorship as $unit) {
+            $unitStats[$unit['status']] ++;
+            if ($unit['status'] == "Complete - Approved") {
+                $unitsComplete ++;
+                $unitsCompleteWaitTime += $unit['waitInDays'];
+            }
         }
-    }
 
-    $chart = Chart::create('unitStats', 'doughnut')
-        ->setOptions([
-            'height' => 80,
-            'legend' => [
-                'position' => 'right',
-            ]
-        ])
-        ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
-        ->setColors(['#FAF089', '#FDE2FF', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+        $chart = Chart::create('unitStats', 'doughnut')
+            ->setOptions([
+                'height' => 80,
+                'legend' => [
+                    'position' => 'right',
+                ]
+            ])
+            ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
+            ->setColors(['#FAF089', '#FDE2FF', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
 
-    $chart->addDataset('pie')
-        ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
+        $chart->addDataset('pie')
+            ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
 
-    echo $chart->render();
+        echo $chart->render();
 
-    if ($unitsComplete > 0 ){
-        echo "<hr class='mt-4 mb-4'/><div class='w-auto'><p class='text-center'>".__("Mean Wait Time (In Days)").": <b>".number_format($unitsCompleteWaitTime/$unitsComplete, 1)."</b></p></div>";
+        if ($unitsComplete > 0 ){
+            echo "<hr class='mt-4 mb-4'/><div class='w-auto'><p class='text-center'>".__("Mean Wait Time (In Days)").": <b>".number_format($unitsCompleteWaitTime/$unitsComplete, 1)."</b></p></div>";
+        }
     }
 
     $collaborationKeys = [];
