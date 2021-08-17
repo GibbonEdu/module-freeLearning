@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.41
+--------
+Add pagination to the grid view of Browse Units
+
 v5.16.40
 --------
 Improved performance of Mentorship Overview for All Mentors

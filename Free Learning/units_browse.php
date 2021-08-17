@@ -93,8 +93,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ->filterBy('showInactive', $showInactive)
             ->filterBy('department', $gibbonDepartmentID)
             ->filterBy('difficulty', $difficulty)
-            ->pageSize($view == 'list' ? 100 : 0)
-            ->fromPOST();
+            ->pageSize($view == 'list' ? 100 : ($view == 'grid' ? 100 : 0))
+            ->fromPOST('browseUnits');
 
         // FORM
         $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
@@ -344,8 +344,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
             } elseif ($view == 'grid') {
                 // GRID TABLE
-                $gridRenderer = new GridView($container->get('twig'));
-                $table = $container->get(DataTable::class)->setRenderer($gridRenderer);
+                $gridRenderer = $container->get(GridView::class)->setCriteria($criteria);
+                $table = DataTable::create('browseUnits')->setRenderer($gridRenderer);
                 $table->setTitle(__('Units'));
 
                 $table->addMetaData('gridClass', 'flex items-stretch -mx-4');
