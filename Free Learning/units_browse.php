@@ -62,7 +62,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
 
-        $view = $_GET['view'] ?? 'map';
+        $viewForm = $view = $_GET['view'] ?? 'map';
         if ($view != 'grid' and $view != 'list') {
             $view = 'map';
         }
@@ -92,12 +92,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ->filterBy('showInactive', $showInactive)
             ->filterBy('department', $gibbonDepartmentID)
             ->filterBy('difficulty', $difficulty);
-            
+
         // ADJUST VIEW BASED ON NUMBER OF UNITS
         $unitCheck = $unitGateway->queryAllUnits($criteria, $gibbonPersonID, $publicUnits, true)->toArray();
         $unitCount = $unitCheck[0]['count'] ?? 0;
 
-        // There has to be a criteria and query to count the total number of units before we can 
+        // There has to be a criteria and query to count the total number of units before we can
         // create the criteria that actually gets the number of units, because of the following
         // lines of code that switch to map view by default when maxMapSize is exceeded :(
         $maxMapSize = getSettingByScope($connection2, 'Free Learning', 'maxMapSize');
@@ -111,7 +111,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ->filterBy('showInactive', $showInactive)
             ->filterBy('department', $gibbonDepartmentID)
             ->filterBy('difficulty', $difficulty)
-            ->pageSize($view == 'list' ? 100 : ($view == 'grid' ? 100 : 0))
+            ->pageSize(($view == 'list' or $view == 'grid') ? 100 : 0)
             ->fromPOST('browseUnits');
 
         // FORM
@@ -121,7 +121,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         $form->setClass('noIntBorder fullWidth');
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
-        $form->addHiddenValue('view', $view);
+        $form->addHiddenValue('view', $viewForm);
 
         $disableLearningAreas = getSettingByScope($connection2, 'Free Learning', 'disableLearningAreas');
         $courses = $unitStudentGateway->selectCoursesByStudent($session->get('gibbonPersonID'), $session->get('gibbonSchoolYearID'));
