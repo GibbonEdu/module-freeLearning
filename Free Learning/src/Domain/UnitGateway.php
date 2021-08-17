@@ -35,22 +35,26 @@ class UnitGateway extends QueryableGateway
      * @param QueryCriteria $criteria
      * @return DataSet
      */
-    public function queryAllUnits(QueryCriteria $criteria, $gibbonPersonID, $publicUnits = null)
+    public function queryAllUnits(QueryCriteria $criteria, $gibbonPersonID, $publicUnits = null, $countOnly = false)
     {
         $query = $this
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
+            ->cols($countOnly ? ['COUNT(DISTINCT freeLearningUnit.freeLearningUnitID) as count'] : 
+            ['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
                 "(SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length",
                 "FIND_IN_SET(freeLearningUnit.difficulty, :difficultyOptions) as difficultyOrder"])
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
             ->leftJoin('freeLearningUnitStudent', "freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID")
-            ->bindValue('gibbonPersonID', $gibbonPersonID)
-            ->groupBy(['freeLearningUnit.freeLearningUnitID']);
+            ->bindValue('gibbonPersonID', $gibbonPersonID);
 
-        $difficultyOptions = $this->db()->selectOne("SELECT value FROM gibbonSetting WHERE scope='Free Learning' AND name='difficultyOptions'");
-        $query->bindValue('difficultyOptions', $difficultyOptions);
+        if (!$countOnly) {
+            $query->groupBy(['freeLearningUnit.freeLearningUnitID']);
+            
+            $difficultyOptions = $this->db()->selectOne("SELECT value FROM gibbonSetting WHERE scope='Free Learning' AND name='difficultyOptions'");
+            $query->bindValue('difficultyOptions', $difficultyOptions);
+        }
 
         if ($publicUnits == 'Y' && empty($gibbonPersonID)) {
             $query->where("freeLearningUnit.sharedPublic='Y'")

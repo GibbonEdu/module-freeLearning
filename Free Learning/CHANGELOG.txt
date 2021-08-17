@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.42
+--------
+Fixed grid view pagination when using the Maximum Map Size setting
+
 v5.16.41
 --------
 Add pagination to the grid view of Browse Units

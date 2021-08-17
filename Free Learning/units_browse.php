@@ -89,6 +89,24 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $unitStudentGateway = $container->get(UnitStudentGateway::class);
         $criteria = $unitGateway->newQueryCriteria()
             ->searchBy($unitGateway->getSearchableColumns(), $name)
+            ->filterBy('showInactive', $showInactive)
+            ->filterBy('department', $gibbonDepartmentID)
+            ->filterBy('difficulty', $difficulty);
+            
+        // ADJUST VIEW BASED ON NUMBER OF UNITS
+        $unitCheck = $unitGateway->queryAllUnits($criteria, $gibbonPersonID, $publicUnits, true)->toArray();
+        $unitCount = $unitCheck[0]['count'] ?? 0;
+
+        // There has to be a criteria and query to count the total number of units before we can 
+        // create the criteria that actually gets the number of units, because of the following
+        // lines of code that switch to map view by default when maxMapSize is exceeded :(
+        $maxMapSize = getSettingByScope($connection2, 'Free Learning', 'maxMapSize');
+        if ($unitCount > $maxMapSize && $view == "map") {
+            $view = "grid";
+        }
+
+        $criteria = $unitGateway->newQueryCriteria()
+            ->searchBy($unitGateway->getSearchableColumns(), $name)
             ->sortBy(['difficultyOrder', 'name'])
             ->filterBy('showInactive', $showInactive)
             ->filterBy('department', $gibbonDepartmentID)
@@ -207,12 +225,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $unit['statusClass']  = '';
             }
         });
-
-        // ADJUST VIEW BASED ON NUMBER OF UNITS
-        $maxMapSize = getSettingByScope($connection2, 'Free Learning', 'maxMapSize');
-        if ($units->count() > $maxMapSize && $view == "map") {
-            $view = "grid";
-        }
 
         // NAVIGATION BUTTONS
         echo $templateView->fetchFromTemplate('unitButtons.twig.html', [
