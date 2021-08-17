@@ -45,12 +45,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $certificateOrientation = $_POST['certificateOrientation'] ?? '';
     $disableParentEvidence = $_POST['disableParentEvidence'] ?? '';
     $disableLearningAreas = $_POST['disableLearningAreas'] ?? '';
+    $disableMyClasses = $_POST['disableMyClasses'] ?? '';
     $enableManualBadges = $_POST['enableManualBadges'] ?? '';
 
     $settingGateway = $container->get(SettingGateway::class);
 
     //Validate Inputs
-    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '' or $collaborativeAssessment == '' or $certificatesAvailable == '' or $disableParentEvidence == '' or $disableLearningAreas == '' or $enableManualBadges == '') {
+    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '' or $collaborativeAssessment == '' or $certificatesAvailable == '' or $disableParentEvidence == '' or $disableLearningAreas == '' or $disableMyClasses == '' or $enableManualBadges == '') {
         //Fail 3
         $URL .= '&return=error3';
         header("Location: {$URL}");
@@ -75,6 +76,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateOrientation', $certificateOrientation);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableParentEvidence', $disableParentEvidence);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableLearningAreas', $disableLearningAreas);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableMyClasses', $disableMyClasses);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableManualBadges', $enableManualBadges);
 
         $URL .= $partialFail

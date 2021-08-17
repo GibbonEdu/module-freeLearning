@@ -108,11 +108,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $row = $form->addRow()->addClass('classEnrolment');
                 $row->addLabel('gibbonCourseClassID', __m('Class'))->description(__m('Which class are you enroling for?'));
+
+            $disableMyClasses = $settingGateway->getSettingByScope('Free Learning', 'disableMyClasses');
+            if ($disableMyClasses == "Y") {
+                $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, [
+                    'allClasses' => false,
+                    'courseFilter' => 'Free Learning',
+                    'departments' => $values['gibbonDepartmentIDList'],
+                ])
+                    ->fromArray([__('My Classes') => []])
+                    ->required();
+            }
+            else {
                 $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, [
                     'allClasses' => false,
                     'courseFilter' => 'Free Learning',
                     'departments' => $values['gibbonDepartmentIDList'],
                 ])->required();
+            }
         }
 
         // SCHOOL MENTOR
@@ -413,7 +426,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $item['comment'] = Format::hyperlinkAll($item['comment']);
             return $item;
         }, $logs);
-        
+
         $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
             'title' => __('Comments'),
             'discussion' => $logs

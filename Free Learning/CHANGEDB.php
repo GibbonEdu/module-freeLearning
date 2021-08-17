@@ -1691,3 +1691,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.16.43';
 $sql[$count][1] = "";
+
+//v5.16.44
+++$count;
+$sql[$count][0] = '5.16.44';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableMyClasses', 'Disable My Classes', 'Remove My Classes from Class menu in Enrolment tab?', 'N');end
+";

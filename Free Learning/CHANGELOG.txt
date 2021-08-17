@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.44
+--------
+Added option to remove My Classes from Enrolment tab's class menu (will function better with core v23, but works with v22)
+
 v5.16.43
 --------
 Returned map/grid default behaviour to v5.16.39 and earlier
