@@ -110,21 +110,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $row->addLabel('gibbonCourseClassID', __m('Class'))->description(__m('Which class are you enroling for?'));
 
             $disableMyClasses = $settingGateway->getSettingByScope('Free Learning', 'disableMyClasses');
+            $select = $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, [
+                'allClasses' => false,
+                'courseFilter' => 'Free Learning',
+                'departments' => $values['gibbonDepartmentIDList'],
+            ])->required();
+
             if ($disableMyClasses == "Y") {
-                $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, [
-                    'allClasses' => false,
-                    'courseFilter' => 'Free Learning',
-                    'departments' => $values['gibbonDepartmentIDList'],
-                ])
-                    ->fromArray([__('My Classes') => []])
-                    ->required();
-            }
-            else {
-                $row->addSelectClass('gibbonCourseClassID', $gibbonSchoolYearID, $gibbonPersonID, [
-                    'allClasses' => false,
-                    'courseFilter' => 'Free Learning',
-                    'departments' => $values['gibbonDepartmentIDList'],
-                ])->required();
+                $select->fromArray([__('My Classes') => []]);
             }
         }
 

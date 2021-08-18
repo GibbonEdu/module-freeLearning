@@ -233,7 +233,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             'gibbonPersonID' => $gibbonPersonID,
             'view'           => $view,
             'maxMapSize'     => $maxMapSize,
-            'count'          => $units->count()
+            'count'          => $unitCount
         ]);
 
         if ($units->getResultCount() == 0) {
