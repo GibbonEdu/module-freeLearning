@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.16.46
+--------
+Added option to remove Learning Area-based school mentors from Enrolment tab's School Mentor menu
+
 v5.16.45
 --------
 Fixed map button disabled when not selectable

@@ -1703,3 +1703,10 @@ INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,
 ++$count;
 $sql[$count][0] = '5.16.45';
 $sql[$count][1] = "";
+
+//v5.16.46
+++$count;
+$sql[$count][0] = '5.16.46';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableLearningAreaMentors', 'Disable Learning Area Mentors', 'Remove Learning Area-based mentors from School Mentor menu in Enrolment tab?', 'N');end
+";

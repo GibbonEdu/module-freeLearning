@@ -128,6 +128,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $params['schoolMentorCompletors'] = $values['schoolMentorCompletors'];
             $params['schoolMentorCustom'] = $values['schoolMentorCustom'];
             $params['schoolMentorCustomRole'] = $values['schoolMentorCustomRole'];
+            $params['disableLearningAreaMentors'] = $settingGateway->getSettingByScope('Free Learning', 'disableLearningAreaMentors');
 
             // Check if there are pre-defined mentors first
             $mentorGroups = $container->get(MentorGroupPersonGateway::class)->selectMentorsByStudent($gibbonPersonID)->fetchGrouped();

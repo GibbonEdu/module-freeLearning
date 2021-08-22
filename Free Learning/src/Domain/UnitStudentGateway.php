@@ -448,19 +448,22 @@ class UnitStudentGateway extends QueryableGateway
 
     public function selectUnitMentors($freeLearningUnitID, $gibbonPersonID, $params = [])
     {
-        $data = ['freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbonPersonID];
-        $sql = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
-            FROM gibbonPerson
-                JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
-                JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
-            WHERE gibbonPerson.status='Full'
-                AND freeLearningUnitID=:freeLearningUnitID
-                AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
-            )";
+        $sql = [];
+        $data = [];
 
+        if (!empty($params['disableLearningAreaMentors']) && $params['disableLearningAreaMentors'] == 'N') {
+            $data = ['freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $gibbonPersonID];
+            $sql[] = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+                FROM gibbonPerson
+                    JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
+                    JOIN freeLearningUnit ON (freeLearningUnit.gibbonDepartmentIDList LIKE concat('%',gibbonDepartmentStaff.gibbonDepartmentID,'%'))
+                WHERE gibbonPerson.status='Full'
+                    AND freeLearningUnitID=:freeLearningUnitID
+                    AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
+                )";
+        }
         if (!empty($params['schoolMentorCompletors']) && $params['schoolMentorCompletors'] == 'Y') {
-            $sql .= " UNION DISTINCT
-                (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+            $sql[] = "(SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
                     FROM gibbonPerson
                     LEFT JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.gibbonPersonID=gibbonPerson.gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID)
                     LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID)
@@ -470,26 +473,30 @@ class UnitStudentGateway extends QueryableGateway
                     GROUP BY gibbonPersonID)";
         }
         if (!empty($params['schoolMentorCustom'])) {
-
             $data['schoolMentorCustom'] = $params['schoolMentorCustom'];
-            $sql .= " UNION DISTINCT
-            (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+            $sql[] = "(SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
                 FROM gibbonPerson
                 WHERE FIND_IN_SET(gibbonPersonID, :schoolMentorCustom)
                     AND status='Full')";
         }
         if (!empty($params['schoolMentorCustomRole'])) {
             $data['gibbonRoleID'] = $params['schoolMentorCustomRole'];
-            $sql .= " UNION DISTINCT
-            (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
+            $sql[] = "(SELECT gibbonPerson.gibbonPersonID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
                 FROM gibbonPerson
                     JOIN gibbonRole ON (FIND_IN_SET(gibbonRole.gibbonRoleID, gibbonPerson.gibbonRoleIDAll))
                 WHERE gibbonRoleID=:gibbonRoleID
                     AND status='Full')";
         }
-        $sql .= " ORDER BY surname, preferredName";
 
-        return $this->db()->select($sql, $data);
+        if (count($sql) == 1) {
+            return $this->db()->select($sql[0]." ORDER BY surname, preferredName", $data);
+        }
+        else if (count($sql) > 1) {
+            return $this->db()->select(implode(" UNION DISTINCT ", $sql)." ORDER BY surname, preferredName", $data);
+        }
+        else {
+            return false;
+        }
     }
 
     public function selectPotentialCollaborators($gibbonSchoolYearID, $gibbonPersonID, $roleCategory, $prerequisiteCount, $params = [])
