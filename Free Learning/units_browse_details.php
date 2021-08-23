@@ -292,8 +292,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     }
                     echo "<li><a href='#tabs3'>".__('Content', 'Free Learning').'</a></li>';
                     echo "<li><a href='#tabs4'>".__('Resources', 'Free Learning').'</a></li>';
-                    echo "<li><a href='#tabs5'>".__('Outcomes', 'Free Learning').'</a></li>';
-                    echo "<li><a href='#tabs6'>".__('Exemplar Work', 'Free Learning').'</a></li>';
+                    $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+                    if ($disableOutcomes != 'Y') {
+                        echo "<li><a href='#tabs5'>".__('Outcomes', 'Free Learning').'</a></li>';
+                    }
+                    $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+                    if ($disableExemplarWork != 'Y') {
+                        echo "<li><a href='#tabs6'>".__('Exemplar Work', 'Free Learning').'</a></li>';
+                    }
                 }
                 echo '</ul>';
 
@@ -689,119 +695,122 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo '</div>';
                     }
                     echo '</div>';
-                    echo "<div id='tabs5'>";
-                        //Spit out outcomes
-                        $unitOutcomeGateway = $container->get(UnitOutcomeGateway::class);
+                    if ($disableOutcomes != 'Y') {
+                        echo "<div id='tabs5'>";
+                            //Spit out outcomes
+                            $unitOutcomeGateway = $container->get(UnitOutcomeGateway::class);
 
-                        $criteria = $unitOutcomeGateway->newQueryCriteria(true)
-                            ->fromPOST();
+                            $criteria = $unitOutcomeGateway->newQueryCriteria(true)
+                                ->fromPOST();
 
-                        $outcomes = $unitOutcomeGateway->selectOutcomesByUnit($freeLearningUnitID)->fetchAll();
+                            $outcomes = $unitOutcomeGateway->selectOutcomesByUnit($freeLearningUnitID)->fetchAll();
 
-                        $table = DataTable::createPaginated('outcomes', $criteria);
+                            $table = DataTable::createPaginated('outcomes', $criteria);
 
-                        $table->addExpandableColumn('content');
-                        $table->addColumn('scope', __('scope'));
-                        $table->addColumn('category', __('Category'));
-                        $table->addColumn('name', __('Name'))
-                            ->format(function($outcome) {
-                                $output = $outcome['nameShort']."<br/>";
-                                $output .= "<div class=\"text-xxs\">".$outcome['name']."</div>";
-                                return $output;
-                            });
-                        $table->addColumn('yearGroups', __('Year Groups'))
-                            ->format(function($outcome) use ($guid, $connection2) {
-                                return getYearGroupsFromIDList($guid, $connection2, $outcome['gibbonYearGroupIDList']);
-                            });
+                            $table->addExpandableColumn('content');
+                            $table->addColumn('scope', __('scope'));
+                            $table->addColumn('category', __('Category'));
+                            $table->addColumn('name', __('Name'))
+                                ->format(function($outcome) {
+                                    $output = $outcome['nameShort']."<br/>";
+                                    $output .= "<div class=\"text-xxs\">".$outcome['name']."</div>";
+                                    return $output;
+                                });
+                            $table->addColumn('yearGroups', __('Year Groups'))
+                                ->format(function($outcome) use ($guid, $connection2) {
+                                    return getYearGroupsFromIDList($guid, $connection2, $outcome['gibbonYearGroupIDList']);
+                                });
 
-                        echo $table->render($outcomes);
-                    echo '</div>';
-                    echo "<div id='tabs6'>";
-                        //Spit out exemplar work
-                        try {
-                            $dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
-                            $sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
-                            $resultWork = $connection2->prepare($sqlWork);
-                            $resultWork->execute($dataWork);
-                        } catch (PDOException $e) {
-                            echo "<div class='error'>".$e->getMessage().'</div>';
-                        }
-                    if ($resultWork->rowCount() < 1) {
-                        echo "<div class='error'>";
-                        echo __('There are no records to display.');
+                            echo $table->render($outcomes);
                         echo '</div>';
-                    } else {
-                        while ($rowWork = $resultWork->fetch()) {
-                            $students = '';
-                            if ($rowWork['grouping'] == 'Individual') { //Created by a single student
-                            $students = $rowWork['preferredName'];
-                            } else { //Created by a group of students
-                                        try {
-                                            $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
-                                            $sqlStudents = "SELECT preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY preferredName";
-                                            $resultStudents = $connection2->prepare($sqlStudents);
-                                            $resultStudents->execute($dataStudents);
-                                        } catch (PDOException $e) {
-                                        }
-                                while ($rowStudents = $resultStudents->fetch()) {
-                                    $students .= $rowStudents['preferredName'].', ';
-                                }
-                                if ($students != '') {
-                                    $students = substr($students, 0, -2);
-                                    $students = preg_replace('/,([^,]*)$/', ' & \1', $students);
-                                }
-                            }
-
-                            echo '<h3>';
-                            echo $students." . <span style='font-size: 75%'>".__('Shared on', 'Free Learning').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
-                            echo '</h3>';
-                            //DISPLAY WORK.
-                            echo '<h4 style=\'margin-top: 0px\'>'.__('Student Work', 'Free Learning').'</h4>';
-                            if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
-                                $extension = strrchr($rowWork['evidenceLocation'], '.');
-                                if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
-                                    echo "<p>";
-                                    if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                        echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
-                                    } else { //It's a link
-                                        echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
-                                    }
-                                    echo '</p>';
-                                } else { //Not an image
-                                    echo '<p class=\'button\'>';
-                                    if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                        echo "<a class='button'target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__('Click to View Work', 'Free Learning').'</a>';
-                                    } else { //It's a link
-                                        echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__('Click to View Work', 'Free Learning').'</a>';
-                                    }
-                                    echo '</p>';
-                                }
-                            } else {
-                                echo '<p>';
-                                print $rowWork['exemplarWorkEmbed'] ;
-                                echo '</p>';
-                            }
-                            //DISPLAY STUDENT COMMENT
-                            if ($rowWork['commentStudent'] != '') {
-                                echo '<h4>'.__('Student Comment', 'Free Learning').'</h4>';
-                                echo '<p style=\'margin-bottom: 0px\'>';
-                                echo nl2br($rowWork['commentStudent']);
-                                echo '</p>';
-                            }
-                            //DISPLAY TEACHER COMMENT
-                            if ($rowWork['commentApproval'] != '') {
-                                if ($rowWork['commentStudent'] != '') {
-                                    echo '<br/>';
-                                }
-                                echo '<h4>'.__('Teacher Comment', 'Free Learning').'</h4>';
-                                echo '<p>';
-                                echo $rowWork['commentApproval'];
-                                echo '</p>';
-                            }
-                        }
                     }
-                    echo '</div>';
+                    if ($disableExemplarWork != 'Y') {
+                        echo "<div id='tabs6'>";
+                            //Spit out exemplar work
+                            try {
+                                $dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
+                                $sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
+                                $resultWork = $connection2->prepare($sqlWork);
+                                $resultWork->execute($dataWork);
+                            } catch (PDOException $e) {
+                                echo "<div class='error'>".$e->getMessage().'</div>';
+                            }
+                            if ($resultWork->rowCount() < 1) {
+                                echo "<div class='error'>";
+                                echo __('There are no records to display.');
+                                echo '</div>';
+                            } else {
+                                while ($rowWork = $resultWork->fetch()) {
+                                    $students = '';
+                                    if ($rowWork['grouping'] == 'Individual') { //Created by a single student
+                                    $students = $rowWork['preferredName'];
+                                    } else { //Created by a group of students
+                                                try {
+                                                    $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
+                                                    $sqlStudents = "SELECT preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY preferredName";
+                                                    $resultStudents = $connection2->prepare($sqlStudents);
+                                                    $resultStudents->execute($dataStudents);
+                                                } catch (PDOException $e) {
+                                                }
+                                        while ($rowStudents = $resultStudents->fetch()) {
+                                            $students .= $rowStudents['preferredName'].', ';
+                                        }
+                                        if ($students != '') {
+                                            $students = substr($students, 0, -2);
+                                            $students = preg_replace('/,([^,]*)$/', ' & \1', $students);
+                                        }
+                                    }
 
+                                    echo '<h3>';
+                                    echo $students." . <span style='font-size: 75%'>".__('Shared on', 'Free Learning').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
+                                    echo '</h3>';
+                                    //DISPLAY WORK.
+                                    echo '<h4 style=\'margin-top: 0px\'>'.__('Student Work', 'Free Learning').'</h4>';
+                                    if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
+                                        $extension = strrchr($rowWork['evidenceLocation'], '.');
+                                        if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
+                                            echo "<p>";
+                                            if ($rowWork['evidenceType'] == 'File') { //It's a file
+                                                echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
+                                            } else { //It's a link
+                                                echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
+                                            }
+                                            echo '</p>';
+                                        } else { //Not an image
+                                            echo '<p class=\'button\'>';
+                                            if ($rowWork['evidenceType'] == 'File') { //It's a file
+                                                echo "<a class='button'target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__('Click to View Work', 'Free Learning').'</a>';
+                                            } else { //It's a link
+                                                echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__('Click to View Work', 'Free Learning').'</a>';
+                                            }
+                                            echo '</p>';
+                                        }
+                                    } else {
+                                        echo '<p>';
+                                        print $rowWork['exemplarWorkEmbed'] ;
+                                        echo '</p>';
+                                    }
+                                    //DISPLAY STUDENT COMMENT
+                                    if ($rowWork['commentStudent'] != '') {
+                                        echo '<h4>'.__('Student Comment', 'Free Learning').'</h4>';
+                                        echo '<p style=\'margin-bottom: 0px\'>';
+                                        echo nl2br($rowWork['commentStudent']);
+                                        echo '</p>';
+                                    }
+                                    //DISPLAY TEACHER COMMENT
+                                    if ($rowWork['commentApproval'] != '') {
+                                        if ($rowWork['commentStudent'] != '') {
+                                            echo '<br/>';
+                                        }
+                                        echo '<h4>'.__('Teacher Comment', 'Free Learning').'</h4>';
+                                        echo '<p>';
+                                        echo $rowWork['commentApproval'];
+                                        echo '</p>';
+                                    }
+                                }
+                            }
+                        echo '</div>';
+                    }
                 }
                 echo '</div>';
 

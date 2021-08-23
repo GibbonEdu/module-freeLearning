@@ -124,6 +124,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 
     $form->addRow()->addHeading(__('Display Settings'));
 
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'disableOutcomes', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'disableExemplarWork', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
     $setting = $settingGateway->getSettingByScope('Free Learning', 'disableParentEvidence', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));

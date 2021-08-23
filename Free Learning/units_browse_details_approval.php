@@ -262,25 +262,28 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $form->toggleVisibilityByClass('approved')->onSelect('status')->when('Complete - Approved');
 
-    $row = $form->addRow()->addClass('approved');
-        $row->addLabel('exemplarWork', __m('Exemplar Work'))->description(__m('Work and comments will be made viewable to other users.'));
-        $row->addYesNo('exemplarWork')->required()->selected($values['exemplarWork'] ?? 'N');
+    $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+    if ($disableExemplarWork != 'Y') {
+        $row = $form->addRow()->addClass('approved');
+            $row->addLabel('exemplarWork', __m('Exemplar Work'))->description(__m('Work and comments will be made viewable to other users.'));
+            $row->addYesNo('exemplarWork')->required()->selected($values['exemplarWork'] ?? 'N');
 
-    $form->toggleVisibilityByClass('exemplarYes')->onSelect('exemplarWork')->when('Y');
+        $form->toggleVisibilityByClass('exemplarYes')->onSelect('exemplarWork')->when('Y');
 
-    $row = $form->addRow()->addClass('exemplarYes');
-        $row->addLabel('exemplarWorkThumb', __m('Exemplar Work Thumbnail Image'))->description(__('150x150px jpg/png/gif'));
-        $row->addFileUpload('file')
-            ->accepts('.jpg,.jpeg,.gif,.png')
-            ->setAttachment('exemplarWorkThumb', $session->get('absoluteURL'), $values['exemplarWorkThumb']);
+        $row = $form->addRow()->addClass('exemplarYes');
+            $row->addLabel('exemplarWorkThumb', __m('Exemplar Work Thumbnail Image'))->description(__('150x150px jpg/png/gif'));
+            $row->addFileUpload('file')
+                ->accepts('.jpg,.jpeg,.gif,.png')
+                ->setAttachment('exemplarWorkThumb', $session->get('absoluteURL'), $values['exemplarWorkThumb']);
 
-    $row = $form->addRow()->addClass('exemplarYes');
-        $row->addLabel('exemplarWorkLicense', __m('Exemplar Work Thumbnail Image Credit'))->description(__m('Credit and license for image used above.'));
-        $row->addTextField('exemplarWorkLicense')->maxLength(255)->setValue($values['exemplarWorkLicense']);
+        $row = $form->addRow()->addClass('exemplarYes');
+            $row->addLabel('exemplarWorkLicense', __m('Exemplar Work Thumbnail Image Credit'))->description(__m('Credit and license for image used above.'));
+            $row->addTextField('exemplarWorkLicense')->maxLength(255)->setValue($values['exemplarWorkLicense']);
 
-    $row = $form->addRow()->addClass('exemplarYes');
-        $row->addLabel('exemplarWorkEmbed', __m('Exemplar Work Embed'))->description(__m('Include embed code, otherwise link to work will be used.'));
-        $row->addTextField('exemplarWorkEmbed')->maxLength(255)->setValue($values['exemplarWorkEmbed']);
+        $row = $form->addRow()->addClass('exemplarYes');
+            $row->addLabel('exemplarWorkEmbed', __m('Exemplar Work Embed'))->description(__m('Include embed code, otherwise link to work will be used.'));
+            $row->addTextField('exemplarWorkEmbed')->maxLength(255)->setValue($values['exemplarWorkEmbed']);
+    }
 
     $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
     if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {

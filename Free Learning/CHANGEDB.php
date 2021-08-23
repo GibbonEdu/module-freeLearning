@@ -1710,3 +1710,11 @@ $sql[$count][0] = '5.16.46';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableLearningAreaMentors', 'Disable Learning Area Mentors', 'Remove Learning Area-based mentors from School Mentor menu in Enrolment tab?', 'N');end
 ";
+
+//v5.17.00
+++$count;
+$sql[$count][0] = '5.17.00';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableOutcomes', 'Disable Outcomes', 'Remove all Outcomes-related functionality?', 'N');end
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableExemplarWork', 'Disable Exemplar Work', 'Remove all Exemplar Work-related functionality?', 'N');end
+";

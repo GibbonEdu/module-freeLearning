@@ -203,9 +203,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 
         // OUTCOMES
-        $form->addRow()->addHeading(__m('Outcomes'));
-        $form->addRow()->addAlert(__m('Outcomes can only be set after the new unit has been saved once. Click submit below, and when you land on the edit page, you will be able to manage outcomes.'), "message");
-
+        $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+        if ($disableOutcomes != 'Y') {
+            $form->addRow()->addHeading(__m('Outcomes'));
+            $form->addRow()->addAlert(__m('Outcomes can only be set after the new unit has been saved once. Click submit below, and when you land on the edit page, you will be able to manage outcomes.'), "message");
+        }
 
         // UNIT OUTLINE
         $form->addRow()->addHeading(__m('Unit Outline'))->append(__m('The contents of this field are viewable to all users, SO AVOID CONFIDENTIAL OR SENSITIVE DATA!'));

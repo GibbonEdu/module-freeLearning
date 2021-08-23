@@ -264,23 +264,26 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 
             // OUTCOMES
-            $form->addRow()->addHeading(__('Outcomes'))->append(__('Link this unit to outcomes (defined in the Manage Outcomes section of the Planner), and track which outcomes are being met in which units, classes and courses.'));
-            $allowOutcomeEditing = getSettingByScope($connection2, 'Planner', 'allowOutcomeEditing');
-            $row = $form->addRow();
-                $customBlocks = $row->addFreeLearningOutcomeBlocks('outcome', $session, implode(",", $values['gibbonDepartmentIDList']), $allowOutcomeEditing);
+            $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+            if ($disableOutcomes != 'Y') {
+                $form->addRow()->addHeading(__('Outcomes'))->append(__('Link this unit to outcomes (defined in the Manage Outcomes section of the Planner), and track which outcomes are being met in which units, classes and courses.'));
+                $allowOutcomeEditing = getSettingByScope($connection2, 'Planner', 'allowOutcomeEditing');
+                $row = $form->addRow();
+                    $customBlocks = $row->addFreeLearningOutcomeBlocks('outcome', $session, implode(",", $values['gibbonDepartmentIDList']), $allowOutcomeEditing);
 
-            $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
-            $sqlBlocks = "SELECT freeLearningUnitOutcome.*, scope, name, category FROM freeLearningUnitOutcome JOIN gibbonOutcome ON (freeLearningUnitOutcome.gibbonOutcomeID=gibbonOutcome.gibbonOutcomeID) WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y' ORDER BY sequenceNumber";
-            $resultBlocks = $pdo->select($sqlBlocks, $dataBlocks);
+                $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
+                $sqlBlocks = "SELECT freeLearningUnitOutcome.*, scope, name, category FROM freeLearningUnitOutcome JOIN gibbonOutcome ON (freeLearningUnitOutcome.gibbonOutcomeID=gibbonOutcome.gibbonOutcomeID) WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y' ORDER BY sequenceNumber";
+                $resultBlocks = $pdo->select($sqlBlocks, $dataBlocks);
 
-            while ($rowBlocks = $resultBlocks->fetch()) {
-                $outcome = array(
-                    'outcometitle' => $rowBlocks['name'],
-                    'outcomegibbonOutcomeID' => $rowBlocks['gibbonOutcomeID'],
-                    'outcomecategory' => $rowBlocks['category'],
-                    'outcomecontents' => $rowBlocks['content']
-                );
-                $customBlocks->addBlock($rowBlocks['gibbonOutcomeID'], $outcome);
+                while ($rowBlocks = $resultBlocks->fetch()) {
+                    $outcome = array(
+                        'outcometitle' => $rowBlocks['name'],
+                        'outcomegibbonOutcomeID' => $rowBlocks['gibbonOutcomeID'],
+                        'outcomecategory' => $rowBlocks['category'],
+                        'outcomecontents' => $rowBlocks['content']
+                    );
+                    $customBlocks->addBlock($rowBlocks['gibbonOutcomeID'], $outcome);
+                }
             }
 
 

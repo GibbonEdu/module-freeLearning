@@ -149,9 +149,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $commentApproval = trim(preg_replace('/^<p>|<\/p>$/i', '', $commentApproval));
 
                     $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'];
-                    $exemplarWork = $_POST['exemplarWork'] ?? 'N';
-                    $exemplarWorkLicense = $_POST['exemplarWorkLicense'] ?? '';
-                    $exemplarWorkEmbed = $_POST['exemplarWorkEmbed'] ?? '';
+                    $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+                    $exemplarWork = (!empty($_POST['exemplarWork']) && $disableExemplarWork != 'Y') ? $_POST['exemplarWork'] : 'N';
+                    $exemplarWorkLicense = (!empty($_POST['exemplarWorkLicense']) && $disableExemplarWork != 'Y') ? $_POST['exemplarWorkLicense'] : '';
+                    $exemplarWorkEmbed = (!empty($_POST['exemplarWorkEmbed']) && $disableExemplarWork != 'Y') ? $_POST['exemplarWorkEmbed'] : '';
                     $attachment = '';
                     $badgesBadgeID = $_POST['badgesBadgeID'] ?? '';
 

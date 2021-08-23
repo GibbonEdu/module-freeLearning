@@ -166,35 +166,38 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         }
                     }
 
-                    //Delete all outcomes
-                    try {
-                        $dataDelete = array('freeLearningUnitID' => $freeLearningUnitID);
-                        $sqlDelete = 'DELETE FROM freeLearningUnitOutcome WHERE freeLearningUnitID=:freeLearningUnitID';
-                        $resultDelete = $connection2->prepare($sqlDelete);
-                        $resultDelete->execute($dataDelete);
-                    } catch (PDOException $e) {
-                        //Fail2
-                        $URL .= '&return=error2';
-                        header("Location: {$URL}");
-                        exit();
-                    }
-                    //Insert outcomes
-                    $count = 0;
-                    if (isset($_POST['outcomeorder'])) {
-                        if (count($_POST['outcomeorder']) > 0) {
-                            foreach ($_POST['outcomeorder'] as $outcome) {
-                                if ($_POST["outcomegibbonOutcomeID$outcome"] != '') {
-                                    try {
-                                        $dataInsert = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonOutcomeID' => $_POST["outcomegibbonOutcomeID$outcome"], 'content' => $_POST["outcomecontents$outcome"], 'count' => $count);
-                                        $sqlInsert = 'INSERT INTO freeLearningUnitOutcome SET freeLearningUnitID=:freeLearningUnitID, gibbonOutcomeID=:gibbonOutcomeID, content=:content, sequenceNumber=:count';
-                                        $resultInsert = $connection2->prepare($sqlInsert);
-                                        $resultInsert->execute($dataInsert);
-                                    } catch (PDOException $e) {
-                                        echo $e;
-                                        $partialFail = true;
+                    $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+                    if ($disableOutcomes != 'Y') {
+                        //Delete all outcomes
+                        try {
+                            $dataDelete = array('freeLearningUnitID' => $freeLearningUnitID);
+                            $sqlDelete = 'DELETE FROM freeLearningUnitOutcome WHERE freeLearningUnitID=:freeLearningUnitID';
+                            $resultDelete = $connection2->prepare($sqlDelete);
+                            $resultDelete->execute($dataDelete);
+                        } catch (PDOException $e) {
+                            //Fail2
+                            $URL .= '&return=error2';
+                            header("Location: {$URL}");
+                            exit();
+                        }
+                        //Insert outcomes
+                        $count = 0;
+                        if (isset($_POST['outcomeorder'])) {
+                            if (count($_POST['outcomeorder']) > 0) {
+                                foreach ($_POST['outcomeorder'] as $outcome) {
+                                    if ($_POST["outcomegibbonOutcomeID$outcome"] != '') {
+                                        try {
+                                            $dataInsert = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonOutcomeID' => $_POST["outcomegibbonOutcomeID$outcome"], 'content' => $_POST["outcomecontents$outcome"], 'count' => $count);
+                                            $sqlInsert = 'INSERT INTO freeLearningUnitOutcome SET freeLearningUnitID=:freeLearningUnitID, gibbonOutcomeID=:gibbonOutcomeID, content=:content, sequenceNumber=:count';
+                                            $resultInsert = $connection2->prepare($sqlInsert);
+                                            $resultInsert->execute($dataInsert);
+                                        } catch (PDOException $e) {
+                                            echo $e;
+                                            $partialFail = true;
+                                        }
                                     }
+                                    ++$count;
                                 }
-                                ++$count;
                             }
                         }
                     }
