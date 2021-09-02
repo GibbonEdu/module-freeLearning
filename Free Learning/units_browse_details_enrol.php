@@ -296,6 +296,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             // SUBMIT EVIDENCE
             $form = Form::create('enrol', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_completePendingProcess.php?'.http_build_query($urlParams));
 
+            $form->setAutocomplete(false); // Prevent students selecting links from autocomplete
             $form->addHiddenValue('address', $session->get('address'));
             $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
             $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);

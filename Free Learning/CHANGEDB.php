@@ -1718,3 +1718,8 @@ $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableOutcomes', 'Disable Outcomes', 'Remove all Outcomes-related functionality?', 'N');end
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableExemplarWork', 'Disable Exemplar Work', 'Remove all Exemplar Work-related functionality?', 'N');end
 ";
+
+//v5.17.01
+++$count;
+$sql[$count][0] = '5.17.01';
+$sql[$count][1] = "";
