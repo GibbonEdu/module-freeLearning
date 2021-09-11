@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.17.01';
+$version = '5.17.02';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -68,7 +68,9 @@ $moduleTables[1] = 'CREATE TABLE `freeLearningUnitBlock` (
   `contents` text NOT NULL,
   `teachersNotes` text NOT NULL,
   `sequenceNumber` int(4) NOT NULL,
-  PRIMARY KEY (`freeLearningUnitBlockID`)
+  PRIMARY KEY (`freeLearningUnitBlockID`),
+  KEY `length` (`length`),
+  KEY `freeLearningUnitID` (`freeLearningUnitID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
 $moduleTables[2] = 'CREATE TABLE `freeLearningUnitOutcome` (
@@ -88,7 +90,7 @@ $moduleTables[3] = 'CREATE TABLE `freeLearningUnitAuthor` (
   `preferredName` varchar(30) NOT NULL,
   `website` varchar(255) NOT NULL,
   PRIMARY KEY (`freeLearningUnitAuthorID`),
-  INDEX(`gibbonPersonID`)
+  KEY `gibbonPersonID` (`gibbonPersonID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
 $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
@@ -118,8 +120,8 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   `exemplarWorkLicense` varchar(255) NULL DEFAULT NULL,
   `exemplarWorkEmbed` text NULL DEFAULT NULL,
   PRIMARY KEY (`freeLearningUnitStudentID`),
-  INDEX(`gibbonPersonIDStudent`),
-  INDEX(`status`)
+  KEY `gibbonPersonIDStudent` (`gibbonPersonIDStudent`),
+  KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (

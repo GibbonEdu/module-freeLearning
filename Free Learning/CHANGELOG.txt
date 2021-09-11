@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.02
+--------
+Added length field index on freeLearningUnitBlock table
+
 v5.17.01
 --------
 Prevent link autocompletion in evidence submission form

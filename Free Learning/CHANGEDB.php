@@ -1723,3 +1723,11 @@ INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,
 ++$count;
 $sql[$count][0] = '5.17.01';
 $sql[$count][1] = "";
+
+//v5.17.02
+++$count;
+$sql[$count][0] = '5.17.02';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnitBlock` ADD INDEX(`length`);end
+ALTER TABLE `freeLearningUnitBlock` ADD INDEX(`freeLearningUnitID`);end
+";
