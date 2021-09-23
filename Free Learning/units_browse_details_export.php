@@ -238,9 +238,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 $pdf = new TCPDF ('P', 'mm', 'A4', true, 'UTF-8', false);
 $fontFile = $session->get('absolutePath'). '/resources/assets/fonts/DroidSansFallback.ttf';
 if (is_file($fontFile)) {
-    $pdf->addTTFfont($fontFile, 'TrueTypeUnicode', '', 32);
+    \TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '', 32);
 } else {
-    $pdf->addTTFfont('DroidSansFallback');
+    \TCPDF_FONTS::addTTFfont('DroidSansFallback');
 }
 
 $pdf->SetCreator($session->get('organisationName'));

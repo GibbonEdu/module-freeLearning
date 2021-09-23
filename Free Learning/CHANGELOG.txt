@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.03
+--------
+Fix use of TCPDF fonts in the Download action on units
+
 v5.17.02
 --------
 Added length field index on freeLearningUnitBlock table

@@ -1731,3 +1731,9 @@ $sql[$count][1] = "
 ALTER TABLE `freeLearningUnitBlock` ADD INDEX(`length`);end
 ALTER TABLE `freeLearningUnitBlock` ADD INDEX(`freeLearningUnitID`);end
 ";
+
+//v5.17.03
+++$count;
+$sql[$count][0] = '5.17.03';
+$sql[$count][1] = "
+";
