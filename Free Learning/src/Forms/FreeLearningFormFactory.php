@@ -79,6 +79,7 @@ class FreeLearningFormFactory extends DatabaseFormFactory
         $blockTemplate = $this->createTable()->setClass('blank w-full');
             $row = $blockTemplate->addRow();
             $row->addTextField('title')
+                ->maxlength(100)
                 ->setClass('w-3/4 title focus:bg-white')
                 ->placeholder(__('Title'))
                 ->append('<input type="hidden" id="gibbonUnitClassBlockID" name="gibbonUnitClassBlockID" value="">')
@@ -86,8 +87,10 @@ class FreeLearningFormFactory extends DatabaseFormFactory
 
             $row = $blockTemplate->addRow()->addClass('w-3/4 flex justify-between mt-1');
                 $row->addTextField('type')->placeholder(__('type (e.g. discussion, outcome)'))
+                    ->maxlength(50)
                     ->setClass('w-full focus:bg-white mr-1');
                 $row->addTextField('length')->placeholder(__('length (min)'))
+                    ->maxlength(3)
                     ->setClass('w-24 focus:bg-white')->prepend('');
 
             $smartBlockTemplate = getSettingByScope($this->pdo->getConnection(), 'Planner', 'smartBlockTemplate');
