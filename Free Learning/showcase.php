@@ -54,7 +54,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
         $sqlPage = $sqlWork.' LIMIT '.$session->get('pagination').' OFFSET '.(($page - 1) * $session->get('pagination'));
 
         if ($resultWork->rowCount() < 1) { echo "<div class='error'>";
-            echo __($guid, 'There are no records to display.');
+            echo __('There are no records to display.');
             echo '</div>';
         } else {
             if ($resultWork->rowCount() > $session->get('pagination')) {
@@ -89,11 +89,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 echo $rowWork['name']."<span style='font-size: 75%; text-transform: none'> by ".$students.'</span>';
                 echo '</h3>';
                 echo "<p style='font-style: italic; margin-top 0; margin-bottom: 5px; font-size: 10.5px'>";
-                echo __($guid, 'Shared on', 'Free Learning').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']);
+                echo __m('Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']);
                 echo '</p>';
                 if ($canEdit) {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID='.$rowWork['freeLearningUnitID'].'&freeLearningUnitStudentID='.$rowWork['freeLearningUnitStudentID']."&sidebar=true'>".__($guid, 'Edit')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'Edit')."' src='./themes/".$session->get('gibbonThemeName')."/img/config.png'/></a>";
+                    echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID='.$rowWork['freeLearningUnitID'].'&freeLearningUnitStudentID='.$rowWork['freeLearningUnitStudentID']."&sidebar=true'>".__('Edit')."<img style='margin: 0 0 -4px 3px' title='".__('Edit')."' src='./themes/".$session->get('gibbonThemeName')."/img/config.png'/></a>";
                     echo '</div>';
                 }
                 echo "<table style='width: 100%'>";
@@ -115,7 +115,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 echo '</td>';
                 echo "<td style='vertical-align: top; border-left: none'>";
                 //DISPLAY WORK.
-                echo '<h4 style=\'margin-top: 0px\'>'.__($guid, 'Student Work', 'Free Learning').'</h4>';
+                echo '<h4 style=\'margin-top: 0px\'>'.__m('Student Work').'</h4>';
                 if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
                     $extension = strrchr($rowWork['evidenceLocation'], '.');
                     if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
@@ -129,9 +129,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                     } else { //Not an image
                         echo '<p class=\'button\'>';
                         if ($rowWork['evidenceType'] == 'File') { //It's a file
-                            echo "<a class='button' target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
+                            echo "<a class='button' target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__m('Click to View Work').'</a>';
                         } else { //It's a link
-                            echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__($guid, 'Click to View Work', 'Free Learning').'</a>';
+                            echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__m('Click to View Work').'</a>';
                         }
                         echo '</p>';
                     }
@@ -142,7 +142,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 }
                 //DISPLAY STUDENT COMMENT
                 if ($rowWork['commentStudent'] != '') {
-                    echo '<h4>'.__($guid, 'Student Comment', 'Free Learning').'</h4>';
+                    echo '<h4>'.__m('Student Comment').'</h4>';
                     echo '<p style=\'margin-bottom: 0px\'>';
                     echo nl2br($rowWork['commentStudent']);
                     echo '</p>';
@@ -152,7 +152,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                     if ($rowWork['commentStudent'] != '') {
                         echo '<br/>';
                     }
-                    echo '<h4>'.__($guid, 'Teacher Comment', 'Free Learning').'</h4>';
+                    echo '<h4>'.__m('Teacher Comment').'</h4>';
                     echo '<p>';
                     echo $rowWork['commentApproval'];
                     echo '</p>';

@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $class = 'error';
         if (!($addReturn == '')) {
             if ($addReturn == 'success0') {
-                $addReturnMessage = __($guid, 'Your Smart Unit was successfully created: you can now edit it using the form below.', 'Free Learning');
+                $addReturnMessage = __m('Your Smart Unit was successfully created: you can now edit it using the form below.');
                 $class = 'success';
             }
             echo "<div class='$class'>";
@@ -87,7 +87,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         }
         if ($result->rowCount() != 1) {
             echo "<div class='error'>";
-            echo __($guid, 'The specified record cannot be found.');
+            echo __('The specified record cannot be found.');
             echo '</div>';
         } else {
             //Let's go!
@@ -96,14 +96,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             // Check edit lock
             if ($highestAction != "Manage Units_all" && $values['editLock'] == "Y") {
                 echo "<div class='error'>";
-                echo __($guid, 'The specified record cannot be found.');
+                echo __('The specified record cannot be found.');
                 echo '</div>';
                 return;
             }
 
             if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__($guid, 'Back to Search Results').'</a>';
+                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__('Back to Search Results').'</a>';
                 echo '</div>';
             }
 
@@ -111,7 +111,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 if ($values['active'] == 'N') $showInactive = 'Y';
 
                 echo "<div class='linkTop'>";
-                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&".http_build_query($urlParams)."'>".__($guid, 'View')."<img style='margin: 0 0 -4px 3px' title='".__($guid, 'View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a>";
+                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&".http_build_query($urlParams)."'>".__('View')."<img style='margin: 0 0 -4px 3px' title='".__('View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a>";
                 echo '</div>';
             }
 

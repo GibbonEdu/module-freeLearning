@@ -123,7 +123,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
             if ($status == 'Complete - Approved') { //APPROVED!
                 // Attempt to notify the student(s) and grant awards
                 foreach ($collaborators as $collaborator) {
-                    $text = sprintf(__($guid, 'Your mentor has approved your request for unit completion (%1$s).', 'Free Learning'), $name);
+                    $text = sprintf(__m('Your mentor has approved your request for unit completion (%1$s).'), $name);
                     $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                     setNotification($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
                     grantBadges($connection2, $guid, $collaborator['gibbonPersonIDStudent']);
@@ -145,7 +145,7 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
             } elseif ($status == 'Evidence Not Yet Approved') { //NOT YET APPROVED
                 // Attempt to notify the student(s)
                 foreach ($collaborators as $collaborator) {
-                    $text = sprintf(__($guid, 'Your mentor has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
+                    $text = sprintf(__m('Your mentor has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name);
                     $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1&view=$view";
                     setNotification($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
                 }

@@ -33,7 +33,7 @@ $publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_export.php') == false) {
     //Acess denied
     $output .= "<div class='error'>";
-    $output .= __($guid, 'You do not have access to this action.');
+    $output .= __('You do not have access to this action.');
     $output .= '</div>';
 } else {
 
@@ -41,7 +41,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     if ($freeLearningUnitID == '') {
         $output .= "<div class='error'>";
-        $output .= __($guid, 'You have not specified one or more required parameters.');
+        $output .= __('You have not specified one or more required parameters.');
         $output .= '</div>';
     } else {
 
@@ -56,7 +56,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         if ($result->rowCount() != 1) {
             $output .= "<div class='error'>";
-            $output .= __($guid, 'The selected record does not exist, or you do not have access to it.');
+            $output .= __('The selected record does not exist, or you do not have access to it.');
             $output .= '</div>';
         } else {
             $row = $result->fetch();
@@ -70,10 +70,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $output .= '<tr>';
             $output .= "<td style=\"vertical-align: top; border-top: 1px solid #000\">";
-            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__($guid, 'Unit Name', 'Free Learning').'</span><br/>';
+            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__m('Unit Name').'</span><br/>';
             $output .= '</td>';
             $output .= "<td style=\"vertical-align: top; border-top: 1px solid #000\">";
-            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__($guid, 'Time', 'Free Learning').'</span><br/>';
+            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__m('Time').'</span><br/>';
             $output .= '</td>';
             $output .= "<td style=\"vertical-align: top; text-align: right\" rowspan=\"8\">";
             if ($row['logo'] == null) {
@@ -100,7 +100,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 }
             }
             if (is_null($timing)) {
-                $output .= '<i>'.__($guid, 'N/A').'</i>';
+                $output .= '<i>'.__('N/A').'</i>';
             } else {
                 $output .= '<i>'.$timing.'</i>';
             }
@@ -110,10 +110,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $output .= '<tr style="">';
             $output .= "<td style=\"padding-top: 15px; vertical-align: top; border-top: 1px solid #000\">";
-            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__($guid, 'Difficulty', 'Free Learning').'</span><br/>';
+            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__m('Difficulty').'</span><br/>';
             $output .= '</td>';
             $output .= "<td style=\"padding-top: 15px; vertical-align: top; border-top: 1px solid #000\">";
-            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__($guid, 'Prerequisites', 'Free Learning').'</span><br/>';
+            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__m('Prerequisites').'</span><br/>';
             $output .= '</td>';
             $output .= '</tr>';
             $output .= '<tr>';
@@ -129,7 +129,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $output .= '<i>'.$units[$prerequisite][0].'</i><br/>';
                 }
             } else {
-                $output .= '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';
+                $output .= '<i>'.__m('None').'<br/></i>';
             }
             $output .= '</td>';
             $output .= '</tr>';
@@ -137,21 +137,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $output .= '<tr>';
             $output .= "<td style=\"vertical-align: top; border-top: 1px solid #000\">";
-            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__($guid, 'Departments', 'Free Learning').'</span><br/>';
+            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__m('Departments').'</span><br/>';
             $output .= '</td>';
             $output .= "<td style=\"vertical-align: top; border-top: 1px solid #000\">";
-            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__($guid, 'Authors', 'Free Learning').'</span><br/>';
+            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__m('Authors').'</span><br/>';
             $output .= '</td>';
             $output .= '</tr>';
             $output .= '<tr>';
             $output .= "<td style='vertical-align: top'>";
             $learningAreas = getLearningAreas($connection2, $guid);
             if ($learningAreas == '') {
-                $output .= '<i>'.__($guid, 'No Learning Areas available.', 'Free Learning').'</i>';
+                $output .= '<i>'.__m('No Learning Areas available.').'</i>';
             } else {
                 for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
                     if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
-                        $output .= '<i>'.__($guid, $learningAreas[($i + 1)]).'</i><br/>';
+                        $output .= '<i>'.__($learningAreas[($i + 1)]).'</i><br/>';
                     }
                 }
             }
@@ -172,7 +172,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $output .= '<tr>';
             $output .= "<td style=\"vertical-align: top; border-top: 1px solid #000\">";
-            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__($guid, 'Groupings', 'Free Learning').'</span><br/>';
+            $output .= "<span style=\"font-size: 115%; font-weight: bold\">".__m('Groupings').'</span><br/>';
             $output .= '</td>';
             $output .= "<td style=\"vertical-align: top; border-top: 1px solid #000\">";
 
@@ -210,7 +210,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             if ($resultBlocks->rowCount() < 1) {
                 $output .= "<div class='error'>";
-                $output .= __($guid, 'There are no records to display.');
+                $output .= __('There are no records to display.');
                 $output .= '</div>';
             } else {
                 $resourceContents = '';

@@ -110,7 +110,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 $values = $result->fetch();
                 if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__('Back to Search Results', 'Free Learning').'</a>';
+                    echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__m('Back to Search Results').'</a>';
                     echo '</div>';
                 }
 
@@ -150,19 +150,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         FROM freeLearningUnitStudent
                         LEFT JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID)
                         WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID
-                            AND gibbonPersonIDStudent=:gibbonPersonID
-                            AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Yet Approved\')';
+                            AND gibbonPersonIDStudent=:gibbonPersonID';
                     $resultEnrol = $connection2->prepare($sqlEnrol);
                     $resultEnrol->execute($dataEnrol);
                 } catch (PDOException $e) {
                     echo "<div class='error'>".$e->getMessage().'</div>';
                 }
 
-                $rowEnrol = null;
-                if ($resultEnrol->rowCount()==1) { //ENROL NOW
-                    $rowEnrol = $resultEnrol->fetch() ;
-                }
-
+                $enrolled = ($resultEnrol->rowCount() == 1) ? true : false ;
 
                 // UNIT DETAILS TABLE
                 $table = DataTable::createDetails('unitDetails');
@@ -281,24 +276,28 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $defaultTab = $_GET['tab'];
                 }
 
+                $showContentOnEnrol = getSettingByScope($connection2, 'Free Learning', 'showContentOnEnrol');
+
                 echo "<div id='tabs' style='margin: 20px 0'>";
                 //Tab links
                 echo '<ul>';
-                echo "<li><a href='#tabs0'>".__('Unit Overview', 'Free Learning').'</a></li>';
-                echo "<li><a href='#tabs1'>".__('Enrol', 'Free Learning').'</a></li>';
+                echo "<li><a href='#tabs0'>".__m('Unit Overview').'</a></li>';
+                echo "<li><a href='#tabs1'>".__m('Enrol').'</a></li>';
                 if ($prerequisitesMet) {
                     if ($canManage || (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') && $roleCategory == 'Staff')) {
-                        echo "<li><a href='#tabs2'>".__('Manage Enrolment', 'Free Learning').'</a></li>';
+                        echo "<li><a href='#tabs2'>".__m('Manage Enrolment').'</a></li>';
                     }
-                    echo "<li><a href='#tabs3'>".__('Content', 'Free Learning').'</a></li>';
-                    echo "<li><a href='#tabs4'>".__('Resources', 'Free Learning').'</a></li>';
-                    $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
-                    if ($disableOutcomes != 'Y') {
-                        echo "<li><a href='#tabs5'>".__('Outcomes', 'Free Learning').'</a></li>';
-                    }
-                    $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
-                    if ($disableExemplarWork != 'Y') {
-                        echo "<li><a href='#tabs6'>".__('Exemplar Work', 'Free Learning').'</a></li>';
+                    echo "<li><a href='#tabs3'>".__m('Content').'</a></li>';
+                    if ($canManage OR $showContentOnEnrol == "N" OR $enrolled) {
+                        echo "<li><a href='#tabs4'>".__m('Resources').'</a></li>';
+                        $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+                        if ($disableOutcomes != 'Y') {
+                            echo "<li><a href='#tabs5'>".__m('Outcomes').'</a></li>';
+                        }
+                        $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+                        if ($disableExemplarWork != 'Y') {
+                            echo "<li><a href='#tabs6'>".__m('Exemplar Work').'</a></li>';
+                        }
                     }
                 }
                 echo '</ul>';
@@ -306,17 +305,17 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 //Tabs
                 echo "<div id='tabs0'>";
                 echo '<h3>';
-                echo __('Blurb', 'Free Learning');
+                echo __m('Blurb');
                 echo '</h3>';
                 echo '<p>';
                 echo $values['blurb'];
                 echo '</p>';
                 if ($values['license'] != '') {
                     echo '<h4>';
-                    echo __('License', 'Free Learning');
+                    echo __m('License');
                     echo '</h4>';
                     echo '<p>';
-                    echo __('This work is shared under the following license:', 'Free Learning').' '.$values['license'];
+                    echo __m('This work is shared under the following license:').' '.$values['license'];
                     echo '</p>';
                 }
                 if ($values['outline'] != '') {
@@ -331,7 +330,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 if (!$prerequisitesMet) {
                     echo "<div id='tabs1'>";
-                    echo Format::alert(__('You do not have access to this unit, as you have not yet met the prerequisites for it.', 'Free Learning'), 'warning');
+                    echo Format::alert(__m('You do not have access to this unit, as you have not yet met the prerequisites for it.'), 'warning');
                     echo '</div>';
                 } else {
 
@@ -568,251 +567,256 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo "</div>";
                     }
                     echo '<div id="tabs3" style="border-width: 1px 0px 0px 0px !important; background-color: transparent !important; padding-left: 0; padding-right: 0; overflow: initial;">';
+                        if (!$canManage AND $showContentOnEnrol == "Y" AND !$enrolled) {
+                            echo Format::alert(__m("You cannot see this unit's content until you have enrolled."), 'warning');
+                        } else {
+                            $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
+                            $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
 
-                    $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
-                    $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
+                            $blocks = $pdo->select($sqlBlocks, $dataBlocks)->fetchAll();
 
-                    $blocks = $pdo->select($sqlBlocks, $dataBlocks)->fetchAll();
-
-                    if (empty($blocks)) {
-                        echo Format::alert(__('There are no records to display.'));
-                    } else {
-                        $templateView = $container->get(View::class);
-                        $resourceContents = '';
-
-                        $blockCount = 0;
-                        foreach ($blocks as $block) {
-                            echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
-                                'roleCategory' => $roleCategory,
-                                'gibbonPersonID' => $session->get('username') ?? '',
-                                'blockCount' => $blockCount
-                            ]);
-                            $resourceContents .= $block['contents'];
-                            $blockCount++;
-                        }
-
-                        // Enable p5js widgets in smart blocks
-                        if (stripos($resourceContents, '<script type="text/p5"') !== false) {
-                            echo '<script src="//toolness.github.io/p5.js-widget/p5-widget.js"></script>';
-                        }
-                    }
-
-                    echo '</div>';
-                    echo "<div id='tabs4'>";
-                    //Resources
-                    $noReosurces = true;
-
-                    //Links
-                    $links = '';
-                    $linksArray = array();
-                    $linksCount = 0;
-                    $dom = new DOMDocument();
-                    @$dom->loadHTML($resourceContents);
-                    foreach ($dom->getElementsByTagName('a') as $node) {
-                        if ($node->nodeValue != '') {
-                            $linksArray[$linksCount] = "<li><a href='".$node->getAttribute('href')."'>".$node->nodeValue.'</a></li>';
-                            ++$linksCount;
-                        }
-                    }
-
-                    $linksArray = array_unique($linksArray);
-                    natcasesort($linksArray);
-
-                    foreach ($linksArray as $link) {
-                        $links .= $link;
-                    }
-
-                    if ($links != '') {
-                        echo '<h2>';
-                        echo 'Links';
-                        echo '</h2>';
-                        echo '<ul>';
-                        echo $links;
-                        echo '</ul>';
-                        $noReosurces = false;
-                    }
-
-                    //Images
-                    $images = '';
-                    $imagesArray = array();
-                    $imagesCount = 0;
-                    $dom2 = new DOMDocument();
-                    @$dom2->loadHTML($resourceContents);
-                    foreach ($dom2->getElementsByTagName('img') as $node) {
-                        if ($node->getAttribute('src') != '') {
-                            $imagesArray[$imagesCount] = "<img class='resource' style='margin: 10px 0; max-width: 560px' src='".$node->getAttribute('src')."'/><br/>";
-                            ++$imagesCount;
-                        }
-                    }
-
-                    $imagesArray = array_unique($imagesArray);
-                    natcasesort($imagesArray);
-
-                    foreach ($imagesArray as $image) {
-                        $images .= $image;
-                    }
-
-                    if ($images != '') {
-                        echo '<h2>';
-                        echo 'Images';
-                        echo '</h2>';
-                        echo $images;
-                        $noReosurces = false;
-                    }
-
-                    //Embeds
-                    $embeds = '';
-                    $embedsArray = array();
-                    $embedsCount = 0;
-                    $dom2 = new DOMDocument();
-                    @$dom2->loadHTML($resourceContents);
-                    foreach ($dom2->getElementsByTagName('iframe') as $node) {
-                        if ($node->getAttribute('src') != '') {
-                            $embedsArray[$embedsCount] = "<iframe style='max-width: 560px' width='".$node->getAttribute('width')."' height='".$node->getAttribute('height')."' src='".$node->getAttribute('src')."' frameborder='".$node->getAttribute('frameborder')."'></iframe>";
-                            ++$embedsCount;
-                        }
-                    }
-
-                    $embedsArray = array_unique($embedsArray);
-                    natcasesort($embedsArray);
-
-                    foreach ($embedsArray as $embed) {
-                        $embeds .= $embed.'<br/><br/>';
-                    }
-
-                    if ($embeds != '') {
-                        echo '<h2>';
-                        echo 'Embeds';
-                        echo '</h2>';
-                        echo $embeds;
-                        $noReosurces = false;
-                    }
-
-                    //No resources!
-                    if ($noReosurces) {
-                        echo "<div class='error'>";
-                        echo __('There are no records to display.');
-                        echo '</div>';
-                    }
-                    echo '</div>';
-                    if ($disableOutcomes != 'Y') {
-                        echo "<div id='tabs5'>";
-                            //Spit out outcomes
-                            $unitOutcomeGateway = $container->get(UnitOutcomeGateway::class);
-
-                            $criteria = $unitOutcomeGateway->newQueryCriteria(true)
-                                ->fromPOST();
-
-                            $outcomes = $unitOutcomeGateway->selectOutcomesByUnit($freeLearningUnitID)->fetchAll();
-
-                            $table = DataTable::createPaginated('outcomes', $criteria);
-
-                            $table->addExpandableColumn('content');
-                            $table->addColumn('scope', __('scope'));
-                            $table->addColumn('category', __('Category'));
-                            $table->addColumn('name', __('Name'))
-                                ->format(function($outcome) {
-                                    $output = $outcome['nameShort']."<br/>";
-                                    $output .= "<div class=\"text-xxs\">".$outcome['name']."</div>";
-                                    return $output;
-                                });
-                            $table->addColumn('yearGroups', __('Year Groups'))
-                                ->format(function($outcome) use ($guid, $connection2) {
-                                    return getYearGroupsFromIDList($guid, $connection2, $outcome['gibbonYearGroupIDList']);
-                                });
-
-                            echo $table->render($outcomes);
-                        echo '</div>';
-                    }
-                    if ($disableExemplarWork != 'Y') {
-                        echo "<div id='tabs6'>";
-                            //Spit out exemplar work
-                            try {
-                                $dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
-                                $sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
-                                $resultWork = $connection2->prepare($sqlWork);
-                                $resultWork->execute($dataWork);
-                            } catch (PDOException $e) {
-                                echo "<div class='error'>".$e->getMessage().'</div>';
-                            }
-                            if ($resultWork->rowCount() < 1) {
-                                echo "<div class='error'>";
-                                echo __('There are no records to display.');
-                                echo '</div>';
+                            if (empty($blocks)) {
+                                echo Format::alert(__('There are no records to display.'));
                             } else {
-                                while ($rowWork = $resultWork->fetch()) {
-                                    $students = '';
-                                    if ($rowWork['grouping'] == 'Individual') { //Created by a single student
-                                    $students = $rowWork['preferredName'];
-                                    } else { //Created by a group of students
-                                                try {
-                                                    $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
-                                                    $sqlStudents = "SELECT preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY preferredName";
-                                                    $resultStudents = $connection2->prepare($sqlStudents);
-                                                    $resultStudents->execute($dataStudents);
-                                                } catch (PDOException $e) {
-                                                }
-                                        while ($rowStudents = $resultStudents->fetch()) {
-                                            $students .= $rowStudents['preferredName'].', ';
-                                        }
-                                        if ($students != '') {
-                                            $students = substr($students, 0, -2);
-                                            $students = preg_replace('/,([^,]*)$/', ' & \1', $students);
-                                        }
-                                    }
+                                $templateView = $container->get(View::class);
+                                $resourceContents = '';
 
-                                    echo '<h3>';
-                                    echo $students." . <span style='font-size: 75%'>".__('Shared on', 'Free Learning').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
-                                    echo '</h3>';
-                                    //DISPLAY WORK.
-                                    echo '<h4 style=\'margin-top: 0px\'>'.__('Student Work', 'Free Learning').'</h4>';
-                                    if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
-                                        $extension = strrchr($rowWork['evidenceLocation'], '.');
-                                        if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
-                                            echo "<p>";
-                                            if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                                echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
-                                            } else { //It's a link
-                                                echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
-                                            }
-                                            echo '</p>';
-                                        } else { //Not an image
-                                            echo '<p class=\'button\'>';
-                                            if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                                echo "<a class='button'target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__('Click to View Work', 'Free Learning').'</a>';
-                                            } else { //It's a link
-                                                echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__('Click to View Work', 'Free Learning').'</a>';
-                                            }
-                                            echo '</p>';
-                                        }
-                                    } else {
-                                        echo '<p>';
-                                        print $rowWork['exemplarWorkEmbed'] ;
-                                        echo '</p>';
-                                    }
-                                    //DISPLAY STUDENT COMMENT
-                                    if ($rowWork['commentStudent'] != '') {
-                                        echo '<h4>'.__('Student Comment', 'Free Learning').'</h4>';
-                                        echo '<p style=\'margin-bottom: 0px\'>';
-                                        echo nl2br($rowWork['commentStudent']);
-                                        echo '</p>';
-                                    }
-                                    //DISPLAY TEACHER COMMENT
-                                    if ($rowWork['commentApproval'] != '') {
-                                        if ($rowWork['commentStudent'] != '') {
-                                            echo '<br/>';
-                                        }
-                                        echo '<h4>'.__('Teacher Comment', 'Free Learning').'</h4>';
-                                        echo '<p>';
-                                        echo $rowWork['commentApproval'];
-                                        echo '</p>';
-                                    }
+                                $blockCount = 0;
+                                foreach ($blocks as $block) {
+                                    echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
+                                        'roleCategory' => $roleCategory,
+                                        'gibbonPersonID' => $session->get('username') ?? '',
+                                        'blockCount' => $blockCount
+                                    ]);
+                                    $resourceContents .= $block['contents'];
+                                    $blockCount++;
+                                }
+
+                                // Enable p5js widgets in smart blocks
+                                if (stripos($resourceContents, '<script type="text/p5"') !== false) {
+                                    echo '<script src="//toolness.github.io/p5.js-widget/p5-widget.js"></script>';
                                 }
                             }
+                        }
+
+                    echo '</div>';
+                    if ($canManage OR $showContentOnEnrol == "N" OR $enrolled) {
+                        echo "<div id='tabs4'>";
+                        //Resources
+                        $noReosurces = true;
+
+                        //Links
+                        $links = '';
+                        $linksArray = array();
+                        $linksCount = 0;
+                        $dom = new DOMDocument();
+                        @$dom->loadHTML($resourceContents);
+                        foreach ($dom->getElementsByTagName('a') as $node) {
+                            if ($node->nodeValue != '') {
+                                $linksArray[$linksCount] = "<li><a href='".$node->getAttribute('href')."'>".$node->nodeValue.'</a></li>';
+                                ++$linksCount;
+                            }
+                        }
+
+                        $linksArray = array_unique($linksArray);
+                        natcasesort($linksArray);
+
+                        foreach ($linksArray as $link) {
+                            $links .= $link;
+                        }
+
+                        if ($links != '') {
+                            echo '<h2>';
+                            echo 'Links';
+                            echo '</h2>';
+                            echo '<ul>';
+                            echo $links;
+                            echo '</ul>';
+                            $noReosurces = false;
+                        }
+
+                        //Images
+                        $images = '';
+                        $imagesArray = array();
+                        $imagesCount = 0;
+                        $dom2 = new DOMDocument();
+                        @$dom2->loadHTML($resourceContents);
+                        foreach ($dom2->getElementsByTagName('img') as $node) {
+                            if ($node->getAttribute('src') != '') {
+                                $imagesArray[$imagesCount] = "<img class='resource' style='margin: 10px 0; max-width: 560px' src='".$node->getAttribute('src')."'/><br/>";
+                                ++$imagesCount;
+                            }
+                        }
+
+                        $imagesArray = array_unique($imagesArray);
+                        natcasesort($imagesArray);
+
+                        foreach ($imagesArray as $image) {
+                            $images .= $image;
+                        }
+
+                        if ($images != '') {
+                            echo '<h2>';
+                            echo 'Images';
+                            echo '</h2>';
+                            echo $images;
+                            $noReosurces = false;
+                        }
+
+                        //Embeds
+                        $embeds = '';
+                        $embedsArray = array();
+                        $embedsCount = 0;
+                        $dom2 = new DOMDocument();
+                        @$dom2->loadHTML($resourceContents);
+                        foreach ($dom2->getElementsByTagName('iframe') as $node) {
+                            if ($node->getAttribute('src') != '') {
+                                $embedsArray[$embedsCount] = "<iframe style='max-width: 560px' width='".$node->getAttribute('width')."' height='".$node->getAttribute('height')."' src='".$node->getAttribute('src')."' frameborder='".$node->getAttribute('frameborder')."'></iframe>";
+                                ++$embedsCount;
+                            }
+                        }
+
+                        $embedsArray = array_unique($embedsArray);
+                        natcasesort($embedsArray);
+
+                        foreach ($embedsArray as $embed) {
+                            $embeds .= $embed.'<br/><br/>';
+                        }
+
+                        if ($embeds != '') {
+                            echo '<h2>';
+                            echo 'Embeds';
+                            echo '</h2>';
+                            echo $embeds;
+                            $noReosurces = false;
+                        }
+
+                        //No resources!
+                        if ($noReosurces) {
+                            echo "<div class='error'>";
+                            echo __('There are no records to display.');
+                            echo '</div>';
+                        }
                         echo '</div>';
+                        if ($disableOutcomes != 'Y') {
+                            echo "<div id='tabs5'>";
+                                //Spit out outcomes
+                                $unitOutcomeGateway = $container->get(UnitOutcomeGateway::class);
+
+                                $criteria = $unitOutcomeGateway->newQueryCriteria(true)
+                                    ->fromPOST();
+
+                                $outcomes = $unitOutcomeGateway->selectOutcomesByUnit($freeLearningUnitID)->fetchAll();
+
+                                $table = DataTable::createPaginated('outcomes', $criteria);
+
+                                $table->addExpandableColumn('content');
+                                $table->addColumn('scope', __('scope'));
+                                $table->addColumn('category', __('Category'));
+                                $table->addColumn('name', __('Name'))
+                                    ->format(function($outcome) {
+                                        $output = $outcome['nameShort']."<br/>";
+                                        $output .= "<div class=\"text-xxs\">".$outcome['name']."</div>";
+                                        return $output;
+                                    });
+                                $table->addColumn('yearGroups', __('Year Groups'))
+                                    ->format(function($outcome) use ($guid, $connection2) {
+                                        return getYearGroupsFromIDList($guid, $connection2, $outcome['gibbonYearGroupIDList']);
+                                    });
+
+                                echo $table->render($outcomes);
+                            echo '</div>';
+                        }
+                        if ($disableExemplarWork != 'Y') {
+                            echo "<div id='tabs6'>";
+                                //Spit out exemplar work
+                                try {
+                                    $dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
+                                    $sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
+                                    $resultWork = $connection2->prepare($sqlWork);
+                                    $resultWork->execute($dataWork);
+                                } catch (PDOException $e) {
+                                    echo "<div class='error'>".$e->getMessage().'</div>';
+                                }
+                                if ($resultWork->rowCount() < 1) {
+                                    echo "<div class='error'>";
+                                    echo __('There are no records to display.');
+                                    echo '</div>';
+                                } else {
+                                    while ($rowWork = $resultWork->fetch()) {
+                                        $students = '';
+                                        if ($rowWork['grouping'] == 'Individual') { //Created by a single student
+                                        $students = $rowWork['preferredName'];
+                                        } else { //Created by a group of students
+                                                    try {
+                                                        $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
+                                                        $sqlStudents = "SELECT preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY preferredName";
+                                                        $resultStudents = $connection2->prepare($sqlStudents);
+                                                        $resultStudents->execute($dataStudents);
+                                                    } catch (PDOException $e) {
+                                                    }
+                                            while ($rowStudents = $resultStudents->fetch()) {
+                                                $students .= $rowStudents['preferredName'].', ';
+                                            }
+                                            if ($students != '') {
+                                                $students = substr($students, 0, -2);
+                                                $students = preg_replace('/,([^,]*)$/', ' & \1', $students);
+                                            }
+                                        }
+
+                                        echo '<h3>';
+                                        echo $students." . <span style='font-size: 75%'>".__m('Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
+                                        echo '</h3>';
+                                        //DISPLAY WORK.
+                                        echo '<h4 style=\'margin-top: 0px\'>'.__m('Student Work').'</h4>';
+                                        if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
+                                            $extension = strrchr($rowWork['evidenceLocation'], '.');
+                                            if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
+                                                echo "<p>";
+                                                if ($rowWork['evidenceType'] == 'File') { //It's a file
+                                                    echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
+                                                } else { //It's a link
+                                                    echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
+                                                }
+                                                echo '</p>';
+                                            } else { //Not an image
+                                                echo '<p class=\'button\'>';
+                                                if ($rowWork['evidenceType'] == 'File') { //It's a file
+                                                    echo "<a class='button'target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__m('Click to View Work').'</a>';
+                                                } else { //It's a link
+                                                    echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__m('Click to View Work').'</a>';
+                                                }
+                                                echo '</p>';
+                                            }
+                                        } else {
+                                            echo '<p>';
+                                            print $rowWork['exemplarWorkEmbed'] ;
+                                            echo '</p>';
+                                        }
+                                        //DISPLAY STUDENT COMMENT
+                                        if ($rowWork['commentStudent'] != '') {
+                                            echo '<h4>'.__m('Student Comment').'</h4>';
+                                            echo '<p style=\'margin-bottom: 0px\'>';
+                                            echo nl2br($rowWork['commentStudent']);
+                                            echo '</p>';
+                                        }
+                                        //DISPLAY TEACHER COMMENT
+                                        if ($rowWork['commentApproval'] != '') {
+                                            if ($rowWork['commentStudent'] != '') {
+                                                echo '<br/>';
+                                            }
+                                            echo '<h4>'.__m('Teacher Comment').'</h4>';
+                                            echo '<p>';
+                                            echo $rowWork['commentApproval'];
+                                            echo '</p>';
+                                        }
+                                    }
+                                }
+                            echo '</div>';
+                        }
                     }
+                    echo '</div>';
                 }
-                echo '</div>';
 
                 echo "<script type='text/javascript'>
                     $( \"#tabs\" ).tabs({

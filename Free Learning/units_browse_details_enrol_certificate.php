@@ -34,19 +34,19 @@ $publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits'
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     //Acess denied
     $output .= "<div class='error'>";
-    $output .= __($guid, 'You do not have access to this action.');
+    $output .= __('You do not have access to this action.');
     $output .= '</div>';
 } else {
     if ($settingGateway->getSettingByScope('Free Learning', 'certificatesAvailable') != "Y") {
         $output .= "<div class='error'>";
-        $output .= __($guid, 'You do not have access to this action.');
+        $output .= __('You do not have access to this action.');
         $output .= '</div>';
     } else {
         $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
 
         if ($freeLearningUnitID == '') {
             $output .= "<div class='error'>";
-            $output .= __($guid, 'You have not specified one or more required parameters.');
+            $output .= __('You have not specified one or more required parameters.');
             $output .= '</div>';
         } else {
 
@@ -67,7 +67,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             if ($result->rowCount() != 1) {
                 $output .= "<div class='error'>";
-                $output .= __($guid, 'The selected record does not exist, or you do not have access to it.');
+                $output .= __('The selected record does not exist, or you do not have access to it.');
                 $output .= '</div>';
             } else {
                 $row = $result->fetch();

@@ -251,7 +251,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             // Attempt to notify the student and grant badges
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
-                                $text = sprintf(__($guid, 'A teacher has approved your request for unit completion (%1$s).', 'Free Learning'), $name);
+                                $text = sprintf(__m('A teacher has approved your request for unit completion (%1$s).'), $name);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
                                     setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
@@ -304,7 +304,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             // Attempt to notify the student
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
-                                $text = sprintf(__($guid, 'A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
+                                $text = sprintf(__('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&sidebar=true&tab=1&view=$view";
                                 setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                             }

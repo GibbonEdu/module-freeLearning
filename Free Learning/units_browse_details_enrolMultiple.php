@@ -62,7 +62,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         if ($freeLearningUnitID == '') {
             echo "<div class='error'>";
-            echo __($guid, 'You have not specified one or more required parameters.');
+            echo __('You have not specified one or more required parameters.');
             echo '</div>';
         } else {
             try {
@@ -77,7 +77,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             if ($result->rowCount() != 1) {
                 echo "<div class='error'>";
-                echo __($guid, 'The selected record does not exist, or you do not have access to it.');
+                echo __('The selected record does not exist, or you do not have access to it.');
                 echo '</div>';
             } else {
                 $values = $result->fetch();

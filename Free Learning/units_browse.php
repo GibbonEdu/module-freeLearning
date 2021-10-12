@@ -377,7 +377,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             } elseif ($view == 'map') {
                 // VISUAL MAP
                 echo '<p>';
-                echo __($guid, 'The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.', 'Free Learning');
+                echo __m('The map below shows all units selected by the filters above. Lines between units represent prerequisites. Units without prerequisites, which make good starting units, are highlighted by a blue border.');
                 echo '</p>';
                 echo '<div class="text-xs py-2">';
                     echo __m('{count} Records', ['count' => count($units)]);

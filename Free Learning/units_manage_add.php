@@ -56,7 +56,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
             echo "<div class='linkTop'>";
-            echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__($guid, 'Back to Search Results').'</a>';
+            echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__('Back to Search Results').'</a>';
             echo '</div>';
         }
 
@@ -180,7 +180,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         ];
         $row = $form->addRow();
         $row->addLabel('grouping', __('Grouping'))->description(__m('How should students work during this unit?'));
-            $row->addCheckbox('grouping')->fromArray($groups);
+            $row->addCheckbox('grouping')->fromArray($groups)->checked('Individual');
 
 
         // MENTORSHIP

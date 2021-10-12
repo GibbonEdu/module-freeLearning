@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
     if ($gibbonPersonID != '') {
         $output = '';
         echo '<h2>';
-        echo __($guid, 'Report Data');
+        echo __('Report Data');
         echo '</h2>';
 
         //Check the years groups the student has been enrolled into
@@ -70,7 +70,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 
         if ($result->rowCount() < 1) {
             echo "<div class='error'>";
-            echo __($guid, 'Your request failed due to a database error.');
+            echo __('Your request failed due to a database error.');
             echo '</div>';
             $proceed = false;
         } else {
@@ -113,7 +113,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
             //Get all school and department outcomes for the students' years in school and store in variable
             $output = '';
             $output .= '<h4>';
-            $output .= __($guid, 'Outcome Completion', 'Free Learning');
+            $output .= __m('Outcome Completion');
             $output .= '</h4>';
             try {
                 $dataOutcomes = array('gibbonPersonID' => $gibbonPersonID);
@@ -125,20 +125,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
 
             if ($resultOutcomes->rowCount() < 1) {
                 $output .= "<div class='error'>";
-                $output .= __($guid, 'There are no records to display.');
+                $output .= __('There are no records to display.');
                 $output .= '</div>';
             } else {
                 $output .= "<table cellspacing='0' style='width: 100%'>";
                 $output .= "<tr class='head'>";
                 $output .= '<th>';
-                $output .= __($guid, 'Scope').'<br/>';
-                $output .= "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Category').'</span>';
+                $output .= __('Scope').'<br/>';
+                $output .= "<span style='font-size: 85%; font-style: italic'>".__('Category').'</span>';
                 $output .= '</th>';
                 $output .= '<th>';
-                $output .= __($guid, 'Name');
+                $output .= __('Name');
                 $output .= '</th>';
                 $output .= '<th>';
-                $output .= __($guid, 'Status');
+                $output .= __('Status');
                 $output .= '</th>';
                 $output .= '</tr>';
 
@@ -167,11 +167,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $output .= '</td>';
                     $output .= '<td>';
                     if (isset($outcomesMet[$rowOutcomes['gibbonOutcomeID']][0]) == false) {
-                        $output .= "<img title='".__($guid, 'Outcome not met', 'Free Learning')."' src='./themes/".$session->get('gibbonThemeName')."/img/iconCross.png'/> ";
+                        $output .= "<img title='".__m('Outcome not met')."' src='./themes/".$session->get('gibbonThemeName')."/img/iconCross.png'/> ";
                         $outcomesNotMet[$outcomesNotMetCount] = $rowOutcomes['gibbonOutcomeID'];
                         ++$outcomesNotMetCount;
                     } else {
-                        $output .= "<img title='".__($guid, 'Outcome met in units:', 'Free Learning').' '.htmlPrep($outcomesMet[$rowOutcomes['gibbonOutcomeID']][1])."' src='./themes/".$session->get('gibbonThemeName')."/img/iconTick.png'/> x".$outcomesMet[$rowOutcomes['gibbonOutcomeID']][0];
+                        $output .= "<img title='".__m('Outcome met in units:').' '.htmlPrep($outcomesMet[$rowOutcomes['gibbonOutcomeID']][1])."' src='./themes/".$session->get('gibbonThemeName')."/img/iconTick.png'/> x".$outcomesMet[$rowOutcomes['gibbonOutcomeID']][0];
                     }
                     $output .= '</td>';
                     $output .= '</tr>';
@@ -214,36 +214,36 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $blocks = getBlocksArray($connection2);
 
                     echo '<h4>';
-                    echo __($guid, 'Recommended Units', 'Free Learning');
+                    echo __m('Recommended Units');
                     echo '</h4>';
                     echo '<p>';
-                    echo __($guid, 'The units below (up to a total of 3) are chosen at random from a list of units that have outcomes this student has not met, but can do based on year group.', 'Free Learning');
+                    echo __m('The units below (up to a total of 3) are chosen at random from a list of units that have outcomes this student has not met, but can do based on year group.');
                     echo '</p>';
 
                     echo "<table cellspacing='0' style='width: 100%'>";
                     echo "<tr class='head'>";
                     echo "<th style='width: 150px!important; text-align: center'>";
-                    echo __($guid, 'Name').'</br>';
+                    echo __('Name').'</br>';
                     echo '</th>';
                     echo "<th style='width: 100px!important'>";
-                    echo __($guid, 'Authors', 'Free Learning').'<br/>';
-                    echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Learning Areas').'</span>';
+                    echo __m('Authors').'<br/>';
+                    echo "<span style='font-size: 85%; font-style: italic'>".__('Learning Areas').'</span>';
                     echo '</th>';
                     echo "<th style='max-width: 325px!important'>";
-                    echo __($guid, 'Difficulty', 'Free Learning').'</br>';
+                    echo __m('Difficulty').'</br>';
                     echo '</th>';
                     echo '<th>';
-                    echo __($guid, 'Length', 'Free Learning').'</br>';
-                    echo "<span style='font-size: 85%; font-style: italic'>".__($guid, 'Minutes', 'Free Learning').'</span>';
+                    echo __m('Length').'</br>';
+                    echo "<span style='font-size: 85%; font-style: italic'>".__m('Minutes').'</span>';
                     echo '</th>';
                     echo '<th>';
-                    echo __($guid, 'Grouping', 'Free Learning').'</br>';
+                    echo __m('Grouping').'</br>';
                     echo '</th>';
                     echo '<th>';
-                    echo __($guid, 'Prerequisites', 'Free Learning').'</br>';
+                    echo __m('Prerequisites').'</br>';
                     echo '</th>';
                     echo "<th style='min-width: 70px'>";
-                    echo __($guid, 'Actions');
+                    echo __('Actions');
                     echo '</th>';
                     echo '</tr>';
 
@@ -301,7 +301,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                             }
                         }
                         if (is_null($timing)) {
-                            echo '<i>'.__($guid, 'N/A').'</i>';
+                            echo '<i>'.__('N/A').'</i>';
                         } else {
                             echo $timing;
                         }
@@ -323,19 +323,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                                 echo $units[$prerequisite][0].'<br/>';
                             }
                         } else {
-                            echo '<i>'.__($guid, 'None', 'Free Learning').'<br/></i>';
+                            echo '<i>'.__m('None').'<br/></i>';
                         }
                         if ($prerequisitesActive != false) {
                             $prerequisitesMet = prerequisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
                             if ($prerequisitesMet) {
-                                echo "<span style='font-weight: bold; color: #00cc00'>".__($guid, 'OK!', 'Free Learning').'</span>';
+                                echo "<span style='font-weight: bold; color: #00cc00'>".__m('OK!').'</span>';
                             } else {
-                                echo "<span style='font-weight: bold; color: #cc0000'>".__($guid, 'Not Met', 'Free Learning').'</span>';
+                                echo "<span style='font-weight: bold; color: #cc0000'>".__m('Not Met').'</span>';
                             }
                         }
                         echo '</td>';
                         echo '<td>';
-                        echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/'.$session->get('module').'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$rowRecommend['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='><img title='".__($guid, 'View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a> ";
+                        echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/'.$session->get('module').'/units_browse_details.php&sidebar=true&freeLearningUnitID='.$rowRecommend['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='><img title='".__('View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a> ";
                         echo '</td>';
                         echo '</tr>';
                     }

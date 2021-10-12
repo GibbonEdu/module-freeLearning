@@ -29,16 +29,16 @@ require_once './modules/Free Learning/moduleFunctions.php';
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_byStudent.php') == false) {
     //Acess denied
     $returnInt .= "<div class='error'>";
-    $returnInt .= __($guid, 'You do not have access to this action.');
+    $returnInt .= __('You do not have access to this action.');
     $returnInt .= '</div>';
 } else {
     $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
     $disableParentEvidence = (getSettingByScope($connection2, 'Free Learning', 'disableParentEvidence') == "Y");
 
     $returnInt .= "<div class='linkTop'>";
-    $returnInt .= sprintf(__($guid, '%1$sView Showcase of Student Work%2$s', 'Free Learning'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
+    $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
     if ($canBrowse) {
-        $returnInt .= " | ".sprintf(__($guid, '%1$sBrowse Units%2$s', 'Free Learning'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
+        $returnInt .= " | ".sprintf(__m('%1$sBrowse Units%2$s'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
     }
     $returnInt .= '</div>';
     $returnInt .= "<p style='margin-top: 20px'>";

@@ -25,7 +25,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.17.04';
+$version = '5.17.05';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
@@ -181,6 +181,7 @@ $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`na
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableLearningAreaMentors', 'Disable Learning Area Mentors', 'Remove Learning Area-based mentors from School Mentor menu in Enrolment tab?', 'N');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableOutcomes', 'Disable Outcomes', 'Remove all Outcomes-related functionality?', 'N');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableExemplarWork', 'Disable Exemplar Work', 'Remove all Exemplar Work-related functionality?', 'N');";
+$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'showContentOnEnrol', 'Show Content On Enrol', 'Prevent users from seeing unit content until enrolled?', 'N');";
 $gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Evidence Submitted', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');";
 $gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Unit Comment', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');";
 $gibbonSetting[] = "INSERT INTO `gibbonNotificationEvent` (`event`, `moduleName`, `actionName`, `type`, `scopes`, `active`) VALUES ('Unit Feedback', 'Free Learning', 'Browse Units_all', 'Additional', 'All', 'Y');";

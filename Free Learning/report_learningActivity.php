@@ -26,7 +26,7 @@ include "./modules/" . $session->get('module') . "/moduleFunctions.php" ;
 if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learningActivity.php")==FALSE) {
     // Acess denied
     print "<div class='error'>" ;
-        print __($guid, "You do not have access to this action.") ;
+        print __("You do not have access to this action.") ;
     print "</div>" ;
 } else {
     // Proceed!
@@ -64,7 +64,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 
     if ($timePeriod != '') {
         echo '<h2>';
-        echo __($guid, 'Report Data');
+        echo __('Report Data');
         echo '</h2>';
 
         try {
@@ -82,7 +82,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 
         if ($result->rowCount() < 1) {
             echo "<div class='error'>";
-            echo __($guid, 'There are no records to display.');
+            echo __('There are no records to display.');
             echo '</div>';
         } else {
             $rows = $result->fetchAll();
@@ -93,7 +93,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 
             // PLOT DATA
             echo '<script type="text/javascript" src="'.$session->get('absoluteURL').'/lib/Chart.js/Chart.min.js"></script>';
-            echo "<p style='margin-top: 20px; margin-bottom: 5px'><b>".__($guid, 'Data').'</b></p>';
+            echo "<p style='margin-top: 20px; margin-bottom: 5px'><b>".__('Data').'</b></p>';
             echo '<div style="width:100%">';
             echo '<div>';
             echo '<canvas id="canvas"></canvas>';
@@ -228,8 +228,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
             </script>
             <?php
             echo "<div class='linkTop'>";
-                echo '<b>'.__($guid, 'Total Units Joined', 'Free Learning').'</b>: '.$countJoinedTotal.'<br/>';
-                echo '<b>'.__($guid, 'Total Units Approved', 'Free Learning').'</b>: '.$countApprovedTotal.'<br/>';
+                echo '<b>'.__m('Total Units Joined').'</b>: '.$countJoinedTotal.'<br/>';
+                echo '<b>'.__m('Total Units Approved').'</b>: '.$countApprovedTotal.'<br/>';
             echo "</div>";
         }
     }

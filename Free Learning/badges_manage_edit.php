@@ -34,7 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";
-        echo __($guid, 'This functionality requires the Badges module to be installed, active and available.', 'Free Learning');
+        echo __m('This functionality requires the Badges module to be installed, active and available.');
         echo '</div>';
     } else {
         //Acess denied
@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         $freeLearningBadgeID = $_GET['freeLearningBadgeID'];
         if ($freeLearningBadgeID == '') {
             echo "<div class='error'>";
-            echo __($guid, 'You have not specified one or more required parameters.');
+            echo __('You have not specified one or more required parameters.');
             echo '</div>';
         } else {
             try {
@@ -67,7 +67,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
             if ($result->rowCount() != 1) {
                 echo "<div class='error'>";
-               echo __($guid, 'The specified record cannot be found.');
+               echo __('The specified record cannot be found.');
                 echo '</div>';
             } else {
                 //Let's go!
@@ -75,7 +75,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
                 if ($_GET['search'] != '') {
                     echo "<div class='linkTop'>";
-                    echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__($guid, 'Back to Search Results')."</a>";
+                    echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$_GET['search']."'>".__('Back to Search Results')."</a>";
                     echo '</div>';
                 }
 

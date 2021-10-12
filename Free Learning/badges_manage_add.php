@@ -33,12 +33,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
     if (isModuleAccessible($guid, $connection2, '/modules/Badges/badges_manage.php') == false) {
         //Acess denied
         echo "<div class='error'>";
-        echo __($guid, 'This functionality requires the Badges module to be installed, active and available.', 'Free Learning');
+        echo __m('This functionality requires the Badges module to be installed, active and available.');
         echo '</div>';
     } else {
         //Acess denied
         echo "<div class='success'>";
-        echo __($guid, 'The Badges module is installed, active and available, so you can access this functionality.', 'Free Learning');
+        echo __m('The Badges module is installed, active and available, so you can access this functionality.');
         echo '</div>';
 
         $returns = array();
@@ -53,7 +53,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         if ($search != '') {
             echo "<div class='linkTop'>";
-            echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$search."'>".__($guid, 'Back to Search Results')."</a>";
+            echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$search."'>".__('Back to Search Results')."</a>";
             echo '</div>';
         }
 

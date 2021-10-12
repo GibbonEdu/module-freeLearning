@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v5.17.05
+--------
+Added new setting allowing unit content to be hidden until enrolment is completed
+Set Grouping to Individual as default in Unit Add interface
+Switched from __(x, 'Free Learning') to __m(x)
+Removed $guid from all __() calls
+
 v5.17.04
 --------
 Added maxlength to Title, Type and Length fields in Smart Blocks
