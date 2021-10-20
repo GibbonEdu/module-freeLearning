@@ -1750,3 +1750,8 @@ $sql[$count][0] = '5.17.05';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'showContentOnEnrol', 'Show Content On Enrol', 'Prevent users from seeing unit content until enrolled?', 'N');end
 ";
+
+//v5.17.06
+++$count;
+$sql[$count][0] = '5.17.06';
+$sql[$count][1] = "";

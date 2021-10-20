@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require getcwd().'/../../../config.php';
-require getcwd().'/../../../functions.php';
+require getcwd().'/../../../gibbon.php';
 require getcwd().'/../moduleFunctions.php';
 
 getSystemSettings($guid, $connection2);
@@ -26,9 +25,9 @@ getSystemSettings($guid, $connection2);
 setCurrentSchoolYear($guid, $connection2);
 
 //Set up for i18n via gettext
-if (isset($_SESSION[$guid]['i18n']['code']) and $_SESSION[$guid]['i18n']['code'] != null) {
-    putenv('LC_ALL='.$_SESSION[$guid]['i18n']['code']);
-    setlocale(LC_ALL, $_SESSION[$guid]['i18n']['code']);
+if (isset($session->get('i18n')['code']) and $session->get('i18n')['code'] != null) {
+    putenv('LC_ALL='.$session->get('i18n')['code']);
+    setlocale(LC_ALL, $session->get('i18n')['code']);
     bindtextdomain('gibbon', getcwd().'/../i18n');
     textdomain('gibbon');
 }

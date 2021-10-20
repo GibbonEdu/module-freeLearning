@@ -36,7 +36,7 @@ if (!isCommandLineInterface()) {
     return;
 }
 
-if ($_SESSION[$guid]['organisationEmail'] == '') {
+if ($session->get('organisationEmail') == '') {
     echo __('This script cannot be run, as no school email address has been set.');
     return;
 }

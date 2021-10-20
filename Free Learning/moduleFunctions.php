@@ -21,6 +21,8 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $gibbonDepartmentID = null, $difficulty = null, $name = null, $showInactive = null, $publicUnits = null, $freeLearningUnitID = null, $difficulties = null)
 {
+    global $session;
+    
     $return = array();
 
     $sql = '';
@@ -73,7 +75,7 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
     }
 
     //Do it!
-    if ($publicUnits == 'Y' and isset($_SESSION[$guid]['username']) == false) {
+    if ($publicUnits == 'Y' and !$session->has('username')) {
         $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name";
     } else {
         if ($highestAction == 'Browse Units_all') {
@@ -85,9 +87,9 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
             }
         } elseif ($highestAction == 'Browse Units_prerequisites') {
             if ($roleCategory == 'Student') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
-                $data['gibbonPersonID2'] = $_SESSION[$guid]['gibbonPersonID'];
-                $data['gibbonSchoolYearID'] = $_SESSION[$guid]['gibbonSchoolYearID'];
+                $data['gibbonPersonID'] =$session->get('gibbonPersonID');
+                $data['gibbonPersonID2'] = $session->get('gibbonPersonID');
+                $data['gibbonSchoolYearID'] = $session->get('gibbonSchoolYearID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
                 FROM freeLearningUnit
                 LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
@@ -98,15 +100,15 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
                 ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Parent') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                $data['gibbonPersonID'] = $session->get('gibbonPersonID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableParents='Y' $sqlWhere ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Staff') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                $data['gibbonPersonID'] = $session->get('gibbonPersonID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableStaff='Y' $sqlWhere ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Other') {
-                $data['gibbonPersonID'] = $_SESSION[$guid]['gibbonPersonID'];
+                $data['gibbonPersonID'] = $session->get('gibbonPersonID');
                 $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableOther='Y' $sqlWhere ORDER BY $difficultyOrder name";
             }
         }
@@ -305,10 +307,12 @@ function getUnitsArray($connection2)
 //Set $limit=TRUE to only return departments that the user has curriculum editing rights in
 function getLearningAreas($connection2, $guid, $limit = false)
 {
+    global $session;
+     
     $output = false;
     try {
         if ($limit == true) {
-            $data = array('gibbonPersonID' => $_SESSION[$guid]['gibbonPersonID']);
+            $data = array('gibbonPersonID' => $session->get('gibbonPersonID'));
             $sql = "SELECT * FROM gibbonDepartment JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE type='Learning Area' AND gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')  ORDER BY name";
         } else {
             $data = array();
@@ -333,6 +337,9 @@ function getLearningAreas($connection2, $guid, $limit = false)
 
 //Does not return errors, just does its best to get the job done
 function grantBadges($connection2, $guid, $gibbonPersonID) {
+
+    global $session;
+
     //Sort out difficulty order
     $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
     if ($difficulties != false) {
@@ -378,7 +385,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                 $hitsNeeded ++;
                 try {
                     //Count conditions
-                    $dataCount = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID']);
+                    $dataCount = array('gibbonPersonID' => $gibbonPersonID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
                     $sqlCount = "SELECT freeLearningUnitStudentID FROM freeLearningUnitStudent WHERE gibbonPersonIDStudent=:gibbonPersonID AND gibbonSchoolYearID=:gibbonSchoolYearID AND status='Complete - Approved'";
                     $resultCount = $connection2->prepare($sqlCount);
                     $resultCount->execute($dataCount);
@@ -523,7 +530,7 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
             //GRANT AWARD
             if ($hitsNeeded > 0 AND $hitsActually == $hitsNeeded) {
                 try {
-                    $dataGrant = array('badgesBadgeID' => $row['badgesBadgeID'], 'gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonID, 'comment' => '', 'gibbonPersonIDCreator' => null);
+                    $dataGrant = array('badgesBadgeID' => $row['badgesBadgeID'], 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonID, 'comment' => '', 'gibbonPersonIDCreator' => null);
                     $sqlGrant = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                     $resultGrant = $connection2->prepare($sqlGrant);
                     $resultGrant->execute($dataGrant);

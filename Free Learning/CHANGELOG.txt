@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.06
+--------
+Final session refactoring
+
 v5.17.05
 --------
 Added new setting allowing unit content to be hidden until enrolment is completed

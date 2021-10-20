@@ -21,7 +21,6 @@ use Gibbon\Services\Format;
 use Gibbon\Comms\NotificationSender;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
-
 $_POST['address'] = '/modules/Free Learning/report_mentorshipOverview.php';
 
 require __DIR__.'/../../../gibbon.php';
@@ -36,7 +35,7 @@ if (!isCommandLineInterface()) {
     return;
 }
 
-if ($_SESSION[$guid]['organisationEmail'] == '') {
+if ($session->get('organisationEmail') == '') {
     echo __('This script cannot be run, as no school email address has been set.');
     return;
 }
