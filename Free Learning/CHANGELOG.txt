@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.17.07
+--------
+Added flexibility to CLI scripts
+New CLI script to notify mentors on outstanding evidence over a certain age
+
 v5.17.06
 --------
 Final session refactoring

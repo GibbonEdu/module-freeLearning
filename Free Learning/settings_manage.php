@@ -166,6 +166,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addYesNo($setting['name'])->required()->selected($setting['value']);
 
+    $form->addRow()->addHeading(__m('CLI Settings'));
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'studentEvidencePrompt', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addNumber($setting['name'])->required()->setValue($setting['value'])->maxLength(2)->minimum(1)->maximum(99);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'mentorshipAcceptancePrompt', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addNumber($setting['name'])->required()->setValue($setting['value'])->maxLength(2)->minimum(1)->maximum(99);
+
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'evidenceOutstandingPrompt', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addNumber($setting['name'])->required()->setValue($setting['value'])->maxLength(2)->minimum(1)->maximum(99);
+
     $row = $form->addRow();
         $row->addFooter();
         $row->addSubmit();
