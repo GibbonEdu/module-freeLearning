@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Services\Format;
 use Gibbon\Comms\NotificationSender;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 $_POST['address'] = '/modules/Free Learning/report_mentorshipOverview.php';
@@ -45,16 +46,18 @@ ini_set('memory_limit', '2048M');
 ini_set('max_execution_time', 1800);
 set_time_limit(1800);
 
+$settingGateway = $container->get(SettingGateway::class);
+$mentorshipAcceptancePrompt = $settingGateway->getSettingByScope('Free Learning', 'mentorshipAcceptancePrompt');
 
 $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 $notificationSender = $container->get(NotificationSender::class);
 
-// Get the list of mentors with requests older than 7 days
-$mentors = $container->get(UnitStudentGateway::class)->selectEnrolmentPending($gibbonSchoolYearID)->fetchKeyPair();
+// Get the list of mentors with requests older than $mentorshipAcceptancePrompt days
+$mentors = $container->get(UnitStudentGateway::class)->selectEnrolmentPending($gibbonSchoolYearID, null, $mentorshipAcceptancePrompt)->fetchKeyPair();
 
 // Loop over each mentor and add a notification to send
 foreach ($mentors as $gibbonPersonID => $count) {
-    $actionText = __m('You have {count} pending mentorship request(s) older than 7 days. Please click below or visit the Mentorship Overview page to view and manage your mentorship requests.', ['count' => $count]);
+    $actionText = __m('You have {count} pending mentorship request(s) older than {mentorshipAcceptancePrompt} days. Please click below or visit the Mentorship Overview page to view and manage your mentorship requests.', ['count' => $count, 'mentorshipAcceptancePrompt' => $mentorshipAcceptancePrompt]);
     $actionLink = '/index.php?q=/modules/Free Learning/report_mentorshipOverview.php';
     $notificationSender->addNotification($gibbonPersonID, $actionText, 'Free Learning', $actionLink);
 }

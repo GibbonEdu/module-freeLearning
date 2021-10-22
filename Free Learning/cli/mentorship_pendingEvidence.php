@@ -22,7 +22,7 @@ use Gibbon\Comms\NotificationSender;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
-$_POST['address'] = '/modules/Free Learning/report_unitHistory_my.php';
+$_POST['address'] = '/modules/Free Learning/report_workPendingApproval.php';
 
 require __DIR__.'/../../../gibbon.php';
 
@@ -47,31 +47,31 @@ ini_set('max_execution_time', 1800);
 set_time_limit(1800);
 
 $settingGateway = $container->get(SettingGateway::class);
-$studentEvidencePrompt = $settingGateway->getSettingByScope('Free Learning', 'studentEvidencePrompt');
+$evidenceOutstandingPrompt = $settingGateway->getSettingByScope('Free Learning', 'evidenceOutstandingPrompt');
 
 $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 $notificationSender = $container->get(NotificationSender::class);
 
-// Get the list of students with current enrolments older than $studentEvidencePrompt days
-$students = $container->get(UnitStudentGateway::class)->selectEvidenceNotSubmitted($gibbonSchoolYearID, null, $studentEvidencePrompt)->fetchGrouped();
+// Get the list of mentors with requests older than 7 days
+$mentors = $container->get(UnitStudentGateway::class)->selectEvidencePending($gibbonSchoolYearID, null, $evidenceOutstandingPrompt)->fetchKeyPair();
 
 // Loop over each mentor and add a notification to send
-foreach ($students as $gibbonPersonID => $units) {
-    $actionText = __m('You have one or more current units that have not had any activity in the past {studentEvidencePrompt} days:<br/>{units}. Please visit your My Unit History page to view your current units.', ['studentEvidencePrompt' => $studentEvidencePrompt, 'units' => Format::list(array_column($units, 'name'))]);
-    $actionLink = '/index.php?q=/modules/Free Learning/report_unitHistory_my.php';
+foreach ($mentors as $gibbonPersonID => $count) {
+    $actionText = __m('You have {count} item(s) of work pending approval older than {evidenceOutstandingPrompt} days. Please click below or visit the Work Pending Approval page to view and manage your requests.', ['count' => $count, 'evidenceOutstandingPrompt' => $evidenceOutstandingPrompt]);
+    $actionLink = '/index.php?q=/modules/Free Learning/report_workPendingApproval.php';
     $notificationSender->addNotification($gibbonPersonID, $actionText, 'Free Learning', $actionLink);
 }
 
 $sendReport = $notificationSender->sendNotifications();
 
 // Notify admin
-$actionText = __m('A Free Learning CLI script ({name}) has run.', ['name' => 'Pending Student Evidence']).'<br/><br/>';
+$actionText = __m('A Free Learning CLI script ({name}) has run.', ['name' => 'Pending Evidence Requests']).'<br/><br/>';
 $actionText .= __('Date').': '.Format::date(date('Y-m-d')).'<br/>';
 $actionText .= __('Total Count').': '.($sendReport['emailSent'] + $sendReport['emailFailed']).'<br/>';
 $actionText .= __('Send Succeed Count').': '.$sendReport['emailSent'].'<br/>';
 $actionText .= __('Send Fail Count').': '.$sendReport['emailFailed'];
 
-$actionLink = '/index.php?q=/modules/Free Learning/report_mentorshipOverview.php';
+$actionLink = '/index.php?q=/modules/Free Learning/report_workPendingApproval.php';
 
 $notificationSender = $container->get(NotificationSender::class);
 $notificationSender->addNotification($session->get('organisationAdministrator'), $actionText, 'Free Learning', $actionLink);

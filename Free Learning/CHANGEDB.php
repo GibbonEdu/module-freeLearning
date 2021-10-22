@@ -1755,3 +1755,12 @@ INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,
 ++$count;
 $sql[$count][0] = '5.17.06';
 $sql[$count][1] = "";
+
+//v5.17.07
+++$count;
+$sql[$count][0] = '5.17.07';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'studentEvidencePrompt', 'Student Evidence Prompt', 'The time since enrolment, in days, after which to prompt for evidence.', '31');end
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mentorshipAcceptancePrompt', 'Mentorship Acceptance Prompt', 'The time since mentorship request, in days, after which to prompt for approval.', '31');end
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'evidenceOutstandingPrompt', 'Evidence Outstanding Prompt', 'The time since evidence submission, in days, after which to prompt for mentor action.', '31');end
+";

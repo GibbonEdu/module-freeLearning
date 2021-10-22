@@ -275,7 +275,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function selectEnrolmentPending($gibbonSchoolYearID, $gibbonPersonID = null)
+    public function selectEnrolmentPending($gibbonSchoolYearID, $gibbonPersonID = null, $mentorshipAcceptancePrompt = 31)
     {
         $query = $this
             ->newSelect()
@@ -288,8 +288,9 @@ class UnitStudentGateway extends QueryableGateway
             ->where("freeLearningUnitStudent.status='Current - Pending'")
             ->where("gibbonPerson.status='Full'")
             ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
-            ->where('freeLearningUnitStudent.timestampJoined < DATE_SUB(:today, INTERVAL 7 DAY)')
+            ->where('freeLearningUnitStudent.timestampJoined < DATE_SUB(:today, INTERVAL :mentorshipAcceptancePrompt DAY)')
             ->bindValue('today', date('Y-m-d'))
+            ->bindvalue('mentorshipAcceptancePrompt', $mentorshipAcceptancePrompt)
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->groupBy(['freeLearningUnitStudent.gibbonPersonIDSchoolMentor']);
 
@@ -301,7 +302,34 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runSelect($query);
     }
 
-    public function selectEvidencePending($gibbonSchoolYearID, $gibbonPersonID = null)
+    public function selectEvidencePending($gibbonSchoolYearID, $gibbonPersonID = null, $evidenceOutstandingPrompt = 31)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnitStudent.gibbonPersonIDSchoolMentor', 'COUNT(DISTINCT freeLearningUnitStudentID) AS count'])
+            ->from('freeLearningUnit')
+            ->innerJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->where("freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID")
+            ->where("freeLearningUnitStudent.enrolmentMethod='schoolMentor'")
+            ->where("freeLearningUnitStudent.status='Complete - Pending'")
+            ->where("gibbonPerson.status='Full'")
+            ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
+            ->where('freeLearningUnitStudent.timestampCompletePending < DATE_SUB(:today, INTERVAL :evidenceOutstandingPrompt DAY)')
+            ->bindValue('today', date('Y-m-d'))
+            ->bindvalue('evidenceOutstandingPrompt', $evidenceOutstandingPrompt)
+            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+            ->groupBy(['freeLearningUnitStudent.gibbonPersonIDSchoolMentor']);
+
+        if (!is_null($gibbonPersonID)) {
+            $query->where('freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID')
+                ->bindValue('gibbonPersonID', $gibbonPersonID);
+        }
+
+        return $this->runSelect($query);
+    }
+
+    public function selectEvidenceNotSubmitted($gibbonSchoolYearID, $gibbonPersonID = null, $studentEvidencePrompt = 31)
     {
         $query = $this
             ->newSelect()
@@ -313,11 +341,12 @@ class UnitStudentGateway extends QueryableGateway
             ->where("gibbonPerson.status='Full'")
             ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
             ->where("(
-                (freeLearningUnitStudent.status='Current' AND freeLearningUnitStudent.timestampJoined < DATE_SUB(:today, INTERVAL 31 DAY))
-                OR (freeLearningUnitStudent.status='Evidence Not Yet Approved' AND freeLearningUnitStudent.timestampCompletePending < DATE_SUB(:today, INTERVAL 31 DAY))
+                (freeLearningUnitStudent.status='Current' AND freeLearningUnitStudent.timestampJoined < DATE_SUB(:today, INTERVAL :studentEvidencePrompt DAY))
+                OR (freeLearningUnitStudent.status='Evidence Not Yet Approved' AND freeLearningUnitStudent.timestampCompletePending < DATE_SUB(:today, INTERVAL :studentEvidencePrompt DAY))
                 )
             ")
             ->bindValue('today', date('Y-m-d'))
+            ->bindValue('studentEvidencePrompt', $studentEvidencePrompt)
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
 
         if (!is_null($gibbonPersonID)) {
