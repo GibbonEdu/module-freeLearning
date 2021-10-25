@@ -32,9 +32,11 @@ if (isset($session->get('i18n')['code']) and $session->get('i18n')['code'] != nu
     textdomain('gibbon');
 }
 
-
 //Check for CLI, so this cannot be run through browser
-if (php_sapi_name() != 'cli') { echo __('This script cannot be run from a browser, only via CLI.');
+$remoteCLIKey = getSettingByScope($connection2, 'System Admin', 'remoteCLIKey');
+$remoteCLIKeyInput = $_GET['remoteCLIKey'] ?? null;
+if (!(isCommandLineInterface() OR ($remoteCLIKey != '' AND $remoteCLIKey == $remoteCLIKeyInput))) {
+    echo __('This script cannot be run from a browser, only via CLI.');
 } else {
     try {
         $data = array();

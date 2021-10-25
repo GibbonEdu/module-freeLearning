@@ -1764,3 +1764,8 @@ INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'mentorshipAcceptancePrompt', 'Mentorship Acceptance Prompt', 'The time since mentorship request, in days, after which to prompt for approval.', '31');end
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'evidenceOutstandingPrompt', 'Evidence Outstanding Prompt', 'The time since evidence submission, in days, after which to prompt for mentor action.', '31');end
 ";
+
+//v5.17.08
+++$count;
+$sql[$count][0] = '5.17.08';
+$sql[$count][1] = "";

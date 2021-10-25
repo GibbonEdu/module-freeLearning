@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.08
+--------
+Added awareness of Core remoteCLIKey setting
+
 v5.17.07
 --------
 Added flexibility to CLI scripts
