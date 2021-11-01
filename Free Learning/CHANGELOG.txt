@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.09
+--------
+Fixed Legend translation issue
+
 v5.17.08
 --------
 Added awareness of Core remoteCLIKey setting
