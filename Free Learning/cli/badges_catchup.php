@@ -17,8 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\SettingGateway;
+
 require getcwd().'/../../../gibbon.php';
 require getcwd().'/../moduleFunctions.php';
+
+$settingGateway = $container->get(SettingGateway::class);
 
 getSystemSettings($guid, $connection2);
 
@@ -33,7 +37,7 @@ if (isset($session->get('i18n')['code']) and $session->get('i18n')['code'] != nu
 }
 
 //Check for CLI, so this cannot be run through browser
-$remoteCLIKey = getSettingByScope($connection2, 'System Admin', 'remoteCLIKey');
+$remoteCLIKey = $settingGateway->getSettingByScope('System Admin', 'remoteCLIKey');
 $remoteCLIKeyInput = $_GET['remoteCLIKey'] ?? null;
 if (!(isCommandLineInterface() OR ($remoteCLIKey != '' AND $remoteCLIKey == $remoteCLIKeyInput))) {
     echo __('This script cannot be run from a browser, only via CLI.');
@@ -47,7 +51,7 @@ if (!(isCommandLineInterface() OR ($remoteCLIKey != '' AND $remoteCLIKey == $rem
 
     if ($result->rowCount() > 0) {
         while ($row = $result->fetch()) {
-            grantBadges($connection2, $guid, $row['gibbonPersonID']);
+            grantBadges($connection2, $guid, $row['gibbonPersonID'], $settingGateway);
         }
     }
 

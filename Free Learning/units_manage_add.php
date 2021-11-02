@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
 
 // Module includes
@@ -45,14 +46,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
              ->add(__m('Manage Units'), 'units_manage.php', $urlParams)
              ->add(__m('Add Unit'));
 
-        $returns = array();
         $editLink = '';
         if (isset($_GET['editID'])) {
             $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID='.$_GET['editID'].'&'.http_build_query($urlParams);
         }
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], $editLink, $returns);
-        }
+        $page->return->setEditLink($editLink);
 
         if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
             echo "<div class='linkTop'>";
@@ -73,7 +71,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addLabel('name', __m('Unit Name'));
             $row->addTextField('name')->maxLength(40)->required();
 
-        $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+		$settingGateway = $container->get(SettingGateway::class);
+        $difficultyOptions = $settingGateway->getSettingByScope('Free Learning', 'difficultyOptions');
         $difficultyOptions = ($difficultyOptions != false) ? explode(',', $difficultyOptions) : [];
         $difficulties = [];
         foreach ($difficultyOptions as $difficultyOption) {
@@ -151,7 +150,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addLabel('availableOther', __m('Available To Others'))->description(__m('Should other users be able to browse and enrol?'));
             $row->addYesNo('availableOther')->required();
 
-        $makeUnitsPublic = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+        $makeUnitsPublic = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
         if ($makeUnitsPublic == 'Y') {
             $row = $form->addRow();
                 $row->addLabel('sharedPublic', __m('Shared Publicly'))->description(__m('Share this unit via the public listing of units? Useful for building MOOCS.'));
@@ -184,7 +183,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 
         // MENTORSHIP
-        $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
+        $enableSchoolMentorEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableSchoolMentorEnrolment');
         if ($enableSchoolMentorEnrolment == 'Y') {
             $form->addRow()->addHeading(__m('Mentorship'))->append(__m('Determines who can act as a school mentor for this unit. These mentorship settings are overridden when a student is part of a mentor group.'));
 
@@ -203,7 +202,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 
         // OUTCOMES
-        $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+        $disableOutcomes = $settingGateway->getSettingByScope('Free Learning', 'disableOutcomes');
         if ($disableOutcomes != 'Y') {
             $form->addRow()->addHeading(__m('Outcomes'));
             $form->addRow()->addAlert(__m('Outcomes can only be set after the new unit has been saved once. Click submit below, and when you land on the edit page, you will be able to manage outcomes.'), "message");
@@ -212,7 +211,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         // UNIT OUTLINE
         $form->addRow()->addHeading(__m('Unit Outline'))->append(__m('The contents of this field are viewable to all users, SO AVOID CONFIDENTIAL OR SENSITIVE DATA!'));
 
-        $unitOutline = getSettingByScope($connection2, 'Free Learning', 'unitOutlineTemplate');
+        $unitOutline = $settingGateway->getSettingByScope('Free Learning', 'unitOutlineTemplate');
         $row = $form->addRow();
             $column = $row->addColumn();
             $column->addLabel('outline', __('Unit Outline'));
@@ -228,7 +227,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->addClass('advanced addBlock');
 
         $row = $form->addRow()->addClass('advanced');
-            $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid)
+            $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid, $settingGateway)
                 ->addToolInput($blockCreator);
 
         for ($i=0 ; $i<5 ; $i++) {

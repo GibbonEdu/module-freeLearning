@@ -3,6 +3,7 @@
 use Gibbon\View\View;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 /*
 Gibbon, Flexible & Open School System
@@ -30,11 +31,13 @@ $page->breadcrumbs
 
 $block = false;
 if (isset($_GET['return'])) {
-    returnProcess($guid, $_GET['return'], null, array('success0' => __m('Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your positive feedback.'), 'success1' => __m('Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your feedback and will resubmit their work in due course, at which point your input will be requested once again: in the meanwhile, no further action is required on your part.')));
     if ($_GET['return'] == 'success0' or $_GET['return'] == 'success1') {
         $block = true;
     }
 }
+
+$returns = ['success0' => __m('Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your positive feedback.'), 'success1' => __m('Your request was completed successfully. Thank you for your time. The learner you are helping has been notified of your feedback and will resubmit their work in due course, at which point your input will be requested once again: in the meanwhile, no further action is required on your part.')];
+$page->return->addReturns($returns);
 
 if (!$block) {
     // Get params
@@ -166,7 +169,7 @@ if (!$block) {
 
             $form->toggleVisibilityByClass('approved')->onSelect('status')->when('Complete - Approved');
             
-            $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
+            $enableManualBadges = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'enableManualBadges');
             if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
                 $data = [];
                 $sql = "SELECT badgesBadgeID as value, name FROM badgesBadge WHERE active='Y' ORDER BY name";

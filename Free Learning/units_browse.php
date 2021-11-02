@@ -23,6 +23,7 @@ use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Tables\View\GridView;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Students\StudentGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
@@ -30,7 +31,8 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$settingGateway = $container->get(SettingGateway::class);
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 
 if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and !$session->exists('username')))) {
     // Access denied
@@ -100,7 +102,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         // There has to be a criteria and query to count the total number of units before we can
         // create the criteria that actually gets the number of units, because of the following
         // lines of code that switch to map view by default when maxMapSize is exceeded :(
-        $maxMapSize = getSettingByScope($connection2, 'Free Learning', 'maxMapSize');
+        $maxMapSize = $settingGateway->getSettingByScope('Free Learning', 'maxMapSize');
         if ($unitCount > $maxMapSize && $view == "map") {
             $view = "grid";
         }
@@ -123,7 +125,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $viewForm);
 
-        $disableLearningAreas = getSettingByScope($connection2, 'Free Learning', 'disableLearningAreas');
+        $disableLearningAreas = $settingGateway->getSettingByScope('Free Learning', 'disableLearningAreas');
         $courses = $unitStudentGateway->selectCoursesByStudent($session->get('gibbonPersonID'), $session->get('gibbonSchoolYearID'));
         $learningAreas = $unitGateway->selectLearningAreasAndCourses(null, $disableLearningAreas);
         $row = $form->addRow();
@@ -138,7 +140,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 ->selected($gibbonDepartmentID)
                 ->placeholder();
 
-        $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+        $difficultyOptions = $settingGateway->getSettingByScope('Free Learning', 'difficultyOptions');
         $difficulties = array_map('trim', explode(',', $difficultyOptions));
         $row = $form->addRow();
             $row->addLabel('difficulty', __m('Difficulty'));

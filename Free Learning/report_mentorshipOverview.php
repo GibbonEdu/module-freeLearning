@@ -22,6 +22,7 @@ use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Forms\Prefab\BulkActionForm;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
@@ -42,7 +43,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     }
 
     // Check for custom field
-    $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+    $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
 
     // Filter
     $allMentors = !empty($_GET['allMentors']) && $highestAction == 'Mentorship Overview_all'

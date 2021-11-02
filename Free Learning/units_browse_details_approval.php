@@ -21,13 +21,15 @@ use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 //  Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$settingGateway = $container->get(SettingGateway::class);
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
     //  Access denied
@@ -70,10 +72,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $unitGateway = $container->get(UnitGateway::class);
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
-
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
 
     //  Check that the required values are present
     if (empty($freeLearningUnitID) || empty($freeLearningUnitStudentID)) {
@@ -148,7 +146,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     echo $table->render([$values]);
 
     $alert = '';
-    $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+    $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
     if ($collaborativeAssessment == 'Y' && !empty($values['collaborationKey'])) {
         $alert = Format::alert(__m('Collaborative Assessment is enabled: you will be giving feedback to all members of this group in one go.'), 'message');
     }
@@ -262,7 +260,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $form->toggleVisibilityByClass('approved')->onSelect('status')->when('Complete - Approved');
 
-    $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+    $disableExemplarWork = $settingGateway->getSettingByScope('Free Learning', 'disableExemplarWork');
     if ($disableExemplarWork != 'Y') {
         $row = $form->addRow()->addClass('approved');
             $row->addLabel('exemplarWork', __m('Exemplar Work'))->description(__m('Work and comments will be made viewable to other users.'));
@@ -285,7 +283,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $row->addTextField('exemplarWorkEmbed')->maxLength(255)->setValue($values['exemplarWorkEmbed']);
     }
 
-    $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
+    $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');
     if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
         $data = [];
         $sql = "SELECT badgesBadgeID as value, name FROM badgesBadge WHERE active='Y' ORDER BY name";

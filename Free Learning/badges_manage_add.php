@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\Domain\System\SettingGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -47,9 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         if (isset($_GET['editID'])) {
             $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$_GET['editID'].'&search='.$search;
         }
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], $editLink, null);
-        }
+        $page->return->setEditLink($editLink);
 
         if ($search != '') {
             echo "<div class='linkTop'>";
@@ -95,7 +94,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
             $row->addLabel('unitsCompleteGroup', __m('Units Completed - Group'))->description(__m('Enter a number greater than zero, or leave blank.'));
             $row->addNumber('unitsCompleteGroup')->decimalPlaces(0)->minimum(1)->maximum(999)->maxLength(3);
 
-        $difficultyOptions = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+        $difficultyOptions = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'difficultyOptions');
         $difficultyOptions = ($difficultyOptions != false) ? explode(',', $difficultyOptions) : [];
         $difficulties = [];
         foreach ($difficultyOptions as $difficultyOption) {

@@ -18,11 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\Domain\System\SettingGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'publicUnits');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     // Access denied
@@ -81,10 +82,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 echo '</div>';
             } else {
                 $values = $result->fetch();
-
-                if (isset($_GET['return'])) {
-                    returnProcess($guid, $_GET['return'], null, null);
-                }
 
                 $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_browse_details_enrolMultipleProcess.php?freeLearningUnitID=$freeLearningUnitID&showInactive=$showInactive&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&view=$view");
 

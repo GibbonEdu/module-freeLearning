@@ -18,11 +18,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\Services\Format;
+use Gibbon\Domain\System\SettingGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'publicUnits');
 
 $highestAction = false;
 $canManage = false;
@@ -56,9 +58,8 @@ $urlParams = compact('view', 'name', 'difficulty', 'gibbonDepartmentID', 'showIn
 $page->breadcrumbs
     ->add(__m('Browse Units'), 'units_browse.php', $urlParams);
 
-if (isset($_GET['return'])) {
-    returnProcess($guid, $_GET['return'], null, array('success0' => __m('Your request was completed successfully. Thank you for your time.'), 'success1' => __m('Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.')));
-}
+$returns = ['success0' => __m('Your request was completed successfully. Thank you for your time.'), 'success1' => __m('Your request was completed successfully. Thank you for your time. The learners you are helping will be in touch in due course: in the meanwhile, no further action is required on your part.')];
+$page->return->addReturns($returns);
 
 if ($freeLearningUnitID != '' && $session->exists('gibbonPersonID')) {
     //Check unit
@@ -112,7 +113,7 @@ if ($freeLearningUnitID != '' && $session->exists('gibbonPersonID')) {
                 echo '<ul>';
                 while ($rowConfCheck = $resultConfCheck->fetch()) {
                     $freeLearningUnitStudentID = (is_null($freeLearningUnitStudentID) ? $rowConfCheck['freeLearningUnitStudentID'] : $freeLearningUnitStudentID);
-                    echo '<li>'.formatName('', $rowConfCheck['preferredName'], $rowConfCheck['surname'], 'Student', true).'</li>';
+                    echo '<li>'.Format::name('', $rowConfCheck['preferredName'], $rowConfCheck['surname'], 'Student', true).'</li>';
                 }
                 echo '</ul>';
                 echo '<p style=\'margin-top: 20px\'>';

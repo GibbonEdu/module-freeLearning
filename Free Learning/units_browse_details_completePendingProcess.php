@@ -20,12 +20,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\View\View;
 use Gibbon\Services\Format;
 use Gibbon\Contracts\Comms\Mailer;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 require_once '../../gibbon.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$settingGateway = $container->get(SettingGateway::class);
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 
 $highestAction = getHighestGroupedAction($guid, $session->get('address'), $connection2);
 
@@ -173,7 +175,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         } else {
                             // Write to database
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
-                            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+                            $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
 
                             $data = [
                                 'status' => $status,
@@ -215,9 +217,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $discussionGateway->insert($data);
                             }
 
+							$notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+							$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
 
                             if ($enrolmentMethod == 'class') { //Attempt to notify teacher(s) of class
-
                                 $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
                                 $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
                                 $result = $pdo->select($sql, $data);
@@ -225,17 +228,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $text = __m('{student} has requested unit completion approval and feedback ({unit}).', ['student' => $studentName, 'unit' => $name]);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&freeLearningUnitID=$freeLearningUnitID&sidebar=true";
                                 while ($row = $result->fetch()) {
-                                    setNotification($connection2, $guid, $row['gibbonPersonID'], $text, 'Free Learning', $actionLink);
+                                	$notificationSender->addNotification($row['gibbonPersonID'], $text, 'Free Learning', $actionLink);
                                 }
+                                $notificationSender->sendNotifications();
                             }
                             else if ($enrolmentMethod == 'schoolMentor' && $gibbonPersonIDSchoolMentor != '') { //Attempt to notify school mentor
                                 $text = __m('{student} has requested unit completion approval and feedback ({unit}).', ['student' => $studentName, 'unit' => $name]);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey";
-                                setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $text, 'Free Learning', $actionLink);
+                                $notificationSender->addNotification($gibbonPersonIDSchoolMentor, $text, 'Free Learning', $actionLink);
+                                $notificationSender->sendNotifications();
                             }
                             elseif ($enrolmentMethod == 'externalMentor' && $emailExternalMentor != '') {
                                 // Attempt to notify external mentors
-
                                 $subject = sprintf(__m('Request For Mentor Feedback via %1$s at %2$s'), $session->get('systemName'), $session->get('organisationNameShort'));
                                 $buttonURL = "/index.php?q=/modules/Free Learning/units_mentor_approval.php&freeLearningUnitStudentID=$freeLearningUnitStudentID&confirmationKey=$confirmationKey";
 

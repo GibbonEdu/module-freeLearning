@@ -17,12 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Services\Format;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $gibbonDepartmentID = null, $difficulty = null, $name = null, $showInactive = null, $publicUnits = null, $freeLearningUnitID = null, $difficulties = null)
 {
     global $session;
-    
+
     $return = array();
 
     $sql = '';
@@ -267,12 +269,12 @@ function getAuthorsArray($connection2, $freeLearningUnitID = null)
         while ($row = $result->fetch()) {
             if ($row['gibbonPersonID'] != null) {
                 $return[$row['freeLearningUnitAuthorID']][0] = $row['freeLearningUnitID'];
-                $return[$row['freeLearningUnitAuthorID']][1] = formatName('', $row['gibbonPersonpreferredName'], $row['gibbonPersonsurname'], 'Student', false);
+                $return[$row['freeLearningUnitAuthorID']][1] = Format::name('', $row['gibbonPersonpreferredName'], $row['gibbonPersonsurname'], 'Student', false);
                 $return[$row['freeLearningUnitAuthorID']][2] = $row['gibbonPersonID'];
                 $return[$row['freeLearningUnitAuthorID']][3] = $row['gibbonPersonwebsite'];
             } else {
                 $return[$row['freeLearningUnitAuthorID']][0] = $row['freeLearningUnitID'];
-                $return[$row['freeLearningUnitAuthorID']][1] = formatName('', $row['freeLearningUnitAuthorpreferredName'], $row['freeLearningUnitAuthorsurname'], 'Student', false);
+                $return[$row['freeLearningUnitAuthorID']][1] = Format::name('', $row['freeLearningUnitAuthorpreferredName'], $row['freeLearningUnitAuthorsurname'], 'Student', false);
                 $return[$row['freeLearningUnitAuthorID']][2] = $row['gibbonPersonID'];
                 $return[$row['freeLearningUnitAuthorID']][3] = $row['freeLearningUnitAuthorwebsite'];
             }
@@ -308,7 +310,7 @@ function getUnitsArray($connection2)
 function getLearningAreas($connection2, $guid, $limit = false)
 {
     global $session;
-     
+
     $output = false;
     try {
         if ($limit == true) {
@@ -338,10 +340,10 @@ function getLearningAreas($connection2, $guid, $limit = false)
 //Does not return errors, just does its best to get the job done
 function grantBadges($connection2, $guid, $gibbonPersonID) {
 
-    global $session;
+    global $session, $container, $pdo;
 
     //Sort out difficulty order
-    $difficulties = getSettingByScope($connection2, 'Free Learning', 'difficultyOptions');
+    $difficulties = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'difficultyOptions');
     if ($difficulties != false) {
         $difficulties = explode(',', $difficulties);
     }
@@ -537,8 +539,11 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                 } catch (PDOException $e) {}
 
                 //Notify User
-                $notificationText = __m('Someone has granted you a badge.');
-                setNotification($connection2, $guid, $gibbonPersonID, $notificationText, 'Badges', "/index.php?q=/modules/Badges/badges_view.php&gibbonPersonID=$gibbonPersonID");
+                $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+				$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
+				$notificationText = __m('Someone has granted you a badge.');
+				$notificationSender->addNotification($gibbonPersonID, $notificationText, 'Badges', "/index.php?q=/modules/Badges/badges_view.php&gibbonPersonID=$gibbonPersonID");
+				$notificationSender->sendNotifications();
             }
         }
     }

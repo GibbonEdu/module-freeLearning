@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Services\Format;
 use Gibbon\Comms\NotificationEvent;
 use Gibbon\Domain\User\UserGateway;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Domain\Timetable\CourseEnrolmentGateway;
@@ -55,7 +56,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $unitGateway = $container->get(UnitGateway::class);
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
     $discussionGateway = $container->get(DiscussionGateway::class);
-    $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+    $collaborativeAssessment = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'collaborativeAssessment');
     $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
     // Validate the required values

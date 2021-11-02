@@ -18,13 +18,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\View\View;
+use Gibbon\Services\Format;
 use Gibbon\Contracts\Comms\Mailer;
+use Gibbon\Domain\System\SettingGateway;
 
 require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$settingGateway = $container->get(SettingGateway::class);
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 
 $highestAction = getHighestGroupedAction($guid, $_POST['address'], $connection2);
 
@@ -59,11 +62,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
         // Get enrolment settings
-        $autoAcceptMentorGroups = getSettingByScope($connection2, 'Free Learning', 'autoAcceptMentorGroups');
-        $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
-        $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+        $autoAcceptMentorGroups = $settingGateway->getSettingByScope('Free Learning', 'autoAcceptMentorGroups');
+        $enableSchoolMentorEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableSchoolMentorEnrolment');
+        $enableExternalMentorEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableExternalMentorEnrolment');
         $enableClassEnrolment = $roleCategory == 'Student'
-            ? getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment')
+            ? $settingGateway->getSettingByScope('Free Learning', 'enableClassEnrolment')
             : 'N';
 
         //Check whether any enrolment methods are available
@@ -216,12 +219,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $collaborators = $_POST['collaborators'] ?? [];
                     $collaboratorsUnique = (count($collaborators)>0) ? (count($collaborators) === count(array_unique($collaborators))) : true;
 
-                    $enableClassEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableClassEnrolment');
+                    $enableClassEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableClassEnrolment');
                     if ($roleCategory != 'Student') {
                         $enableClassEnrolment = 'N';
                     }
-                    $enableSchoolMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableSchoolMentorEnrolment');
-                    $enableExternalMentorEnrolment = getSettingByScope($connection2, 'Free Learning', 'enableExternalMentorEnrolment');
+                    $enableSchoolMentorEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableSchoolMentorEnrolment');
+                    $enableExternalMentorEnrolment = $settingGateway->getSettingByScope('Free Learning', 'enableExternalMentorEnrolment');
 
                     if ($checkFail or $grouping == '' or ($enrolmentMethod == 'class' and $gibbonCourseClassID == '' and $enableClassEnrolment == 'N') or ($enrolmentMethod == 'schoolMentor' and $gibbonPersonIDSchoolMentor == '' and $enableSchoolMentorEnrolment == 'N') or ($enrolmentMethod == 'externalMentor' and $enableExternalMentorEnrolment == 'N' and ($emailExternalMentor == '' or $nameExternalMentor == '')) or !$collaboratorsUnique) {
                         //Fail 3
@@ -346,7 +349,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             } else {
                                 $studentCount = 0;
                                 while ($row = $result->fetch()) {
-                                    $students[$studentCount][0] = formatName('', $row['preferredName'], $row['surname'], 'Student', true);
+                                    $students[$studentCount][0] = Format::name('', $row['preferredName'], $row['surname'], 'Student', true);
                                     $students[$studentCount][1] = $row['email'];
                                     $studentCount ++;
                                 }
@@ -386,9 +389,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                 //Notify internal mentors by gibbon
                                 if ($enrolmentMethod == 'schoolMentor' && $status == 'Current - Pending') {
-                                    $notificationText = sprintf(__m('A learner (or group of learners) has requested that you mentor them for the Free Learning unit %1$s.'), $unit);
+                                    $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+									$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
+									$notificationText = sprintf(__m('A learner (or group of learners) has requested that you mentor them for the Free Learning unit %1$s.'), $unit);
                                     $actionLink = "/index.php?q=/modules/Free Learning/units_mentor.php&mode=internal&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey";
-                                    setNotification($connection2, $guid, $gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', $actionLink);
+									$notificationSender->addNotification($gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', $actionLink);
+									$notificationSender->sendNotifications();
                                 }
 
                                 // Notify external mentors by email

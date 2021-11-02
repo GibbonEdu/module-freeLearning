@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Tables\UnitHistory;
 
 global $session, $container, $page;
@@ -33,7 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= '</div>';
 } else {
     $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
-    $disableParentEvidence = (getSettingByScope($connection2, 'Free Learning', 'disableParentEvidence') == "Y");
+    $disableParentEvidence = ($container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'disableParentEvidence') == "Y");
 
     $returnInt .= "<div class='linkTop'>";
     $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');

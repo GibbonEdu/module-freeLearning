@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\SettingGateway;
+
 require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'publicUnits');
 
 $highestAction = false;
 $canManage = false;
@@ -88,6 +90,9 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
         $unit = $row['unit'];
         $freeLearningUnitID = $row['freeLearningUnitID'];
 
+		$notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+		$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
+
         if ($response == 'Y') { //If yes, updated student and collaborators based on confirmation key
             try {
                 $data = array('confirmationKey' => $confirmationKey) ;
@@ -102,7 +107,8 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
 
             //Notify student
             $notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been accepted.'), $unit);
-            setNotification($connection2, $guid, $row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+            $notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+			$notificationSender->sendNotifications();
 
             //Return to thanks page
             $URL .= "&return=success1&freeLearningUnitID=$freeLearningUnitID";
@@ -123,8 +129,8 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
             //Notify student
             $notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been declined. Your enrolment has been deleted.'), $unit);
             $notificationText .= (!empty($reason)) ? " ".sprintf(__m('The following reason was given: %1$s.'), $reason) : '' ;
-
-            setNotification($connection2, $guid, $row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+           	$notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+			$notificationSender->sendNotifications();
 
             //Return to thanks page
             $URL .= "&return=success0&freeLearningUnitID=$freeLearningUnitID";

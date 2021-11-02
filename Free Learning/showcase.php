@@ -17,10 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Services\Format;
+use Gibbon\Domain\System\SettingGateway;
+
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$settingGateway = $container->get(SettingGateway::class);
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 
 $canEdit = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php');
 
@@ -32,7 +36,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
     $page->breadcrumbs
          ->add(__m('Free Learning Showcase'));
 
-    $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+    $disableExemplarWork = $settingGateway->getSettingByScope('Free Learning', 'disableExemplarWork');
     if ($disableExemplarWork == 'Y') {
         $page->addWarning(__('Exemplar work is disabled.'));
     }
@@ -89,7 +93,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 echo $rowWork['name']."<span style='font-size: 75%; text-transform: none'> by ".$students.'</span>';
                 echo '</h3>';
                 echo "<p style='font-style: italic; margin-top 0; margin-bottom: 5px; font-size: 10.5px'>";
-                echo __m('Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']);
+                echo __m('Shared on').' '.Format::date($rowWork['timestampCompleteApproved']);
                 echo '</p>';
                 if ($canEdit) {
                     echo "<div class='linkTop'>";

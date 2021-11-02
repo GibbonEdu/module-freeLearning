@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
@@ -24,7 +25,8 @@ require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$settingGateway = $container->get(SettingGateway::class);
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 
 $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
 
@@ -149,7 +151,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $commentApproval = trim(preg_replace('/^<p>|<\/p>$/i', '', $commentApproval));
 
                     $gibbonPersonIDStudent = $row['gibbonPersonIDStudent'];
-                    $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+                    $disableExemplarWork = $settingGateway->getSettingByScope('Free Learning', 'disableExemplarWork');
                     $exemplarWork = (!empty($_POST['exemplarWork']) && $disableExemplarWork != 'Y') ? $_POST['exemplarWork'] : 'N';
                     $exemplarWorkLicense = (!empty($_POST['exemplarWorkLicense']) && $disableExemplarWork != 'Y') ? $_POST['exemplarWorkLicense'] : '';
                     $exemplarWorkEmbed = (!empty($_POST['exemplarWorkEmbed']) && $disableExemplarWork != 'Y') ? $_POST['exemplarWorkEmbed'] : '';
@@ -166,7 +168,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                         // Insert discussion records
                         if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) {
-                            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+                            $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
                             $discussionGateway = $container->get(DiscussionGateway::class);
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
@@ -192,6 +194,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $discussionGateway->insert($data);
                             }
                         }
+                        
+                        $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+                        $notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
 
                         if ($status == 'Complete - Approved') { // APPROVED!
                             // Move attached file, if there is one
@@ -254,15 +259,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $text = sprintf(__m('A teacher has approved your request for unit completion (%1$s).'), $name);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
-                                    setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
+                                    $notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                                     if (isActionAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
-                                        grantBadges($connection2, $guid, $gibbonPersonIDStudent);
+                                        grantBadges($connection2, $guid, $gibbonPersonIDStudent, $settingGateway);
                                     }
                                 }
+                                $notificationSender->sendNotifications();
                             }
 
                             // Deal with manually granted badges
-                            $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
+                            $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');
                             if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !is_null($badgesBadgeID)) {
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
                                     $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonIDStudent, 'comment' => '', 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
@@ -281,7 +287,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             }
                         } elseif ($status == 'Evidence Not Yet Approved') { // NOT YET APPROVED
                             // Write to database
-                            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+                            $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
                             try {
                                 $data = array('status' => $status, 'exemplarWork' => $exemplarWork, 'exemplarWorkThumb' => '', 'exemplarWorkLicense' => '', 'commentApproval' => $commentApproval, 'commentApproval' => $commentApproval, 'gibbonPersonIDApproval' => $session->get('gibbonPersonID'), 'timestampCompleteApproved' => date('Y-m-d H:i:s'));
                                 if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
@@ -304,9 +310,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             // Attempt to notify the student
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
-                                $text = sprintf(__('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
+                            	$text = sprintf(__('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
                                 $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&sidebar=true&tab=1&view=$view";
-                                setNotification($connection2, $guid, $gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
+								foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
+									$notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
+								}
+								$notificationSender->sendNotifications();
                             }
 
                             // Success 0

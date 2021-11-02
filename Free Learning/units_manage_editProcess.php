@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once '../../gibbon.php';
+use Gibbon\Domain\System\SettingGateway;
 
+require_once '../../gibbon.php';
 
 $freeLearningUnitID = $_GET['freeLearningUnitID'];
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'];
@@ -166,7 +167,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         }
                     }
 
-                    $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+                    $disableOutcomes = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'disableOutcomes');
                     if ($disableOutcomes != 'Y') {
                         //Delete all outcomes
                         try {

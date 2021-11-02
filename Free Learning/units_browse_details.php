@@ -21,6 +21,7 @@ use Gibbon\View\View;
 use Gibbon\Domain\DataSet;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
@@ -29,7 +30,8 @@ use Gibbon\Module\FreeLearning\Domain\UnitOutcomeGateway;
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$settingGateway = $container->get(SettingGateway::class);
+$publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
 $browseAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php', 'Browse Units_all');
 
@@ -81,11 +83,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 ->add(__m('Unit Details'));
         }
 
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null, [
-                'error6' => __('An error occured with your submission, most likely because a submitted file was too large.'),
-            ]);
-        }
+        $returns = ['error6' => __('An error occured with your submission, most likely because a submitted file was too large.')];
+		$page->return->addReturns($returns);
 
         if ($freeLearningUnitID == '') {
             echo "<div class='error'>";
@@ -276,7 +275,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $defaultTab = $_GET['tab'];
                 }
 
-                $showContentOnEnrol = getSettingByScope($connection2, 'Free Learning', 'showContentOnEnrol');
+                $showContentOnEnrol = $settingGateway->getSettingByScope('Free Learning', 'showContentOnEnrol');
 
                 echo "<div id='tabs' style='margin: 20px 0'>";
                 //Tab links
@@ -290,11 +289,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     echo "<li><a href='#tabs3'>".__m('Content').'</a></li>';
                     if ($canManage OR $showContentOnEnrol == "N" OR $enrolled) {
                         echo "<li><a href='#tabs4'>".__m('Resources').'</a></li>';
-                        $disableOutcomes = getSettingByScope($connection2, 'Free Learning', 'disableOutcomes');
+                        $disableOutcomes = $settingGateway->getSettingByScope('Free Learning', 'disableOutcomes');
                         if ($disableOutcomes != 'Y') {
                             echo "<li><a href='#tabs5'>".__m('Outcomes').'</a></li>';
                         }
-                        $disableExemplarWork = getSettingByScope($connection2, 'Free Learning', 'disableExemplarWork');
+                        $disableExemplarWork = $settingGateway->getSettingByScope('Free Learning', 'disableExemplarWork');
                         if ($disableExemplarWork != 'Y') {
                             echo "<li><a href='#tabs6'>".__m('Exemplar Work').'</a></li>';
                         }
@@ -380,7 +379,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $session->get('gibbonSchoolYearID'), $values['freeLearningUnitID'], $session->get('gibbonPersonID'), $manageAll);
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
-                            $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+                            $customField = $settingGateway->getSettingByScope('Free Learning', 'customField');
 
                             $collaborationKeys = [];
 
@@ -475,7 +474,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                             $return .= Format::small(__('N/A'));
                                         }
                                     } else if ($student['enrolmentMethod'] == 'schoolMentor') {
-                                        $return .= formatName('', $student['mentorpreferredName'], $student['mentorsurname'], 'Student', false);
+                                        $return .= Format::name('', $student['mentorpreferredName'], $student['mentorsurname'], 'Student', false);
                                     } else if ($student['enrolmentMethod'] == 'externalMentor') {
                                         $return .= $student['nameExternalMentor'];
                                     }
@@ -765,7 +764,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         }
 
                                         echo '<h3>';
-                                        echo $students." . <span style='font-size: 75%'>".__m('Shared on').' '.dateConvertBack($guid, $rowWork['timestampCompleteApproved']).'</span>';
+                                        echo $students." . <span style='font-size: 75%'>".__m('Shared on').' '.Format::date($rowWork['timestampCompleteApproved']).'</span>';
                                         echo '</h3>';
                                         //DISPLAY WORK.
                                         echo '<h4 style=\'margin-top: 0px\'>'.__m('Student Work').'</h4>';

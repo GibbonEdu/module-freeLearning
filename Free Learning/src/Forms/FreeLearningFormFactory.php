@@ -49,9 +49,9 @@ class FreeLearningFormFactory extends DatabaseFormFactory
      * @param string $guid
      * @return OutputableInterface
      */
-    public function createFreeLearningSmartBlocks($name, $session, $guid) : OutputableInterface
+    public function createFreeLearningSmartBlocks($name, $session, $guid, $settingGateway) : OutputableInterface
     {
-        $blockTemplate = $this->createSmartBlockTemplate($guid);
+        $blockTemplate = $this->createSmartBlockTemplate($guid, $settingGateway);
 
         // Create and initialize the Custom Blocks
         $customBlocks = $this->createCustomBlocks($name, $session)
@@ -74,7 +74,7 @@ class FreeLearningFormFactory extends DatabaseFormFactory
      * @param string $guid
      * @return OutputableInterface
      */
-    public function createSmartBlockTemplate($guid) : OutputableInterface
+    public function createSmartBlockTemplate($guid, $settingGateway) : OutputableInterface
     {
         $blockTemplate = $this->createTable()->setClass('blank w-full');
             $row = $blockTemplate->addRow();
@@ -93,7 +93,7 @@ class FreeLearningFormFactory extends DatabaseFormFactory
                     ->maxlength(3)
                     ->setClass('w-24 focus:bg-white')->prepend('');
 
-            $smartBlockTemplate = getSettingByScope($this->pdo->getConnection(), 'Planner', 'smartBlockTemplate');
+            $smartBlockTemplate = $settingGateway->getSettingByScope('Planner', 'smartBlockTemplate');
             $col = $blockTemplate->addRow()->addClass('showHide w-full')->addColumn();
                 $col->addLabel('contentsLabel', __('Block Contents'))->setClass('mt-3 -mb-2');
                 $col->addTextArea('contents', $guid)->setRows(25)->addData('tinymce')->addData('media', '1')->setValue($smartBlockTemplate);

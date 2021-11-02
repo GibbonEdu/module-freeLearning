@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\SettingGateway;
+
 require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
@@ -28,7 +30,7 @@ if (is_file($tcpdfFile)) {
 
 $output = '';
 
-$publicUnits = getSettingByScope($connection2, 'Free Learning', 'publicUnits');
+$publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'publicUnits');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_export.php') == false) {
     //Acess denied

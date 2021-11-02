@@ -41,6 +41,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_mento
     }
 
     if ($action == 'Approve') {
+    	$notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+    	
         foreach ($freeLearningUnitStudentIDs AS $freeLearningUnitStudentID) {
             try {
                 $data = array('freeLearningUnitStudentID' => $freeLearningUnitStudentID) ;
@@ -72,8 +74,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_mento
                 }
 
                 //Notify student
-                $notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been accepted.'), $unit);
-                setNotification($connection2, $guid, $row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+				$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
+				$notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been accepted.'), $unit);
+				$notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+				$notificationSender->sendNotifications();
             }
         }
     }

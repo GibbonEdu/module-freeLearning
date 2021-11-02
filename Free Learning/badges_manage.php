@@ -44,10 +44,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         echo __m('The Badges module is installed, active and available, so you can access this functionality.');
         echo '</div>';
 
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null, null);
-        }
-
         //Set pagination variable
         $page = $_GET['page'] ?? null;
         if ((!is_numeric($page)) or $page < 1) {

@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\IndividualNeeds\INGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
@@ -42,7 +43,7 @@ else {
     }
 
     //Check for custom field
-    $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+    $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
 
     print "<p>" ;
         print __m('This report shows all work that is complete, but pending approval, in all of your classes.') ;
@@ -118,7 +119,7 @@ else {
                 }
             }
             else if ($values['enrolmentMethod'] == 'schoolMentor') {
-                $output .= formatName('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
+                $output .= Format::name('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
             }
             else if ($values['enrolmentMethod'] == 'externalMentor') {
                 $output .= $values['nameExternalMentor'];
@@ -156,10 +157,10 @@ else {
             // Name
             $output = "";
             if ($values['category'] == 'Student') {
-                $output .= "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $values["gibbonPersonID"] . "'>" . formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true) . "</a>";
+                $output .= "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $values["gibbonPersonID"] . "'>" . Format::name("", $values["studentpreferredName"], $values["studentsurname"], "Student", true) . "</a>";
             }
             else {
-                $output .= formatName("", $values["studentpreferredName"], $values["studentsurname"], "Student", true);
+                $output .= Format::name("", $values["studentpreferredName"], $values["studentsurname"], "Student", true);
             }
             $output .= "<br/>";
             // Custom fields

@@ -32,7 +32,8 @@ setCurrentSchoolYear($guid, $connection2);
 Format::setupFromSession($container->get('session'));
 
 //Check for CLI, so this cannot be run through browser
-$remoteCLIKey = getSettingByScope($connection2, 'System Admin', 'remoteCLIKey');
+$settingGateway = $container->get(SettingGateway::class);
+$remoteCLIKey = $settingGateway->getSettingByScope('System Admin', 'remoteCLIKey');
 $remoteCLIKeyInput = $_GET['remoteCLIKey'] ?? null;
 if (!(isCommandLineInterface() OR ($remoteCLIKey != '' AND $remoteCLIKey == $remoteCLIKeyInput))) {
     print __('This script cannot be run from a browser, only via CLI.');
@@ -49,7 +50,6 @@ ini_set('memory_limit', '2048M');
 ini_set('max_execution_time', 1800);
 set_time_limit(1800);
 
-$settingGateway = $container->get(SettingGateway::class);
 $mentorshipAcceptancePrompt = $settingGateway->getSettingByScope('Free Learning', 'mentorshipAcceptancePrompt');
 
 $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');

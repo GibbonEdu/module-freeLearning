@@ -18,7 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Timetable\CourseGateway;
 
 // Module includes
@@ -104,7 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             }
 
             //Check for custom field
-            $customField = getSettingByScope($connection2, 'Free Learning', 'customField');
+            $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
 
             echo "<table class='mini' cellspacing='0' style='width: 100%'>";
             echo "<tr class='head'>";
@@ -155,7 +157,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 echo $count;
                 echo '</td>';
                 echo '<td>';
-                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".formatName('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
+                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
                 $fields = json_decode($row['fields'], true);
                 if (!empty($fields[$customField])) {
                     $value = $fields[$customField];
@@ -182,7 +184,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 echo '</td>';
                 echo '<td>';
                 if ($row['timestampJoined'] != '') {
-                    echo dateConvertBack($guid, substr($row['timestampJoined'], 0, 10));
+                    echo Format::date(substr($row['timestampJoined'], 0, 10));
                 }
                 echo '</td>';
                 echo '<td>';

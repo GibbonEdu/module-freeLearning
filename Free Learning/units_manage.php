@@ -21,6 +21,7 @@ use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Forms\Prefab\BulkActionForm;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
 
@@ -37,10 +38,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         $page->breadcrumbs->add(__m('Manage Units'));
-
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null, null);
-        }
 
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
@@ -70,7 +67,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
             $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
 
-        $difficulties = array_map('trim', explode(',', getSettingByScope($connection2, 'Free Learning', 'difficultyOptions')));
+        $difficulties = array_map('trim', explode(',', $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'difficultyOptions')));
         $row = $form->addRow();
             $row->addLabel('difficulty', __('Difficulty'));
             $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();

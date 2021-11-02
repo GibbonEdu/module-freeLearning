@@ -20,6 +20,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\SettingGateway;
+
 require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
@@ -74,7 +76,8 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
             header("Location: {$URL}");
         } else {
             // Post Discussion
-            $collaborativeAssessment = getSettingByScope($connection2, 'Free Learning', 'collaborativeAssessment');
+            $settingGateway = $container->get(SettingGateway::class);
+            $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
 
             if ($values['enrolmentMethod'] == 'schoolMentor') {
                 $discussionGateway = $container->get(DiscussionGateway::class);
@@ -119,18 +122,22 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
             } else {
                 $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
             }
+            
+            $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+			$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
 
             if ($status == 'Complete - Approved') { //APPROVED!
                 // Attempt to notify the student(s) and grant awards
+                $text = sprintf(__m('Your mentor has approved your request for unit completion (%1$s).'), $name);
+                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
                 foreach ($collaborators as $collaborator) {
-                    $text = sprintf(__m('Your mentor has approved your request for unit completion (%1$s).'), $name);
-                    $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
-                    setNotification($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
-                    grantBadges($connection2, $guid, $collaborator['gibbonPersonIDStudent']);
+                    $notificationSender->addNotification($collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
+                    grantBadges($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $settingGateway);
                 }
+                $notificationSender->sendNotifications();
 
                 // Deal with manually granted badges
-                $enableManualBadges = getSettingByScope($connection2, 'Free Learning', 'enableManualBadges');
+                $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');
                 if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !is_null($badgesBadgeID)) {
                     foreach ($collaborators as $collaborator) {
                         $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $collaborator['gibbonPersonIDStudent'], 'comment' => '', 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
@@ -144,11 +151,12 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 header("Location: {$URL}");
             } elseif ($status == 'Evidence Not Yet Approved') { //NOT YET APPROVED
                 // Attempt to notify the student(s)
+                $text = sprintf(__m('Your mentor has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name);
+                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1&view=$view";
                 foreach ($collaborators as $collaborator) {
-                    $text = sprintf(__m('Your mentor has responded to your request for unit completion, but your evidence has not been approved (%1$s).'), $name);
-                    $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&sidebar=true&tab=1&view=$view";
-                    setNotification($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
+                	$notificationSender->addNotification($collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
                 }
+                $notificationSender->sendNotifications();
 
                 $URL .= '&return=success1';
                 header("Location: {$URL}");

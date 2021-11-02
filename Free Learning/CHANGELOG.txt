@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.10
+--------
+Removed deprecated function calls
+
 v5.17.09
 --------
 Fixed Legend translation issue
