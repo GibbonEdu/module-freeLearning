@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Students\StudentGateway;
 use Gibbon\Module\FreeLearning\Tables\UnitHistory;
 
@@ -41,6 +42,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $page->breadcrumbs
              ->add(__m('Unit History By Student'));
 
+        $settingGateway = $container->get(SettingGateway::class);
+
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
 
         // FORM
@@ -60,7 +63,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                     ->placeholder()
                     ->selected($gibbonPersonID);
 		} elseif ($highestAction == 'Unit History By Student_myChildren') {
-            $disableParentEvidence = (getSettingByScope($connection2, 'Free Learning', 'disableParentEvidence') == "Y");
+            $disableParentEvidence = ($settingGateway->getSettingByScope('Free Learning', 'disableParentEvidence') == "Y");
             $children = $container->get(StudentGateway::class)
                 ->selectAnyStudentsByFamilyAdult($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))
                 ->fetchAll();

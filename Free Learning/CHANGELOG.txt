@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.17.12
+--------
+Added custom field filter to Mentor Overview
+Fixed setting error in parent view of Unit History by Student
+
 v5.17.11
 --------
 Fixed notification sending when approving student evidence
