@@ -1784,3 +1784,11 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.17.11';
 $sql[$count][1] = "";
+
+//v5.17.12
+++$count;
+$sql[$count][0] = '5.17.12';
+$sql[$count][1] = "
+INSERT INTO `gibbonAction` (`gibbonActionID`, `gibbonModuleID`, `name`, `precedence`, `category`, `description`, `URLList`, `entryURL`, `entrySidebar`, `defaultPermissionAdmin`, `defaultPermissionTeacher`, `defaultPermissionStudent`, `defaultPermissionParent`, `defaultPermissionSupport`, `categoryPermissionStaff`, `categoryPermissionStudent`, `categoryPermissionParent`, `categoryPermissionOther`) VALUES (NULL, (SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning'), 'Current Unit by Custom Field', 0, 'Reports', 'Allows a user to see current unit choice for students by custom field.', 'report_currentUnitByCustomField.php','report_currentUnitByCustomField.php', 'Y', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'N', 'N');end
+
+";

@@ -42,9 +42,6 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         return;
     }
 
-    // Check for custom field
-    $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
-
     // Filter
     $allMentors = !empty($_GET['allMentors']) && $highestAction == 'Mentorship Overview_all'
         ? $_GET['allMentors']
