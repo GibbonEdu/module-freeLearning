@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.11
+--------
+Fixed notification sending when approving student evidence
+
 v5.17.10
 --------
 Removed deprecated function calls

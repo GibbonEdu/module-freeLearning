@@ -194,6 +194,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $discussionGateway->insert($data);
                             }
                         }
+
+                        // Attempt to assemble list of students for notification and badges
+                        $gibbonPersonIDStudents = [$gibbonPersonIDStudent];
+                        if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
+                            $dataNotification = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitStudentID' => $freeLearningUnitStudentID, 'collaborationKey' => $row['collaborationKey']);
+                            $sqlNotification = "SELECT gibbonPersonIDStudent FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND NOT freeLearningUnitStudentID=:freeLearningUnitStudentID AND (status='Complete - Pending' OR status='Complete - Approved' OR status='Evidence Not Yet Approved') AND collaborationKey=:collaborationKey";
+                            $resultNotification = $pdo->select($sqlNotification, $dataNotification)->fetchAll();
+
+                            foreach ($resultNotification as $rowNotification) {
+                                $gibbonPersonIDStudents[] = $rowNotification['gibbonPersonIDStudent'];
+                            }
+                        }
                         
                         $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
                         $notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
@@ -238,20 +250,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
                             } else {
                                 $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
-                            }
-
-                            // Attempt to assemble list of students for notification and badges
-                            $gibbonPersonIDStudents[] = $gibbonPersonIDStudent;
-                            if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
-                                try {
-                                    $dataNotification = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitStudentID' => $freeLearningUnitStudentID, 'collaborationKey' => $row['collaborationKey']);
-                                    $sqlNotification = "SELECT gibbonPersonIDStudent FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND NOT freeLearningUnitStudentID=:freeLearningUnitStudentID AND (status='Complete - Pending' OR status='Complete - Approved' OR status='Evidence Not Yet Approved') AND collaborationKey=:collaborationKey";
-                                    $resultNotification = $connection2->prepare($sqlNotification);
-                                    $resultNotification->execute($dataNotification);
-                                } catch (PDOException $e) { echo $e->getMessage(); exit; }
-                                while ($rowNotification = $resultNotification->fetch()) {
-                                    $gibbonPersonIDStudents[] = $rowNotification['gibbonPersonIDStudent'];
-                                }
                             }
 
                             // Attempt to notify the student and grant badges
