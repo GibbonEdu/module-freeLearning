@@ -21,7 +21,6 @@ use Gibbon\Forms\Form;
 use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
-use Gibbon\Forms\CustomFieldHandler;
 use Gibbon\Forms\Prefab\BulkActionForm;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
@@ -43,15 +42,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         return;
     }
 
-    // Check for custom field
-    echo $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
-
     // Filter
     $allMentors = !empty($_GET['allMentors']) && $highestAction == 'Mentorship Overview_all'
         ? $_GET['allMentors']
         : '';
-
-    $customFieldValue = $_GET["custom$customField"] ?? null ;
 
     if ($highestAction == 'Mentorship Overview_all' && $allMentors == "on") {
         $gibbonPersonID = null;
@@ -69,39 +63,30 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         echo "<p>".__m('This report offers a summary of all of your mentor activity, including enrolments by class.')."</p>";
     }
 
-    if ($highestAction == 'Mentorship Overview_all' || !empty($customField)) {
+    if ($highestAction == 'Mentorship Overview_all') {
         $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
         $form->setTitle(__('Filter'));
         $form->setClass('noIntBorder fullWidth');
 
         $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_mentorshipOverview.php');
 
-        if ($highestAction == 'Mentorship Overview_all') {
-            $row = $form->addRow();
-                $row->addLabel('allMentors', __('All Mentors'));
-                $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
+        $row = $form->addRow();
+            $row->addLabel('allMentors', __('All Mentors'));
+            $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
 
-            $form->toggleVisibilityByClass('mentor')->onCheckbox('allMentors')->whenNot('on');
+        $form->toggleVisibilityByClass('mentor')->onCheckbox('allMentors')->whenNot('on');
 
-            $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
-            $sql = "SELECT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'School Mentor' AS groupBy FROM gibbonPerson JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
-            $data2 = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
-            $sql2 = "SELECT DISTINCT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'Class Teacher' AS groupBy FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonCourseClass ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID AND role='Teacher' ORDER BY surname, preferredName";
-            $row = $form->addRow()->addClass('mentor');
-                $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'))->description(!empty($mentorGroups) ? __m('Mentors based on your assigned mentor groups.') : '');
-                $row->addSelectPerson('gibbonPersonIDSchoolMentor')
-                    ->fromQuery($pdo, $sql, $data, 'groupBy')
-                    ->fromQuery($pdo, $sql2, $data2, 'groupBy')
-                    ->placeholder()
-                    ->selected($gibbonPersonID);
-        }
-
-        if (!empty($customField)) {
-            $row = $form->addRow();
-                $row->addLabel('customField', $customField['name'])->description($field['description']);
-                $row->addCustomField('customField', $customField)->setValue($customFieldValue);
-            $container->get(CustomFieldHandler::class)->addCustomFieldsToForm($form, 'User', [], $customField);
-        }
+        $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
+        $sql = "SELECT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'School Mentor' AS groupBy FROM gibbonPerson JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
+        $data2 = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
+        $sql2 = "SELECT DISTINCT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'Class Teacher' AS groupBy FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonCourseClass ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID AND role='Teacher' ORDER BY surname, preferredName";
+        $row = $form->addRow()->addClass('mentor');
+            $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'))->description(!empty($mentorGroups) ? __m('Mentors based on your assigned mentor groups.') : '');
+            $row->addSelectPerson('gibbonPersonIDSchoolMentor')
+                ->fromQuery($pdo, $sql, $data, 'groupBy')
+                ->fromQuery($pdo, $sql2, $data2, 'groupBy')
+                ->placeholder()
+                ->selected($gibbonPersonID);
 
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));

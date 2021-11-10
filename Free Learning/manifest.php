@@ -542,6 +542,23 @@ $actionRows[20]['categoryPermissionStudent'] = 'N';
 $actionRows[20]['categoryPermissionParent'] = 'N';
 $actionRows[20]['categoryPermissionOther'] = 'N';
 
+$actionRows[21]['name'] = 'Current Unit by Custom Field';
+$actionRows[21]['precedence'] = '0';
+$actionRows[21]['category'] = 'Reports';
+$actionRows[21]['description'] = "Allows a user to see current unit choice for students by custom field.";
+$actionRows[21]['URLList'] = 'report_currentUnitByCustomField.php';
+$actionRows[21]['entryURL'] = 'report_currentUnitByCustomField.php';
+$actionRows[21]['entrySidebar'] = 'Y';
+$actionRows[21]['defaultPermissionAdmin'] = 'N';
+$actionRows[21]['defaultPermissionTeacher'] = 'N';
+$actionRows[21]['defaultPermissionStudent'] = 'N';
+$actionRows[21]['defaultPermissionParent'] = 'N';
+$actionRows[21]['defaultPermissionSupport'] = 'N';
+$actionRows[21]['categoryPermissionStaff'] = 'Y';
+$actionRows[21]['categoryPermissionStudent'] = 'N';
+$actionRows[21]['categoryPermissionParent'] = 'N';
+$actionRows[21]['categoryPermissionOther'] = 'N';
+
 $array = array();
 $array['toggleSettingName'] = 'publicUnits';
 $array['toggleSettingScope'] = 'Free Learning';

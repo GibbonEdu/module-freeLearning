@@ -2,7 +2,7 @@ CHANGELOG
 =========
 v5.17.12
 --------
-Added custom field filter to Mentor Overview
+Added new report Current Unit by Custom Field
 Fixed setting error in parent view of Unit History by Student
 
 v5.17.11
