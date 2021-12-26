@@ -23,6 +23,7 @@ use ZipArchive;
 use DOMDocument;
 use Gibbon\Domain\User\RoleGateway;
 use Gibbon\Contracts\Services\Session;
+use Gibbon\Domain\School\YearGroupGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
@@ -36,14 +37,16 @@ class UnitExporter
     protected $unitGateway;
     protected $unitBlockGateway;
     protected $unitAuthorGateway;
+    protected $yearGroupGateway;
     protected $roleGateway;
     protected $session;
 
-    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, Session $session, RoleGateway $roleGateway)
+    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, YearGroupGateway $yearGroupGateway, Session $session, RoleGateway $roleGateway)
     {
         $this->unitGateway = $unitGateway;
         $this->unitBlockGateway = $unitBlockGateway;
         $this->unitAuthorGateway = $unitAuthorGateway;
+        $this->yearGroupGateway = $yearGroupGateway;
         $this->roleGateway = $roleGateway;
         $this->session = $session;
     }
@@ -102,6 +105,12 @@ class UnitExporter
 
                 $blocks[$index]['contents'] = str_replace($src, basename($src), $blocks[$index]['contents']);
             }
+        }
+
+        // Convert gibbonYearGroupIDMinimum to year group nameShort
+        if (!empty($unit['gibbonYearGroupIDMinimum'])) {
+            $yearGroup = $this->yearGroupGateway->getByID($unit['gibbonYearGroupIDMinimum']);
+            $unit['gibbonYearGroupIDMinimum'] = (!empty($yearGroup['nameShort'])) ? $yearGroup['nameShort'] : null;
         }
 
         // Add unit details to data array

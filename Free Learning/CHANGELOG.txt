@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.17.13
+--------
+Adjusted export/import to use minimum year group Short Name, not ID
+
 v5.17.12
 --------
 Added new report Current Unit by Custom Field

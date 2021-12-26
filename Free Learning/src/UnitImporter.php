@@ -22,6 +22,7 @@ namespace Gibbon\Module\FreeLearning;
 use ZipArchive;
 use Gibbon\Domain\User\RoleGateway;
 use Gibbon\Contracts\Services\Session;
+use Gibbon\Domain\School\YearGroupGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
@@ -37,14 +38,16 @@ class UnitImporter
     protected $unitGateway;
     protected $unitBlockGateway;
     protected $unitAuthorGateway;
+    protected $yearGroupGateway;
     protected $roleGateway;
     protected $session;
 
-    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, Session $session, RoleGateway $roleGateway)
+    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, YearGroupGateway $yearGroupGateway, Session $session, RoleGateway $roleGateway)
     {
         $this->unitGateway = $unitGateway;
         $this->unitBlockGateway = $unitBlockGateway;
         $this->unitAuthorGateway = $unitAuthorGateway;
+        $this->yearGroupGateway = $yearGroupGateway;
         $this->roleGateway = $roleGateway;
         $this->session = $session;
     }
@@ -147,6 +150,12 @@ class UnitImporter
         // Update unit outline to point to new file locations
         foreach ($this->files as $filename => $url) {
             $unit['unit']['outline'] = str_replace($filename, $url, $unit['unit']['outline']);
+        }
+
+        // Convert year group nameShort back to gibbonYearGroupIDMinimum
+        if (!empty($unit['unit']['gibbonYearGroupIDMinimum'])) {
+            $yearGroup = $this->yearGroupGateway->selectBy(['nameShort' => $unit['unit']['gibbonYearGroupIDMinimum']])->fetch();
+            $unit['unit']['gibbonYearGroupIDMinimum'] = (!empty($yearGroup['gibbonYearGroupID'])) ? $yearGroup['gibbonYearGroupID'] : null;
         }
 
         return $unit;
