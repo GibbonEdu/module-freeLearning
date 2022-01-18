@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v5.18.00
+--------
+Implemented v23 navigator class
+Fixed no-category outcome issue
+Updated Afrikaans translations
+
 v5.17.13
 --------
 Adjusted export/import to use minimum year group Short Name, not ID

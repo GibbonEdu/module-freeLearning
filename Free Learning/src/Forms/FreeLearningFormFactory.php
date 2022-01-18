@@ -156,8 +156,8 @@ class FreeLearningFormFactory extends DatabaseFormFactory
     public function createSelectOutcome($name, $gibbonDepartmentIDList) : OutputableInterface
     {
         // Get School Outcomes
-        $data = [];
-        $sql = "SELECT category AS groupBy, CONCAT('all ', category) as chainedTo, gibbonOutcomeID AS value, gibbonOutcome.name AS name
+        $data = ['noCategory' => '['.__('No Category').']'];
+        $sql = "SELECT (CASE WHEN category='' THEN :noCategory ELSE category END) AS groupBy, CONCAT('all ', category) as chainedTo, gibbonOutcomeID AS value, gibbonOutcome.name AS name
                 FROM gibbonOutcome
                 WHERE active='Y' AND scope='School'
                 GROUP BY gibbonOutcome.gibbonOutcomeID
@@ -184,8 +184,8 @@ class FreeLearningFormFactory extends DatabaseFormFactory
             ->fromQueryChained($this->pdo, $sql2, $data2, $name.'Filter', 'groupBy');
 
         // Get Categories by Year Group
-        $data3 = [];
-        $sql3 = "SELECT category as value, category as name
+        $data3 = ['noCategory' => '['.__('No Category').']'];
+        $sql3 = "SELECT category as value, (CASE WHEN category='' THEN :noCategory ELSE category END) as name
                 FROM gibbonOutcome
                 WHERE active='Y'
                 GROUP BY gibbonOutcome.category";

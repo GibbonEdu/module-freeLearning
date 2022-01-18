@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
@@ -53,9 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $page->return->setEditLink($editLink);
 
         if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
-            echo "<div class='linkTop'>";
-            echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__('Back to Search Results').'</a>';
-            echo '</div>';
+            $page->navigator->addSearchResultsAction(Url::fromModuleRoute('Free Learning', 'units_manage.php')->withQueryParams($urlParams));
         }
 
         $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_addProcess.php?".http_build_query($urlParams));

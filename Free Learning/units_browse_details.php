@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\View\View;
 use Gibbon\Domain\DataSet;
 use Gibbon\Services\Format;
@@ -107,11 +108,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 echo '</div>';
             } else {
                 $values = $result->fetch();
-                if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
-                    echo "<div class='linkTop'>";
-                    echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__m('Back to Search Results').'</a>';
-                    echo '</div>';
-                }
 
                 $prerequisitesMet = false;
                 if ($highestAction == 'Browse Units_all') {
@@ -123,23 +119,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $prerequisitesActive = prerequisitesRemoveInactive($connection2, $values['freeLearningUnitIDPrerequisiteList']);
                         $prerequisitesMet = prerequisitesMet($connection2, $gibbonPersonID, $prerequisitesActive);
                     }
-                }
-
-                //Let's go!
-                if ($canManage || $browseAll) {
-                    echo "<div class='linkTop'>";
-                    if ($canManage) {
-                        echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view'>".__('Edit')."<img style='margin: 0 0 -4px 3px' title='".__('Edit')."' src='./themes/".$session->get('gibbonThemeName')."/img/config.png'/></a>";
-                    }
-                    if ($canManage & $browseAll) {
-                        echo " | ";
-                    }
-                    if ($browseAll) {
-                        echo "<a target='_blank' href='".$session->get('absoluteURL')."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID'>".__('Download')."<img style='margin: 0 0 -4px 3px' title='".__('Download')."' src='./themes/".$session->get('gibbonThemeName')."/img/download.png'/></a> | ";
-
-                        echo "<a target='_blank' href='".$session->get('absoluteURL')."/modules/Free Learning/units_manageProcessBulk.php?action=Export&freeLearningUnitID=$freeLearningUnitID&name=".$values['name']."'>".__('Export')."<img style='margin: 0 0 -4px 3px' title='".__('Export')."' src='./themes/".$session->get('gibbonThemeName')."/img/delivery2.png'/></a>";
-                    }
-                    echo '</div>';
                 }
 
                 //Get enrolment Details
@@ -160,6 +139,38 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 // UNIT DETAILS TABLE
                 $table = DataTable::createDetails('unitDetails');
+
+                // HEADER ACTIONS
+                $back = false ;
+                if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
+                    $back = true ;
+                    $table->addHeaderAction('back', __('Back to Search Results'))
+                        ->setURL('/modules/Free Learning/units_manage.php')
+                        ->setIcon('search')
+                        ->displayLabel()
+                        ->addParams($urlParams);
+                }
+                if ($canManage) {
+                    $table->addHeaderAction('edit', __('Edit'))
+                        ->setURL('/modules/Free Learning/units_manage_edit.php')
+                        ->setIcon('config')
+                        ->displayLabel()
+                        ->addParams($urlParams)
+                        ->prepend(($back) ? ' | ' : '');
+                }
+                if ($browseAll) {
+                    $table->addHeaderAction('download', __('Download'))
+                        ->setExternalURL($session->get('absoluteURL')."/modules/Free Learning/units_browse_details_export.php?freeLearningUnitID=$freeLearningUnitID")
+                        ->setIcon('download')
+                        ->displayLabel()
+                        ->prepend(($canManage) ? ' | ' : '');
+
+                    $table->addHeaderAction('export', __('Export'))
+                        ->setExternalURL($session->get('absoluteURL')."/modules/Free Learning/units_manageProcessBulk.php?action=Export&freeLearningUnitID=$freeLearningUnitID&name=".$values['name'])
+                        ->setIcon('delivery2')
+                        ->displayLabel()
+                        ->prepend(' | ');
+                }
 
                 $table->addColumn('name', '')->addClass('text-lg font-bold');
                 $table->addColumn('time', __m('Time'))

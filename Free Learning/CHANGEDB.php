@@ -1796,3 +1796,8 @@ INSERT INTO `gibbonAction` (`gibbonActionID`, `gibbonModuleID`, `name`, `precede
 ++$count;
 $sql[$count][0] = '5.17.13';
 $sql[$count][1] = "";
+
+//v5.18.00
+++$count;
+$sql[$count][0] = '5.18.00';
+$sql[$count][1] = "";

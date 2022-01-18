@@ -89,6 +89,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
 
         $table->addHeaderAction('add', __('Add'))
            ->setURL('/modules/Free Learning/badges_manage_add.php')
+           ->addParam('search', $search)
            ->displayLabel();
 
         $table->addColumn('logo', __('Logo'))

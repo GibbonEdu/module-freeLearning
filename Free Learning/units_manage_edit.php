@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
@@ -88,25 +89,30 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 return;
             }
 
-            if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
-                echo "<div class='linkTop'>";
-                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_manage.php&".http_build_query($urlParams)."'>".__('Back to Search Results').'</a>';
-                echo '</div>';
-            }
-
-            if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php')) {
-                if ($values['active'] == 'N') $showInactive = 'Y';
-
-                echo "<div class='linkTop'>";
-                echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&".http_build_query($urlParams)."'>".__('View')."<img style='margin: 0 0 -4px 3px' title='".__('View')."' src='./themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a>";
-                echo '</div>';
-            }
-
             $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/units_manage_editProcess.php?".http_build_query($urlParams));
             $form->setFactory(FreeLearningFormFactory::create($pdo));
 
             $form->addHiddenValue('address', $session->get('address'));
 
+            // HEADER ACTIONS
+            $back = false ;
+            if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '' or $gibbonYearGroupIDMinimum != '') {
+                $back = true ;
+                $form->addHeaderAction('back', __('Back to Search Results'))
+                    ->setURL('/modules/Free Learning/units_manage.php')
+                    ->setIcon('search')
+                    ->displayLabel()
+                    ->addParams($urlParams);
+            }
+            if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php')) {
+                $showInactive = ($values['active'] == 'N') ? 'Y' : 'N';
+                $form->addHeaderAction('view', __('View'))
+                    ->setURL('/modules/Free Learning/units_browse_details.php')
+                    ->setIcon('plus')
+                    ->displayLabel()
+                    ->addParams($urlParams)
+                    ->prepend(($back) ? ' | ' : '');
+            }
 
             // UNIT BASICS
             $form->addRow()->addHeading(__m('Unit Basics'));

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Domain\System\SettingGateway;
 
@@ -51,9 +52,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         $page->return->setEditLink($editLink);
 
         if ($search != '') {
-            echo "<div class='linkTop'>";
-            echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage.php&search='.$search."'>".__('Back to Search Results')."</a>";
-            echo '</div>';
+            $page->navigator->addSearchResultsAction(Url::fromModuleRoute('Free Learning', 'badges_manage.php')->withQueryParams(["search" => $search]));
         }
 
         $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module').'/badges_manage_addProcess.php');
