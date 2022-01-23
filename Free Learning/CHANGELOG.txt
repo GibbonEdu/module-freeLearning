@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.01
+--------
+Added Delete Existing Smart Blocks? option to importer
+
 v5.18.00
 --------
 Implemented v23 navigator class

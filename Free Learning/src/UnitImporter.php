@@ -33,6 +33,7 @@ class UnitImporter
     protected $course;
 
     protected $override = false;
+    protected $delete = false;
     protected $files;
 
     protected $unitGateway;
@@ -55,6 +56,11 @@ class UnitImporter
     public function setOverride($override)
     {
         $this->override = $override;
+    }
+
+    public function setDelete($delete)
+    {
+        $this->delete = $delete;
     }
 
     public function setDefaults($gibbonDepartmentIDList = null, $course = null)
@@ -163,24 +169,33 @@ class UnitImporter
 
     protected function addUnitBlocks($blocks, $freeLearningUnitID, $existingUnit)
     {
+        if ($this->delete) {
+            $this->unitBlockGateway->deleteWhere(['freeLearningUnitID' => $freeLearningUnitID]);
+        }
+
         foreach ($blocks as $block) {
             $block['freeLearningUnitID'] = $freeLearningUnitID;
-            if (!empty($existingUnit)) {
-                $existingBlock = $this->unitBlockGateway->selectBy([
-                    'freeLearningUnitID' => $existingUnit['freeLearningUnitID'],
-                    'title' => $block['title'],
-                ])->fetch();
-            }
-
             // Update uploaded files to point to their new file location
             foreach ($this->files as $filename => $url) {
                 $block['contents'] = str_replace($filename, $url, $block['contents']);
             }
 
-            if (!empty($existingBlock)) {
-                $this->unitBlockGateway->update($existingBlock['freeLearningUnitBlockID'], $block);
-            } else {
+            if ($this->delete) {
                 $this->unitBlockGateway->insert($block);
+            }
+            else {
+                if (!empty($existingUnit)) {
+                    $existingBlock = $this->unitBlockGateway->selectBy([
+                        'freeLearningUnitID' => $existingUnit['freeLearningUnitID'],
+                        'title' => $block['title'],
+                    ])->fetch();
+                }
+
+                if (!empty($existingBlock)) {
+                    $this->unitBlockGateway->update($existingBlock['freeLearningUnitBlockID'], $block);
+                } else {
+                    $this->unitBlockGateway->insert($block);
+                }
             }
         }
     }

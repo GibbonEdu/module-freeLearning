@@ -51,6 +51,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $row->addLabel('override', __m('Allow override?'))->description(__m('Units with the same name will be updated with the imported content.'));
         $row->addCheckbox('override')->setValue('Y');
 
+    $form->toggleVisibilityByClass('delete')->onCheckbox('override')->when('Y');
+    $row = $form->addRow()->addClass('delete');;
+        $row->addLabel('delete', __m('Delete Existing Smart Blocks?'));
+        $row->addCheckbox('delete')->setValue('Y');
+
     $row = $form->addRow();
         $row->addFooter();
         $row->addSubmit();

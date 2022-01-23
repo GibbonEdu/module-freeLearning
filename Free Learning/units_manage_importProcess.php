@@ -37,6 +37,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     $gibbonDepartmentIDList = isset($_POST['gibbonDepartmentIDList']) ? implode(',', $_POST['gibbonDepartmentIDList']) : '';
     $course = $_POST['course'] ?? '';
     $override = $_POST['override'] ?? false;
+    $delete = $_POST['delete'] ?? false;
 
     if (empty($_FILES['file'])) {
         $URL .= '&return=error1';
@@ -56,6 +57,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     $importer = $container->get(UnitImporter::class);
     $importer->setDefaults($gibbonDepartmentIDList, $course);
     $importer->setOverride($override == 'Y');
+    $importer->setDelete($delete == 'Y');
 
     $success = $importer->importFromFile($session->get('absolutePath').'/'.$zipFile);
 
