@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.02
+--------
+Added pagination to Manage Enrolment tab in Browse Units
+
 v5.18.01
 --------
 Added Delete Existing Smart Blocks? option to importer

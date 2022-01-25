@@ -386,7 +386,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             $criteria = $unitStudentGateway->newQueryCriteria()
                                 ->sortBy(['statusSort', 'collaborationKey', 'surname', 'preferredName'])
-                                ->fromPOST();
+                                ->fromPOST()
+                                ->pageSize(50);
 
                             $students = $unitStudentGateway->queryCurrentStudentsByUnit($criteria, $session->get('gibbonSchoolYearID'), $values['freeLearningUnitID'], $session->get('gibbonPersonID'), $manageAll);
                             $canViewStudents = isActionAccessible($guid, $connection2, '/modules/Students/student_view_details.php');
