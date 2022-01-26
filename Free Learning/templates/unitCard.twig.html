@@ -6,7 +6,7 @@ This is a Gibbon template file, written in HTML and Twig syntax.
 For info about editing, see: https://twig.symfony.com/doc/2.x/
 -->#}
 
-{% if prerequisitesMet != 'N' %} 
+{% if prerequisitesMet != 'N' %}
     <a href="{{ viewUnitURL }}&freeLearningUnitID={{ freeLearningUnitID }}" class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 hover:shadow-lg {{ statusClass|default('bg-gray-100 hover:bg-white hover:border-blue-500 hover:text-blue-500') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
 {% else %}
     <a href="{{ viewUnitURL }}&freeLearningUnitID={{ freeLearningUnitID }}" class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 {{ statusClass|default('bg-gray-100') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
@@ -26,7 +26,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
             {{ __('Not Met') }}
         </span>
     {% elseif prerequisitesMet == "Y" %}
-        <span class="z-10 tag success block absolute right-0 mt-1 mr-1">
+        <span class="z-10 tag success ok block absolute right-0 mt-1 mr-1">
             {{ __('Ok!') }}
         </span>
     {% endif %}

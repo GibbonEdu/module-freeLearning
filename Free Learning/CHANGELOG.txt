@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.03
+--------
+Added "ok" class to units with prerequisites met in Grid view
+
 v5.18.02
 --------
 Added pagination to Manage Enrolment tab in Browse Units
