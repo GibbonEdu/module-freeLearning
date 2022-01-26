@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.04
+--------
+Prevent displaying of more than 999 units in Browse Units
+
 v5.18.03
 --------
 Added "ok" class to units with prerequisites met in Grid view
