@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v5.18.05
+--------
+Fixed intermittent unit duplicate failure in Manage Units
+Fixed PHP notice in Unit History
+Removed script tag allowance
+
 v5.18.04
 --------
 Prevent displaying of more than 999 units in Browse Units

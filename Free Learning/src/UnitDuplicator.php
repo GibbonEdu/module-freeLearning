@@ -51,7 +51,7 @@ class UnitDuplicator
         $unit['freeLearningUnitID'] = null;
         $unit['name'] .= " ".__('Copy');
         $unit['gibbonPersonIDCreator'] = $this->session->get('gibbonPersonID');
-        $unit['timestamp'] = null;
+        $unit['timestamp'] = date('Y-m-d H:i:s');
         $freeLearningUnitIDNew = str_pad($this->unitGateway->insert($unit), 10, '0', STR_PAD_LEFT);
 
         if (is_numeric($freeLearningUnitIDNew)) {
