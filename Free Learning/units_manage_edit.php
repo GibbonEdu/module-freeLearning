@@ -329,10 +329,3 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         }
     }
 }
-?>
-<script>
-    // Allows script tags to be used inside Free Learning smart blocks
-    $(document).on('gibbon-setup', function(){
-        Gibbon.config.tinymce.extended_valid_elements = 'script[src|async|defer|type|charset]';
-    });
-</script>

@@ -67,7 +67,8 @@ class UnitHistory
             "Current" => 0,
             "Complete - Pending" => 0,
             "Evidence Not Yet Approved" => 0,
-            "Complete - Approved" => 0
+            "Complete - Approved" => 0,
+            "Exempt" => 0,
         ];
         foreach ($units as $unit) {
             ++$unitStats[$unit['status']];
