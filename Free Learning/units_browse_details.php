@@ -402,7 +402,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             // DATA TABLE
                             $table = DataTable::createPaginated('manageEnrolment', $criteria);
 
-                            if ($enrolmentType == 'staffEdit') {
+                            if ($enrolmentType == 'staffEdit' || isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_learningAreas')) {
                                 $table->addHeaderAction('addMultiple', __('Add Multiple'))
                                     ->setURL('/modules/Free Learning/units_browse_details_enrolMultiple.php')
                                     ->addParam('freeLearningUnitID', $values['freeLearningUnitID'])

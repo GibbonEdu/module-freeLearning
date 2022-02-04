@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.06
+--------
+Added ability for users with Manage Units_learningAreas to add exemptions for students in their classes
+
 v5.18.05
 --------
 Fixed intermittent unit duplicate failure in Manage Units

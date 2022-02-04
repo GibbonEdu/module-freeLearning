@@ -38,15 +38,11 @@ $view = $_GET['view'] ?? '';
 if ($view != 'grid' and $view != 'map') {
     $view = 'list';
 }
-$gibbonPersonID = $session->get('gibbonPersonID');
-if ($canManage and isset($_GET['gibbonPersonID'])) {
-    $gibbonPersonID = $_GET['gibbonPersonID'];
-}
-
+$gibbonPersonID = ($canManage and isset($_GET['gibbonPersonID'])) ? $_GET['gibbonPersonID'] : $session->get('gibbonPersonID');
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_enrolMultiple.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&tab=2&view='.$view;
 
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
+if (!isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') || !isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php')) {
     //Fail 0
     $URL .= '&return=error0';
     header("Location: {$URL}");
@@ -94,51 +90,28 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $URL .= '&return=error3';
                     header("Location: {$URL}");
                 } else {
-                    $proceed = false;
-                    //Check to see if we can set enrolmentType to "staffEdit" based on access to Manage Units_all
-                    $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
-                    if ($manageAll == true) {
-                        $proceed = true;
-                    } else {
-                        //Check to see if we can set enrolmentType to "staffEdit" if user has rights in relevant department(s)
-                        $learningAreas = getLearningAreas($connection2, $guid, true);
-                        if ($learningAreas != '') {
-                            for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                                if (is_numeric(strpos($row['gibbonDepartmentIDList'], $learningAreas[$i]))) {
-                                    $proceed = true;
-                                }
-                            }
+                    $partialFail = false;
+
+                    foreach ($gibbonPersonIDMulti as $gibbonPersonID) {
+                        //Write to database
+                        try {
+                            $data = array('gibbonPersonID' => substr($gibbonPersonID, 9), 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
+                            $sql = 'INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonID, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, gibbonCourseClassID=:gibbonCourseClassID, `grouping`=:grouping, status=:status';
+                            $result = $connection2->prepare($sql);
+                            $result->execute($data);
+                        } catch (PDOException $e) {
+                            $partialFail = true;
                         }
                     }
 
-                    if ($proceed == false) {
-                        //Fail 0
-                        $URL .= '&updateReturn=error0';
+                    if ($partialFail == true) {
+                        //Fail 5
+                        $URL .= '&return=error5';
                         header("Location: {$URL}");
                     } else {
-                        $partialFail = false;
-
-                        foreach ($gibbonPersonIDMulti as $gibbonPersonID) {
-                            //Write to database
-                            try {
-                                $data = array('gibbonPersonID' => substr($gibbonPersonID, 9), 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
-                                $sql = 'INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonID, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, gibbonCourseClassID=:gibbonCourseClassID, `grouping`=:grouping, status=:status';
-                                $result = $connection2->prepare($sql);
-                                $result->execute($data);
-                            } catch (PDOException $e) {
-                                $partialFail = true;
-                            }
-                        }
-
-                        if ($partialFail == true) {
-                            //Fail 5
-                            $URL .= '&return=error5';
-                            header("Location: {$URL}");
-                        } else {
-                            //Success 0
-                            $URL .= '&return=success0';
-                            header("Location: {$URL}");
-                        }
+                        //Success 0
+                        $URL .= '&return=success0';
+                        header("Location: {$URL}");
                     }
                 }
             }

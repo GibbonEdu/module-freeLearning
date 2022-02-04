@@ -25,7 +25,7 @@ require_once __DIR__ . '/moduleFunctions.php';
 
 $publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'publicUnits');
 
-if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
+if (!isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') || !isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php')) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
@@ -46,10 +46,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         if ($view != 'grid' and $view != 'map') {
             $view = 'list';
         }
-        $gibbonPersonID = $session->get('gibbonPersonID');
-        if ($canManage and isset($_GET['gibbonPersonID'])) {
-            $gibbonPersonID = $_GET['gibbonPersonID'];
-        }
+        $gibbonPersonID = ($canManage and isset($_GET['gibbonPersonID'])) ? $_GET['gibbonPersonID'] : $session->get('gibbonPersonID');
 
         //Get action with highest precendence
         $urlParams = compact('freeLearningUnitID', 'showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'view', 'gibbonPersonID');
