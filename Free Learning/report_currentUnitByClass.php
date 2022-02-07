@@ -22,6 +22,8 @@ use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Timetable\CourseGateway;
+use Gibbon\Tables\DataTable;
+use Gibbon\Module\FreeLearning\Domain\UnitClassGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -61,138 +63,91 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 
     echo $form->getOutput();
 
-
     if ($gibbonCourseClassID != '') {
-        echo '<h2>';
-        echo __('Report Data');
-        echo '</h2>';
-
         $courseGateway = $container->get(CourseGateway::class);
         $values = $courseGateway->getCourseClassByID($gibbonCourseClassID);
-
+        
         if (!is_array($values)) {
-            echo "<div class='error'>";
-            echo __('There are no records to display.');
-            echo '</div>';
+            $page->addError(__('There are no records to display.'));
         } else {
-            echo "<p style='margin-bottom: 0px'><b>".__('Class').'</b>: '.$values['courseNameShort'].'.'.$values['nameShort'].'</p>';
+            $unitClassGateway = $container->get(UnitClassGateway::class);
+            $studentUnits = $unitClassGateway->selectUnitsByClass($gibbonCourseClassID, $sort)->toDataSet();
+            
+            $table = DataTable::create('reportData');
+            $table->setTitle('Report Data - '.$values['courseNameShort'].'.'.$values['nameShort']);
+            
+            $table->addColumn('gibbonPersonID', __('Student'))
+                ->format(function ($row) use ($session, $container) {
+                    
+                    $output = '<a href="'.$session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$row['gibbonPersonID'].'">'.Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br>';
+                    
+                    
+                    //Check for custom field
+                    $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
 
-            //Get data on blocks in an efficient manner
-            $blocks = getBlocksArray($connection2);
-
-            try {
-                $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
-                $sql = "SELECT
-                        gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnit.freeLearningUnitID, freeLearningUnit.name AS unitName, timestampJoined, collaborationKey, freeLearningUnitStudent.status, enrolmentMethod, fields
-                    FROM
-                        gibbonPerson
-                        JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role='Student')
-                        LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID OR enrolmentMethod='schoolMentor' OR enrolmentMethod='externalMentor') AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Current - Pending' OR freeLearningUnitStudent.status='Complete - Pending' OR freeLearningUnitStudent.status='Evidence Not Yet Approved'))
-                        LEFT JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                    WHERE
-                        gibbonPerson.status='Full'
-                        AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."')
-                        AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."')
-                        AND gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID";
-                if ($sort == 'student') {
-                    $sql .= " ORDER BY surname, preferredName, unitName";
-                } else {
-                    $sql .= " ORDER BY unitName, collaborationKey, surname, preferredName";
-                }
-                $result = $connection2->prepare($sql);
-                $result->execute($data);
-            } catch (PDOException $e) {
-                echo "<div class='error'>".$e->getMessage().'</div>';
-            }
-
-            //Check for custom field
-            $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
-
-            echo "<table class='mini' cellspacing='0' style='width: 100%'>";
-            echo "<tr class='head'>";
-            echo '<th>';
-            echo __('Number');
-            echo '</th>';
-            echo '<th>';
-            echo __('Student');
-            echo '</th>';
-            echo '<th>';
-            echo __m('Group');
-            echo '</th>';
-            echo '<th>';
-            echo __('Unit').'<br/>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__m('Status').'</span>';
-            echo '</th>';
-            echo '<th>';
-            echo __m('Date Started');
-            echo '</th>';
-            echo '<th>';
-            echo __m('Days Since Started');
-            echo '</th>';
-            echo '<th>';
-            echo __m('Length').'</br>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__('Minutes').'</span>';
-            echo '</th>';
-            echo '<th>';
-            echo __m('Time Spent').'</br>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__m('Minutes By Day\'s End').'</span>';
-            echo '</th>';
-            echo '</tr>';
-
-            $count = 0;
-            $rowNum = 'odd';
+                    $fields = json_decode($row['fields'], true);
+                    if (!empty($fields[$customField])) {
+                        $value = $fields[$customField];
+                        if ($value != '') {
+                            $output .= "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
+                        }
+                    }
+                    
+                    return $output;
+                });
+                
             $group = 0;
             $collaborationKeys = array();
-            while ($row = $result->fetch()) {
-                if ($count % 2 == 0) {
-                    $rowNum = 'even';
-                } else {
-                    $rowNum = 'odd';
-                }
-                ++$count;
-
-                //COLOR ROW BY STATUS!
-                echo "<tr class=$rowNum>";
-                echo '<td>';
-                echo $count;
-                echo '</td>';
-                echo '<td>';
-                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
-                $fields = json_decode($row['fields'], true);
-                if (!empty($fields[$customField])) {
-                    $value = $fields[$customField];
-                    if ($value != '') {
-                        echo "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
+            $table->addColumn('collaborationKey', __m('Group'))
+                ->format(function ($row) use ($group, $collaborationKeys) {
+                    $output = '';
+                    if ($row['collaborationKey'] != '') {
+                        if (isset($collaborationKeys[$row['collaborationKey']]) == false) {
+                            ++$group;
+                            $collaborationKeys[$row['collaborationKey']] = $group;
+                        }
+                        $output = $collaborationKeys[$row['collaborationKey']];
+                    } 
+                    return $output;
+                });
+                
+            $table->addColumn('unit', __('Unit'))
+                ->description(__m('Status'))
+                ->format(function ($row) use ($session) {
+                    $output = '';
+                    if ($row['enrolmentMethod'] == "schoolMentor" || $row['enrolmentMethod'] == "externalMentor") {
+                        $output .= "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
                     }
-                }
-                echo '</td>';
-                echo '<td>';
-                if ($row['collaborationKey'] != '') {
-                    if (isset($collaborationKeys[$row['collaborationKey']]) == false) {
-                        ++$group;
-                        $collaborationKeys[$row['collaborationKey']] = $group;
+                    $output .= "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
+                    $output .= "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status'] ?? '').'</span>';
+                    //TODO: CHANGE FROM INLINE HTML TO OO FORMATTING :(
+                    return $output;
+                });
+            
+            $table->addColumn('timestampJoined', __m('Date Started'))
+                ->format(function ($row) {
+                    $output = '';
+                    if ($row['timestampJoined'] != '') {
+                        $output .= Format::date(substr($row['timestampJoined'], 0, 10));
                     }
-                    echo $collaborationKeys[$row['collaborationKey']];
-                }
-                echo '</td>';
-                echo '<td>';
-                if ($row['enrolmentMethod'] == "schoolMentor" || $row['enrolmentMethod'] == "externalMentor") {
-                    echo "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
-                }
-                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
-                echo "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status'] ?? '').'</span>';
-                echo '</td>';
-                echo '<td>';
-                if ($row['timestampJoined'] != '') {
-                    echo Format::date(substr($row['timestampJoined'], 0, 10));
-                }
-                echo '</td>';
-                echo '<td>';
-                if ($row['timestampJoined'] != '') {
-                    echo round((time() - strtotime($row['timestampJoined'])) / (60 * 60 * 24));
-                }
-                echo '</td>';
-                echo '<td>';
+                    return $output;
+                });
+                
+            $table->addColumn('daysSince', __m('Days Since Started'))
+                ->format(function ($row) {
+                    $output = '';
+                    if ($row['timestampJoined'] != '') {
+                        $output .= round((time() - strtotime($row['timestampJoined'])) / (60 * 60 * 24));
+                    }
+                    return $output;
+                });
+            
+            $blocks = getBlocksArray($connection2);
+            
+            $table->addColumn('length', __m('Length'))
+                ->description(__('Minutes'))
+                ->format(function ($row) use ($blocks) {
+                    $output = '';
                     if ($row['timestampJoined'] != '') {
                         $timing = null;
                         if ($blocks != false) {
@@ -205,56 +160,49 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                             }
                         }
                         if (is_null($timing)) {
-                            echo '<i>'.__('N/A').'</i>';
+                            $output .= '<i>'.__('N/A').'</i>';
                         } else {
-                            echo $timing;
+                            $output .= $timing;
                         }
                     }
-                echo '</td>';
-                echo '<td>';
+                    return $output;
+                });
+                
+            $table->addColumn('timeSpent', __m('Time Spent'))
+                ->description(__('Minutes By Day\'s End'))
+                ->format(function ($row) use ($unitClassGateway, $gibbonCourseClassID) {
+                    $output = '';
                     $spent = 0;
-                    if ($row['timestampJoined'] != '') {
-                        try {
-                            $dataLessons = array('gibbonCourseClassID' => $gibbonCourseClassID, "dateJoined" => substr($row['timestampJoined'], 0, 10), "today" => date('Y-m-d'));
-                            $sqlLessons = "SELECT date, timeStart, timeEnd FROM gibbonPlannerEntry WHERE name LIKE '%Free Learning%' AND gibbonCourseClassID=:gibbonCourseClassID AND date>=:dateJoined AND date<=:today";
-                            $resultLessons = $connection2->prepare($sqlLessons);
-                            $resultLessons->execute($dataLessons);
-                        } catch (PDOException $e) {
-                            echo "<div class='error'>".$e->getMessage().'</div>';
+                    $resultLessons = $unitClassGateway->selectTiming($gibbonCourseClassID, $row['timestampJoined']);
+                    
+                    if ($resultLessons->rowCount() < 1) {
+                        $output .= $spent;
+                    } else {
+                        while ($rowLessons = $resultLessons->fetch()) {
+                            $start_date = new DateTime($rowLessons['date'].' '.$rowLessons['timeStart']);
+                            $since_start = $start_date->diff(new DateTime($rowLessons['date'].' '.$rowLessons['timeEnd']));
+                            $spent += (60*$since_start->h) + $since_start->i;
                         }
-                        if ($resultLessons->rowCount() < 1) {
-                            echo $spent;
-                        }
-                        else {
-                            while ($rowLessons = $resultLessons->fetch()) {
-                                $start_date = new DateTime($rowLessons['date'].' '.$rowLessons['timeStart']);
-                                $since_start = $start_date->diff(new DateTime($rowLessons['date'].' '.$rowLessons['timeEnd']));
-                                $spent += (60*$since_start->h) + $since_start->i;
-                            }
 
-                            if (is_null($timing)) { //No length to compare to, so just spit out answer
-                                echo $spent;
-                            }
-                            else if ($spent<=$timing) { //OK for time, spit out in green
-                                echo "<span style='font-weight: bold; color: #390;'>$spent</span>";
-                            }
-                            else { //Over time, spit out in orange
-                                echo "<span style='font-weight: bold; color: #D65602;'>$spent</span>";
-                            }
-
+                        if (is_null($timing)) { //No length to compare to, so just spit out answer
+                            $output .= $spent;
                         }
+                        else if ($spent<=$timing) { //OK for time, spit out in green
+                            $output .= "<span style='font-weight: bold; color: #390;'>$spent</span>";
+                        }
+                        else { //Over time, spit out in orange
+                            $output .= "<span style='font-weight: bold; color: #D65602;'>$spent</span>";
+                        }
+
                     }
-                echo '</td>';
-                echo '</tr>';
-            }
-            if ($count == 0) {
-                echo "<tr class=$rowNum>";
-                echo '<td colspan=3>';
-                echo __('There are no records to display.');
-                echo '</td>';
-                echo '</tr>';
-            }
-            echo '</table>';
+                    
+                    
+                    return $output;
+                });
+                
+            //TODO: TIME SPENT / MINUTES BY DAY END
+            
+            echo $table->render($studentUnits);
         }
     }
 }
