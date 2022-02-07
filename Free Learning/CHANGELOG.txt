@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.07
+--------
+Refactored Current Unit by Class
+
 v5.18.06
 --------
 Added ability for users with Manage Units_learningAreas to add exemptions for students in their classes
