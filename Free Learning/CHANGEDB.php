@@ -1836,3 +1836,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.18.07';
 $sql[$count][1] = "";
+
+//v5.18.08
+++$count;
+$sql[$count][0] = '5.18.08';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'genderOnFeedback', 'Gender on Feedback', 'Show student gender when giving unit completion feedback?', 'N');end
+";

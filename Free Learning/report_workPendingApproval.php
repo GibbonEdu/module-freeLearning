@@ -182,8 +182,9 @@ else {
                 $personalDescriptors = $gateway->queryIndividualNeedsPersonDescriptors($criteria)->toArray();
 
                 if (count($personalDescriptors) > 0) {
-                    $output .= Format::small(__('Individual Needs'));
+                    $output .= Format::tag(__('Individual Needs'), 'message mt-1');
                 }
+    
             }
 
             return $output;

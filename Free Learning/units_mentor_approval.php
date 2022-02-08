@@ -42,6 +42,7 @@ $page->return->addReturns($returns);
 if (!$block) {
     // Get params
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
+    $settingGateway = $container->get(SettingGateway::class);
 
     $freeLearningUnitStudentID =  $_GET['freeLearningUnitStudentID'] ?? '';
     $confirmationKey = $_GET['confirmationKey'] ?? '';
@@ -52,7 +53,7 @@ if (!$block) {
         //Check student & confirmation key
         try {
             $data = array('freeLearningUnitStudentID' => $freeLearningUnitStudentID, 'confirmationKey' => $confirmationKey) ;
-            $sql = 'SELECT freeLearningUnitStudent.*, freeLearningUnit.name AS unit, surname, preferredName, (SELECT count(*) FROM gibbonINPersonDescriptor WHERE gibbonINPersonDescriptor.gibbonPersonID=freeLearningUnitStudent.gibbonPersonIDStudent GROUP BY gibbonINPersonDescriptor.gibbonPersonID) AS inCount
+            $sql = 'SELECT freeLearningUnitStudent.*, freeLearningUnit.name AS unit, surname, preferredName, gender, (SELECT count(*) FROM gibbonINPersonDescriptor WHERE gibbonINPersonDescriptor.gibbonPersonID=freeLearningUnitStudent.gibbonPersonIDStudent GROUP BY gibbonINPersonDescriptor.gibbonPersonID) AS inCount
                 FROM freeLearningUnitStudent
                     JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                     JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
@@ -115,6 +116,7 @@ if (!$block) {
             $form->addHiddenValue('freeLearningUnitStudentID', $values['freeLearningUnitStudentID']);
             $form->addHiddenValue('confirmationKey', $confirmationKey);
 
+            $genderOnFeedback = $settingGateway->getSettingByScope('Free Learning', 'genderOnFeedback');
             if (!empty($values['collaborationKey'])) {
                 $row = $form->addRow();
                     $row->addLabel('student', __('Students'));
@@ -122,14 +124,17 @@ if (!$block) {
 
                 $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
                 foreach ($collaborators as $index => $collaborator) {
-                    $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
-                    $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false).$in);
+                    $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mt-2') : "" ;
+                    $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($values['gender']), 'dull ml-2') : "";
+                    $col->addContent(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false).$gender.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
+
                 }
             } else {
-                $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
+                $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message ml-2') : "" ;
+                $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($values['gender']), 'dull ml-2') : "";
                 $row = $form->addRow();
                     $row->addLabel('student', __('Student'));
-                    $row->addTextField('student')->readonly()->setValue(Format::name('', $values['preferredName'], $values['surname'], 'Student', false).$in);
+                    $row->addContent(Format::name('', $values['preferredName'], $values['surname'], 'Student', false).$gender.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
             }
 
             $submissionLink = $values['evidenceType'] == 'Link'
@@ -168,8 +173,8 @@ if (!$block) {
                 $row->addSelect('status')->fromArray($statuses)->required()->placeholder()->selected($values['status']);
 
             $form->toggleVisibilityByClass('approved')->onSelect('status')->when('Complete - Approved');
-            
-            $enableManualBadges = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'enableManualBadges');
+
+            $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');
             if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
                 $data = [];
                 $sql = "SELECT badgesBadgeID as value, name FROM badgesBadge WHERE active='Y' ORDER BY name";

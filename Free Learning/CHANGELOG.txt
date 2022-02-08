@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.18.08
+--------
+Added option (off by default) to show student gender when writing unit completion feedback
+Adjusted Individual Needs flag to use tag style
+
 v5.18.07
 --------
 Refactored Current Unit by Class
