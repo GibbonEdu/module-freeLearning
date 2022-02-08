@@ -226,14 +226,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
         foreach ($collaborators as $index => $collaborator) {
-            $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
-            $col->addTextField('student'.$index)->readonly()->setValue(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false).$in);
+            $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message ml-2') : '';
+            $gender = Format::tag(Format::genderName($values['gender']), 'dull ml-2');
+            $col->addContent(Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false).$gender.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
         }
     } else {
-        $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? " (".__('Individual Needs').")": "" ;
+        $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message ml-2') : '';
+        $gender = Format::tag(Format::genderName($values['gender']), 'dull ml-2');
         $row = $form->addRow();
             $row->addLabel('student', __('Student'));
-            $row->addTextField('student')->readonly()->setValue(Format::name('', $values['preferredName'], $values['surname'], 'Student', false).$in);
+            $row->addContent(Format::name('', $values['preferredName'], $values['surname'], 'Student', false).$gender.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
     }
 
     $submissionLink = $values['evidenceType'] == 'Link'
