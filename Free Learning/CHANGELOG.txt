@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.09
+--------
+Fixed Back to Search Results link in View Unit page
+
 v5.18.08
 --------
 Added option (off by default) to show student gender when writing unit completion feedback

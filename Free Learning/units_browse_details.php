@@ -145,7 +145,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 if ($gibbonDepartmentID != '' or $difficulty != '' or $name != '') {
                     $back = true ;
                     $table->addHeaderAction('back', __('Back to Search Results'))
-                        ->setURL('/modules/Free Learning/units_manage.php')
+                        ->setURL('/modules/Free Learning/units_browse.php')
                         ->setIcon('search')
                         ->displayLabel()
                         ->addParams($urlParams);
