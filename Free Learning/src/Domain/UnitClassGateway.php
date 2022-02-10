@@ -36,7 +36,7 @@ class UnitClassGateway extends QueryableGateway
         $query = $this
             ->newQuery()
             ->from('gibbonPerson')
-            ->cols(['gibbonPerson.gibbonPersonID', 'surname', 'preferredName', 'freeLearningUnit.freeLearningUnitID', 'freeLearningUnit.name AS unitName', 'timestampJoined', 'collaborationKey', 'freeLearningUnitStudent.status', 'enrolmentMethod', 'fields'])
+            ->cols(['gibbonPerson.gibbonPersonID', 'surname', 'preferredName', 'freeLearningUnit.freeLearningUnitID', 'freeLearningUnit.name AS unitName', 'timestampJoined', 'collaborationKey', 'freeLearningUnitStudent.status', 'enrolmentMethod', 'freeLearningUnitStudent.grouping', 'fields'])
             ->join('inner', 'gibbonCourseClassPerson','gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role=\'Student\'')
             ->leftJoin('freeLearningUnitStudent','freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID OR enrolmentMethod=\'schoolMentor\' OR enrolmentMethod=\'externalMentor\') AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Yet Approved\')')
             ->leftJoin('freeLearningUnit','freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
@@ -47,10 +47,12 @@ class UnitClassGateway extends QueryableGateway
             ->where('gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID')
                 ->bindValue('gibbonCourseClassID', $gibbonCourseClassID);
                 
-                if ($sort == 'student') {
+                if ($sort == 'unit') {
+                    $query->orderBy(['unitName', 'collaborationKey', 'surname', 'preferredName']);
+                } elseif ($sort == 'student') {
                     $query->orderBy(['surname', 'preferredName', 'unitName']);
                 } else {
-                    $query->orderBy(['unitName', 'collaborationKey', 'surname', 'preferredName']);
+                    $query->orderBy(['status', 'unitName', 'collaborationKey', 'surname', 'preferredName']);
                 }
 
         return $this->runSelect($query);

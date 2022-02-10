@@ -37,7 +37,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
          ->add(__m('Current Unit by Class'));
 
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? '';
-    $sort = $_GET['sort'] ?? 'unit';
+    $sort = $_GET['sort'] ?? 'status';
 
     $form = Form::create('filter', $session->get('absoluteURL') . '/index.php', 'get');
     $form->setFactory(DatabaseFormFactory::create($pdo));
@@ -53,7 +53,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             ->selected($gibbonCourseClassID)
             ->placeholder();
 
-    $sortOptions = ['unit' => __('Unit'), 'student' => __('Student')];
+    $sortOptions = ['status' => __('Status'), 'unit' => __('Unit'), 'student' => __('Student')];
     $row = $form->addRow();
         $row->addLabel('sort', __('Sort By'));
         $row->addSelect('sort')->fromArray($sortOptions)->selected($sort);
@@ -72,6 +72,24 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
         } else {
             $unitClassGateway = $container->get(UnitClassGateway::class);
             $studentUnits = $unitClassGateway->selectUnitsByClass($gibbonCourseClassID, $sort)->toDataSet();
+
+            $blocks = getBlocksArray($connection2);
+            $collaborationKeys = [];
+
+            $studentUnits->transform(function (&$row) use ($blocks) {
+                if (!empty($row['timestampJoined'])) {
+                    $row['timing'] = null;
+                    if ($blocks != false) {
+                        foreach ($blocks as $block) {
+                            if ($block[0] == $row['freeLearningUnitID']) {
+                                if (is_numeric($block[2])) {
+                                    $row['timing'] += $block[2];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
             
             $table = DataTable::create('reportData');
             $table->setTitle('Report Data - '.$values['courseNameShort'].'.'.$values['nameShort']);
@@ -79,7 +97,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             $table->addColumn('gibbonPersonID', __('Student'))
                 ->format(function ($row) use ($session, $container) {
                     
-                    $output = '<a href="'.$session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$row['gibbonPersonID'].'">'.Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br>';
+                    $output = '<a href="'.$session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$row['gibbonPersonID'].'">'.Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a>';
                     
                     
                     //Check for custom field
@@ -89,25 +107,32 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     if (!empty($fields[$customField])) {
                         $value = $fields[$customField];
                         if ($value != '') {
-                            $output .= "<span style='font-size: 85%; font-style: italic'>".$value.'</span>';
+                            $output .= '<br/>'.Format::small($value);
                         }
+                    }
+
+                    if (!empty($values['grouping']) && $values['grouping'] != 'Individual') {
+                        $output .= '<br/>'.Format::small($values['grouping']);
                     }
                     
                     return $output;
                 });
                 
-            $group = 0;
-            $collaborationKeys = array();
             $table->addColumn('collaborationKey', __m('Group'))
-                ->format(function ($row) use ($group, $collaborationKeys) {
+                ->format(function ($values) use (&$collaborationKeys) {
                     $output = '';
-                    if ($row['collaborationKey'] != '') {
-                        if (isset($collaborationKeys[$row['collaborationKey']]) == false) {
-                            ++$group;
-                            $collaborationKeys[$row['collaborationKey']] = $group;
+                    if (!empty($values['collaborationKey'])) {
+                        // Get the index for the group, otherwise add it to the array
+                        $group = array_search($values['collaborationKey'], $collaborationKeys);
+                        if ($group === false) {
+                            $collaborationKeys[] = $values['collaborationKey'];
+                            $group = count($collaborationKeys);
+                        } else {
+                            $group++;
                         }
-                        $output = $collaborationKeys[$row['collaborationKey']];
-                    } 
+                        $output .= $group;
+                    }
+
                     return $output;
                 });
                 
@@ -142,32 +167,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     return $output;
                 });
             
-            $blocks = getBlocksArray($connection2);
-            
             $table->addColumn('length', __m('Length'))
                 ->description(__('Minutes'))
-                ->format(function ($row) use ($blocks) {
+                ->format(function ($row) {
                     $output = '';
                     if ($row['timestampJoined'] != '') {
-                        $timing = null;
-                        if ($blocks != false) {
-                            foreach ($blocks as $block) {
-                                if ($block[0] == $row['freeLearningUnitID']) {
-                                    if (is_numeric($block[2])) {
-                                        $timing += $block[2];
-                                    }
-                                }
-                            }
-                        }
-                        if (is_null($timing)) {
+                        if (is_null($row['timing'])) {
                             $output .= '<i>'.__('N/A').'</i>';
                         } else {
-                            $output .= $timing;
+                            $output .= $row['timing'];
                         }
                     }
                     return $output;
                 });
-                
+
             $table->addColumn('timeSpent', __m('Time Spent'))
                 ->description(__('Minutes By Day\'s End'))
                 ->format(function ($row) use ($unitClassGateway, $gibbonCourseClassID) {
@@ -184,10 +197,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                             $spent += (60*$since_start->h) + $since_start->i;
                         }
 
-                        if (is_null($timing)) { //No length to compare to, so just spit out answer
+                        if (is_null($row['timing'])) { //No length to compare to, so just spit out answer
                             $output .= $spent;
                         }
-                        else if ($spent<=$timing) { //OK for time, spit out in green
+                        else if ($spent<=$row['timing']) { //OK for time, spit out in green
                             $output .= "<span style='font-weight: bold; color: #390;'>$spent</span>";
                         }
                         else { //Over time, spit out in orange

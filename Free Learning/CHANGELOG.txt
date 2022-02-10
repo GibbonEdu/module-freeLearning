@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.18.10
+--------
+Fixed time colouration and group numbers in Current Unit by Class report
+Sort Current Unit by Class by status first, by default
+
 v5.18.09
 --------
 Fixed Back to Search Results link in View Unit page
