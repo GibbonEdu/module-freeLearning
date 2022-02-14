@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.11
+--------
+Fix missing row count in Current Unit by Class report
+
 v5.18.10
 --------
 Fixed time colouration and group numbers in Current Unit by Class report

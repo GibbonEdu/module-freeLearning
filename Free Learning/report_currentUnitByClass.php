@@ -93,6 +93,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             
             $table = DataTable::create('reportData');
             $table->setTitle('Report Data - '.$values['courseNameShort'].'.'.$values['nameShort']);
+
+            $count = 1;
+            $table->addColumn('count', '')
+                ->notSortable()
+                ->width('35px')
+                ->format(function ($row) use (&$count) {
+                    return '<span class="subdued">'.$count++.'</span>';
+                });
             
             $table->addColumn('gibbonPersonID', __('Student'))
                 ->format(function ($row) use ($session, $container) {
