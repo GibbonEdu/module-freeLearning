@@ -21,6 +21,7 @@ use Gibbon\Forms\Form;
 use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
+use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Forms\Prefab\BulkActionForm;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
@@ -57,6 +58,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $gibbonPersonID = $session->get('gibbonPersonID');
     }
 
+    $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
+
     if ($highestAction == 'Mentorship Overview_all') {
         echo "<p>".__m('This report offers a summary of all mentor activity, including enrolments by class.')."</p>";
     } else {
@@ -65,6 +68,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     if ($highestAction == 'Mentorship Overview_all') {
         $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
+        $form->setFactory(DatabaseFormFactory::create($pdo));
+
         $form->setTitle(__('Filter'));
         $form->setClass('noIntBorder fullWidth');
 
@@ -76,10 +81,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
         $form->toggleVisibilityByClass('mentor')->onCheckbox('allMentors')->whenNot('on');
 
-        $data = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
-        $sql = "SELECT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'School Mentor' AS groupBy FROM gibbonPerson JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID ORDER BY surname, preferredName";
-        $data2 = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
-        $sql2 = "SELECT DISTINCT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'Class Teacher' AS groupBy FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonCourseClass ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID AND role='Teacher' ORDER BY surname, preferredName";
+        $data = array();
+        $sql = "SELECT DISTINCT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'School Mentor' AS groupBy FROM gibbonPerson JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDSchoolMentor=gibbonPerson.gibbonPersonID) WHERE gibbonPerson.status='Full' ORDER BY surname, preferredName";
+        $data2 = array();
+        $sql2 = "SELECT DISTINCT gibbonPerson.gibbonPersonID AS value, CONCAT(surname, ', ', preferredName) AS name, 'Class Teacher' AS groupBy FROM gibbonPerson JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID) JOIN gibbonCourseClass ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourse ON (gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID) WHERE gibbonPerson.status='Full' AND role='Teacher' ORDER BY surname, preferredName";
         $row = $form->addRow()->addClass('mentor');
             $row->addLabel('gibbonPersonIDSchoolMentor', __m('School Mentor'))->description(!empty($mentorGroups) ? __m('Mentors based on your assigned mentor groups.') : '');
             $row->addSelectPerson('gibbonPersonIDSchoolMentor')
@@ -87,6 +92,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
                 ->fromQuery($pdo, $sql2, $data2, 'groupBy')
                 ->placeholder()
                 ->selected($gibbonPersonID);
+
+        $row = $form->addRow();
+            $row->addLabel('gibbonSchoolYearID', __('School Year'));
+            $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->required()->selected($gibbonSchoolYearID);
 
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
@@ -110,11 +119,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     if (!empty($gibbonPersonID)) {
         $criteria->pageSize(0);
     }
-
-    $mentorship = $unitStudentGateway->queryMentorship($criteria, $session->get('gibbonSchoolYearID'), !empty($allMentors) ? null : $gibbonPersonID);
+    $mentorship = $unitStudentGateway->queryMentorship($criteria, $gibbonSchoolYearID, !empty($allMentors) ? null : $gibbonPersonID);
 
     // Render chart for individuals
-    if (!empty($gibbonPersonID)) {
+    if (!empty($gibbonPersonID) && count($mentorship) > 0) {
         $page->scripts->add('chart');
 
         echo "<h3>".__('Overview')."</h3>";
