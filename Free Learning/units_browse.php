@@ -69,6 +69,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $view = 'map';
         }
 
+        $advancedOptions = (!empty($_GET['showInactive']) || !empty($_GET['difficulty']) || !empty($_GET['name'])) ? true : false;
+
         // View the current user by default
         $gibbonPersonID = $session->get('gibbonPersonID');
         $viewingAsUser = false;
@@ -125,6 +127,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $viewForm);
 
+        $row = $form->addRow();
+            $row->addContent('<a class="show_hide" onclick="false" href="#">'.__('Advanced Options').'</a>')
+                ->wrap('<span class="small">', '</span>')
+                ->setClass('right');
+
         $disableLearningAreas = $settingGateway->getSettingByScope('Free Learning', 'disableLearningAreas');
         $courses = $unitStudentGateway->selectCoursesByStudent($session->get('gibbonPersonID'), $session->get('gibbonSchoolYearID'));
         $learningAreas = $unitGateway->selectLearningAreasAndCourses(null, $disableLearningAreas);
@@ -140,22 +147,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 ->selected($gibbonDepartmentID)
                 ->placeholder();
 
-        $difficultyOptions = $settingGateway->getSettingByScope('Free Learning', 'difficultyOptions');
-        $difficulties = array_map('trim', explode(',', $difficultyOptions));
-        $row = $form->addRow();
-            $row->addLabel('difficulty', __m('Difficulty'));
-            $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
-
-        $row = $form->addRow();
-            $row->addLabel('name', __m('Unit Name'));
-            $row->addTextField('name')->setValue($criteria->getSearchText());
-
         if ($canManage) {
             // Allow admins to view the map for any user
-            $row = $form->addRow();
-                $row->addLabel('showInactive', __m('Show Inactive Units?'));
-                $row->addYesNo('showInactive')->selected($showInactive);
-
             $row = $form->addRow();
                 $row->addLabel('gibbonPersonID', __m('View As'));
                 $row->addSelectUsers('gibbonPersonID', $session->get('gibbonSchoolYearID'), ['includeStudents' => true])->selected($gibbonPersonID);
@@ -175,10 +168,37 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     ->selected($gibbonPersonID);
         }
 
+        $difficultyOptions = $settingGateway->getSettingByScope('Free Learning', 'difficultyOptions');
+        $difficulties = array_map('trim', explode(',', $difficultyOptions));
+        $row = $form->addRow()->addClass('advancedOptions');
+            $row->addLabel('difficulty', __m('Difficulty'));
+            $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
+
+        $row = $form->addRow()->addClass('advancedOptions');
+            $row->addLabel('name', __m('Unit Name'));
+            $row->addTextField('name')->setValue($criteria->getSearchText());
+
+        if ($canManage) {
+            // Allow admins to view the map for any user
+            $row = $form->addRow()->addClass('advancedOptions');
+                $row->addLabel('showInactive', __m('Show Inactive Units?'));
+                $row->addYesNo('showInactive')->selected($showInactive);
+        }
+
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
+
+        // Control the show/hide for advanced options
+        echo "<script type='text/javascript'>";
+            if (!$advancedOptions) {
+                echo '$(".advancedOptions").hide();';
+            }
+            echo '$(".show_hide").click(function(){';
+            echo '$(".advancedOptions").fadeToggle(1000);';
+            echo '});';
+        echo '</script>';
 
         // QUERY
         if ($highestAction == 'Browse Units_all' && !$viewingAsUser) {

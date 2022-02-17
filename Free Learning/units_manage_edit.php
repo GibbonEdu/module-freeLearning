@@ -111,6 +111,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     ->setIcon('plus')
                     ->displayLabel()
                     ->addParams($urlParams)
+                    ->addParam('sidebar', 'y')
                     ->prepend(($back) ? ' | ' : '');
             }
 
