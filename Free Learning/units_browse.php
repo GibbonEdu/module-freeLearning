@@ -69,7 +69,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $view = 'map';
         }
 
-        $advancedOptions = (!empty($_GET['showInactive']) || !empty($_GET['difficulty']) || !empty($_GET['name'])) ? true : false;
+        $advancedOptions = ($showInactive == "Y" || !empty($_GET['difficulty']) || !empty($_GET['name'])) ? true : false;
 
         // View the current user by default
         $gibbonPersonID = $session->get('gibbonPersonID');
@@ -190,7 +190,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
         echo $form->getOutput();
 
-        // Control the show/hide for advanced options
+        // Control the show/hide for login options
         echo "<script type='text/javascript'>";
             if (!$advancedOptions) {
                 echo '$(".advancedOptions").hide();';
