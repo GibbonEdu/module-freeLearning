@@ -3,6 +3,7 @@ CHANGELOG
 v5.18.14
 --------
 Fixed left students showing up in Mentorship Overview
+Fixed multiple unit history charts on the parent view causing a javascript error
 
 v5.18.13
 --------
