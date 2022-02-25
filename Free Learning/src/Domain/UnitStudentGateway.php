@@ -215,7 +215,7 @@ class UnitStudentGateway extends QueryableGateway
             ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
 
         if (!is_null($gibbonPersonID)) {
-            $query->where("(enrolmentMethod='schoolMentor' AND mentor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID) OR (enrolmentMethod='class' AND teacher.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID)")
+            $query->where("((enrolmentMethod='schoolMentor' AND mentor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID) OR (enrolmentMethod='class' AND teacher.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID))")
                 ->bindValue('gibbonPersonID', $gibbonPersonID);
         }
 

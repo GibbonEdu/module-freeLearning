@@ -192,6 +192,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             $table->addColumn('timeSpent', __m('Time Spent'))
                 ->description(__('Minutes By Day\'s End'))
                 ->format(function ($row) use ($unitClassGateway, $gibbonCourseClassID) {
+                    if (empty($row['timestampJoined'])) return '';
+                    
                     $output = '';
                     $spent = 0;
                     $resultLessons = $unitClassGateway->selectTiming($gibbonCourseClassID, $row['timestampJoined']);

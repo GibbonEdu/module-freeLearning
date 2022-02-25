@@ -59,6 +59,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     }
 
     $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
+    $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
 
     if ($highestAction == 'Mentorship Overview_all') {
         echo "<p>".__m('This report offers a summary of all mentor activity, including enrolments by class.')."</p>";

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.14
+--------
+Fixed left students showing up in Mentorship Overview
+
 v5.18.13
 --------
 Made certain Browse Units filters hidden by default

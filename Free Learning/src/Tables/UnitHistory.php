@@ -74,7 +74,7 @@ class UnitHistory
             ++$unitStats[$unit['status']];
         }
 
-        $chart = Chart::create('unitStats', 'doughnut')
+        $chart = Chart::create('unitStats'.$gibbonPersonID, 'doughnut')
             ->setOptions([
                 'height' => 80,
                 'legend' => [
