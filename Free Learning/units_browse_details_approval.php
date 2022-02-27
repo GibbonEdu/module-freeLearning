@@ -283,7 +283,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $row->addTextField('exemplarWorkLicense')->maxLength(255)->setValue($values['exemplarWorkLicense']);
 
         $row = $form->addRow()->addClass('exemplarYes');
-            $row->addLabel('exemplarWorkEmbed', __m('Exemplar Work Embed'))->description(__m('Include embed code, otherwise link to work will be used.'));
+            $row->addLabel('exemplarWorkEmbed', __m('Exemplar Work Link or Embed'))->description(__m('Include specific link or embed code, otherwise the submitted version of the work will be used.'));
             $row->addTextField('exemplarWorkEmbed')->maxLength(255)->setValue($values['exemplarWorkEmbed']);
     }
 

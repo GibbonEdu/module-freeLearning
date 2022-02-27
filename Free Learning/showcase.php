@@ -141,7 +141,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                     }
                 } else {
                     echo '<p>';
-                    print $rowWork['exemplarWorkEmbed'] ;
+                    if (filter_var($rowWork['exemplarWorkEmbed'], FILTER_VALIDATE_URL)) {
+                        echo "<a class='button' target='_blank' href='".$rowWork['exemplarWorkEmbed']."'>".__m('Click to View Work').'</a>';
+                    } else {
+                        print $rowWork['exemplarWorkEmbed'];
+                    }
                     echo '</p>';
                 }
                 //DISPLAY STUDENT COMMENT

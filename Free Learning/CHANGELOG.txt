@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.15
+--------
+Adjusted Exemplar Work field to facilitate links as well as embeds
+
 v5.18.14
 --------
 Fixed left students showing up in Mentorship Overview
