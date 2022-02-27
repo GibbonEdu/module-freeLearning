@@ -149,7 +149,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function queryEvidencePending(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null)
+    public function queryEvidencePending(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null, $gibbonCourseClassID = null)
     {
         $query = $this
             ->newQuery()
@@ -166,6 +166,11 @@ class UnitStudentGateway extends QueryableGateway
             ->bindValue('date', date("Y-m-d"))
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
+
+        if (!empty($gibbonCourseClassID)) {
+            $query->where('freeLearningUnitStudent.gibbonCourseClassID=:gibbonCourseClassID')
+                ->bindValue('gibbonCourseClassID', $gibbonCourseClassID);
+        }
 
         if (!is_null($gibbonPersonID)) {
             $query->where('gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID')

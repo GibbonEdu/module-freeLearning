@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
+use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\IndividualNeeds\INGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
@@ -52,23 +53,32 @@ else {
     //Filter
     $allMentors = (isset($_GET['allMentors']) && $highestAction == 'Work Pending Approval_all') ? $_GET['allMentors'] : '';
     $search = $_GET['search'] ?? '';
+    $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? null;
+
+
+    $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
+    $form->setFactory(DatabaseFormFactory::create($pdo));
+    $form->setTitle(__('Filter'));
+    $form->setClass('noIntBorder fullWidth');
+
+    $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_workPendingApproval.php');
+
+    $row = $form->addRow();
+    $row->addLabel('gibbonCourseClassID', __('Class'));
+    $row->addSelectClass('gibbonCourseClassID', $session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'), ["allClasses" => ($highestAction == 'Work Pending Approval_all')])
+        ->selected($gibbonCourseClassID)
+        ->placeholder();
 
     if ($highestAction == 'Work Pending Approval_all') {
-        $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
-        $form->setTitle(__('Filter'));
-        $form->setClass('noIntBorder fullWidth');
-
-        $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_workPendingApproval.php');
-
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'))->description(__('Include evidence pending for all mentors.'));
             $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
-
-        $row = $form->addRow();
-            $row->addSearchSubmit($session, __('Clear Search'));
-
-        echo $form->getOutput();
     }
+
+    $row = $form->addRow();
+        $row->addSearchSubmit($session, __('Clear Search'));
+
+    echo $form->getOutput();
 
     //Table
     $unitGateway = $container->get(UnitGateway::class);
@@ -79,10 +89,10 @@ else {
         ->fromPOST();
 
     if (!empty($allMentors)) {
-        $journey = $unitStudentGateway->queryEvidencePending($criteria, $session->get('gibbonSchoolYearID'));
+        $journey = $unitStudentGateway->queryEvidencePending($criteria, $session->get('gibbonSchoolYearID'), null, $gibbonCourseClassID);
     }
     else {
-        $journey = $unitStudentGateway->queryEvidencePending($criteria, $session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'));
+        $journey = $unitStudentGateway->queryEvidencePending($criteria, $session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'), $gibbonCourseClassID);
     }
 
     $manageAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_all');
@@ -184,7 +194,7 @@ else {
                 if (count($personalDescriptors) > 0) {
                     $output .= Format::tag(__('Individual Needs'), 'message mt-1');
                 }
-    
+
             }
 
             return $output;
