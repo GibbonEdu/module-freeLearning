@@ -204,7 +204,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     }
 
                     //Update blocks
-                    $order = $_POST['order'] ?? '';
+                    $order = $_POST['order'] ?? [];
                     $sequenceNumber = 0;
                     $dataRemove = array();
                     $whereRemove = '';

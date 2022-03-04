@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.17
+--------
+Fixed the chart.js library in the Learning Activity page
+
 v5.18.16
 --------
 Added Class filter to  Work Pending Approval report

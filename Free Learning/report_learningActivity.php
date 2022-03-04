@@ -87,12 +87,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
         } else {
             $rows = $result->fetchAll();
 
-            // CREATE LEGEND
-            $templateView = new View($container->get('twig'));
-            echo $templateView->fetchFromTemplate('activityLegend.twig.html');
-
             // PLOT DATA
-            echo '<script type="text/javascript" src="'.$session->get('absoluteURL').'/lib/Chart.js/Chart.min.js"></script>';
+            echo '<script type="text/javascript" src="'.$session->get('absoluteURL').'/lib/Chart.js/3.0/chart.min.js"></script>';
             echo "<p style='margin-top: 20px; margin-bottom: 5px'><b>".__('Data').'</b></p>';
             echo '<div style="width:100%">';
             echo '<div>';
@@ -170,12 +166,13 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                     datasets : [
                         {
                             label: "Units Joined",
-                            fillColor : "rgba(253, 226, 255, 0.5)",
-                            strokeColor : "rgba(169, 60, 179,1)",
+                            backgroundColor : "rgba(253, 226, 255, 0.5)",
+                            borderColor : "rgba(169, 60, 179,1)",
+                            hoverBorderColor : "rgba(169, 60, 179,1)",
                             pointColor : "rgba(169, 60, 179,1)",
-                            pointStrokeColor : "#fff",
-                            pointHighlightFill : "#fff",
-                            pointHighlightStroke : "rgba(169, 60, 179,1)",
+                            pointBorderColor : "rgba(169, 60, 179,1)",
+                            pointBackgroundColor : "rgba(169, 60, 179,1)",
+                            lineTension: 0.3,
                             data : [
                                 <?php
                                 $data = '';
@@ -194,12 +191,13 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                         },
                         {
                             label: "Units Approved",
-                            fillColor : "rgba(198, 246, 213,0.5",
-                            strokeColor : "rgba(47, 133, 90,1)",
+                            backgroundColor : "rgba(198, 246, 213,0.5",
+                            borderColor : "rgba(47, 133, 90,1)",
+                            hoverBorderColor : "rgba(47, 133, 90,1)",
                             pointColor : "rgba(47, 133, 90,1)",
-                            pointStrokeColor : "#fff",
-                            pointHighlightFill : "#fff",
-                            pointHighlightStroke : "rgba(47, 133, 90,1)",
+                            pointBorderColor : "rgba(47, 133, 90,1)",
+                            pointBackgroundColor : "rgba(47, 133, 90,1)",
+                            lineTension: 0.3,
                             data : [
                                 <?php
                                 $data = '';
@@ -221,8 +219,19 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 
                 window.onload = function(){
                     var ctx = document.getElementById("canvas").getContext("2d");
-                    window.myLine = new Chart(ctx).Line(lineChartData, {
-                        responsive: true
+                    window.myLine = new Chart(ctx, {
+                        type: 'line',
+                        data: lineChartData,
+                        options: {
+                            responsive: true,
+                            spanGaps: true,
+                            showTooltips: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                }
+                            }
+                        }
                     });
                 }
             </script>

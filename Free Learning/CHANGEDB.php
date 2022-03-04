@@ -1883,3 +1883,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.18.16';
 $sql[$count][1] = "";
+
+//v5.18.17
+++$count;
+$sql[$count][0] = '5.18.17';
+$sql[$count][1] = "";
