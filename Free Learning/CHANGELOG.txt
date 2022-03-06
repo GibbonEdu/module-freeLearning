@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.18
+--------
+Added School Year filter to both Unit History by Student and My Unit History
+
 v5.18.17
 --------
 Fixed the chart.js library in the Learning Activity page

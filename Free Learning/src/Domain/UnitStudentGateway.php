@@ -95,7 +95,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function queryUnitsByStudent(QueryCriteria $criteria, $gibbonPersonID)
+    public function queryUnitsByStudent(QueryCriteria $criteria, $gibbonPersonID, $gibbonSchoolYearID = null)
     {
         $query = $this
             ->newQuery()
@@ -132,6 +132,11 @@ class UnitStudentGateway extends QueryableGateway
             ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
             ->bindValue('today', date('Y-m-d'))
             ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
+
+        if (!empty($gibbonSchoolYearID)) {
+            $query->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+                ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
+        }
 
         $criteria->addFilterRules([
             'department' => function ($query, $department) {
