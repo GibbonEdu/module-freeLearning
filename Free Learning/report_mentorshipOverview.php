@@ -270,7 +270,12 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         ->format(Format::using('relativeTime', 'timestamp'));
 
     $table->addColumn('waitInDays', __('Wait Time'))
-        ->description(__m('In Days'));
+        ->description(__m('In Days'))
+        ->format(function($values) {
+            if ($values['status'] == "Complete - Approved") {
+                return $values['waitInDays'];
+            }
+        });
 
 
     // ACTIONS
