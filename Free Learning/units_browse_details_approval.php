@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
+use Gibbon\View\View;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
@@ -177,6 +178,36 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             : '';
         return $item;
     }, $logs);
+
+    // Show unit content
+    echo '<h3>';
+        echo __m('Unit Content');
+    echo '</h3>';
+
+    $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
+    $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
+    $blocks = $pdo->select($sqlBlocks, $dataBlocks)->fetchAll();
+
+    if (empty($blocks)) {
+        echo Format::alert(__('There are no records to display.'));
+    } else {
+        $templateView = $container->get(View::class);
+        $resourceContents = '';
+
+        $blockCount = 0;
+        foreach ($blocks as $block) {
+            echo $templateView->fetchFromTemplate('unitBlockCollapsed.twig.html', $block + [
+                'roleCategory' => 'Staff',
+                'gibbonPersonID' => $session->get('username') ?? '',
+                'blockCount' => $blockCount,
+                'freeLearningUnitBlockID' => $block["freeLearningUnitBlockID"],
+                'absoluteURL' => $session->get('absoluteURL'),
+                'gibbonThemeName' => $session->get('gibbonThemeName') ?? 'Default',
+            ]);
+            $resourceContents .= $block['contents'];
+            $blockCount++;
+        }
+    }
 
     $form->addRow()->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
         'title' => __('Comments'),

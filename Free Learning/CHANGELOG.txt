@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.18.20
+--------
+Added collapsible Smart Blocks to display unit content in class and mentor feedback views
+
 v5.18.19
 --------
 Removed spurious negative wait times in Mentorship Overview

@@ -84,7 +84,6 @@ if (!$block) {
 
             $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
             $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
-
             $blocks = $pdo->select($sqlBlocks, $dataBlocks)->fetchAll();
 
             if (empty($blocks)) {
@@ -95,16 +94,18 @@ if (!$block) {
 
                 $blockCount = 0;
                 foreach ($blocks as $block) {
-                    echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
+                    echo $templateView->fetchFromTemplate('unitBlockCollapsed.twig.html', $block + [
                         'roleCategory' => 'Staff',
                         'gibbonPersonID' => $session->get('username') ?? '',
-                        'blockCount' => $blockCount
+                        'blockCount' => $blockCount,
+                        'freeLearningUnitBlockID' => $block["freeLearningUnitBlockID"],
+                        'absoluteURL' => $session->get('absoluteURL'),
+                        'gibbonThemeName' => $session->get('gibbonThemeName') ?? 'Default',
                     ]);
                     $resourceContents .= $block['contents'];
                     $blockCount++;
                 }
             }
-
 
             // FORM
             $form = Form::create('approval', $session->get('absoluteURL').'/modules/Free Learning/units_mentor_approvalProcess.php');
