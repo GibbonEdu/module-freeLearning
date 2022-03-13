@@ -65,7 +65,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $data = array('freeLearningUnitID' => $freeLearningUnitID);
                 $sql = "SELECT
                             *,
-                            GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
+                            GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
                         FROM
                             freeLearningUnit
                             LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
@@ -75,7 +75,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
                 $sql = "SELECT DISTINCT
                             freeLearningUnit.*,
-                            GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
+                            GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
                         FROM
                             freeLearningUnit
                         JOIN

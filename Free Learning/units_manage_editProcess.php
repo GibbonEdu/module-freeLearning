@@ -224,12 +224,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                 }
 
                                 $length = isset($_POST["length$i"]) ? intval(trim($_POST["length$i"])) : null;
-                                $contents = trim($_POST["contents$i"]);
+                                $contents = !empty($_POST["contents$i"]) ? trim($_POST["contents$i"]) : '';
 
                                 // Remove the <![CDATA that TinyMCE adds to script tags
                                 $contents = str_replace(["// <![CDATA[", "// ]]>"], ['', ''], $contents);
 
-                                $teachersNotes = $_POST["teachersNotes$i"];
+                                $teachersNotes = $_POST["teachersNotes$i"] ?? '';
                                 $freeLearningUnitBlockID = @$_POST["freeLearningUnitBlockID$i"];
 
                                 if ($freeLearningUnitBlockID != '') {

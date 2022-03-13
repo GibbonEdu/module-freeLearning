@@ -193,14 +193,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                     $dataRecommend['gibbonPersonID'] = $gibbonPersonID;
                     $dataRecommend['gibbonPersonID2'] = $gibbonPersonID;
                     $dataRecommend['gibbonSchoolYearID'] = $session->get('gibbonSchoolYearID');
-                    $sqlRecommend = "SELECT DISTINCT freeLearningUnitStudent.status, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
+                    $sqlRecommend = "SELECT DISTINCT freeLearningUnitStudent.status, GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, freeLearningUnit.freeLearningUnitID, freeLearningUnit.*, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
                         FROM freeLearningUnit
+                        LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                         JOIN freeLearningUnitOutcome ON (freeLearningUnitOutcome.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                         LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
                         LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID)
                         JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
                         JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
                         WHERE $outcomesNotMetWhere AND (status IS NULL OR NOT status='Current') AND active='Y' AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber)
+                        GROUP BY freeLearningUnit.freeLearningUnitID
                         ORDER BY RAND() LIMIT 0, 3";
                     $resultRecommend = $connection2->prepare($sqlRecommend);
                     $resultRecommend->execute($dataRecommend);
@@ -256,8 +258,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
                         }
                         ++$count;
 
-                            //COLOR ROW BY STATUS!
-                            echo "<tr class=$rowNum>";
+                        //COLOR ROW BY STATUS!
+                        echo "<tr class=$rowNum>";
                         echo "<td style='text-align: center; font-size: 125%'>";
                         echo $rowRecommend['status'];
                         echo "<div style='font-weight: bold; margin-top: 5px; margin-bottom: -6px ;'>".$rowRecommend['name'].'</div><br/>';

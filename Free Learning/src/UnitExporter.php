@@ -58,7 +58,7 @@ class UnitExporter
 
     public function addUnitToExport($freeLearningUnitID)
     {
-        $unit = $this->unitGateway->getUnitByID($freeLearningUnitID);
+        $unit = $this->unitGateway->getByID($freeLearningUnitID);
 
         if (empty($unit)) return;
 
@@ -117,7 +117,7 @@ class UnitExporter
         $this->data['units'][] = [
             'name' => $unit['name'],
             'unit' => $unit,
-            'prerequisites' => $this->unitGateway->selectPrerequisiteNamesByIDs($unit['freeLearningUnitIDPrerequisiteList'])->fetchAll(\PDO::FETCH_COLUMN),
+            'prerequisites' => $this->unitGateway->selectPrerequisiteNamesByUnitID($unit['freeLearningUnitID'])->fetchAll(\PDO::FETCH_COLUMN),
             'blocks' => $blocks,
             'authors' => $this->unitAuthorGateway->selectAuthorsByUnit($freeLearningUnitID)->fetchAll(),
         ];

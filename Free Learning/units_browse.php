@@ -50,7 +50,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         //UPDATE CODE FOR v5.19.00 - Populate new table if freeLearningUnitIDPrerequisiteList still exists and if module updater
-        if (isActionAccessible($guid, $connection2, '/modules/System Admin/module_manage_update.php')) {
+        if ($roleCategory == "Staff" && isActionAccessible($guid, $connection2, '/modules/System Admin/module_manage_update.php')) {
             $sql = "SHOW COLUMNS FROM freeLearningUnit LIKE 'freeLearningUnitIDPrerequisiteList'";
             $exists = ($connection2->query($sql)->rowCount() > 0) ? true : false ;
 

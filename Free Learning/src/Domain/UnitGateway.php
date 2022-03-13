@@ -42,7 +42,7 @@ class UnitGateway extends QueryableGateway
             ->distinct()
             ->from($this->getTableName())
             ->cols($countOnly ? ['COUNT(DISTINCT freeLearningUnit.freeLearningUnitID) as count'] :
-            ['freeLearningUnit.*', "GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList", "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
+            ['freeLearningUnit.*', "GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList", "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
                 "(SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length",
                 "FIND_IN_SET(freeLearningUnit.difficulty, :difficultyOptions) as difficultyOrder"])
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
@@ -83,7 +83,7 @@ class UnitGateway extends QueryableGateway
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList", "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
+            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList", "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea", 'freeLearningUnitStudent.status',
                 "(SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length",
                 "FIND_IN_SET(freeLearningUnit.difficulty, :difficultyOptions) as difficultyOrder"])
             ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
@@ -155,37 +155,16 @@ class UnitGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function getUnitByID($freeLearningUnitID) {
-        $data = ['freeLearningUnitID' => $freeLearningUnitID];
-        $sql = "SELECT
-                    freeLearningUnit.*,
-                    GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList,
-                    GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea,
-                    (SELECT SUM(freeLearningUnitBlock.length) FROM freeLearningUnitBlock WHERE freeLearningUnitBlock.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) as length
-                FROM
-                    freeLearningUnit
-                    LEFT JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%'))
-                    LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                WHERE
-                    freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
-
-        return $this->db()->select($sql, $data)->fetch();
-    }
-
-    public function selectPrerequisiteNamesByIDs($freeLearningUnitIDPrerequisiteList)
+    public function selectPrerequisiteNamesByUnitID($freeLearningUnitID)
     {
-        $freeLearningUnitIDPrerequisiteList = is_array($freeLearningUnitIDPrerequisiteList) ? implode(',', $freeLearningUnitIDPrerequisiteList) : $freeLearningUnitIDPrerequisiteList;
-
-        $data = ['freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList];
+        $data = ['freeLearningUnitID' => $freeLearningUnitID];
         $sql = "SELECT
                 name
             FROM
                 freeLearningUnitPrerequisite
                 JOIN freeLearningUnit ON (freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite=freeLearningUnit.freeLearningUnitID)
             WHERE
-                FIND_IN_SET(freeLearningUnitIDPrerequisite, :freeLearningUnitIDPrerequisiteList)
-            ORDER BY
-                FIND_IN_SET(freeLearningUnitIDPrerequisite, :freeLearningUnitIDPrerequisiteList)";
+                freeLearningUnitPrerequisite.freeLearningUnitID=:freeLearningUnitID";
 
         return $this->db()->select($sql, $data);
     }

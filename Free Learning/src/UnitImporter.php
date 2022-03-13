@@ -231,13 +231,14 @@ class UnitImporter
 
             $existingUnit = $this->unitGateway->selectBy(['name' => $unit['name']])->fetch();
 
-            $prerequisiteList = $this->unitGateway->selectPrerequisiteIDsByNames($unit['prerequisites'])->fetchAll(\PDO::FETCH_COLUMN);
-            foreach ($prerequisiteList as $prerequisite) {
-                //NOT WORKING! NEED TO DETERMINE WHEN TO INSERT/UPDATE/REMOVE
-                $this->unitPrerequisiteGateway->insert($existingUnit['freeLearningUnitID'], $prerequisite['freeLearningUnitIDPrerequisite']);
+            // Remove prerequisites for this unit
+            if (!empty($existingUnit)) {
+                $this->unitPrerequisiteGateway->deleteWhere(['freeLearningUnitID' => $existingUnit['freeLearningUnitID']]);
+            }
 
-
-
+            foreach ($unit['prerequisites'] as $prerequisite) {
+                $freeLearningUnitIDPrerequisite = $this->unitGateway->selectBy(['name' => $prerequisite])->fetch()['freeLearningUnitID'];
+                $this->unitPrerequisiteGateway->insert(['freeLearningUnitID' => $existingUnit['freeLearningUnitID'], 'freeLearningUnitIDPrerequisite' => $freeLearningUnitIDPrerequisite]);
             }
         }
     }
