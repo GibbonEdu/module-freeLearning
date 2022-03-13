@@ -1908,3 +1908,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.19.00';
 $sql[$count][1] = "CREATE TABLE `freeLearningUnitPrerequisite` (`freeLearningUnitPrerequisiteID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT, `freeLearningUnitID` int(10) unsigned zerofill NOT NULL, `freeLearningUnitIDPrerequisite` int(10) unsigned zerofill NOT NULL, PRIMARY KEY (`freeLearningUnitPrerequisiteID`), KEY `prerequisite` (`freeLearningUnitID`, `freeLearningUnitIDPrerequisite`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;end";
+
+//v5.19.01
+++$count;
+$sql[$count][0] = '5.19.01';
+$sql[$count][1] = "";

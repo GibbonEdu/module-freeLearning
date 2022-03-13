@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.01
+--------
+Installer fix
+
 v5.19.00
 --------
 Normalised prerequisites in database
