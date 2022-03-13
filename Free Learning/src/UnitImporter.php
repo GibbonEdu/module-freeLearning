@@ -26,6 +26,7 @@ use Gibbon\Domain\School\YearGroupGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitPrerequisiteGateway;
 
 class UnitImporter
 {
@@ -39,15 +40,17 @@ class UnitImporter
     protected $unitGateway;
     protected $unitBlockGateway;
     protected $unitAuthorGateway;
+    protected $unitPrerequisiteGateway;
     protected $yearGroupGateway;
     protected $roleGateway;
     protected $session;
 
-    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, YearGroupGateway $yearGroupGateway, Session $session, RoleGateway $roleGateway)
+    public function __construct(UnitGateway $unitGateway, UnitBlockGateway $unitBlockGateway, UnitAuthorGateway $unitAuthorGateway, UnitPrerequisiteGateway $unitPrerequisiteGateway, YearGroupGateway $yearGroupGateway, Session $session, RoleGateway $roleGateway)
     {
         $this->unitGateway = $unitGateway;
         $this->unitBlockGateway = $unitBlockGateway;
         $this->unitAuthorGateway = $unitAuthorGateway;
+        $this->unitPrerequisiteGateway = $unitPrerequisiteGateway;
         $this->yearGroupGateway = $yearGroupGateway;
         $this->roleGateway = $roleGateway;
         $this->session = $session;
@@ -136,7 +139,6 @@ class UnitImporter
     protected function updateUnitDetails($unit) {
         // Reset un-importable values
         $unit['unit']['gibbonPersonIDCreator'] = $this->session->get('gibbonPersonID');
-        $unit['unit']['freeLearningUnitIDPrerequisiteList'] = '';
 
         // Apply default values
         if (!empty($this->gibbonDepartmentIDList)) $unit['unit']['gibbonDepartmentIDList'] = $this->gibbonDepartmentIDList;
@@ -230,7 +232,13 @@ class UnitImporter
             $existingUnit = $this->unitGateway->selectBy(['name' => $unit['name']])->fetch();
 
             $prerequisiteList = $this->unitGateway->selectPrerequisiteIDsByNames($unit['prerequisites'])->fetchAll(\PDO::FETCH_COLUMN);
-            $this->unitGateway->update($existingUnit['freeLearningUnitID'], ['freeLearningUnitIDPrerequisiteList' => implode(',', $prerequisiteList)]);
+            foreach ($prerequisiteList as $prerequisite) {
+                //NOT WORKING! NEED TO DETERMINE WHEN TO INSERT/UPDATE/REMOVE
+                $this->unitPrerequisiteGateway->insert($existingUnit['freeLearningUnitID'], $prerequisite['freeLearningUnitIDPrerequisite']);
+
+
+
+            }
         }
     }
 }

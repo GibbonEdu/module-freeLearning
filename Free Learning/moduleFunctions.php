@@ -78,40 +78,42 @@ function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highe
 
     //Do it!
     if ($publicUnits == 'Y' and !$session->has('username')) {
-        $sql = "SELECT DISTINCT freeLearningUnit.*, NULL AS status FROM freeLearningUnit WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere ORDER BY $difficultyOrder name";
+        $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, NULL AS status FROM freeLearningUnit LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID WHERE sharedPublic='Y' AND gibbonYearGroupIDMinimum IS NULL AND active='Y' $sqlWhere GROUP BY freeLearningUnit.freeLearningUnitID ORDER BY $difficultyOrder name";
     } else {
         if ($highestAction == 'Browse Units_all') {
             $data['gibbonPersonID'] = $gibbonPersonID;
             if ($showInactive == 'Y') {
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere ORDER BY $difficultyOrder name";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE (active='Y' OR active='N') $sqlWhere GROUP BY freeLearningUnit.freeLearningUnitID ORDER BY $difficultyOrder name";
             } else {
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere ORDER BY $difficultyOrder name";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' $sqlWhere GROUP BY freeLearningUnit.freeLearningUnitID ORDER BY $difficultyOrder name";
             }
         } elseif ($highestAction == 'Browse Units_prerequisites') {
             if ($roleCategory == 'Student') {
                 $data['gibbonPersonID'] =$session->get('gibbonPersonID');
                 $data['gibbonPersonID2'] = $session->get('gibbonPersonID');
                 $data['gibbonSchoolYearID'] = $session->get('gibbonSchoolYearID');
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, freeLearningUnitStudent.status, gibbonYearGroup.sequenceNumber AS sn1, gibbonYearGroup2.sequenceNumber AS sn2
                 FROM freeLearningUnit
+                LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID
                 LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID2)
                 LEFT JOIN gibbonYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=gibbonYearGroup.gibbonYearGroupID)
                 LEFT JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
                 LEFT JOIN gibbonYearGroup AS gibbonYearGroup2 ON (gibbonStudentEnrolment.gibbonYearGroupID=gibbonYearGroup2.gibbonYearGroupID)
                 WHERE active='Y' AND availableStudents='Y' $sqlWhere AND (gibbonYearGroup.sequenceNumber IS NULL OR gibbonYearGroup.sequenceNumber<=gibbonYearGroup2.sequenceNumber)
+                GROUP BY freeLearningUnit.freeLearningUnitID
                 ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Parent') {
                 $data['gibbonPersonID'] = $session->get('gibbonPersonID');
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableParents='Y' $sqlWhere ORDER BY $difficultyOrder name";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableParents='Y' $sqlWhere GROUP BY freeLearningUnit.freeLearningUnitID ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Staff') {
                 $data['gibbonPersonID'] = $session->get('gibbonPersonID');
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableStaff='Y' $sqlWhere ORDER BY $difficultyOrder name";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableStaff='Y' $sqlWhere GROUP BY freeLearningUnit.freeLearningUnitID ORDER BY $difficultyOrder name";
             }
             else if ($roleCategory == 'Other') {
                 $data['gibbonPersonID'] = $session->get('gibbonPersonID');
-                $sql = "SELECT DISTINCT freeLearningUnit.*, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableOther='Y' $sqlWhere ORDER BY $difficultyOrder name";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList, freeLearningUnitStudent.status FROM freeLearningUnit LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID) WHERE active='Y' AND availableOther='Y' $sqlWhere GROUP BY freeLearningUnit.freeLearningUnitID ORDER BY $difficultyOrder name";
             }
         }
     }

@@ -25,12 +25,12 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.18.20';
+$version = '5.19.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org/free-learning';
 
 //Module tables
-$moduleTables[0] = "CREATE TABLE `freeLearningUnit` (
+$moduleTables[] = "CREATE TABLE `freeLearningUnit` (
 `freeLearningUnitID` int(10) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `gibbonDepartmentIDList` text,
   `course` VARCHAR(50) NULL DEFAULT NULL,
@@ -49,7 +49,6 @@ $moduleTables[0] = "CREATE TABLE `freeLearningUnit` (
   `availableParents` enum('Y','N') NOT NULL DEFAULT 'Y',
   `availableOther` enum('Y','N') NOT NULL DEFAULT 'N',
   `sharedPublic` enum('Y','N') DEFAULT NULL,
-  `freeLearningUnitIDPrerequisiteList` text,
   `schoolMentorCompletors` enum('N','Y') DEFAULT NULL,
   `schoolMentorCustom` text,
   `schoolMentorCustomRole` int(3) unsigned zerofill NULL DEFAULT NULL,
@@ -59,7 +58,15 @@ $moduleTables[0] = "CREATE TABLE `freeLearningUnit` (
   PRIMARY KEY (`freeLearningUnitID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
-$moduleTables[1] = 'CREATE TABLE `freeLearningUnitBlock` (
+$moduleTables[] = 'CREATE TABLE `freeLearningUnitPrerequisite` (
+`freeLearningUnitPrerequisiteID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
+  `freeLearningUnitIDPrerequisite` int(10) unsigned zerofill NOT NULL,
+  PRIMARY KEY (`freeLearningUnitPrerequisiteID`),
+  KEY `prerequisite` (`freeLearningUnitID`, `freeLearningUnitIDPrerequisite`)freeLearningUnitIDPrerequisite
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+
+$moduleTables[] = 'CREATE TABLE `freeLearningUnitBlock` (
 `freeLearningUnitBlockID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
   `title` varchar(100) NOT NULL,
@@ -73,7 +80,7 @@ $moduleTables[1] = 'CREATE TABLE `freeLearningUnitBlock` (
   KEY `freeLearningUnitID` (`freeLearningUnitID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-$moduleTables[2] = 'CREATE TABLE `freeLearningUnitOutcome` (
+$moduleTables[] = 'CREATE TABLE `freeLearningUnitOutcome` (
 `freeLearningUnitOutcomeID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
   `gibbonOutcomeID` int(8) unsigned zerofill NOT NULL,
@@ -82,7 +89,7 @@ $moduleTables[2] = 'CREATE TABLE `freeLearningUnitOutcome` (
   PRIMARY KEY (`freeLearningUnitOutcomeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-$moduleTables[3] = 'CREATE TABLE `freeLearningUnitAuthor` (
+$moduleTables[] = 'CREATE TABLE `freeLearningUnitAuthor` (
 `freeLearningUnitAuthorID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
   `gibbonPersonID` int(8) unsigned zerofill DEFAULT NULL,
@@ -93,7 +100,7 @@ $moduleTables[3] = 'CREATE TABLE `freeLearningUnitAuthor` (
   KEY `gibbonPersonID` (`gibbonPersonID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-$moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
+$moduleTables[] = "CREATE TABLE `freeLearningUnitStudent` (
 `freeLearningUnitStudentID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `gibbonPersonIDStudent` int(10) unsigned zerofill DEFAULT NULL,
   `freeLearningUnitID` int(10) unsigned zerofill NOT NULL,
@@ -124,7 +131,7 @@ $moduleTables[4] = "CREATE TABLE `freeLearningUnitStudent` (
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
-$moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
+$moduleTables[] = "CREATE TABLE `freeLearningBadge` (
   `freeLearningBadgeID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `badgesBadgeID` int(8) unsigned zerofill NOT NULL,
   `active` enum('Y','N') NOT NULL DEFAULT 'Y',
@@ -138,7 +145,7 @@ $moduleTables[5] = "CREATE TABLE `freeLearningBadge` (
   PRIMARY KEY (`freeLearningBadgeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
-$moduleTables[6] = "CREATE TABLE `freeLearningMentorGroup` (
+$moduleTables[] = "CREATE TABLE `freeLearningMentorGroup` (
     `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT ,
     `name` VARCHAR(100) NOT NULL ,
     `assignment` ENUM('Manual','Automatic') NOT NULL DEFAULT 'Manual',
@@ -148,7 +155,7 @@ $moduleTables[6] = "CREATE TABLE `freeLearningMentorGroup` (
     UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
-$moduleTables[7] = "CREATE TABLE `freeLearningMentorGroupPerson` (
+$moduleTables[] = "CREATE TABLE `freeLearningMentorGroupPerson` (
     `freeLearningMentorGroupPersonID` INT(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT ,
     `freeLearningMentorGroupID` INT(10) UNSIGNED ZEROFILL NOT NULL ,
     `gibbonPersonID` INT(10) UNSIGNED ZEROFILL NOT NULL ,

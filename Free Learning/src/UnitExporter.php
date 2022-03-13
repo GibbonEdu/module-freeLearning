@@ -58,7 +58,7 @@ class UnitExporter
 
     public function addUnitToExport($freeLearningUnitID)
     {
-        $unit = $this->unitGateway->getByID($freeLearningUnitID);
+        $unit = $this->unitGateway->getUnitByID($freeLearningUnitID);
 
         if (empty($unit)) return;
 

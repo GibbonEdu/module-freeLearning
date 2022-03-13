@@ -58,7 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $editLock = $_POST['editLock'] ?? 'N';
             $gibbonYearGroupIDMinimum = !empty($_POST['gibbonYearGroupIDMinimum']) ? $_POST['gibbonYearGroupIDMinimum'] : null;
             $grouping = (!empty($_POST['grouping']) && is_array($_POST['grouping'])) ? implode(",", $_POST['grouping']) : '';
-            $freeLearningUnitIDPrerequisiteList = (!empty($_POST['freeLearningUnitIDPrerequisiteList']) && is_array($_POST['freeLearningUnitIDPrerequisiteList'])) ? implode(",", $_POST['freeLearningUnitIDPrerequisiteList']) : null;
+            $freeLearningUnitIDPrerequisiteList = (!empty($_POST['freeLearningUnitIDPrerequisiteList']) && is_array($_POST['freeLearningUnitIDPrerequisiteList'])) ? $_POST['freeLearningUnitIDPrerequisiteList'] : [];
             $outline = $_POST['outline'];
             $schoolMentorCompletors = $_POST['schoolMentorCompletors'] ?? null;
             $schoolMentorCustom = (!empty($_POST['schoolMentorCustom']) && is_array($_POST['schoolMentorCustom'])) ? implode(",", $_POST['schoolMentorCustom']) : null;
@@ -133,9 +133,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
                     //Write to database
                     try {
-                        $data = array('name' => $name, 'course' => $course, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'editLock' => $editLock, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'freeLearningUnitIDPrerequisiteList' => $freeLearningUnitIDPrerequisiteList, 'schoolMentorCompletors' => $schoolMentorCompletors, 'schoolMentorCustom' => $schoolMentorCustom, 'schoolMentorCustomRole'
+                        $data = array('name' => $name, 'course' => $course, 'logo' => $attachment, 'difficulty' => $difficulty, 'blurb' => $blurb, 'license' => $license, 'availableStudents'=>$availableStudents, 'availableStaff'=>$availableStaff, 'availableParents'=>$availableParents, 'availableOther' => $availableOther, 'sharedPublic' => $sharedPublic, 'active' => $active, 'editLock' => $editLock, 'gibbonYearGroupIDMinimum' => $gibbonYearGroupIDMinimum, 'grouping' => $grouping, 'gibbonDepartmentIDList' => $gibbonDepartmentIDList, 'schoolMentorCompletors' => $schoolMentorCompletors, 'schoolMentorCustom' => $schoolMentorCustom, 'schoolMentorCustomRole'
                          => $schoolMentorCustomRole, 'outline' => $outline, 'studentReflectionText' => $studentReflectionText, 'freeLearningUnitID' => $freeLearningUnitID);
-                        $sql = 'UPDATE freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, editLock=:editLock, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, `grouping`=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, freeLearningUnitIDPrerequisiteList=:freeLearningUnitIDPrerequisiteList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline, studentReflectionText=:studentReflectionText WHERE freeLearningUnitID=:freeLearningUnitID';
+                        $sql = 'UPDATE freeLearningUnit SET name=:name, course=:course, logo=:logo, difficulty=:difficulty, blurb=:blurb, license=:license, availableStudents=:availableStudents, availableStaff=:availableStaff, availableParents=:availableParents, availableOther=:availableOther, sharedPublic=:sharedPublic, active=:active, editLock=:editLock, gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum, `grouping`=:grouping, gibbonDepartmentIDList=:gibbonDepartmentIDList, schoolMentorCompletors=:schoolMentorCompletors, schoolMentorCustom=:schoolMentorCustom, schoolMentorCustomRole=:schoolMentorCustomRole, outline=:outline, studentReflectionText=:studentReflectionText WHERE freeLearningUnitID=:freeLearningUnitID';
                         $result = $connection2->prepare($sql);
                         $result->execute($data);
                     } catch (PDOException $e) {
@@ -193,7 +193,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                                             $resultInsert = $connection2->prepare($sqlInsert);
                                             $resultInsert->execute($dataInsert);
                                         } catch (PDOException $e) {
-                                            echo $e;
                                             $partialFail = true;
                                         }
                                     }
@@ -272,6 +271,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         } catch (PDOException $e) {
                             $partialFail = true;
                         }
+                    }
+
+                    //Delete prerequisites
+                    try {
+                        $dataDelete = array('freeLearningUnitID' => $freeLearningUnitID);
+                        $sqlDelete = 'DELETE FROM freeLearningUnitPrerequisite WHERE freeLearningUnitID=:freeLearningUnitID';
+                        $resultDelete = $connection2->prepare($sqlDelete);
+                        $resultDelete->execute($dataDelete);
+                    } catch (PDOException $e) {
+                        $partialFail = true;
+                    }
+                    //Insert prerequisites
+                    foreach ($freeLearningUnitIDPrerequisiteList as $prerequisite) {
+                        $dataPrerequisite = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitIDPrerequisite' => $prerequisite);
+                        $sqlPrerequisite = 'INSERT INTO freeLearningUnitPrerequisite SET freeLearningUnitID=:freeLearningUnitID, freeLearningUnitIDPrerequisite=:freeLearningUnitIDPrerequisite';
+                        $inserted = $pdo->insert($sqlPrerequisite, $dataPrerequisite);
+                        $partialFail &= !$inserted;
                     }
 
                     if ($partialFail) {

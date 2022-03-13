@@ -63,10 +63,29 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         try {
             if ($highestAction == 'Manage Units_all') {
                 $data = array('freeLearningUnitID' => $freeLearningUnitID);
-                $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
+                $sql = "SELECT
+                            *,
+                            GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
+                        FROM
+                            freeLearningUnit
+                            LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                        WHERE
+                            freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
             } elseif ($highestAction == 'Manage Units_learningAreas') {
                 $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
-                $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID ORDER BY difficulty, name";
+                $sql = "SELECT DISTINCT
+                            freeLearningUnit.*,
+                            GROUP_CONCAT(freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
+                        FROM
+                            freeLearningUnit
+                        JOIN
+                            gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%'))
+                            LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                            JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
+                        WHERE
+                            gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID
+                            AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')
+                            AND freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
             }
             $result = $connection2->prepare($sql);
             $result->execute($data);

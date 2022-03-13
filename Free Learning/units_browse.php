@@ -49,6 +49,34 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
+        //UPDATE CODE FOR v5.19.00 - Populate new table if freeLearningUnitIDPrerequisiteList still exists and if module updater
+        if (isActionAccessible($guid, $connection2, '/modules/System Admin/module_manage_update.php')) {
+            $sql = "SHOW COLUMNS FROM freeLearningUnit LIKE 'freeLearningUnitIDPrerequisiteList'";
+            $exists = ($connection2->query($sql)->rowCount() > 0) ? true : false ;
+
+            if ($exists) {
+                $sql = "SELECT freeLearningUnitID, freeLearningUnitIDPrerequisiteList FROM freeLearningUnit";
+                $units = $connection2->query($sql)->fetchAll();
+
+                foreach ($units AS $unit) {
+                    if (!empty($unit['freeLearningUnitIDPrerequisiteList'])) {
+                        $prerequisites = explode(",", $unit['freeLearningUnitIDPrerequisiteList']);
+
+                        foreach ($prerequisites AS $prerequisite) {
+                            $data = ['freeLearningUnitID' => $unit['freeLearningUnitID'], 'freeLearningUnitIDPrerequisite' => $prerequisite];
+                            $sql = "INSERT INTO freeLearningUnitPrerequisite SET freeLearningUnitID=:freeLearningUnitID, freeLearningUnitIDPrerequisite=:freeLearningUnitIDPrerequisite";
+                            $result = $connection2->prepare($sql);
+                            $result->execute($data);
+                        }
+                    }
+                }
+
+                $sql = "ALTER TABLE freeLearningUnit DROP COLUMN freeLearningUnitIDPrerequisiteList";
+                $connection2->query($sql) ;
+            }
+        }
+
+
         // Breadcrumbs
         $page->breadcrumbs->add(__m('Browse Units'));
 
@@ -211,8 +239,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             $page->addMessage(__('There are too many units to display: please filter by Learning Area & Course.'));
         }
         else {
-
-
             // Join a set of author data per unit
             $unitAuthors = $unitGateway->selectUnitAuthors()->fetchGrouped();
             $units->joinColumn('freeLearningUnitID', 'authors', $unitAuthors);

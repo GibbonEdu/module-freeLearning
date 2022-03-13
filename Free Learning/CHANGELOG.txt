@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.00
+--------
+Normalised prerequisites in database
+
 v5.18.20
 --------
 Added collapsible Smart Blocks to display unit content in class and mentor feedback views

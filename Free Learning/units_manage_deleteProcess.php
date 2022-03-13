@@ -95,6 +95,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 exit();
             }
 
+            try {
+                $data = array('freeLearningUnitID' => $freeLearningUnitID);
+                $sql = 'DELETE FROM freeLearningUnitPrerequisite WHERE freeLearningUnitID=:freeLearningUnitID';
+                $result = $connection2->prepare($sql);
+                $result->execute($data);
+            } catch (PDOException $e) {
+                //Fail 2
+                $URL .= '&return=error2';
+                header("Location: {$URL}");
+                exit();
+            }
+
             //Success 0
             $URLDelete = $URLDelete.'&return=success0';
             header("Location: {$URLDelete}");
