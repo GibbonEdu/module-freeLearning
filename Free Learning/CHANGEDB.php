@@ -1913,3 +1913,8 @@ $sql[$count][1] = "CREATE TABLE `freeLearningUnitPrerequisite` (`freeLearningUni
 ++$count;
 $sql[$count][0] = '5.19.01';
 $sql[$count][1] = "";
+
+//v5.19.02
+++$count;
+$sql[$count][0] = '5.19.02';
+$sql[$count][1] = "";
