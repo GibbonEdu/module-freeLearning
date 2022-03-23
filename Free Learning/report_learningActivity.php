@@ -236,10 +236,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                 }
             </script>
             <?php
-            echo "<div class='linkTop'>";
+            echo "<p class='text-right mt-4 text-xs'>";
                 echo '<b>'.__m('Total Units Joined').'</b>: '.$countJoinedTotal.'<br/>';
                 echo '<b>'.__m('Total Units Approved').'</b>: '.$countApprovedTotal.'<br/>';
-            echo "</div>";
+            echo "</p>";
         }
     }
 }

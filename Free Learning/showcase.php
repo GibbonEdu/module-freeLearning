@@ -96,9 +96,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/showcase.p
                 echo __m('Shared on').' '.Format::date($rowWork['timestampCompleteApproved']);
                 echo '</p>';
                 if ($canEdit) {
-                    echo "<div class='linkTop'>";
+                    echo "<p class='text-right'>";
                     echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID='.$rowWork['freeLearningUnitID'].'&freeLearningUnitStudentID='.$rowWork['freeLearningUnitStudentID']."&sidebar=true'>".__('Edit')."<img style='margin: 0 0 -4px 3px' title='".__('Edit')."' src='./themes/".$session->get('gibbonThemeName')."/img/config.png'/></a>";
-                    echo '</div>';
+                    echo '</p>';
                 }
                 echo "<table style='width: 100%'>";
                 echo '<tr>';

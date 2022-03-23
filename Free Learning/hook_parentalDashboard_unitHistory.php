@@ -36,12 +36,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
     $disableParentEvidence = ($container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'disableParentEvidence') == "Y");
 
-    $returnInt .= "<div class='linkTop'>";
-    $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
+    $returnInt .= "<p class='text-right mb-4 text-xs'>";
+    $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a class='button' href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
     if ($canBrowse) {
-        $returnInt .= " | ".sprintf(__m('%1$sBrowse Units%2$s'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
+        $returnInt .= sprintf(__m('%1$sBrowse Units%2$s'), "<a class='button ml-2' href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
     }
-    $returnInt .= '</div>';
+    $returnInt .= '</p>';
     $returnInt .= "<p style='margin-top: 20px'>";
     $returnInt .= __m('This tab shows recent results and enrolment for Free Learning units studied by your child.');
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_byStudent.php')) {

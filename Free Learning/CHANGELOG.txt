@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.04
+--------
+Refactoring of linkTop divs
+
 v5.19.03
 --------
 Further tweak to When column in Mentorship Overview

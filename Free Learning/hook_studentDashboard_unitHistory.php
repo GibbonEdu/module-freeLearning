@@ -32,10 +32,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= __('You do not have access to this action.');
     $returnInt .= '</div>';
 } else {
-    $returnInt .= "<div class='linkTop'>";
-    $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>')." | ";
-    $returnInt .= sprintf(__m('%1$sBrowse Units%2$s'), "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
-    $returnInt .= '</div>';
+    $returnInt .= "<p class='text-right mb-4 text-xs'>";
+    $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a class='button' href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
+    $returnInt .= sprintf(__m('%1$sBrowse Units%2$s'), "<a class='button ml-2' href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
+    $returnInt .= '</p>';
     $returnInt .= "<p style='margin-top: 20px'>";
     $returnInt .= __m('This tab shows your recent results and enrolment for Free Learning.');
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_my.php')) {
