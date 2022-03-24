@@ -586,4 +586,20 @@ class UnitStudentGateway extends QueryableGateway
 
         return $this->db()->select($sql, $data);
     }
+
+    public function selectShowcase()
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnit.name', 'freeLearningUnit.logo', 'freeLearningUnitStudent.*', "GROUP_CONCAT(DISTINCT gibbonPerson.preferredName SEPARATOR ', ') as students"])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->where('freeLearningUnit.active = \'Y\'')
+            ->where('freeLearningUnitStudent.exemplarWork = \'Y\'')
+            ->groupBy(['freeLearningUnit.freeLearningUnitID'])
+            ->orderBy(['timestampCompleteApproved DESC']);
+
+        return $this->runSelect($query)->fetchAll();
+    }
 }
