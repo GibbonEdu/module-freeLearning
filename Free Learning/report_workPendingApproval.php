@@ -55,7 +55,6 @@ else {
     $search = $_GET['search'] ?? '';
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? null;
 
-
     $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
     $form->setFactory(DatabaseFormFactory::create($pdo));
     $form->setTitle(__('Filter'));
@@ -85,7 +84,7 @@ else {
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
     $criteria = $unitStudentGateway->newQueryCriteria()
-        ->sortBy('timestampCompletePending')
+        ->sortBy(['timestampCompletePending'])
         ->fromPOST();
 
     if (!empty($allMentors)) {
@@ -201,6 +200,9 @@ else {
         });
 
     $table->addColumn('status', __m('Status'));
+
+    $table->addColumn('submissions', __m('Submissions'))
+        ->notSortable();
 
     $table->addColumn('timestampCompletePending', __('When'))->format(Format::using('relativeTime', 'timestampCompletePending'));
 
