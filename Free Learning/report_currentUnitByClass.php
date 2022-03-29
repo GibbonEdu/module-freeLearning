@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Timetable\CourseGateway;
-use Gibbon\Tables\DataTable;
 use Gibbon\Module\FreeLearning\Domain\UnitClassGateway;
 
 // Module includes
@@ -66,7 +66,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
     if ($gibbonCourseClassID != '') {
         $courseGateway = $container->get(CourseGateway::class);
         $values = $courseGateway->getCourseClassByID($gibbonCourseClassID);
-        
+
         if (!is_array($values)) {
             $page->addError(__('There are no records to display.'));
         } else {
@@ -90,9 +90,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     }
                 }
             });
-            
+
             $table = DataTable::create('reportData');
-            $table->setTitle('Report Data - '.$values['courseNameShort'].'.'.$values['nameShort']);
+            $table->setTitle(__m('Report Data').' - '.$values['courseNameShort'].'.'.$values['nameShort']);
 
             $count = 1;
             $table->addColumn('count', '')
@@ -101,13 +101,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 ->format(function ($row) use (&$count) {
                     return '<span class="subdued">'.$count++.'</span>';
                 });
-            
+
             $table->addColumn('gibbonPersonID', __('Student'))
                 ->format(function ($row) use ($session, $container) {
-                    
+
                     $output = '<a href="'.$session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$row['gibbonPersonID'].'">'.Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a>';
-                    
-                    
+
                     //Check for custom field
                     $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
 
@@ -122,10 +121,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     if (!empty($values['grouping']) && $values['grouping'] != 'Individual') {
                         $output .= '<br/>'.Format::small($values['grouping']);
                     }
-                    
+
                     return $output;
                 });
-                
+
             $table->addColumn('collaborationKey', __m('Group'))
                 ->format(function ($values) use (&$collaborationKeys) {
                     $output = '';
@@ -143,7 +142,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 
                     return $output;
                 });
-                
+
             $table->addColumn('unit', __('Unit'))
                 ->description(__m('Status'))
                 ->format(function ($row) use ($session) {
@@ -156,7 +155,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     //TODO: CHANGE FROM INLINE HTML TO OO FORMATTING :(
                     return $output;
                 });
-            
+
             $table->addColumn('timestampJoined', __m('Date Started'))
                 ->format(function ($row) {
                     $output = '';
@@ -165,7 +164,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     }
                     return $output;
                 });
-                
+
             $table->addColumn('daysSince', __m('Days Since Started'))
                 ->format(function ($row) {
                     $output = '';
@@ -174,7 +173,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     }
                     return $output;
                 });
-            
+
             $table->addColumn('length', __m('Length'))
                 ->description(__('Minutes'))
                 ->format(function ($row) {
@@ -193,11 +192,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                 ->description(__('Minutes By Day\'s End'))
                 ->format(function ($row) use ($unitClassGateway, $gibbonCourseClassID) {
                     if (empty($row['timestampJoined'])) return '';
-                    
+
                     $output = '';
                     $spent = 0;
                     $resultLessons = $unitClassGateway->selectTiming($gibbonCourseClassID, $row['timestampJoined']);
-                    
+
                     if ($resultLessons->rowCount() < 1) {
                         $output .= $spent;
                     } else {
@@ -218,13 +217,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                         }
 
                     }
-                    
-                    
+
+
                     return $output;
                 });
-                
-            //TODO: TIME SPENT / MINUTES BY DAY END
-            
+
             echo $table->render($studentUnits);
         }
     }

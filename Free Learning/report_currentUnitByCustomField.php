@@ -19,11 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
 use Gibbon\Forms\CustomFieldHandler;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Timetable\CourseGateway;
 use Gibbon\Domain\System\CustomFieldGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitClassGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -59,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             $row->addLabel('customField', $field['name']);
             $row->addCustomField('customField', ['type' => $field['type'], 'options' => $field['options']])->setValue($customFieldValue)->required();
 
-        $sortOptions = ['unit' => __('Unit'), 'student' => __('Student')];
+        $sortOptions = ['status' => __('Status'), 'unit' => __('Unit'), 'student' => __('Student')];
         $row = $form->addRow();
             $row->addLabel('sort', __('Sort By'));
             $row->addSelect('sort')->fromArray($sortOptions)->selected($sort);
@@ -70,144 +72,126 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
         echo $form->getOutput();
 
         if (!empty($customFieldValue)) {
-            echo '<h2>';
-            echo __('Report Data');
-            echo '</h2>';
 
-            echo "<p style='margin-bottom: 0px'><b>".$field['name'].'</b>: '.$customFieldValue.'</p>';
+            $unitClassGateway = $container->get(UnitClassGateway::class);
+            $studentUnits = $unitClassGateway->selectUnitsByCustomField($customFieldValue, $session->get('gibbonSchoolYearID'), $sort)->toDataSet();
 
-            //Get data on blocks in an efficient manner
             $blocks = getBlocksArray($connection2);
+            $collaborationKeys = [];
 
-            try {
-                $data = array('customFieldValue' => $customFieldValue);
-                $sql = "SELECT
-                        gibbonPerson.gibbonPersonID, surname, preferredName, freeLearningUnit.freeLearningUnitID, freeLearningUnit.name AS unitName, timestampJoined, collaborationKey, freeLearningUnitStudent.status, enrolmentMethod, fields
-                    FROM
-                        gibbonPerson
-                        LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND (enrolmentMethod='schoolMentor' OR enrolmentMethod='externalMentor') AND (freeLearningUnitStudent.status='Current' OR freeLearningUnitStudent.status='Current - Pending' OR freeLearningUnitStudent.status='Complete - Pending' OR freeLearningUnitStudent.status='Evidence Not Yet Approved'))
-                        LEFT JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                    WHERE
-                        gibbonPerson.status='Full'
-                        AND (dateStart IS NULL OR dateStart<='".date('Y-m-d')."')
-                        AND (dateEnd IS NULL  OR dateEnd>='".date('Y-m-d')."')
-                        AND gibbonPerson.fields LIKE CONCAT('%', :customFieldValue, '%')";
-                if ($sort == 'student') {
-                    $sql .= " ORDER BY surname, preferredName, unitName";
-                } else {
-                    $sql .= " ORDER BY unitName, collaborationKey, surname, preferredName";
-                }
-                $result = $connection2->prepare($sql);
-                $result->execute($data);
-            } catch (PDOException $e) {
-                echo "<div class='error'>".$e->getMessage().'</div>';
-            }
-
-            //Check for custom field
-            $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
-
-            echo "<table class='mini' cellspacing='0' style='width: 100%'>";
-            echo "<tr class='head'>";
-            echo '<th>';
-            echo __('Number');
-            echo '</th>';
-            echo '<th>';
-            echo __('Student');
-            echo '</th>';
-            echo '<th>';
-            echo __m('Group');
-            echo '</th>';
-            echo '<th>';
-            echo __('Unit').'<br/>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__m('Status').'</span>';
-            echo '</th>';
-            echo '<th>';
-            echo __m('Date Started');
-            echo '</th>';
-            echo '<th>';
-            echo __m('Days Since Started');
-            echo '</th>';
-            echo '<th>';
-            echo __m('Length').'</br>';
-            echo "<span style='font-size: 85%; font-style: italic'>".__('Minutes').'</span>';
-            echo '</th>';
-            echo '</tr>';
-
-            $count = 0;
-            $rowNum = 'odd';
-            $group = 0;
-            $collaborationKeys = array();
-            while ($row = $result->fetch()) {
-                if ($count % 2 == 0) {
-                    $rowNum = 'even';
-                } else {
-                    $rowNum = 'odd';
-                }
-                ++$count;
-
-                //COLOR ROW BY STATUS!
-                echo "<tr class=$rowNum>";
-                echo '<td>';
-                echo $count;
-                echo '</td>';
-                echo '<td>';
-                    echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$row['gibbonPersonID']."'>".Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a><br/>';
-                echo '</td>';
-                echo '<td>';
-                if ($row['collaborationKey'] != '') {
-                    if (isset($collaborationKeys[$row['collaborationKey']]) == false) {
-                        ++$group;
-                        $collaborationKeys[$row['collaborationKey']] = $group;
-                    }
-                    echo $collaborationKeys[$row['collaborationKey']];
-                }
-                echo '</td>';
-                echo '<td>';
-                if ($row['enrolmentMethod'] == "schoolMentor" || $row['enrolmentMethod'] == "externalMentor") {
-                    echo "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
-                }
-                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
-                echo "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status'] ?? '').'</span>';
-                echo '</td>';
-                echo '<td>';
-                if ($row['timestampJoined'] != '') {
-                    echo Format::date(substr($row['timestampJoined'], 0, 10));
-                }
-                echo '</td>';
-                echo '<td>';
-                if ($row['timestampJoined'] != '') {
-                    echo round((time() - strtotime($row['timestampJoined'])) / (60 * 60 * 24));
-                }
-                echo '</td>';
-                echo '<td>';
-                    if ($row['timestampJoined'] != '') {
-                        $timing = null;
-                        if ($blocks != false) {
-                            foreach ($blocks as $block) {
-                                if ($block[0] == $row['freeLearningUnitID']) {
-                                    if (is_numeric($block[2])) {
-                                        $timing += $block[2];
-                                    }
+            $studentUnits->transform(function (&$row) use ($blocks) {
+                if (!empty($row['timestampJoined'])) {
+                    $row['timing'] = null;
+                    if ($blocks != false) {
+                        foreach ($blocks as $block) {
+                            if ($block[0] == $row['freeLearningUnitID']) {
+                                if (is_numeric($block[2])) {
+                                    $row['timing'] += $block[2];
                                 }
                             }
                         }
-                        if (is_null($timing)) {
-                            echo '<i>'.__('N/A').'</i>';
-                        } else {
-                            echo $timing;
+                    }
+                }
+            });
+
+            $table = DataTable::create('reportData');
+            $table->setTitle(__m('Report Data').' - '.$customFieldValue);
+
+            $count = 1;
+            $table->addColumn('count', '')
+                ->notSortable()
+                ->width('35px')
+                ->format(function ($row) use (&$count) {
+                    return '<span class="subdued">'.$count++.'</span>';
+                });
+
+            $table->addColumn('gibbonPersonID', __('Student'))
+                ->format(function ($row) use ($session, $container) {
+
+                    $output = '<a href="'.$session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$row['gibbonPersonID'].'">'.Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a>';
+
+                    //Check for custom field
+                    $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
+
+                    $fields = json_decode($row['fields'], true);
+                    if (!empty($fields[$customField])) {
+                        $value = $fields[$customField];
+                        if ($value != '') {
+                            $output .= '<br/>'.Format::small($value);
                         }
                     }
-                echo '</td>';
-                echo '</tr>';
-            }
-            if ($count == 0) {
-                echo "<tr class=$rowNum>";
-                echo '<td colspan=7>';
-                echo __('There are no records to display.');
-                echo '</td>';
-                echo '</tr>';
-            }
-            echo '</table>';
+
+                    if (!empty($values['grouping']) && $values['grouping'] != 'Individual') {
+                        $output .= '<br/>'.Format::small($values['grouping']);
+                    }
+
+                    return $output;
+                });
+
+            $table->addColumn('collaborationKey', __m('Group'))
+                ->format(function ($values) use (&$collaborationKeys) {
+                    $output = '';
+                    if (!empty($values['collaborationKey'])) {
+                        // Get the index for the group, otherwise add it to the array
+                        $group = array_search($values['collaborationKey'], $collaborationKeys);
+                        if ($group === false) {
+                            $collaborationKeys[] = $values['collaborationKey'];
+                            $group = count($collaborationKeys);
+                        } else {
+                            $group++;
+                        }
+                        $output .= $group;
+                    }
+
+                    return $output;
+                });
+
+            $table->addColumn('unit', __('Unit'))
+                ->description(__m('Status'))
+                ->format(function ($row) use ($session) {
+                    $output = '';
+                    if ($row['enrolmentMethod'] == "schoolMentor" || $row['enrolmentMethod'] == "externalMentor") {
+                        $output .= "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
+                    }
+                    $output .= "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
+                    $output .= "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status'] ?? '').'</span>';
+                    //TODO: CHANGE FROM INLINE HTML TO OO FORMATTING :(
+                    return $output;
+                });
+
+            $table->addColumn('timestampJoined', __m('Date Started'))
+                ->format(function ($row) {
+                    $output = '';
+                    if ($row['timestampJoined'] != '') {
+                        $output .= Format::date(substr($row['timestampJoined'], 0, 10));
+                    }
+                    return $output;
+                });
+
+            $table->addColumn('daysSince', __m('Days Since Started'))
+                ->format(function ($row) {
+                    $output = '';
+                    if ($row['timestampJoined'] != '') {
+                        $output .= round((time() - strtotime($row['timestampJoined'])) / (60 * 60 * 24));
+                    }
+                    return $output;
+                });
+
+            $table->addColumn('length', __m('Length'))
+                ->description(__('Minutes'))
+                ->format(function ($row) {
+                    $output = '';
+                    if ($row['timestampJoined'] != '') {
+                        if (is_null($row['timing'])) {
+                            $output .= '<i>'.__('N/A').'</i>';
+                        } else {
+                            $output .= $row['timing'];
+                        }
+                    }
+                    return $output;
+                });
+
+            echo $table->render($studentUnits);
         }
     }
 }

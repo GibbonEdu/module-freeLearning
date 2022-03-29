@@ -35,8 +35,8 @@ class UnitClassGateway extends QueryableGateway
     {
         $query = $this
             ->newQuery()
-            ->from('gibbonPerson')
             ->cols(['gibbonPerson.gibbonPersonID', 'surname', 'preferredName', 'freeLearningUnit.freeLearningUnitID', 'freeLearningUnit.name AS unitName', 'timestampJoined', 'collaborationKey', 'freeLearningUnitStudent.status', 'enrolmentMethod', 'freeLearningUnitStudent.grouping', 'fields'])
+            ->from('gibbonPerson')
             ->join('inner', 'gibbonCourseClassPerson','gibbonCourseClassPerson.gibbonPersonID=gibbonPerson.gibbonPersonID AND role=\'Student\'')
             ->leftJoin('freeLearningUnitStudent','freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND (freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClassPerson.gibbonCourseClassID OR enrolmentMethod=\'schoolMentor\' OR enrolmentMethod=\'externalMentor\') AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Yet Approved\')')
             ->leftJoin('freeLearningUnit','freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
@@ -46,18 +46,45 @@ class UnitClassGateway extends QueryableGateway
                 ->bindValue('date', date('Y-m-d'))
             ->where('gibbonCourseClassPerson.gibbonCourseClassID=:gibbonCourseClassID')
                 ->bindValue('gibbonCourseClassID', $gibbonCourseClassID);
-                
-                if ($sort == 'unit') {
-                    $query->orderBy(['unitName', 'collaborationKey', 'surname', 'preferredName']);
-                } elseif ($sort == 'student') {
-                    $query->orderBy(['surname', 'preferredName', 'unitName']);
-                } else {
-                    $query->orderBy(['status', 'unitName', 'collaborationKey', 'surname', 'preferredName']);
-                }
+
+            if ($sort == 'unit') {
+                $query->orderBy(['unitName', 'collaborationKey', 'surname', 'preferredName']);
+            } elseif ($sort == 'student') {
+                $query->orderBy(['surname', 'preferredName', 'unitName']);
+            } else {
+                $query->orderBy(['status', 'unitName', 'collaborationKey', 'surname', 'preferredName']);
+            }
 
         return $this->runSelect($query);
     }
-    
+
+    public function selectUnitsByCustomField($customFieldValue, $gibbonSchoolYearID, $sort)
+    {
+        $query = $this
+            ->newQuery()
+            ->cols(['gibbonPerson.gibbonPersonID', 'surname', 'preferredName', 'freeLearningUnit.freeLearningUnitID', 'freeLearningUnit.name AS unitName', 'timestampJoined', 'collaborationKey', 'freeLearningUnitStudent.status', 'enrolmentMethod', 'freeLearningUnitStudent.grouping', 'fields'])
+            ->from('gibbonPerson')
+            ->leftJoin('freeLearningUnitStudent','freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID AND (freeLearningUnitStudent.status=\'Current\' OR freeLearningUnitStudent.status=\'Current - Pending\' OR freeLearningUnitStudent.status=\'Complete - Pending\' OR freeLearningUnitStudent.status=\'Evidence Not Yet Approved\')')
+                ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+            ->leftJoin('freeLearningUnit','freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->where('gibbonPerson.status=\'Full\'')
+            ->where('(dateStart IS NULL OR dateStart<=:date)')
+            ->where('(dateEnd IS NULL  OR dateEnd>=:date)')
+                ->bindValue('date', date('Y-m-d'))
+            ->where("gibbonPerson.fields LIKE CONCAT('%\"', :customFieldValue, '\"%')")
+                ->bindValue('customFieldValue', $customFieldValue);
+
+            if ($sort == 'unit') {
+                $query->orderBy(['unitName', 'collaborationKey', 'surname', 'preferredName']);
+            } elseif ($sort == 'student') {
+                $query->orderBy(['surname', 'preferredName', 'unitName']);
+            } else {
+                $query->orderBy(['status', 'unitName', 'collaborationKey', 'surname', 'preferredName']);
+            }
+
+        return $this->runSelect($query);
+    }
+
     public function selectTiming($gibbonCourseClassID, $dateJoined)
     {
         $query = $this
@@ -71,7 +98,7 @@ class UnitClassGateway extends QueryableGateway
                 ->bindValue('dateJoined', substr($dateJoined, 0, 10))
             ->where(' date<=:today')
                 ->bindValue('today', date('Y-m-d'));
-                
+
         return $this->runSelect($query);
     }
 }
