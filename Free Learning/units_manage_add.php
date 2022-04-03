@@ -229,11 +229,29 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid, $settingGateway)
                 ->addToolInput($blockCreator);
 
-        for ($i=0 ; $i<5 ; $i++) {
-            $customBlocks->addBlock("block$i");
-        }
+        $smartBlocksTemplate = $settingGateway->getSettingByScope('Free Learning', 'smartBlocksTemplate');
+        if (!empty($smartBlocksTemplate)) { // Get blocks from template unit
+            $dataBlocks = array('freeLearningUnitID' => $smartBlocksTemplate);
+            $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
+            $resultBlocks = $pdo->select($sqlBlocks, $dataBlocks);
 
-        $form->addHiddenValue('blockCount', "5");
+            while ($rowBlocks = $resultBlocks->fetch()) {
+                $smart = array(
+                    'title' => $rowBlocks['title'],
+                    'type' => $rowBlocks['type'],
+                    'length' => $rowBlocks['length'],
+                    'contents' => $rowBlocks['contents'],
+                    'teachersNotes' => $rowBlocks['teachersNotes']
+                );
+                $customBlocks->addBlock($rowBlocks['freeLearningUnitBlockID'], $smart);
+            }
+        } else { // Get blank blocks
+            for ($i=0 ; $i<5 ; $i++) {
+                $customBlocks->addBlock("block$i");
+            }
+
+            $form->addHiddenValue('smartCount', "5");
+        }
 
         $row = $form->addRow();
             $row->addFooter();

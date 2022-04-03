@@ -60,6 +60,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addTextArea($setting['name'])->setValue($setting['value'])->setRows(8);
 
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'smartBlocksTemplate', true);
+    $sql = 'SELECT freeLearningUnitID as value, name FROM freeLearningUnit ORDER BY name';
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addSelect($setting['name'])->fromQuery($pdo, $sql, array())->selected($setting['value'])->placeholder();;
+
     $sql = "SELECT gibbonCustomFieldID as value, name FROM gibbonCustomField WHERE context='User' AND active='Y'";
     $setting = $settingGateway->getSettingByScope('Free Learning', 'customField', true);
     $row = $form->addRow();

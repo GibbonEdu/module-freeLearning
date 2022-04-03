@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.08
+--------
+Addition of Smart Blocks template setting
+
 v5.19.07
 --------
 Refactoring of tables

@@ -1943,3 +1943,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.19.07';
 $sql[$count][1] = "";
+
+//v5.19.08
+++$count;
+$sql[$count][0] = '5.19.08';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'smartBlocksTemplate', 'Smart Blocks Template', 'Uses Smart Blocks from the selected unit as a template for new units.', '');end
+";

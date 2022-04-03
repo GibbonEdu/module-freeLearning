@@ -108,7 +108,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 $partialFail &= !$inserted;
 
                 //ADD BLOCKS
-                $blockCount = ($_POST['blockCount'] - 1);
+                $blockCount = ($_POST['smartCount'] - 1);
                 $sequenceNumber = 0;
                 if ($blockCount > 0) {
                     $order = $_POST['order'] ?? array();

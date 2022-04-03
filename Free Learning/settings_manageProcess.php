@@ -32,6 +32,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $difficultyOptions = $_POST['difficultyOptions'] ?? '';
     $publicUnits = $_POST['publicUnits'] ?? '';
     $unitOutlineTemplate = $_POST['unitOutlineTemplate'] ?? '';
+    $smartBlocksTemplate = $_POST['smartBlocksTemplate'] ?? '';
     $learningAreaRestriction = $_POST['learningAreaRestriction'] ?? '';
     $customField = $_POST['customField'] ?? '';
     $maxMapSize = $_POST['maxMapSize'] ?? '';
@@ -72,6 +73,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'difficultyOptions', $difficultyOptions);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'publicUnits', $publicUnits);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'unitOutlineTemplate', $unitOutlineTemplate);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'smartBlocksTemplate', $smartBlocksTemplate);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'learningAreaRestriction', $learningAreaRestriction);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'customField', $customField);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'maxMapSize', $maxMapSize);
