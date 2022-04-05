@@ -73,7 +73,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
 
         $row = $form->addRow();
-            $row->addLabel('name', __m('Unit Name'));
+            $row->addLabel('name', __m('Unit/Course Name'));
             $row->addTextField('name')->setValue($criteria->getSearchText());
 
         $row = $form->addRow();

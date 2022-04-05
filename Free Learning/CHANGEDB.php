@@ -1950,3 +1950,8 @@ $sql[$count][0] = '5.19.08';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'smartBlocksTemplate', 'Smart Blocks Template', 'Uses Smart Blocks from the selected unit as a template for new units.', '');end
 ";
+
+//v5.19.09
+++$count;
+$sql[$count][0] = '5.19.09';
+$sql[$count][1] = "";

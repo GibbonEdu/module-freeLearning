@@ -29,7 +29,7 @@ class UnitGateway extends QueryableGateway
 
     private static $tableName = 'freeLearningUnit';
     private static $primaryKey = 'freeLearningUnitID';
-    private static $searchableColumns = ['freeLearningUnit.name'];
+    private static $searchableColumns = ['freeLearningUnit.name','freeLearningUnit.course'];
 
     /**
      * @param QueryCriteria $criteria
