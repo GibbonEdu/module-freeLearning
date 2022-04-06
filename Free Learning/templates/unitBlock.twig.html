@@ -18,11 +18,13 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
         {{ title }}
     </div>
 
-    {% if type %}
+
     <div class="mb-4 font-sans text-sm leading-snug text-gray-600">
-        {{ type }}
+        {% if type %}
+            {{ type }}
+        {% endif %}
     </div>
-    {% endif %}
+
 
     <div class="text-base">
         {{ contents|raw }}
