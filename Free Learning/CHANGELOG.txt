@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.12
+--------
+Added new UnitStudentGateway methods
+
 v5.19.11
 --------
 Added date range filter to Mentorship Overview

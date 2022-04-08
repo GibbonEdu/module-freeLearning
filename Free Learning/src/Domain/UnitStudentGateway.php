@@ -608,10 +608,83 @@ class UnitStudentGateway extends QueryableGateway
             ->from('freeLearningUnitStudent')
             ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
             ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
-            ->where('freeLearningUnit.active = \'Y\'')
-            ->where('freeLearningUnitStudent.exemplarWork = \'Y\'')
+            ->where('freeLearningUnit.active=\'Y\'')
+            ->where('freeLearningUnitStudent.exemplarWork=\'Y\'')
             ->groupBy(['freeLearningUnit.freeLearningUnitID'])
             ->orderBy(['timestampCompleteApproved DESC']);
+
+        return $this->runSelect($query)->fetchAll();
+    }
+
+    public function selectLastCompleteUnitByLearner($gibbonPersonID)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnitStudent.timestampCompleteApproved', 'freeLearningUnit.name', 'freeLearningUnit.freeLearningUnitID'])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->where('freeLearningUnitStudent.gibbonPersonIDStudent = :gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->where("freeLearningUnitStudent.status='Complete - Approved'")
+            ->orderBy(['timestampCompleteApproved DESC'])
+            ->setPaging(1)
+            ->page(1);
+
+        return $this->runSelect($query)->fetchAll();
+    }
+
+    public function selectCurrentUnitByLearner($gibbonPersonID)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnitStudent.timestampJoined', 'freeLearningUnit.name', 'freeLearningUnit.freeLearningUnitID'])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->where('freeLearningUnitStudent.gibbonPersonIDStudent = :gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->where("freeLearningUnitStudent.status IN ('Current', 'Complete - Pending')")
+            ->orderBy(['timestampJoined DESC'])
+            ->setPaging(1)
+            ->page(1);
+
+        return $this->runSelect($query)->fetchAll();
+    }
+
+    public function selectAllUnitsByLearner($gibbonPersonID, $date = null)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnitStudent.timestampJoined', 'freeLearningUnit.name'])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->where('freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->orderBy(['timestampJoined']);
+
+        if (!empty($date)) {
+            $query->where('freeLearningUnitStudent.timestampJoined>=:date')
+                ->bindValue('date', $date." 00:00:00");
+        }
+
+        return $this->runSelect($query)->fetchAll();
+    }
+
+    public function selectMentorshipByMentor($gibbonPersonID, $status = null)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['freeLearningUnitStudent.timestampJoined', 'freeLearningUnit.name'])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->where("freeLearningUnitStudent.enrolmentMethod='schoolMentor'")
+            ->where('freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->orderBy(['timestampJoined']);
+
+        if (!empty($status)) {
+            $query->where('freeLearningUnitStudent.status=:status')
+                ->bindValue('status', $status);
+        }
 
         return $this->runSelect($query)->fetchAll();
     }
