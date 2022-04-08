@@ -60,6 +60,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
     $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
+    $dateStart = $_GET['dateStart'] ?? null;
+    $dateEnd = $_GET['dateEnd'] ?? null;
 
     if ($highestAction == 'Mentorship Overview_all') {
         echo "<p>".__m('This report offers a summary of all mentor activity, including enrolments by class.')."</p>";
@@ -99,6 +101,14 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->required()->selected($gibbonSchoolYearID);
 
         $row = $form->addRow();
+            $row->addLabel('dateStart', __('Start Date'));
+            $row->addDate('dateStart')->setValue($dateStart);
+
+        $row = $form->addRow();
+            $row->addLabel('dateEnd', __('End Date'));
+            $row->addDate('dateEnd')->setValue($dateEnd);
+
+        $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
@@ -120,7 +130,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     if (!empty($gibbonPersonID)) {
         $criteria->pageSize(0);
     }
-    $mentorship = $unitStudentGateway->queryMentorship($criteria, $gibbonSchoolYearID, !empty($allMentors) ? null : $gibbonPersonID);
+    $mentorship = $unitStudentGateway->queryMentorship($criteria, $gibbonSchoolYearID, !empty($allMentors) ? null : $gibbonPersonID, $dateStart, $dateEnd);
 
     // Render chart for individuals
     if (!empty($gibbonPersonID) && count($mentorship) > 0) {

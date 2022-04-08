@@ -1960,3 +1960,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.19.10';
 $sql[$count][1] = "";
+
+//v5.19.11
+++$count;
+$sql[$count][0] = '5.19.11';
+$sql[$count][1] = "";

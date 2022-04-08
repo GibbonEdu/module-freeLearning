@@ -19,9 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 namespace Gibbon\Module\FreeLearning\Domain;
 
-use Gibbon\Domain\Traits\TableAware;
+use Gibbon\Services\Format;
 use Gibbon\Domain\QueryCriteria;
 use Gibbon\Domain\QueryableGateway;
+use Gibbon\Domain\Traits\TableAware;
 
 class UnitStudentGateway extends QueryableGateway
 {
@@ -205,7 +206,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function queryMentorship(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null)
+    public function queryMentorship(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null, $dateStart = null, $dateEnd = null)
     {
         $query = $this
             ->newQuery()
@@ -229,6 +230,16 @@ class UnitStudentGateway extends QueryableGateway
         if (!is_null($gibbonPersonID)) {
             $query->where("((enrolmentMethod='schoolMentor' AND mentor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID) OR (enrolmentMethod='class' AND teacher.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID))")
                 ->bindValue('gibbonPersonID', $gibbonPersonID);
+        }
+
+        if (!empty($dateStart)) {
+            $query->where("(CASE WHEN (timestampCompleteApproved IS NOT NULL AND timestampCompleteApproved > timestampCompletePending) THEN timestampCompleteApproved WHEN timestampCompletePending IS NOT NULL THEN timestampCompletePending ELSE timestampJoined END)>=:dateStart")
+                ->bindValue('dateStart', Format::dateConvert($dateStart)." 00:00:00");
+        }
+
+        if (!empty($dateEnd)) {
+            $query->where("(CASE WHEN (timestampCompleteApproved IS NOT NULL AND timestampCompleteApproved > timestampCompletePending) THEN timestampCompleteApproved WHEN timestampCompletePending IS NOT NULL THEN timestampCompletePending ELSE timestampJoined END)<=:dateEnd")
+                ->bindValue('dateEnd', Format::dateConvert($dateEnd)." 23:59:59");
         }
 
         $criteria->addFilterRules([
