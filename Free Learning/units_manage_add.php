@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
 
 // Module includes
@@ -218,6 +219,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 
         // SMART BLOCKS
+
+        $unitBlockGateway = $container->get(UnitBlockGateway::Class);
+
         $form->addRow()->addHeading(__m('Smart Blocks'))->append(__m('Smart Blocks aid unit planning by giving teachers help in creating and maintaining new units, splitting material into smaller chunks. As well as predefined fields to fill, Smart Blocks provide a visual view of the content blocks that make up a unit. Blocks may be any kind of content, such as discussion, assessments, group work, outcome etc.'));
 
         $blockCreator = $form->getFactory()
@@ -225,28 +229,67 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->setValue(__('Click to create a new block'))
             ->addClass('advanced addBlock');
 
+        $allBlocks = $unitBlockGateway->selectAllBlocks();
+
+        $blocks = [];
+        $chainedTo = [];
+
+        $units = array_reduce($allBlocks->fetchAll(), function($group, $item) use (&$blocks, &$chainedTo) {
+            $group[$item['freeLearningUnitID']] = $item['unitName'];
+
+            $blocks[$item['freeLearningUnitBlockID']] = $item['title'];
+            $chainedTo[$item['freeLearningUnitBlockID']] = $item['freeLearningUnitID'];
+
+            return $group;
+        }, []);
+
+
+        $grid = $form->getFactory()
+            ->createGrid('selectGrid', 4);
+
+        $grid->addCell()
+            ->addClass('w-1/5')
+            ->addLabel('selectUnit', __('Copy From Unit'))
+            ->description(__('Select a unit to copy a block from'));
+
+        $grid->addCell()
+            ->addClass('w-1/5')
+            ->addSelect('selectUnit')
+            ->placeholder('Select Unit')
+            ->fromArray($units);
+
+        $grid->addCell()
+            ->addClass('w-1/5 ml-5')
+            ->addLabel('selectBlock', __('Copy Block'))
+            ->description(__('Select a block to copy'));
+
+        $grid->addCell()
+            ->addClass('w-1/5')
+            ->addSelect('selectBlock')
+            ->fromArray($blocks)
+            ->chainedTo('selectUnit', $chainedTo);
+
         $row = $form->addRow()->addClass('advanced');
             $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid, $settingGateway)
-                ->addToolInput($blockCreator);
+                ->addToolInput($blockCreator)
+                ->addToolInput($grid);
 
         $smartBlocksTemplate = $settingGateway->getSettingByScope('Free Learning', 'smartBlocksTemplate');
         if (!empty($smartBlocksTemplate)) { // Get blocks from template unit
-            $dataBlocks = array('freeLearningUnitID' => $smartBlocksTemplate);
-            $sqlBlocks = 'SELECT * FROM freeLearningUnitBlock WHERE freeLearningUnitID=:freeLearningUnitID ORDER BY sequenceNumber';
-            $resultBlocks = $pdo->select($sqlBlocks, $dataBlocks);
+            $resultBlocks = $unitBlockGateway->selectBlocksByUnit($smartBlocksTemplate);
 
             while ($rowBlocks = $resultBlocks->fetch()) {
-                $smart = array(
+                $smart = [
                     'title' => $rowBlocks['title'],
                     'type' => $rowBlocks['type'],
                     'length' => $rowBlocks['length'],
                     'contents' => $rowBlocks['contents'],
                     'teachersNotes' => $rowBlocks['teachersNotes']
-                );
+                ];
                 $customBlocks->addBlock($rowBlocks['freeLearningUnitBlockID'], $smart);
             }
         } else { // Get blank blocks
-            for ($i=0 ; $i<5 ; $i++) {
+            for ($i = 0; $i < 5 ; $i++) {
                 $customBlocks->addBlock("block$i");
             }
 
@@ -259,5 +302,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         echo $form->getOutput();
     }
+    ?>
+    <script>
+        //Temporary fix to disable selectors if the required core changes are not implemented.
+            $(document).ready(function() {
+                if (!$('#smart').data('gibbonCustomBlocks')) {
+                    $('#selectUnit').parents('tr').hide();
+                }
+            });
+
+        //Fix for datepicker in custom blocks
+        $(document).on('change', '#selectBlock', function () {
+            var blockID = $(this).val();
+            $.ajax({
+                type: 'POST',
+                data: {freeLearningUnitBlockID: blockID},
+                url: "<?php echo $session->get('absoluteURL') . '/modules/Free Learning/units_manage_addAjax.php' ?>",
+                success: function (responseData) {
+                    if (responseData !== -1) {
+                        $('#smart').data('gibbonCustomBlocks').addBlock(JSON.parse(responseData));
+                    }
+                }
+            }); 
+            $(this).val('');
+        });
+    </script>
+    <?php
 }
 ?>
