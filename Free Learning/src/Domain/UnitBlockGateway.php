@@ -31,6 +31,18 @@ class UnitBlockGateway extends QueryableGateway
     private static $primaryKey = 'freeLearningUnitBlockID';
     private static $searchableColumns = ['freeLearningUnitBlock.title'];
 
+    public function selectAllBlocks()
+    {
+        $sql = "
+            SELECT freeLearningUnitBlock.*, freeLearningUnit.name as unitName
+            FROM freeLearningUnitBlock
+            LEFT JOIN freeLearningUnit ON (freeLearningUnitBlock.freeLearningUnitID = freeLearningUnit.freeLearningUnitID)
+            ORDER BY unitName, title
+        ";
+
+        return $this->db()->select($sql);
+    }
+
     public function selectBlocksByUnit($freeLearningUnitID)
     {
         $data = ['freeLearningUnitID' => $freeLearningUnitID];

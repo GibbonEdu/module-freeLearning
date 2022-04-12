@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.13
+--------
+Added copy unit block feature
+
 v5.19.12
 --------
 Added new UnitStudentGateway methods
