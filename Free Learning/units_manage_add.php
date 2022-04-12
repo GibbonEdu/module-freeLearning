@@ -231,7 +231,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         $allBlocks = $unitBlockGateway->selectAllBlocks();
 
-
         $blocks = [];
         $chainedTo = [];
 
