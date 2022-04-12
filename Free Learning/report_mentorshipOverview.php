@@ -233,7 +233,6 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         });
 
     $table->addColumn('student', __('Student'))
-        ->description(__m('Grouping'))
         ->sortable('gibbonPersonID')
         ->format(function($values) use ($customField) {
             $output = "";
@@ -255,6 +254,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         });
 
     $table->addColumn('status', __m('Status'))
+        ->description(__m('Grouping'))
         ->format(function ($values) use (&$collaborationKeys) {
             $output = __m($values['status']);
             $grouping = $values['grouping'];
@@ -286,6 +286,9 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
                 return $values['waitInDays'];
             }
         });
+
+    $table->addColumn('submissions', __m('Submissions'))
+        ->notSortable();
 
 
     // ACTIONS

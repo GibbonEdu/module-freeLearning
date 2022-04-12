@@ -37,7 +37,7 @@ class UnitBlockGateway extends QueryableGateway
             SELECT freeLearningUnitBlock.*, freeLearningUnit.name as unitName
             FROM freeLearningUnitBlock
             LEFT JOIN freeLearningUnit ON (freeLearningUnitBlock.freeLearningUnitID = freeLearningUnit.freeLearningUnitID)
-            ORDER BY unitName, title
+            ORDER BY unitName, sequenceNumber
         ";
 
         return $this->db()->select($sql);
