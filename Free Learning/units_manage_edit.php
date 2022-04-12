@@ -331,7 +331,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $units = array_reduce($allBlocks->fetchAll(), function($group, $item) use (&$blocks, &$chainedTo) {
                 $group[$item['freeLearningUnitID']] = $item['unitName'];
 
+                $blocks[$item['freeLearningUnitID'].'_placeholder'] = '';
                 $blocks[$item['freeLearningUnitBlockID']] = $item['title'];
+                $chainedTo[$item['freeLearningUnitID'].'_placeholder'] = $item['freeLearningUnitID'];
                 $chainedTo[$item['freeLearningUnitBlockID']] = $item['freeLearningUnitID'];
 
                 return $group;
@@ -343,19 +345,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
             $grid->addCell()
                 ->addClass('w-1/5')
-                ->addLabel('selectUnit', __('Copy From Unit'))
-                ->description(__('Select a unit to copy a block from'));
+                ->addLabel('selectUnit', __m('Copy From Unit'))
+                ->description(__m('Select a unit to copy a block from'));
 
             $grid->addCell()
                 ->addClass('w-1/5')
                 ->addSelect('selectUnit')
-                ->placeholder('Select Unit')
+                ->placeholder(__m('Select Unit'))
                 ->fromArray($units);
 
             $grid->addCell()
                 ->addClass('w-1/5 ml-5')
                 ->addLabel('selectBlock', __('Copy Block'))
-                ->description(__('Select a block to copy'));
+                ->description(__m('Select a block to copy'));
 
             $grid->addCell()
                 ->addClass('w-1/5')
@@ -393,14 +395,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         }
         ?>
         <script>
-            //Temporary fix to disable selectors if the required core changes are not implemented.
+            // Temporary fix to disable selectors if the required core changes are not implemented.
             $(document).ready(function() {
-                if ($('smart').data('gibbonCustomBlocks') === undefined) {
+                if (!$('#smart').data('gibbonCustomBlocks')) {
                     $('#selectUnit').parents('tr').hide();
                 }
             });
 
-            //Make Copy Block Selector Work
+            // Make Copy Block Selector Work
             $(document).on('change', '#selectBlock', function () {
                 var blockID = $(this).val();
                 $.ajax({
@@ -412,7 +414,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             $('#smart').data('gibbonCustomBlocks').addBlock(JSON.parse(responseData));
                         }
                     }
-                }); 
+                });
                 $(this).val('');
             });
         </script>
