@@ -620,12 +620,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $links = '';
                         $linksArray = array();
                         $linksCount = 0;
-                        $dom = new DOMDocument();
-                        @$dom->loadHTML($resourceContents);
-                        foreach ($dom->getElementsByTagName('a') as $node) {
-                            if ($node->nodeValue != '') {
-                                $linksArray[$linksCount] = "<li><a href='".$node->getAttribute('href')."'>".$node->nodeValue.'</a></li>';
-                                ++$linksCount;
+                        if (!empty($resourceContents)) {
+                            $dom = new DOMDocument();
+                            @$dom->loadHTML($resourceContents);
+                            foreach ($dom->getElementsByTagName('a') as $node) {
+                                if ($node->nodeValue != '') {
+                                    $linksArray[$linksCount] = "<li><a href='".$node->getAttribute('href')."'>".$node->nodeValue.'</a></li>';
+                                    ++$linksCount;
+                                }
                             }
                         }
 
@@ -650,12 +652,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $images = '';
                         $imagesArray = array();
                         $imagesCount = 0;
-                        $dom2 = new DOMDocument();
-                        @$dom2->loadHTML($resourceContents);
-                        foreach ($dom2->getElementsByTagName('img') as $node) {
-                            if ($node->getAttribute('src') != '') {
-                                $imagesArray[$imagesCount] = "<img class='resource' style='margin: 10px 0; max-width: 560px' src='".$node->getAttribute('src')."'/><br/>";
-                                ++$imagesCount;
+                        if (!empty($resourceContents)) {
+                            $dom2 = new DOMDocument();
+                            @$dom2->loadHTML($resourceContents);
+                            foreach ($dom2->getElementsByTagName('img') as $node) {
+                                if ($node->getAttribute('src') != '') {
+                                    $imagesArray[$imagesCount] = "<img class='resource' style='margin: 10px 0; max-width: 560px' src='".$node->getAttribute('src')."'/><br/>";
+                                    ++$imagesCount;
+                                }
                             }
                         }
 
@@ -678,12 +682,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         $embeds = '';
                         $embedsArray = array();
                         $embedsCount = 0;
-                        $dom2 = new DOMDocument();
-                        @$dom2->loadHTML($resourceContents);
-                        foreach ($dom2->getElementsByTagName('iframe') as $node) {
-                            if ($node->getAttribute('src') != '') {
-                                $embedsArray[$embedsCount] = "<iframe style='max-width: 560px' width='".$node->getAttribute('width')."' height='".$node->getAttribute('height')."' src='".$node->getAttribute('src')."' frameborder='".$node->getAttribute('frameborder')."'></iframe>";
-                                ++$embedsCount;
+                        if (!empty($resourceContents)) {
+                            $dom2 = new DOMDocument();
+                            @$dom2->loadHTML($resourceContents);
+                            foreach ($dom2->getElementsByTagName('iframe') as $node) {
+                                if ($node->getAttribute('src') != '') {
+                                    $embedsArray[$embedsCount] = "<iframe style='max-width: 560px' width='".$node->getAttribute('width')."' height='".$node->getAttribute('height')."' src='".$node->getAttribute('src')."' frameborder='".$node->getAttribute('frameborder')."'></iframe>";
+                                    ++$embedsCount;
+                                }
                             }
                         }
 
