@@ -203,10 +203,11 @@ class UnitGateway extends QueryableGateway
                 FROM
                 	freeLearningUnit
                 	LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                	LEFT JOIN freeLearningUnit AS prerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=prerequisite.freeLearningUnitID)
+                	LEFT JOIN freeLearningUnit AS prerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite=prerequisite.freeLearningUnitID)
                 	LEFT JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=prerequisite.freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID)
                 WHERE prerequisite.active='Y'
                 ORDER BY prerequisite.name";
+
         return $this->db()->select($sql, $data);
     }
 

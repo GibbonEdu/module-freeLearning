@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.15
+--------
+Fixed OK/Not Met label bug
+
 v5.19.14
 --------
 Added submission count column to Mentorship Overview
