@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.17
+--------
+Removed Left students from UnitStudentGateway method selectMentorshipByMentor 
+
 v5.19.16
 --------
 Fixed error in DOMDocument when a unit has no content

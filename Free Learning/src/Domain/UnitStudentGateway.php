@@ -677,8 +677,11 @@ class UnitStudentGateway extends QueryableGateway
             ->cols(['freeLearningUnitStudent.timestampJoined', 'freeLearningUnit.name'])
             ->from('freeLearningUnitStudent')
             ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
             ->where("freeLearningUnitStudent.enrolmentMethod='schoolMentor'")
             ->where('freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID')
+            ->where("freeLearningUnit.active='Y'")
+            ->where("gibbonPerson.status='Full'")
             ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->orderBy(['timestampJoined']);
 
