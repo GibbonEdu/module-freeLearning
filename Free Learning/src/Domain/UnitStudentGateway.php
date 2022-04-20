@@ -206,7 +206,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function queryMentorship(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null, $dateStart = null, $dateEnd = null)
+    public function queryMentorship(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null, $allStudents = false, $dateStart = null, $dateEnd = null)
     {
         $query = $this
             ->newQuery()
@@ -223,7 +223,6 @@ class UnitStudentGateway extends QueryableGateway
             ->leftJoin('gibbonDiscussion', "gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND gibbonDiscussion.foreignTable='freeLearningUnitStudent' AND gibbonDiscussion.type='Complete - Pending'")
             ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
-            ->where("gibbonPerson.status='Full'")
             ->where("(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:date) AND (gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:date)")
             ->bindValue('date', date("Y-m-d"))
             ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID']);
@@ -231,6 +230,10 @@ class UnitStudentGateway extends QueryableGateway
         if (!is_null($gibbonPersonID)) {
             $query->where("((enrolmentMethod='schoolMentor' AND mentor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID) OR (enrolmentMethod='class' AND teacher.gibbonPersonID=:gibbonPersonID AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID))")
                 ->bindValue('gibbonPersonID', $gibbonPersonID);
+        }
+
+        if ($allStudents == "on") {
+            $query->where("gibbonPerson.status='Full'");
         }
 
         if (!empty($dateStart)) {
@@ -670,7 +673,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runSelect($query)->fetchAll();
     }
 
-    public function selectMentorshipByMentor($gibbonPersonID, $status = null)
+    public function selectMentorshipByMentor($gibbonPersonID, $status = null, $current = true)
     {
         $query = $this
             ->newSelect()
@@ -681,13 +684,17 @@ class UnitStudentGateway extends QueryableGateway
             ->where("freeLearningUnitStudent.enrolmentMethod='schoolMentor'")
             ->where('freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID')
             ->where("freeLearningUnit.active='Y'")
-            ->where("gibbonPerson.status='Full'")
+
             ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->orderBy(['timestampJoined']);
 
         if (!empty($status)) {
             $query->where('freeLearningUnitStudent.status=:status')
                 ->bindValue('status', $status);
+        }
+
+        if ($current) {
+            $query->where("gibbonPerson.status='Full'");
         }
 
         return $this->runSelect($query)->fetchAll();

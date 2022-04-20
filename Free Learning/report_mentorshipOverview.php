@@ -48,6 +48,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         ? $_GET['allMentors']
         : '';
 
+    $allStudents = $_GET['allStudents'] ?? null;
+
     if ($highestAction == 'Mentorship Overview_all' && $allMentors == "on") {
         $gibbonPersonID = null;
     }
@@ -81,6 +83,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'));
             $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
+
+        $row = $form->addRow();
+            $row->addLabel('allStudents', __('All Students'))->description(__m('Includes all statuses when checked'));
+            $row->addCheckbox('allStudents')->setValue('on')->checked($allStudents);
 
         $form->toggleVisibilityByClass('mentor')->onCheckbox('allMentors')->whenNot('on');
 
@@ -126,11 +132,12 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $criteria = $unitStudentGateway->newQueryCriteria(true)
         ->sortBy(['statusSort', 'timestamp'], 'DESC')
+        ->filterBy('status', $_GET['status'] ?? '')
         ->fromPOST();
     if (!empty($gibbonPersonID)) {
         $criteria->pageSize(0);
     }
-    $mentorship = $unitStudentGateway->queryMentorship($criteria, $gibbonSchoolYearID, !empty($allMentors) ? null : $gibbonPersonID, $dateStart, $dateEnd);
+    $mentorship = $unitStudentGateway->queryMentorship($criteria, $gibbonSchoolYearID, !empty($allMentors) ? null : $gibbonPersonID, $allStudents, $dateStart, $dateEnd);
 
     // Render chart for individuals
     if (!empty($gibbonPersonID) && count($mentorship) > 0) {
