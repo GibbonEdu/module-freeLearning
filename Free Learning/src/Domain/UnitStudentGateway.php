@@ -232,7 +232,7 @@ class UnitStudentGateway extends QueryableGateway
                 ->bindValue('gibbonPersonID', $gibbonPersonID);
         }
 
-        if ($allStudents == "on") {
+        if ($allStudents != "on") {
             $query->where("gibbonPerson.status='Full'");
         }
 
@@ -684,7 +684,6 @@ class UnitStudentGateway extends QueryableGateway
             ->where("freeLearningUnitStudent.enrolmentMethod='schoolMentor'")
             ->where('freeLearningUnitStudent.gibbonPersonIDSchoolMentor=:gibbonPersonID')
             ->where("freeLearningUnit.active='Y'")
-
             ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->orderBy(['timestampJoined']);
 

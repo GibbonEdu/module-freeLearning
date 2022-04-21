@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.19
+--------
+Fixed new Mentorship Overview filter
+
 v5.19.18
 --------
 New Mentorship Overview filters

@@ -65,6 +65,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     $dateStart = $_GET['dateStart'] ?? null;
     $dateEnd = $_GET['dateEnd'] ?? null;
 
+    $status = $_GET['status'] ?? '';
+
     if ($highestAction == 'Mentorship Overview_all') {
         echo "<p>".__m('This report offers a summary of all mentor activity, including enrolments by class.')."</p>";
     } else {
@@ -79,6 +81,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $form->setClass('noIntBorder fullWidth');
 
         $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_mentorshipOverview.php');
+        $form->addHiddenValue('status', $status);
 
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'));
@@ -132,7 +135,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
     $criteria = $unitStudentGateway->newQueryCriteria(true)
         ->sortBy(['statusSort', 'timestamp'], 'DESC')
-        ->filterBy('status', $_GET['status'] ?? '')
+        ->filterBy('status', $status)
         ->fromPOST();
     if (!empty($gibbonPersonID)) {
         $criteria->pageSize(0);
