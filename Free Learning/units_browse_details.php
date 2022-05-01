@@ -473,6 +473,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                     return $student['status'] . '<br/>' . Format::small($enrolmentMethod);
                                 });
 
+                            $table->addColumn('submissions', __m('Submissions'))
+                                ->notSortable();
+
                             $table->addColumn('classMentor', __m('Class/Mentor'))
                                 ->description(__m('Grouping'))
                                 ->sortable(['course', 'class'])

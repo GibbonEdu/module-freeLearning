@@ -39,11 +39,12 @@ class UnitStudentGateway extends QueryableGateway
                 ->newQuery()
                 ->distinct()
                 ->from($this->getTableName())
-                ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey', 'collaborationKey')
+                ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort", 'count(DISTINCT gibbonDiscussionID) AS submissions'])
                 ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
                 ->leftJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
                 ->leftJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
                 ->leftJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+                ->leftJoin('gibbonDiscussion', "gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND gibbonDiscussion.foreignTable='freeLearningUnitStudent' AND gibbonDiscussion.type='Complete - Pending'")
                 ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
                 ->bindValue('freeLearningUnitID', $freeLearningUnitID)
                 ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
@@ -51,16 +52,18 @@ class UnitStudentGateway extends QueryableGateway
                 ->where("gibbonPerson.status='Full'")
                 ->where('(gibbonPerson.dateStart IS NULL OR gibbonPerson.dateStart<=:today)')
                 ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
-                ->bindValue('today', date('Y-m-d'));
+                ->bindValue('today', date('Y-m-d'))
+                ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID', 'gibbonDiscussion.foreignTableID']);
             }
             else {
                 $query = $this
                     ->newQuery()
                     ->distinct()
                     ->from($this->getTableName())
-                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'null AS course', 'null AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey', 'collaborationKey')
+                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'null AS course', 'null AS class', 'mentor.surname AS mentorsurname', 'mentor.preferredName AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort", 'count(DISTINCT gibbonDiscussionID) AS submissions'])
                     ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
                     ->innerJoin('gibbonPerson AS mentor', 'freeLearningUnitStudent.gibbonPersonIDSchoolMentor=mentor.gibbonPersonID')
+                    ->leftJoin('gibbonDiscussion', "gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND gibbonDiscussion.foreignTable='freeLearningUnitStudent' AND gibbonDiscussion.type='Complete - Pending'")
                     ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
                     ->bindValue('freeLearningUnitID', $freeLearningUnitID)
                     ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
@@ -70,16 +73,17 @@ class UnitStudentGateway extends QueryableGateway
                     ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
                     ->bindValue('today', date('Y-m-d'))
                     ->where('mentor.gibbonPersonID=:gibbonPersonID')
-                    ->bindValue('gibbonPersonID', $gibbonPersonID);
-
+                    ->bindValue('gibbonPersonID', $gibbonPersonID)
+                    ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID', 'gibbonDiscussion.foreignTableID']);
                 $this->unionAllWithCriteria($query, $criteria)
                     ->distinct()
                     ->from($this->getTableName())
-                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'null AS mentorsurname', 'null AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort"], 'confirmationKey', 'collaborationKey')
+                    ->cols(['gibbonPerson.gibbonPersonID', 'gibbonPerson.email', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'freeLearningUnitStudent.*', 'gibbonCourse.nameShort AS course', 'gibbonCourseClass.nameShort AS class', 'null AS mentorsurname', 'null AS mentorpreferredName', 'gibbonPerson.fields', 'freeLearningUnitStudent.freeLearningUnitStudentID', "FIELD(freeLearningUnitStudent.status,'Complete - Pending','Evidence Not Yet Approved','Current','Complete - Approved','Exempt') as statusSort", 'count(DISTINCT gibbonDiscussionID) AS submissions'])
                     ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
                     ->innerJoin('gibbonCourseClass', 'freeLearningUnitStudent.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
                     ->innerJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
                     ->innerJoin('gibbonCourse', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
+                    ->leftJoin('gibbonDiscussion', "gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND gibbonDiscussion.foreignTable='freeLearningUnitStudent' AND gibbonDiscussion.type='Complete - Pending'")
                     ->where('freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID')
                     ->bindValue('freeLearningUnitID', $freeLearningUnitID)
                     ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
@@ -89,8 +93,8 @@ class UnitStudentGateway extends QueryableGateway
                     ->where('(gibbonPerson.dateEnd IS NULL OR gibbonPerson.dateEnd>=:today)')
                     ->bindValue('today', date('Y-m-d'))
                     ->where('gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID AND (gibbonCourseClassPerson.role=\'Teacher\' OR gibbonCourseClassPerson.role=\'Assistant\')')
-                    ->bindValue('gibbonPersonID', $gibbonPersonID);
-
+                    ->bindValue('gibbonPersonID', $gibbonPersonID)
+                    ->groupBy(['freeLearningUnitStudent.freeLearningUnitStudentID', 'gibbonDiscussion.foreignTableID']);
             }
 
         return $this->runQuery($query, $criteria);

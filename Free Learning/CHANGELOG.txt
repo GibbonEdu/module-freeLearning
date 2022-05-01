@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.20
+--------
+Added Submissions column to Manage Enrolment tab in Browse Units details
+
 v5.19.19
 --------
 Fixed new Mentorship Overview filter
