@@ -42,6 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $autoAcceptMentorGroups = $_POST['autoAcceptMentorGroups'] ?? '';
     $showContentOnEnrol = $_POST['showContentOnEnrol'] ?? '';
     $collaborativeAssessment = $_POST['collaborativeAssessment'] ?? '';
+    $availableSubmissionTypes = $_POST['availableSubmissionTypes'] ?? 'Link/File';
     $certificatesAvailable = $_POST['certificatesAvailable'] ?? '';
     $certificateTemplate = $_POST['certificateTemplate'] ?? '';
     $certificateOrientation = $_POST['certificateOrientation'] ?? '';
@@ -61,7 +62,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $settingGateway = $container->get(SettingGateway::class);
 
     //Validate Inputs
-    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '' or $autoAcceptMentorGroups == '' or $showContentOnEnrol == '' or $collaborativeAssessment == '' or $certificatesAvailable == '' or $disableOutcomes == '' or $disableExemplarWork == '' or $disableParentEvidence == '' or $disableLearningAreas == '' or $disableLearningAreaMentors == '' or $disableMyClasses == '' or $enableManualBadges == '' or $genderOnFeedback == '' or $studentEvidencePrompt == '' or $mentorshipAcceptancePrompt == '' or $evidenceOutstandingPrompt == '') {
+    if ($difficultyOptions == '' or $publicUnits == '' or $learningAreaRestriction == ''or $enableClassEnrolment == '' or $enableSchoolMentorEnrolment == '' or $enableExternalMentorEnrolment == '' or $autoAcceptMentorGroups == '' or $showContentOnEnrol == '' or $collaborativeAssessment == '' or $availableSubmissionTypes == '' or $certificatesAvailable == '' or $disableOutcomes == '' or $disableExemplarWork == '' or $disableParentEvidence == '' or $disableLearningAreas == '' or $disableLearningAreaMentors == '' or $disableMyClasses == '' or $enableManualBadges == '' or $genderOnFeedback == '' or $studentEvidencePrompt == '' or $mentorshipAcceptancePrompt == '' or $evidenceOutstandingPrompt == '') {
         //Fail 3
         $URL .= '&return=error3';
         header("Location: {$URL}");
@@ -83,6 +84,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'autoAcceptMentorGroups', $autoAcceptMentorGroups);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'showContentOnEnrol', $showContentOnEnrol);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'collaborativeAssessment', $collaborativeAssessment);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'availableSubmissionTypes', $availableSubmissionTypes);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificatesAvailable', $certificatesAvailable);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateTemplate', $certificateTemplate);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateOrientation', $certificateOrientation);

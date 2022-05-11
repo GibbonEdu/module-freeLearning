@@ -311,23 +311,36 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 $row->addLabel('commentStudent', __('Comment'))->description(!empty($values['studentReflectionText']) ? $values['studentReflectionText'] : __m('Leave a brief reflective comment on this unit<br/>and what you learned.'));
                 $row->addTextArea('commentStudent')->setRows(4)->required();
 
-            $types = ['Link' => __('Link'), 'File' => __('File')];
-            $row = $form->addRow();
-                $row->addLabel('type', __('Type'));
-                $row->addRadio('type')->fromArray($types)->inline()->required()->checked('Link');
+
+            $availableSubmissionTypes = $settingGateway->getSettingByScope('Free Learning', 'availableSubmissionTypes');
+            if ($availableSubmissionTypes == "Link/File") {
+                $types = ['Link' => __('Link'), 'File' => __('File')];
+                $row = $form->addRow();
+                    $row->addLabel('type', __('Type'));
+                    $row->addRadio('type')->fromArray($types)->inline()->required()->checked('Link');
+
+                $form->toggleVisibilityByClass('evidenceFile')->onRadio('type')->when('File');
+                $form->toggleVisibilityByClass('evidenceLink')->onRadio('type')->when('Link');
+            } else if ($availableSubmissionTypes == "File") {
+                $form->addHiddenValue('type', 'File');
+            } else if ($availableSubmissionTypes == "Link") {
+                $form->addHiddenValue('type', 'Link');
+            }
 
             // File
-            $fileUploader = $container->get(FileUploader::class);
-            $form->toggleVisibilityByClass('evidenceFile')->onRadio('type')->when('File');
-            $row = $form->addRow()->addClass('evidenceFile');
-                $row->addLabel('file', __('Submit File'));
-                $row->addFileUpload('file')->accepts($fileUploader->getFileExtensions())->required();
+            if ($availableSubmissionTypes == "Link/File" or $availableSubmissionTypes == "File") {
+                $fileUploader = $container->get(FileUploader::class);
+                $row = $form->addRow()->addClass('evidenceFile');
+                    $row->addLabel('file', __('Submit File'));
+                    $row->addFileUpload('file')->accepts($fileUploader->getFileExtensions())->required();
+            }
 
             // Link
-            $form->toggleVisibilityByClass('evidenceLink')->onRadio('type')->when('Link');
-            $row = $form->addRow()->addClass('evidenceLink');
-                $row->addLabel('link', __('Submit Link'));
-                $row->addURL('link')->maxLength(255)->required();
+            if ($availableSubmissionTypes == "Link/File" or $availableSubmissionTypes == "Link") {
+                $row = $form->addRow()->addClass('evidenceLink');
+                    $row->addLabel('link', __('Submit Link'));
+                    $row->addURL('link')->maxLength(255)->required();
+            }
 
             $row = $form->addRow();
                 $row->addFooter();

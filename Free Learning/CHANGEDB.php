@@ -2010,3 +2010,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.19.20';
 $sql[$count][1] = "";
+
+//v5.19.21
+++$count;
+$sql[$count][0] = '5.19.21';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'availableSubmissionTypes', 'Available Submission Types', 'Determines which types of submissions a learner can make.', 'Link/File');end
+";
