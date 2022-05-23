@@ -115,16 +115,19 @@ else {
             return ucwords(preg_replace('/(?<=\\w)(?=[A-Z])/'," $1", $values["enrolmentMethod"])).'<br/>';
         });
 
-    $table->addColumn('grouping', __m('Class/Mentor'))
-        ->sortable(['course', 'class', 'grouping'])
-        ->description(__m('Grouping'))
-        ->format(function($values) use (&$collaborationKeys) {
+    $table->addColumn('class', __m('Class/Mentor'))
+        ->sortable(['course', 'class'])
+        ->format(function($values) use (&$collaborationKeys, $highestAction) {
             $output = '';
             if ($values['enrolmentMethod'] == 'class') {
                 if ($values['course'] != '' and $values['class'] != '') {
                     $output .= $values['course'].'.'.$values['class'];
                 } else {
                     $output .= '<i>'.__('N/A').'</i>';
+                }
+
+                if (!empty($values['teacherNames']) && $highestAction == 'Work Pending Approval_all') {
+                    $output .= "<br/>".Format::small($values['teacherNames']);
                 }
             }
             else if ($values['enrolmentMethod'] == 'schoolMentor') {
@@ -134,6 +137,12 @@ else {
                 $output .= $values['nameExternalMentor'];
             }
 
+            return $output;
+        });
+
+    $table->addColumn('grouping', __m('Grouping'))
+        ->format(function($values) use (&$collaborationKeys) {
+            $output = '';
             $grouping = $values['grouping'];
             if ($values['collaborationKey'] != '') {
                 // Get the index for the group, otherwise add it to the array
@@ -146,7 +155,7 @@ else {
                 }
                 $grouping .= " (".__m("Group")." ".$group.")";
             }
-            $output .= '<br/>' . Format::small($grouping);
+            $output .= $grouping;
 
             return $output;
         });
@@ -191,7 +200,7 @@ else {
                 $personalDescriptors = $gateway->queryIndividualNeedsPersonDescriptors($criteria)->toArray();
 
                 if (count($personalDescriptors) > 0) {
-                    $output .= Format::tag(__('Individual Needs'), 'message mt-1');
+                    $output .= "<br/>".Format::tag(__('Individual Needs'), 'message mt-1');
                 }
 
             }

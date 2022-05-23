@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.19.22
+--------
+Added teachers name to Work Pending Approval_all
+Added link from feedback screen to Browse Unit with course/student pre-selected
+
 v5.19.21
 --------
 Added new setting to control submission type (file or link)
