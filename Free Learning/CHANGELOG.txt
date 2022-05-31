@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.19.23
+--------
+Applied Showcase style to Exemplar work
+Fixed GROUP BY issue in showcase
+
 v5.19.22
 --------
 Added teachers name to Work Pending Approval_all

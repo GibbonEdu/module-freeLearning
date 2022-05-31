@@ -749,93 +749,76 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
                         if ($disableExemplarWork != 'Y') {
                             echo "<div id='tabs6'>";
-                                //Spit out exemplar work
-                                try {
-                                    $dataWork = array('freeLearningUnitID' => $freeLearningUnitID);
-                                    $sqlWork = "SELECT freeLearningUnitStudent.*, preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) WHERE freeLearningUnitID=:freeLearningUnitID AND exemplarWork='Y' ORDER BY timestampCompleteApproved DESC";
-                                    $resultWork = $connection2->prepare($sqlWork);
-                                    $resultWork->execute($dataWork);
-                                } catch (PDOException $e) {
-                                    echo "<div class='error'>".$e->getMessage().'</div>';
-                                }
-                                if ($resultWork->rowCount() < 1) {
-                                    echo "<div class='error'>";
-                                    echo __('There are no records to display.');
-                                    echo '</div>';
-                                } else {
-                                    while ($rowWork = $resultWork->fetch()) {
-                                        $students = '';
-                                        if ($rowWork['grouping'] == 'Individual') { //Created by a single student
-                                        $students = $rowWork['preferredName'];
-                                        } else { //Created by a group of students
-                                                    try {
-                                                        $dataStudents = array('collaborationKey' => $rowWork['collaborationKey']);
-                                                        $sqlStudents = "SELECT preferredName FROM freeLearningUnitStudent JOIN gibbonPerson ON (freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID) JOIN freeLearningUnit ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE active='Y' AND collaborationKey=:collaborationKey ORDER BY preferredName";
-                                                        $resultStudents = $connection2->prepare($sqlStudents);
-                                                        $resultStudents->execute($dataStudents);
-                                                    } catch (PDOException $e) {
-                                                    }
-                                            while ($rowStudents = $resultStudents->fetch()) {
-                                                $students .= $rowStudents['preferredName'].', ';
+                                $units = $unitStudentGateway->selectShowcase($freeLearningUnitID);
+
+                                $table = DataTable::createPaginated('units', $criteria);
+
+                                $table->addColumn('unit', __('Unit'))
+                                    ->format(function ($values) use ($session) {
+                                        if ($values['exemplarWorkThumb'] != '') {
+                                            $return .= "<img style='width: 150px; height: 150px; margin: 5px 0' class='user' src='".$values['exemplarWorkThumb']."'/><br/>";
+                                            if ($values['exemplarWorkLicense'] != '') {
+                                                $return .= "<span style='font-size: 85%; font-style: italic'>".$values['exemplarWorkLicense'].'</span>';
                                             }
-                                            if ($students != '') {
-                                                $students = substr($students, 0, -2);
-                                                $students = preg_replace('/,([^,]*)$/', ' & \1', $students);
+                                        } else {
+                                            if ($values['logo'] != '') {
+                                                $return .= "<img style='height: 150px; width: 150px; opacity: 1.0; margin: 5px 0' class='user' src='".$values['logo']."'/><br/>";
+                                            }
+                                            else {
+                                                $return .= "<img style='height: 150px; width: 150px; opacity: 1.0; margin: 5px 0' class='user' src='".$session->get('absoluteURL').'/themes/'.$session->get('gibbonThemeName')."/img/anonymous_240_square.jpg'/><br/>";
                                             }
                                         }
 
-                                        echo '<h3>';
-                                        echo $students." . <span style='font-size: 75%'>".__m('Shared on').' '.Format::date($rowWork['timestampCompleteApproved']).'</span>';
-                                        echo '</h3>';
-                                        //DISPLAY WORK.
-                                        echo '<h4 style=\'margin-top: 0px\'>'.__m('Student Work').'</h4>';
-                                        if ($rowWork['exemplarWorkEmbed'] =='') { //It's not an embed
-                                            $extension = strrchr($rowWork['evidenceLocation'], '.');
+                                        return $return;
+                                    });
+
+                                $table->addColumn('students', __('Students'))
+                                    ->format(function ($values) {
+                                        $return = preg_replace("/,([^,]+)$/", " & $1", $values['students'])."<br/>";
+
+                                        $return .= Format::small(__m('Shared on')." ".Format::date($values['timestampCompleteApproved']));
+
+                                        return $return;
+                                    });
+
+                                $table->addColumn('work', __('Work'))
+                                    ->format(function ($values) use ($session) {
+                                        $return = '';
+
+                                        $return .= '<p class="mt-4">';
+                                        if ($values['exemplarWorkEmbed'] =='') { //It's not an embed
+                                            $extension = strrchr($values['evidenceLocation'], '.');
                                             if (strcasecmp($extension, '.gif') == 0 or strcasecmp($extension, '.jpg') == 0 or strcasecmp($extension, '.jpeg') == 0 or strcasecmp($extension, '.png') == 0) { //Its an image
-                                                echo "<p>";
-                                                if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                                    echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'/></a>";
+                                                if ($values['evidenceType'] == 'File') { //It's a file
+                                                    $return .= "<a target='_blank' href='".$session->get('absoluteURL').'/'.$values['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$session->get('absoluteURL').'/'.$values['evidenceLocation']."'/></a>";
                                                 } else { //It's a link
-                                                    echo "<a target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$rowWork['evidenceLocation']."'/></a>";
+                                                    $return .= "<a target='_blank' href='".$session->get('absoluteURL').'/'.$values['evidenceLocation']."'><img class='user' style='max-width: 550px' src='".$values['evidenceLocation']."'/></a>";
                                                 }
-                                                echo '</p>';
                                             } else { //Not an image
-                                                echo '<p class=\'button\'>';
-                                                if ($rowWork['evidenceType'] == 'File') { //It's a file
-                                                    echo "<a class='button'target='_blank' href='".$session->get('absoluteURL').'/'.$rowWork['evidenceLocation']."'>".__m('Click to View Work').'</a>';
+                                                if ($values['evidenceType'] == 'File') { //It's a file
+                                                    $return .= "<a class='button' target='_blank' href='".$session->get('absoluteURL').'/'.$values['evidenceLocation']."'>".__m('Click to View Work').'</a>';
                                                 } else { //It's a link
-                                                    echo "<a class='button' target='_blank' href='".$rowWork['evidenceLocation']."'>".__m('Click to View Work').'</a>';
+                                                    $return .= "<a class='button' target='_blank' href='".$values['evidenceLocation']."'>".__m('Click to View Work').'</a>';
                                                 }
-                                                echo '</p>';
                                             }
                                         } else {
-                                            echo '<p>';
-                                            if (filter_var($rowWork['exemplarWorkEmbed'], FILTER_VALIDATE_URL)) {
-                                                echo "<a class='button' target='_blank' href='".$rowWork['exemplarWorkEmbed']."'>".__m('Click to View Work').'</a>';
+                                            if (filter_var($values['exemplarWorkEmbed'], FILTER_VALIDATE_URL)) {
+                                                $return .= "<a class='button' target='_blank' href='".$values['exemplarWorkEmbed']."'>".__m('Click to View Work').'</a>';
                                             } else {
-                                                print $rowWork['exemplarWorkEmbed'];
+                                                $return .= $values['exemplarWorkEmbed'];
                                             }
-                                            echo '</p>';
                                         }
-                                        //DISPLAY STUDENT COMMENT
-                                        if ($rowWork['commentStudent'] != '') {
-                                            echo '<h4>'.__m('Student Comment').'</h4>';
-                                            echo '<p style=\'margin-bottom: 0px\'>';
-                                            echo nl2br($rowWork['commentStudent']);
-                                            echo '</p>';
-                                        }
-                                        //DISPLAY TEACHER COMMENT
-                                        if ($rowWork['commentApproval'] != '') {
-                                            if ($rowWork['commentStudent'] != '') {
-                                                echo '<br/>';
-                                            }
-                                            echo '<h4>'.__m('Teacher Comment').'</h4>';
-                                            echo '<p>';
-                                            echo $rowWork['commentApproval'];
-                                            echo '</p>';
-                                        }
-                                    }
-                                }
+                                        $return .= '<p>';
+
+                                        $return .= "<br/>";
+
+                                        $return .= Format::bold(__m('Student Comment'))."<br/><i>".$values['commentStudent']."</i><br/><br/>";
+                                        $return .= Format::bold(__m('Teacher Comment'))."<br/><i>".$values['commentApproval']."</i>";
+
+                                        return $return;
+                                    });
+
+                                echo $table->render($units);
                             echo '</div>';
                         }
                     }

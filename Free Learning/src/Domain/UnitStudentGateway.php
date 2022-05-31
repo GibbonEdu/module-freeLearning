@@ -610,18 +610,57 @@ class UnitStudentGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
-    public function selectShowcase()
+    public function selectShowcase($freeLearningUnitID = null)
     {
         $query = $this
             ->newSelect()
+            ->cols(['freeLearningUnit.name', 'freeLearningUnit.logo', 'freeLearningUnitStudent.*', "gibbonPerson.preferredName as students"])
+            ->from('freeLearningUnitStudent')
+            ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+            ->where('freeLearningUnit.active=\'Y\'')
+            ->where('freeLearningUnitStudent.exemplarWork=\'Y\'')
+            ->where('freeLearningUnitStudent.grouping=\'Individual\'');
+
+        $query->union()
             ->cols(['freeLearningUnit.name', 'freeLearningUnit.logo', 'freeLearningUnitStudent.*', "GROUP_CONCAT(DISTINCT gibbonPerson.preferredName SEPARATOR ', ') as students"])
             ->from('freeLearningUnitStudent')
             ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
             ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
             ->where('freeLearningUnit.active=\'Y\'')
             ->where('freeLearningUnitStudent.exemplarWork=\'Y\'')
-            ->groupBy(['freeLearningUnit.freeLearningUnitID'])
+            ->where('NOT freeLearningUnitStudent.grouping=\'Individual\'')
+            ->groupBy(['freeLearningUnit.freeLearningUnitID', 'freeLearningUnitStudent.collaborationKey'])
+
+        ->orderBy(['timestampCompleteApproved DESC']);
+
+        if (!empty($freeLearningUnitID)) {
+            $query = $this
+                ->newSelect()
+                ->cols(['freeLearningUnit.name', 'freeLearningUnit.logo', 'freeLearningUnitStudent.*', "gibbonPerson.preferredName as students"])
+                ->from('freeLearningUnitStudent')
+                ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+                ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+                ->where('freeLearningUnit.active=\'Y\'')
+                ->where('freeLearningUnitStudent.exemplarWork=\'Y\'')
+                ->where('freeLearningUnitStudent.grouping=\'Individual\'')
+                ->where('freeLearningUnit.freeLearningUnitID = :freeLearningUnitID')
+                ->bindValue('freeLearningUnitID', $freeLearningUnitID);
+
+            $query->union()
+                ->cols(['freeLearningUnit.name', 'freeLearningUnit.logo', 'freeLearningUnitStudent.*', "GROUP_CONCAT(DISTINCT gibbonPerson.preferredName SEPARATOR ', ') as students"])
+                ->from('freeLearningUnitStudent')
+                ->innerJoin('freeLearningUnit', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+                ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
+                ->where('freeLearningUnit.active=\'Y\'')
+                ->where('freeLearningUnitStudent.exemplarWork=\'Y\'')
+                ->where('NOT freeLearningUnitStudent.grouping=\'Individual\'')
+                ->groupBy(['freeLearningUnit.freeLearningUnitID', 'freeLearningUnitStudent.collaborationKey'])
+                ->where('freeLearningUnit.freeLearningUnitID = :freeLearningUnitID')
+                ->bindValue('freeLearningUnitID', $freeLearningUnitID)
+
             ->orderBy(['timestampCompleteApproved DESC']);
+        }
 
         return $this->runSelect($query)->fetchAll();
     }

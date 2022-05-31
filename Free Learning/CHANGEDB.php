@@ -2025,3 +2025,8 @@ $sql[$count][1] = "
 UPDATE gibbonAction SET entrySidebar='N' WHERE gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning') AND name='Work Pending Approval_my';end
 UPDATE gibbonAction SET entrySidebar='N' WHERE gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Free Learning') AND name='Work Pending Approval_all';end
 ";
+
+//v5.19.23
+++$count;
+$sql[$count][0] = '5.19.23';
+$sql[$count][1] = "";
