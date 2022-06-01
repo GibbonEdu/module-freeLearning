@@ -751,6 +751,9 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             echo "<div id='tabs6'>";
                                 $units = $unitStudentGateway->selectShowcase($freeLearningUnitID);
 
+                                $criteria = $unitStudentGateway->newQueryCriteria(true)
+                                    ->fromPOST();
+
                                 $table = DataTable::createPaginated('units', $criteria);
 
                                 $table->addColumn('unit', __('Unit'))

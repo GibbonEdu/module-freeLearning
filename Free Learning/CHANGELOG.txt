@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.24
+--------
+Fixed Exemplar Work bug when Outcomes are off, caused by v5.19.23
+
 v5.19.23
 --------
 Applied Showcase style to Exemplar work

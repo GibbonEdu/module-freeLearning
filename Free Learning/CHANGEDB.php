@@ -2030,3 +2030,8 @@ UPDATE gibbonAction SET entrySidebar='N' WHERE gibbonModuleID=(SELECT gibbonModu
 ++$count;
 $sql[$count][0] = '5.19.23';
 $sql[$count][1] = "";
+
+//v5.19.24
+++$count;
+$sql[$count][0] = '5.19.24';
+$sql[$count][1] = "";
