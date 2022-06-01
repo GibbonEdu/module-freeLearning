@@ -36,6 +36,9 @@ $publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits'
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
 $browseAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php', 'Browse Units_all');
 
+$unitGateway = $container->get(UnitGateway::class);
+$unitStudentGateway = $container->get(UnitStudentGateway::class);
+
 if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php') == true or ($publicUnits == 'Y' and !$session->exists('username')))) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
@@ -376,10 +379,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                     echo __m('Below you can view those students currently enrolled in this unit from your classes or that you mentor. This includes those who are working on it, those who are awaiting approval and those who have completed it.');
                                 }
                             echo '</p>';
-
-                            // List students whose status is Current or Complete - Pending
-                            $unitGateway = $container->get(UnitGateway::class);
-                            $unitStudentGateway = $container->get(UnitStudentGateway::class);
 
                             // Get list of my classes before we start looping, for efficiency's sake
                             $myClasses = $unitGateway->selectRelevantClassesByTeacher($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
