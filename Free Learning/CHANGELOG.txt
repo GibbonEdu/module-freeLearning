@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.25
+--------
+i18n tweak
+
 v5.19.24
 --------
 Fixed Exemplar Work bug when Outcomes are off, caused by v5.19.23
