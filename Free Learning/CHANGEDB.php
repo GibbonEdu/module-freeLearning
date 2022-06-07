@@ -2040,3 +2040,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.19.25';
 $sql[$count][1] = "";
+
+//v5.19.26
+++$count;
+$sql[$count][0] = '5.19.26';
+$sql[$count][1] = "";

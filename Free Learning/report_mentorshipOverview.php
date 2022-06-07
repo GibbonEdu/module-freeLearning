@@ -73,16 +73,16 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         echo "<p>".__m('This report offers a summary of all of your mentor activity, including enrolments by class.')."</p>";
     }
 
+    $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
+    $form->setFactory(DatabaseFormFactory::create($pdo));
+
+    $form->setTitle(__('Filter'));
+    $form->setClass('noIntBorder fullWidth');
+
+    $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_mentorshipOverview.php');
+    $form->addHiddenValue('status', $status);
+
     if ($highestAction == 'Mentorship Overview_all') {
-        $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
-        $form->setFactory(DatabaseFormFactory::create($pdo));
-
-        $form->setTitle(__('Filter'));
-        $form->setClass('noIntBorder fullWidth');
-
-        $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_mentorshipOverview.php');
-        $form->addHiddenValue('status', $status);
-
         $row = $form->addRow();
             $row->addLabel('allMentors', __('All Mentors'));
             $row->addCheckbox('allMentors')->setValue('on')->checked($allMentors);
@@ -108,20 +108,20 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         $row = $form->addRow();
             $row->addLabel('gibbonSchoolYearID', __('School Year'));
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->required()->selected($gibbonSchoolYearID);
-
-        $row = $form->addRow();
-            $row->addLabel('dateStart', __('Start Date'));
-            $row->addDate('dateStart')->setValue($dateStart);
-
-        $row = $form->addRow();
-            $row->addLabel('dateEnd', __('End Date'));
-            $row->addDate('dateEnd')->setValue($dateEnd);
-
-        $row = $form->addRow();
-            $row->addSearchSubmit($session, __('Clear Filters'));
-
-        echo $form->getOutput();
     }
+
+    $row = $form->addRow();
+        $row->addLabel('dateStart', __('Start Date'));
+        $row->addDate('dateStart')->setValue($dateStart);
+
+    $row = $form->addRow();
+        $row->addLabel('dateEnd', __('End Date'));
+        $row->addDate('dateEnd')->setValue($dateEnd);
+
+    $row = $form->addRow();
+        $row->addSearchSubmit($session, __('Clear Filters'));
+
+    echo $form->getOutput();
 
     $form = BulkActionForm::create('bulkAction', $session->get('absoluteURL').'/modules/Free Learning/report_mentorshipOverviewProcessBulk.php');
 
