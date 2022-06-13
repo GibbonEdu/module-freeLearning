@@ -757,6 +757,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                                 $table->addColumn('unit', __('Unit'))
                                     ->format(function ($values) use ($session) {
+                                        $return = '';
                                         if ($values['exemplarWorkThumb'] != '') {
                                             $return .= "<img style='width: 150px; height: 150px; margin: 5px 0' class='user' src='".$values['exemplarWorkThumb']."'/><br/>";
                                             if ($values['exemplarWorkLicense'] != '') {
