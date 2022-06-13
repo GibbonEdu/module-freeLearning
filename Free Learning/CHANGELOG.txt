@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.19.27
+--------
+Set default Active value to No for new units
+Fixed PHP warning in unit details view
+
 v5.19.26
 --------
 Added date filter to Mentorship Overview_my

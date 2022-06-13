@@ -128,7 +128,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         $row = $form->addRow();
             $row->addLabel('active', __('Active'));
-            $row->addYesNo('active')->required();
+            $row->addYesNo('active')->required()->selected('N');
 
         $row = $form->addRow();
             $row->addLabel('editLock', __('Edit Lock'))->description(__m('Restricts editing to users with Manage Units_all'));
