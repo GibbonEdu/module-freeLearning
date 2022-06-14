@@ -46,6 +46,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
         $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
+        $dateStart = $_GET['dateStart'] ?? null;
+        $dateEnd = $_GET['dateEnd'] ?? null;
 
         // FORM
         $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
@@ -84,6 +86,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->selected($gibbonSchoolYearID);
 
         $row = $form->addRow();
+            $row->addLabel('dateStart', __('Start Date'));
+            $row->addDate('dateStart')->setValue($dateStart);
+
+        $row = $form->addRow();
+            $row->addLabel('dateEnd', __('End Date'));
+            $row->addDate('dateEnd')->setValue($dateEnd);
+
+        $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
@@ -100,6 +110,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         }
 
         $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
-        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID);
+        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd);
     }
 }

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.19.28
+--------
+Added date range filter to Unit History by Student
+
 v5.19.27
 --------
 Set default Active value to No for new units

@@ -41,7 +41,7 @@ class UnitHistory
         $this->templateView = $templateView;
     }
 
-    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null)
+    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null)
     {
         $criteria = $this->unitStudentGateway->newQueryCriteria()
             ->sortBy(['freeLearningUnitStudent.timestampJoined', 'schoolYear'], 'DESC')
@@ -52,7 +52,7 @@ class UnitHistory
             $criteria->pageSize(8);
         }
 
-        $units = $this->unitStudentGateway->queryUnitsByStudent($criteria, $gibbonPersonID, $gibbonSchoolYearID);
+        $units = $this->unitStudentGateway->queryUnitsByStudent($criteria, $gibbonPersonID, $gibbonSchoolYearID, $dateStart, $dateEnd);
 
         $table = !$summary
             ? DataTable::createPaginated('unitHistory', $criteria)->withData($units)
