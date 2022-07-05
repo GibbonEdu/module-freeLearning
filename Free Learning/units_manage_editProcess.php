@@ -22,7 +22,7 @@ use Gibbon\Domain\System\SettingGateway;
 require_once '../../gibbon.php';
 
 $freeLearningUnitID = $_GET['freeLearningUnitID'];
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'];
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_GET['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'].'&showInactive='.$_GET['showInactive'];
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_edit.php') == false) {
     //Fail 0

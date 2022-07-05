@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.19.30
+--------
+Fixed bug preventing View link from working after editing an inactive unit
+Updated Afrikaans translations
+
 v5.19.29
 --------
 Switched current unit colour from pink to blue
