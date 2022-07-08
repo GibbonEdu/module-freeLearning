@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+v5.20.00
+--------
+Added Big Data School setting, which:
+    Adds date filters to Mentorship Overview, setting default to one month
+    Adds date filters to Unit History By Student, setting default to one month
+    Sets School Year filter default to current year in Unit History By Student
+
 v5.19.30
 --------
 Fixed bug preventing View link from working after editing an inactive unit

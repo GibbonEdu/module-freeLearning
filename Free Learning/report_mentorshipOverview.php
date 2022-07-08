@@ -37,6 +37,9 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     // Proceed!
     $page->breadcrumbs->add(__m('Mentorship Overview'));
 
+    $settingGateway = $container->get(SettingGateway::class);
+    $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+
     $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/report_mentorshipOverview.php', $connection2);
     if (empty($highestAction)) {
         $page->addError(__('You do not have access to this action.'));
@@ -61,9 +64,9 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     }
 
     $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
-    $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
-    $dateStart = $_GET['dateStart'] ?? null;
-    $dateEnd = $_GET['dateEnd'] ?? null;
+    $customField = $settingGateway->getSettingByScope('Free Learning', 'customField');
+    $dateStart = $_GET['dateStart'] ?? (($bigDataSchool == "Y") ? Format::date(date('Y-m-d', strtotime(' - 1 months'))) : null);
+    $dateEnd = $_GET['dateEnd'] ?? (($bigDataSchool == "Y") ? Format::date(date('Y-m-d')) : null);
 
     $status = $_GET['status'] ?? '';
 
@@ -110,13 +113,15 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->required()->selected($gibbonSchoolYearID);
     }
 
-    $row = $form->addRow();
-        $row->addLabel('dateStart', __('Start Date'));
-        $row->addDate('dateStart')->setValue($dateStart);
+    if ($bigDataSchool == "Y") {
+        $row = $form->addRow();
+            $row->addLabel('dateStart', __('Start Date'));
+            $row->addDate('dateStart')->setValue($dateStart);
 
-    $row = $form->addRow();
-        $row->addLabel('dateEnd', __('End Date'));
-        $row->addDate('dateEnd')->setValue($dateEnd);
+        $row = $form->addRow();
+            $row->addLabel('dateEnd', __('End Date'));
+            $row->addDate('dateEnd')->setValue($dateEnd);
+    }
 
     $row = $form->addRow();
         $row->addSearchSubmit($session, __('Clear Filters'));

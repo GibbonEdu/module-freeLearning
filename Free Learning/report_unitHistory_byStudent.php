@@ -43,11 +43,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
              ->add(__m('Unit History By Student'));
 
         $settingGateway = $container->get(SettingGateway::class);
+        $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
 
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
-        $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
-        $dateStart = $_GET['dateStart'] ?? null;
-        $dateEnd = $_GET['dateEnd'] ?? null;
+        $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? (($bigDataSchool == "Y") ? $session->get('gibbonSchoolYearID') : null);
+        $dateStart = $_GET['dateStart'] ?? (($bigDataSchool == "Y") ? Format::date(date('Y-m-d', strtotime(' - 1 months'))) : null);
+        $dateEnd = $_GET['dateEnd'] ?? (($bigDataSchool == "Y") ? Format::date(date('Y-m-d')) : null);
 
         // FORM
         $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
@@ -85,13 +86,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $row->addLabel('gibbonSchoolYearID', __('School Year'));
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->selected($gibbonSchoolYearID);
 
-        $row = $form->addRow();
-            $row->addLabel('dateStart', __('Start Date'));
-            $row->addDate('dateStart')->setValue($dateStart);
+        if ($bigDataSchool == "Y") {
+            $row = $form->addRow();
+                $row->addLabel('dateStart', __('Start Date'));
+                $row->addDate('dateStart')->setValue($dateStart);
 
-        $row = $form->addRow();
-            $row->addLabel('dateEnd', __('End Date'));
-            $row->addDate('dateEnd')->setValue($dateEnd);
+            $row = $form->addRow();
+                $row->addLabel('dateEnd', __('End Date'));
+                $row->addDate('dateEnd')->setValue($dateEnd);
+        }
 
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));

@@ -29,8 +29,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     header("Location: {$URL}");
 } else {
     //Proceed!
-    $difficultyOptions = $_POST['difficultyOptions'] ?? '';
+    $bigDataSchool = $_POST['bigDataSchool'] ?? '';
     $publicUnits = $_POST['publicUnits'] ?? '';
+    $difficultyOptions = $_POST['difficultyOptions'] ?? '';
     $unitOutlineTemplate = $_POST['unitOutlineTemplate'] ?? '';
     $smartBlocksTemplate = $_POST['smartBlocksTemplate'] ?? '';
     $learningAreaRestriction = $_POST['learningAreaRestriction'] ?? '';
@@ -71,8 +72,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         //Write to database
         $partialFail = false;
 
-        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'difficultyOptions', $difficultyOptions);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'bigDataSchool', $bigDataSchool);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'publicUnits', $publicUnits);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'difficultyOptions', $difficultyOptions);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'unitOutlineTemplate', $unitOutlineTemplate);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'smartBlocksTemplate', $smartBlocksTemplate);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'learningAreaRestriction', $learningAreaRestriction);
