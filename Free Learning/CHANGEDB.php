@@ -2072,3 +2072,10 @@ $sql[$count][0] = '5.20.00';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'bigDataSchool', 'Big Data School', 'Enables various defaults and filters for schools producing lots of data.', 'N');end
 ";
+
+//v5.20.01
+++$count;
+$sql[$count][0] = '5.20.01';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnitStudent` ADD INDEX(`freeLearningUnitID`);end
+";
