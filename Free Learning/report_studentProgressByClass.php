@@ -33,7 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
 } else {
     //Proceed!
     $page->breadcrumbs
-         ->add(__m('Student Progress by Class'));
+         ->add(__m('Student Progress By Class'));
 
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? null;
     $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? null;

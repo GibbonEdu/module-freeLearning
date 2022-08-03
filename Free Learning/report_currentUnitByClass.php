@@ -34,7 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 } else {
     //Proceed!
     $page->breadcrumbs
-         ->add(__m('Current Unit by Class'));
+         ->add(__m('Current Unit By Class'));
 
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? '';
     $sort = $_GET['sort'] ?? 'status';

@@ -165,7 +165,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 
                     datasets : [
                         {
-                            label: "Units Joined",
+                            label: "<?php echo __m("Units Joined") ?>",
                             backgroundColor : "rgba(253, 226, 255, 0.5)",
                             borderColor : "rgba(169, 60, 179,1)",
                             hoverBorderColor : "rgba(169, 60, 179,1)",
@@ -190,7 +190,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                             ]
                         },
                         {
-                            label: "Units Approved",
+                            label: "<?php echo __m("Units Approved") ?>",
                             backgroundColor : "rgba(198, 246, 213,0.5",
                             borderColor : "rgba(47, 133, 90,1)",
                             hoverBorderColor : "rgba(47, 133, 90,1)",

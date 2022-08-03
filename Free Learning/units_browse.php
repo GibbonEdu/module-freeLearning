@@ -236,7 +236,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         }
 
         if ($unitCount > 999 && empty($gibbonDepartmentID)) {
-            $page->addMessage(__('There are too many units to display: please filter by Learning Area & Course.'));
+            $page->addMessage(__m('There are too many units to display: please filter by Learning Area & Course.'));
         }
         else {
             // Join a set of author data per unit

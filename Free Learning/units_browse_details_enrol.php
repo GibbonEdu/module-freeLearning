@@ -262,6 +262,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
             $logs = array_map(function ($item) {
                 $item['comment'] = Format::hyperlinkAll($item['comment']);
+                $item['type'] = __m($item['type']);
                 return $item;
             }, $logs);
 
@@ -368,6 +369,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $logs = array_map(function ($item) {
             $item['comment'] = Format::hyperlinkAll($item['comment']);
+            $item['type'] = __m($item['type']);
             return $item;
         }, $logs);
 
@@ -421,7 +423,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $form = Form::create('enrolComment', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
         $form->setClass('blank');
         $form->setTitle(__m('Complete - Approved'));
-        $form->setDescription(__m('Congratulations! Your evidence, shown below, has been accepted and approved by your teacher(s), and so you have successfully completed this unit. Please look below for your teacher\'s comment.'));
+        $form->setDescription(__m("Congratulations! Your evidence, shown below, has been accepted and approved by your teacher, and so you have successfully completed this unit. Please look below for your teacher's comment."));
 
         $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
@@ -432,6 +434,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $logs = array_map(function ($item) {
             $item['comment'] = Format::hyperlinkAll($item['comment']);
+            $item['type'] = __m($item['type']);
             return $item;
         }, $logs);
 
