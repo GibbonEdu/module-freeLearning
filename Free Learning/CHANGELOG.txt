@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.20.03
+--------
+Added Joined tag against student name in class evidence approval interface, for Big Data Schools only
+
 v5.20.02
 --------
 Fixed translation issues

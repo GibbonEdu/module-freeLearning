@@ -251,24 +251,26 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
 
     $genderOnFeedback = $settingGateway->getSettingByScope('Free Learning', 'genderOnFeedback');
+    $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
 
     if ($collaborativeAssessment == 'Y' && !empty($values['collaborationKey'])) {
         $row = $form->addRow();
             $row->addLabel('student', __('Students'));
             $col = $row->addColumn()->setClass('flex-col');
-
         $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
         foreach ($collaborators as $index => $collaborator) {
-            $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message ml-2') : '';
-            $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($values['gender']), 'dull ml-2') : "";
-            $col->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'], 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$collaborator['gibbonPersonID']."'>".Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false)."</a>".$gender.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
+            $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mr-2 mt-2') : '';
+            $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($collaborator['gender']), 'dull mr-2 mt-2') : "";
+            $dateStart = ($bigDataSchool == "Y" && !empty($collaborator['dateStart'])) ? Format::tag(__m("Joined {dateStart}", ["dateStart" => Format::date($collaborator['dateStart'])]), 'dull mr-2 mt-2') : "";
+            $col->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'], 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$collaborator['gibbonPersonID']."'>".Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
         }
     } else {
-        $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message ml-2') : '';
-        $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($values['gender']), 'dull ml-2') : "";
+        $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mr-2 mt-2') : '';
+        $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($values['gender']), 'dull mr-2 mt-2') : "";
+        $dateStart = ($bigDataSchool == "Y" && !empty($values['dateStart'])) ? Format::tag(__m("Joined {dateStart}", ["dateStart" => Format::date($values['dateStart'])]), 'dull mr-2 mt-2') : "";
         $row = $form->addRow();
             $row->addLabel('student', __('Student'));
-            $row->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'], 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$values['gibbonPersonID']."'>".Format::name('', $values['preferredName'], $values['surname'], 'Student', false)."</a>".$gender.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
+            $row->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'], 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$values['gibbonPersonID']."'>".Format::name('', $values['preferredName'], $values['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
     }
 
     $submissionLink = $values['evidenceType'] == 'Link'
