@@ -2089,3 +2089,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.20.03';
 $sql[$count][1] = "";
+
+//v5.20.04
+++$count;
+$sql[$count][0] = '5.20.04';
+$sql[$count][1] = "
+ALTER TABLE `freeLearningUnit` ADD `assessable` enum('Y','N') NULL DEFAULT NULL AFTER `license`;end
+";

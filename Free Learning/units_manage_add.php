@@ -122,6 +122,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addLabel('file', __m('Logo'))->description(__m('125px x 125px'));
             $row->addFileUpload('file')->accepts('.jpg,.jpeg,.gif,.png');
 
+        $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+        if ($bigDataSchool == "Y") {
+            $row = $form->addRow();
+                $row->addLabel('assessable', __m('Assessable'))->description(__m('Flag this unit as representing an additional assessment task?'));
+                $row->addYesNo('assessable')->required()->selected('N');
+        }
 
         // ACCESS
         $form->addRow()->addHeading(__m('Access'))->append(__m('Users with permission to manage units can override avaiability preferences.'));

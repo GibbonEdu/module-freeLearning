@@ -195,6 +195,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     ->accepts('.jpg,.jpeg,.gif,.png')
                     ->setAttachment('logo', null, $values['logo']);
 
+            $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+            if ($bigDataSchool == "Y") {
+                $row = $form->addRow();
+                    $row->addLabel('assessable', __m('Assessable'))->description(__m('Flag this unit as representing an additional assessment task?'));
+                    $row->addYesNo('assessable')->required();
+            }
+
             $row = $form->addRow();
             $row->addLabel('majorEdit', __('Major Edit'))->description(__m('If checked, you will be added as an author.'));
                 $row->addCheckbox('majorEdit')->setValue('Y')->description(__('Yes'));
