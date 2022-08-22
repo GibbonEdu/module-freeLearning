@@ -2096,3 +2096,8 @@ $sql[$count][0] = '5.20.04';
 $sql[$count][1] = "
 ALTER TABLE `freeLearningUnit` ADD `assessable` enum('Y','N') NULL DEFAULT NULL AFTER `license`;end
 ";
+
+//v5.20.05
+++$count;
+$sql[$count][0] = '5.20.05';
+$sql[$count][1] = "";

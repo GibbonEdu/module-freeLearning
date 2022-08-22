@@ -23,6 +23,7 @@ use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\Markbook\MarkbookColumnGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
@@ -127,6 +128,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         return;
     }
 
+    // COPY TO MARKBOOK PREPARATION
+    $gibbonMarkbookColumnID = null;
+    $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+    if ($bigDataSchool && !empty($values['gibbonCourseClassID'])) {
+        $markbookColumnGateway = $container->get(MarkbookColumnGateway::class);
+        $gibbonMarkbookColumn = $markbookColumnGateway->selectBy(['name' => $values['name'], 'gibbonCourseClassID' => $values['gibbonCourseClassID']]);
+        if ($gibbonMarkbookColumn->rowCount() == 1) {
+            $gibbonMarkbookColumnID = $gibbonMarkbookColumn->fetch()['gibbonMarkbookColumnID'];
+        }
+    }
+
     //  DETAILS TABLE
     $table = DataTable::createDetails('personal');
     $table->addHeaderAction('edit', __('Edit'))
@@ -143,6 +155,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         }
     });
     $table->addColumn('authors', __('Authors'))->format(Format::using('nameList', 'authors'));
+
+    if ($bigDataSchool && !empty($values['gibbonCourseClassID']) && !is_null($gibbonMarkbookColumnID) && $values['status'] == 'Complete - Approved') {
+        $table->addColumn('linkToMarkbook', 'Markbook')->format(function ($unit) use ($values, $gibbonMarkbookColumnID) {
+            return Format::link('./index.php?q=/modules/Markbook/markbook_edit_data.php&gibbonCourseClassID='.$values['gibbonCourseClassID'].'&gibbonMarkbookColumnID='.$gibbonMarkbookColumnID.'#'.$values['gibbonPersonIDStudent'], __('Enter Data'));
+        });
+    }
 
     echo $table->render([$values]);
 
@@ -251,7 +269,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $form->addHiddenValue('freeLearningUnitStudentID', $freeLearningUnitStudentID);
 
     $genderOnFeedback = $settingGateway->getSettingByScope('Free Learning', 'genderOnFeedback');
-    $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
 
     if ($collaborativeAssessment == 'Y' && !empty($values['collaborationKey'])) {
         $row = $form->addRow();
@@ -318,6 +335,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $row = $form->addRow()->addClass('exemplarYes');
             $row->addLabel('exemplarWorkEmbed', __m('Exemplar Work Link or Embed'))->description(__m('Include specific link or embed code, otherwise the submitted version of the work will be used.'));
             $row->addTextField('exemplarWorkEmbed')->maxLength(255)->setValue($values['exemplarWorkEmbed']);
+    }
+
+    // COPY TO MARKBOOK OUTPUT
+    if ($bigDataSchool && !empty($values['gibbonCourseClassID']) && !is_null($gibbonMarkbookColumnID)) {
+        $row = $form->addRow()->addClass('approved');
+            $row->addLabel('copyToMarkbook', __m('Copy To Markbook'))->description(__m('Insert this comment into an existing Markbook column for this class, with a matching column name? If a comment exists already, it will be overwritten.'));
+            $row->addYesNo('copyToMarkbook')->required();
+
+        $form->addHiddenValue('gibbonMarkbookColumnID', $gibbonMarkbookColumnID);
+        $form->addHiddenValue('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);
     }
 
     $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');

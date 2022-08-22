@@ -19,6 +19,7 @@ along with this program. If not, see <http:// www.gnu.org/licenses/>.
 
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Domain\Markbook\MarkbookEntryGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 require_once '../../gibbon.php';
@@ -158,6 +159,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $attachment = '';
                     $badgesBadgeID = $_POST['badgesBadgeID'] ?? '';
 
+                    // Copy to Markbook
+                    $copyToMarkbook = $_POST['copyToMarkbook'] ?? 'N';
+                    $gibbonMarkbookColumnID = $_POST['gibbonMarkbookColumnID'] ?? null;
+                    $gibbonPersonIDStudent = $_POST['gibbonPersonIDStudent'] ?? null;
+
+                    if ($copyToMarkbook == "Y" && !empty($gibbonMarkbookColumnID) && !empty($gibbonPersonIDStudent)) {
+                        $markbookEntryGateway = $container->get(MarkbookEntryGateway::class);
+                        $gibbonMarkbookEntry = $markbookEntryGateway->selectBy(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
+
+                        if ($gibbonMarkbookEntry->rowCount() == 1) { // Update existing row
+                            $gibbonMarkbookEntryID = $gibbonMarkbookEntry->fetch()['gibbonMarkbookEntryID'];
+                            $markbookEntryGateway->update($gibbonMarkbookEntryID, ['comment' => strip_tags($commentApproval)]);
+                        } else { //Insert new row, overwriting comment
+                            $markbookEntryGateway->insert(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'comment' => strip_tags($commentApproval), 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
+                        }
+                    }
+
                     // Validation
                     if ($commentApproval == '' or $exemplarWork == '') {
                         // Fail 3
@@ -206,7 +224,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $gibbonPersonIDStudents[] = $rowNotification['gibbonPersonIDStudent'];
                             }
                         }
-                        
+
                         $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
                         $notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
 

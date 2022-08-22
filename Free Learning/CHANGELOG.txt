@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v5.20.05
+--------
+Added Copy to Markbook feature
+
 v5.20.04
 --------
-Added an Assessable flag to units, for Big Data Schools only 
+Added an Assessable flag to units, for Big Data Schools only
 
 v5.20.03
 --------
