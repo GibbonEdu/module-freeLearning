@@ -2,7 +2,7 @@ CHANGELOG
 =========
 v5.20.05
 --------
-Added Copy to Markbook feature
+Added Copy to Markbook feature, for Big Data Schools only
 
 v5.20.04
 --------
