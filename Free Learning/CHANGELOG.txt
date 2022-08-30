@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.20.06
+--------
+Fixed badge and notification eating bug in Copy to Markbook feature
+
 v5.20.05
 --------
 Added Copy to Markbook feature, for Big Data Schools only

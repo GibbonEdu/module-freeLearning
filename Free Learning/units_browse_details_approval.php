@@ -131,7 +131,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     // COPY TO MARKBOOK PREPARATION
     $gibbonMarkbookColumnID = null;
     $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
-    if ($bigDataSchool && !empty($values['gibbonCourseClassID'])) {
+    if ($bigDataSchool == "Y" && !empty($values['gibbonCourseClassID'])) {
         $markbookColumnGateway = $container->get(MarkbookColumnGateway::class);
         $gibbonMarkbookColumn = $markbookColumnGateway->selectBy(['name' => $values['name'], 'gibbonCourseClassID' => $values['gibbonCourseClassID']]);
         if ($gibbonMarkbookColumn->rowCount() == 1) {
@@ -156,7 +156,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     });
     $table->addColumn('authors', __('Authors'))->format(Format::using('nameList', 'authors'));
 
-    if ($bigDataSchool && !empty($values['gibbonCourseClassID']) && !is_null($gibbonMarkbookColumnID) && $values['status'] == 'Complete - Approved') {
+    if ($bigDataSchool == "Y" && !empty($values['gibbonCourseClassID']) && !is_null($gibbonMarkbookColumnID) && $values['status'] == 'Complete - Approved') {
         $table->addColumn('linkToMarkbook', 'Markbook')->format(function ($unit) use ($values, $gibbonMarkbookColumnID) {
             return Format::link('./index.php?q=/modules/Markbook/markbook_edit_data.php&gibbonCourseClassID='.$values['gibbonCourseClassID'].'&gibbonMarkbookColumnID='.$gibbonMarkbookColumnID.'#'.$values['gibbonPersonIDStudent'], __('Enter Data'));
         });
@@ -338,13 +338,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     }
 
     // COPY TO MARKBOOK OUTPUT
-    if ($bigDataSchool && !empty($values['gibbonCourseClassID']) && !is_null($gibbonMarkbookColumnID)) {
+    if ($bigDataSchool == "Y" && !empty($values['gibbonCourseClassID']) && !is_null($gibbonMarkbookColumnID)) {
         $row = $form->addRow()->addClass('approved');
             $row->addLabel('copyToMarkbook', __m('Copy To Markbook'))->description(__m('Insert this comment into an existing Markbook column for this class, with a matching column name? If a comment exists already, it will be overwritten.'));
             $row->addYesNo('copyToMarkbook')->required();
 
         $form->addHiddenValue('gibbonMarkbookColumnID', $gibbonMarkbookColumnID);
-        $form->addHiddenValue('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);
     }
 
     $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');

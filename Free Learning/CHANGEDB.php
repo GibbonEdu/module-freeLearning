@@ -2101,3 +2101,8 @@ ALTER TABLE `freeLearningUnit` ADD `assessable` enum('Y','N') NULL DEFAULT NULL 
 ++$count;
 $sql[$count][0] = '5.20.05';
 $sql[$count][1] = "";
+
+//v5.20.06
+++$count;
+$sql[$count][0] = '5.20.06';
+$sql[$count][1] = "";

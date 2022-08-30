@@ -159,23 +159,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $attachment = '';
                     $badgesBadgeID = $_POST['badgesBadgeID'] ?? '';
 
-                    // Copy to Markbook
-                    $copyToMarkbook = $_POST['copyToMarkbook'] ?? 'N';
-                    $gibbonMarkbookColumnID = $_POST['gibbonMarkbookColumnID'] ?? null;
-                    $gibbonPersonIDStudent = $_POST['gibbonPersonIDStudent'] ?? null;
-
-                    if ($copyToMarkbook == "Y" && !empty($gibbonMarkbookColumnID) && !empty($gibbonPersonIDStudent)) {
-                        $markbookEntryGateway = $container->get(MarkbookEntryGateway::class);
-                        $gibbonMarkbookEntry = $markbookEntryGateway->selectBy(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
-
-                        if ($gibbonMarkbookEntry->rowCount() == 1) { // Update existing row
-                            $gibbonMarkbookEntryID = $gibbonMarkbookEntry->fetch()['gibbonMarkbookEntryID'];
-                            $markbookEntryGateway->update($gibbonMarkbookEntryID, ['comment' => strip_tags($commentApproval)]);
-                        } else { //Insert new row, overwriting comment
-                            $markbookEntryGateway->insert(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'comment' => strip_tags($commentApproval), 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
-                        }
-                    }
-
                     // Validation
                     if ($commentApproval == '' or $exemplarWork == '') {
                         // Fail 3
@@ -281,6 +264,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     }
                                 }
                                 $notificationSender->sendNotifications();
+                            }
+
+                            // Copy to Markbook
+                            $copyToMarkbook = $_POST['copyToMarkbook'] ?? 'N';
+                            $gibbonMarkbookColumnID = $_POST['gibbonMarkbookColumnID'] ?? null;
+
+                            if ($copyToMarkbook == "Y" && !empty($gibbonMarkbookColumnID) && !empty($gibbonPersonIDStudent)) {
+                                $markbookEntryGateway = $container->get(MarkbookEntryGateway::class);
+
+                                foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
+                                    $gibbonMarkbookEntry = $markbookEntryGateway->selectBy(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
+
+                                    if ($gibbonMarkbookEntry->rowCount() == 1) { // Update existing row
+                                        $gibbonMarkbookEntryID = $gibbonMarkbookEntry->fetch()['gibbonMarkbookEntryID'];
+                                        $markbookEntryGateway->update($gibbonMarkbookEntryID, ['comment' => strip_tags($commentApproval)]);
+                                    } else { //Insert new row, overwriting comment
+                                        $markbookEntryGateway->insert(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'comment' => strip_tags($commentApproval), 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
+                                    }
+                                }
                             }
 
                             // Deal with manually granted badges
