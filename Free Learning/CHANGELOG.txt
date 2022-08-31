@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.20.07
+--------
+Improved Assessable default for existing units
+
 v5.20.06
 --------
 Fixed badge and notification eating bug in Copy to Markbook feature

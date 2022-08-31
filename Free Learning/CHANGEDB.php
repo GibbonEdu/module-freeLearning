@@ -2106,3 +2106,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.20.06';
 $sql[$count][1] = "";
+
+//v5.20.07
+++$count;
+$sql[$count][0] = '5.20.07';
+$sql[$count][1] = "";

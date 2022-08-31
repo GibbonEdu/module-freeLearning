@@ -199,7 +199,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             if ($bigDataSchool == "Y") {
                 $row = $form->addRow();
                     $row->addLabel('assessable', __m('Assessable'))->description(__m('Flag this unit as representing an additional assessment task?'));
-                    $row->addYesNo('assessable')->required();
+                    $row->addYesNo('assessable')->required()->selected('N');
             }
 
             $row = $form->addRow();
