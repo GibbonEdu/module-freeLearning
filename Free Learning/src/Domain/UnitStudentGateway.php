@@ -586,7 +586,7 @@ class UnitStudentGateway extends QueryableGateway
                 WHERE freeLearningUnit.active='Y'
                 AND (:prerequisiteList = '' OR FIND_IN_SET(freeLearningUnit.freeLearningUnitID, :prerequisiteList))
                 AND (freeLearningUnitStudent.status='Complete - Approved' OR freeLearningUnitStudent.status='Exempt')
-                GROUP BY freeLearningUnitStudent.freeLearningUnitStudentID
+                GROUP BY freeLearningUnitStudent.gibbonPersonIDStudent
             ) AS prerequisites ON (prerequisites.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID)
             LEFT JOIN (
                 SELECT freeLearningUnitStudentID as completed, freeLearningUnitStudent.gibbonPersonIDStudent

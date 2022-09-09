@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.20.08
+--------
+Fix collaborator list for units with multiple prerequisites
+
 v5.20.07
 --------
 Improved Assessable default for existing units
