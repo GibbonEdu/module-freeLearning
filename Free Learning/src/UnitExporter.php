@@ -95,6 +95,8 @@ class UnitExporter
         $blocks = $this->unitBlockGateway->selectBlocksByUnit($freeLearningUnitID)->fetchAll();
         foreach ($blocks as $index => $block) {
             $dom = new DOMDocument();
+            if (empty($blocks[$index]['contents'])) continue;
+            
             @$dom->loadHTML($blocks[$index]['contents']);
             foreach ($dom->getElementsByTagName('img') as $node) {
                 $src = $node->getAttribute('src');
