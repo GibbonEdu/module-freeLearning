@@ -265,7 +265,6 @@ class UnitGateway extends QueryableGateway
 
     public function selectLearningAreasAndCourses($gibbonPersonID = null, $disableLearningAreas = 'N', $roleCategory = null, $gibbonSchoolYearID = null, $highestAction = 'Browse Units_prerequisites')
     {
-        echo $highestAction;
         $data = [];
         $sql = '';
 
