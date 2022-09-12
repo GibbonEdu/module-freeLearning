@@ -491,18 +491,21 @@ class UnitStudentGateway extends QueryableGateway
 
     public function selectCoursesByStudent($gibbonPersonIDStudent, $gibbonSchoolYearID)
     {
-        $data = ['gibbonPersonID' => $gibbonPersonIDStudent, 'gibbonSchoolYearID' => $gibbonSchoolYearID, 'groupBy' => __m('Enrolled Course')];
-        $sql = "SELECT DISTINCT course as value, course as name, :groupBy as groupBy
-            FROM freeLearningUnit
-            JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-            WHERE active='Y'
-            AND NOT course IS NULL
-            AND NOT course=''
-            AND freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID
-            AND freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID
-            ORDER BY course";
+        $query = $this
+            ->newSelect()
+            ->cols(['course as value', 'course as name', "'".__m('Enrolled Course')."' as groupBy"])
+            ->from('freeLearningUnit')
+            ->innerJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
+            ->where("freeLearningUnit.active='Y'")
+            ->where('NOT course IS NULL')
+            ->where('NOT course=\'\'')
+            ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
+            ->where('freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonIDStudent')
+            ->bindValue('gibbonPersonIDStudent', $gibbonPersonIDStudent)
+            ->orderBy(['course']);
 
-        return $this->db()->select($sql, $data);
+        return $this->runSelect($query);
     }
 
     public function selectUnitCollaboratorsByKey($collaborationKey)

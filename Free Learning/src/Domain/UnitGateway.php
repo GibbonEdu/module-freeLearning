@@ -263,11 +263,63 @@ class UnitGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
-    public function selectLearningAreasAndCourses($gibbonPersonID = null, $disableLearningAreas = 'N')
+    public function selectLearningAreasAndCourses($gibbonPersonID = null, $disableLearningAreas = 'N', $roleCategory = null, $gibbonSchoolYearID = null, $highestAction = 'Browse Units_prerequisites')
     {
+        echo $highestAction;
         $data = [];
         $sql = '';
 
+        // Prep course query
+        $data['course'] = __m('Course');
+        if ($roleCategory == "Student") {
+            $data['gibbonSchoolYearID'] = $gibbonSchoolYearID;
+            $data['gibbonPersonID2'] = $gibbonPersonID;
+            $course = "(SELECT DISTINCT course as value, course as name, :course as groupBy
+                FROM freeLearningUnit
+                LEFT JOIN gibbonStudentEnrolment ON (gibbonPersonID=:gibbonPersonID2 AND gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID)
+                LEFT JOIN gibbonYearGroup as studentYearGroup ON (gibbonStudentEnrolment.gibbonYearGroupID=studentYearGroup.gibbonYearGroupID)
+                LEFT JOIN gibbonYearGroup as minimumYearGroup ON (freeLearningUnit.gibbonYearGroupIDMinimum=minimumYearGroup.gibbonYearGroupID)
+                WHERE active='Y'
+                AND NOT course IS NULL
+                AND NOT course=''
+                AND (minimumYearGroup.sequenceNumber IS NULL OR minimumYearGroup.sequenceNumber<=studentYearGroup.sequenceNumber)
+                AND freeLearningUnit.active='Y'
+                AND freeLearningUnit.availableStudents='Y')";
+        } else if ($roleCategory == "Staff") {
+            $course = "(SELECT DISTINCT course as value, course as name, :course as groupBy
+                FROM freeLearningUnit
+                WHERE active='Y'
+                AND NOT course IS NULL
+                AND NOT course=''";
+                if ($highestAction = 'Browse Units_prerequisites') {
+                    $course .= "AND freeLearningUnit.availableStaff='Y'";
+                }
+                $course .= ")";
+        } else if ($roleCategory == "Parent") {
+            $course = "(SELECT DISTINCT course as value, course as name, :course as groupBy
+                FROM freeLearningUnit
+                WHERE active='Y'
+                AND NOT course IS NULL
+                AND NOT course=''
+                AND freeLearningUnit.availableParents='Y')";
+        } else if ($roleCategory == "Other") {
+            $course = "(SELECT DISTINCT course as value, course as name, :course as groupBy
+                FROM freeLearningUnit
+                WHERE active='Y'
+                AND NOT course IS NULL
+                AND NOT course=''
+                AND freeLearningUnit.availableOther='Y')";
+        } else {
+            $course = "(SELECT DISTINCT course as value, course as name, :course as groupBy
+                FROM freeLearningUnit
+                WHERE active='Y'
+                AND NOT course IS NULL
+                AND NOT course=''
+                AND freeLearningUnit.sharedPublic='Y'
+                AND freeLearningUnit.gibbonYearGroupIDMinimum IS NULL)";
+        }
+
+        // Prep main query
         if ($disableLearningAreas != 'Y') {
             if (!empty($gibbonPersonID)) {
                 $data['gibbonPersonID'] = $gibbonPersonID;
@@ -291,24 +343,10 @@ class UnitGateway extends QueryableGateway
                         ORDER BY gibbonDepartment.name
                         ) UNION ALL ";
             }
+            $sql .= $course. " ORDER BY FIELD(groupBy, :learningArea, :course), name";
 
-            $data['course'] = __m('Course');
-            $sql .= "(SELECT DISTINCT course as value, course as name, :course as groupBy
-                FROM freeLearningUnit
-                WHERE active='Y'
-                AND NOT course IS NULL
-                AND NOT course=''
-                ORDER BY course
-            )
-            ORDER BY FIELD(groupBy, :learningArea, :course), name";
         } else {
-            $data['course'] = __m('Course');
-            $sql .= "SELECT DISTINCT course as value, course as name, :course as groupBy
-                FROM freeLearningUnit
-                WHERE active='Y'
-                AND NOT course IS NULL
-                AND NOT course=''
-                ORDER BY course";
+            $sql = $course . " ORDER BY course";
         }
 
         return $this->db()->select($sql, $data);
