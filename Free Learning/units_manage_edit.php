@@ -321,7 +321,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
             // SMART BLOCKS
 
-            $unitBlockGateway = $container->get(UnitBlockGateway::Class);
+            $unitBlockGateway = $container->get(UnitBlockGateway::class);
 
 
             $form->addRow()->addHeading(__('Smart Blocks'))->append(__('Smart Blocks aid unit planning by giving teachers help in creating and maintaining new units, splitting material into smaller units which can be deployed to lesson plans. As well as predefined fields to fill, Smart Units provide a visual view of the content blocks that make up a unit. Blocks may be any kind of content, such as discussion, assessments, group work, outcome etc.'));
@@ -407,6 +407,39 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 if (!$('#smart').data('gibbonCustomBlocks')) {
                     $('#selectUnit').parents('tr').hide();
                 }
+            });
+
+            // Enable quicksaving blocks
+            $(document).on('click', 'a.blockButton[data-event="quicksave"]', function (event) {
+                var blockTemplate = $(event.target).parents('.blockTemplate');
+
+                var blockID = $('input[name^="freeLearningUnitBlockID"]', blockTemplate);
+                var blockTitle = $('input[name^="title"]', blockTemplate);
+                var blockContent = $('.tinymce[id^="contents"]', blockTemplate);
+                var blockTeacherNotes = $('.tinymce[id^="teachersNotes"]', blockTemplate);
+
+                event.preventDefault();
+                tinymce.triggerSave();
+
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        freeLearningUnitBlockID: blockID.val(),
+                        title: blockTitle.val(),
+                        type: $('input[name^="type"]', blockTemplate).val(),
+                        length: $('input[name^="length"]', blockTemplate).val(),
+                        contents: blockContent.val(),
+                        teachersNotes: blockTeacherNotes.val(),
+                    },
+                    url: "<?php echo $session->get('absoluteURL') . '/modules/Free Learning/units_manage_editAjax.php' ?>",
+                    success: function (responseData) {
+                        if (responseData == 1) {
+                            alert('<?php echo __m('Quicksave successful.'); ?>');
+                        } else {
+                            alert('<?php echo __m('Quicksave failed. Please submit the form to save your data.'); ?>');
+                        }
+                    }
+                });
             });
 
             // Make Copy Block Selector Work

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.00
+--------
+Added a quicksave option when editing unit blocks in Manage Units
+
 v5.20.10
 --------
 Limited Course list in Browse Units to remove courses with no units available

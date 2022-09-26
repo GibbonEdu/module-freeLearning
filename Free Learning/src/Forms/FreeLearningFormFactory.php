@@ -63,6 +63,7 @@ class FreeLearningFormFactory extends DatabaseFormFactory
                 'orderName'         => 'order',
             ])
             ->placeholder(__('Smart Blocks listed here...'))
+            ->addBlockButton('quicksave', __('Quicksave'), $session->get('absoluteURL').'/modules/Free Learning/img/save.png', 'showHide')
             ->addBlockButton('showHide', __('Show/Hide'), 'plus.png');
 
         return $customBlocks;
@@ -82,8 +83,7 @@ class FreeLearningFormFactory extends DatabaseFormFactory
                 ->maxlength(100)
                 ->setClass('w-3/4 title focus:bg-white')
                 ->placeholder(__('Title'))
-                ->append('<input type="hidden" id="gibbonUnitClassBlockID" name="gibbonUnitClassBlockID" value="">')
-                ->append('<input type="hidden" id="gibbonUnitBlockID" name="gibbonUnitBlockID" value="">');
+                ->append('<input type="hidden" id="freeLearningUnitBlockID" name="freeLearningUnitBlockID" value="">');
 
             $row = $blockTemplate->addRow()->addClass('w-3/4 flex justify-between mt-1');
                 $row->addTextField('type')->placeholder(__('type (e.g. discussion, outcome)'))
