@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.01
+--------
+Fixed bug impacting student Course listing in Browse Units
+
 v5.21.00
 --------
 Added a quicksave option when editing unit blocks in Manage Units
