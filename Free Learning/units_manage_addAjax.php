@@ -34,10 +34,12 @@ if (empty($gibbon->session->get('gibbonPersonID')) || empty($gibbon->session->ge
         die();
     }
 
-
     $unitBlockGateway = $container->get(UnitBlockGateway::class);
 
-    echo json_encode($unitBlockGateway->getByID($freeLearningUnitBlockID));
+    $unit = $unitBlockGateway->getByID($freeLearningUnitBlockID);
+    $unit['freeLearningUnitBlockID'] = null;
+
+    echo json_encode($unit);
 }
 
 ?>
