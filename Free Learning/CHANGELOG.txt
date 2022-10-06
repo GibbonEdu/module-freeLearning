@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.03
+--------
+Fixed missing Learning Areas bug, caused by v5.21.01
+
 v5.21.02
 --------
 Fixed Smart Block copy thief issue

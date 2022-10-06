@@ -263,7 +263,7 @@ class UnitGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
-    public function selectLearningAreasAndCourses($gibbonPersonID = null, $disableLearningAreas = 'N', $roleCategory = null, $gibbonSchoolYearID = null, $highestAction = 'Browse Units_prerequisites')
+    public function selectLearningAreasAndCourses($gibbonPersonID = null, $disableLearningAreas = 'N', $roleCategory = null, $gibbonSchoolYearID = null, $highestAction = 'Browse Units_prerequisites', $mode = 'Browse')
     {
         $data = [];
         $sql = '';
@@ -320,7 +320,7 @@ class UnitGateway extends QueryableGateway
 
         // Prep main query
         if ($disableLearningAreas != 'Y') {
-            if (!empty($gibbonPersonID)) {
+            if (!empty($gibbonPersonID) && $mode == 'Manage') {
                 $data['gibbonPersonID'] = $gibbonPersonID;
                 $data['learningArea'] = __m('Learning Area');
                 $sql .= "(SELECT gibbonDepartment.gibbonDepartmentID as value, gibbonDepartment.name, :learningArea as groupBy
