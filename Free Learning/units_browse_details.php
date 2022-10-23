@@ -140,6 +140,14 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                 $enrolled = ($resultEnrol->rowCount() == 1) ? true : false ;
 
+                // Add prerequisitesMet if student has exemption for this unit
+                if ($enrolled) {
+                    $rowEnrol = $resultEnrol->fetch() ;
+                    if ($rowEnrol['status'] == 'Exempt') {
+                        $prerequisitesMet = true;
+                    }
+                }
+
                 // UNIT DETAILS TABLE
                 $table = DataTable::createDetails('unitDetails');
 
