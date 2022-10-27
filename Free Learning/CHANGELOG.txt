@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.05
+--------
+Added bulk Lock/Unlock option in Manage Units
+
 v5.21.04
 --------
 Gives student with Exemption the ability to see unit contents

@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Module\FreeLearning\UnitExporter;
 use Gibbon\Module\FreeLearning\UnitDuplicator;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
 $_POST['address'] = '/modules/Free Learning/units_manage.php';
 
@@ -67,6 +68,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
             $partialFail = $duplicator->duplicateUnit($freeLearningUnitID);
+        }
+
+    } else if ($action == 'Lock' or $action == 'Unlock') {
+
+        $unitGateway = $container->get(UnitGateway::class);
+
+        foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
+            $partialFail = !$unitGateway->update($freeLearningUnitID, ['editLock' => ($action == 'Lock' ? 'Y' : 'N')]);
         }
 
     } else {

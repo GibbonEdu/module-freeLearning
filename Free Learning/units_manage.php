@@ -94,7 +94,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         $form = BulkActionForm::create('bulkAction', $session->get('absoluteURL').'/modules/Free Learning/units_manageProcessBulk.php');
 
-        $bulkActions = ['Export' => __('Export'), 'Duplicate' => __('Duplicate')];
+        $bulkActions = ['Export' => __('Export'), 'Duplicate' => __('Duplicate'), 'Lock' => __m('Lock'), 'Unlock' => __m('Unlock')];
         $col = $form->createBulkActionColumn($bulkActions);
             $col->addSubmit(__('Go'));
 
