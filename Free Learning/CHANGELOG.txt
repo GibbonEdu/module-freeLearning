@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.06
+--------
+Extended execution time and memory limit for unit download
+
 v5.21.05
 --------
 Added bulk Lock/Unlock option in Manage Units

@@ -28,6 +28,11 @@ if (is_file($tcpdfFile)) {
     include $tcpdfFile;
 }
 
+// Override the ini to keep this process alive
+ini_set('memory_limit', '2048M');
+ini_set('max_execution_time', 1800);
+set_time_limit(1800);
+
 $output = '';
 
 $publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'publicUnits');
