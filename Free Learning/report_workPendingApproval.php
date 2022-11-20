@@ -85,6 +85,7 @@ else {
 
     $criteria = $unitStudentGateway->newQueryCriteria()
         ->sortBy(['timestampCompletePending'])
+        ->pageSize(50)
         ->fromPOST();
 
     if (!empty($allMentors)) {
@@ -195,8 +196,7 @@ else {
                 $gateway = $container->get(INGateway::class);
                 $criteria = $gateway
                   ->newQueryCriteria()
-                  ->filterBy('gibbonPersonID', $values['gibbonPersonID'])
-                  ->fromPOST();
+                  ->filterBy('gibbonPersonID', $values['gibbonPersonID']);
                 $personalDescriptors = $gateway->queryIndividualNeedsPersonDescriptors($criteria)->toArray();
 
                 if (count($personalDescriptors) > 0) {

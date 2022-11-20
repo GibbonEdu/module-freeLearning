@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.07
+--------
+Added pagination to Work Pending Approval report
+
 v5.21.06
 --------
 Extended execution time and memory limit for unit download
