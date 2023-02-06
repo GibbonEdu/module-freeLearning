@@ -278,9 +278,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                     if ($gibbonMarkbookEntry->rowCount() == 1) { // Update existing row
                                         $gibbonMarkbookEntryID = $gibbonMarkbookEntry->fetch()['gibbonMarkbookEntryID'];
-                                        $markbookEntryGateway->update($gibbonMarkbookEntryID, ['comment' => strip_tags($commentApproval)]);
+                                        $markbookEntryGateway->update($gibbonMarkbookEntryID, ['comment' => html_entity_decode(strip_tags($commentApproval))]);
                                     } else { //Insert new row, overwriting comment
-                                        $markbookEntryGateway->insert(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'comment' => strip_tags($commentApproval), 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
+                                        $markbookEntryGateway->insert(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'comment' => html_entity_decode(strip_tags($commentApproval)), 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
                                     }
                                 }
                             }

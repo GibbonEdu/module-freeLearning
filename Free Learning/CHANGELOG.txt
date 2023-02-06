@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.08
+--------
+Fixed Markbook comment HTML entity decoding bug
+
 v5.21.07
 --------
 Added pagination to Work Pending Approval report
