@@ -81,6 +81,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $page->breadcrumbs->add(__m('Browse Units'));
 
         $templateView = new View($container->get('twig'));
+        $defaultBrowseView = $settingGateway->getSettingByScope('Free Learning', 'defaultBrowseView');
+        $defaultBrowseCourse = $settingGateway->getSettingByScope('Free Learning', 'defaultBrowseCourse');
 
         // Get params
         $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') && $highestAction == 'Browse Units_all';
@@ -88,13 +90,13 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ? $_GET['showInactive']
             : 'N';
 
-        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? $defaultBrowseCourse;
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
 
-        $viewForm = $view = $_GET['view'] ?? 'map';
+        $viewForm = $view = $_GET['view'] ?? $defaultBrowseView;
         if ($view != 'grid' and $view != 'list') {
-            $view = 'map';
+            $view = $defaultBrowseView;
         }
 
         $advancedOptions = ($showInactive == "Y" || !empty($_GET['difficulty']) || !empty($_GET['name'])) ? true : false;
@@ -161,6 +163,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 ->setClass('right');
 
         $disableLearningAreas = $settingGateway->getSettingByScope('Free Learning', 'disableLearningAreas');
+
         $courses = $unitStudentGateway->selectCoursesByStudent($session->get('gibbonPersonID'), $session->get('gibbonSchoolYearID'));
         $learningAreas = $unitGateway->selectLearningAreasAndCourses($session->get('gibbonPersonID'), $disableLearningAreas, $roleCategory, $session->get('gibbonSchoolYearID'), $highestAction, 'Browse');
         $row = $form->addRow();

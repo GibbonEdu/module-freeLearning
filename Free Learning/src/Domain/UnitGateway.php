@@ -362,6 +362,16 @@ class UnitGateway extends QueryableGateway
         return $this->db()->select($sql, $data);
     }
 
+    public function selectAllCourses()
+    {
+        $sql = "SELECT freeLearningUnit.course as value, freeLearningUnit.course as name
+                FROM freeLearningUnit
+                WHERE freeLearningUnit.active='Y'
+                GROUP BY freeLearningUnit.course";
+
+        return $this->db()->select($sql);
+    }
+
     protected function getSharedFilterRules()
     {
         return [

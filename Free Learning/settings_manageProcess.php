@@ -58,6 +58,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $studentEvidencePrompt = $_POST['studentEvidencePrompt'] ?? '';
     $mentorshipAcceptancePrompt = $_POST['mentorshipAcceptancePrompt'] ?? '';
     $evidenceOutstandingPrompt = $_POST['evidenceOutstandingPrompt'] ?? '';
+    $defaultBrowseView = $_POST['defaultBrowseView'] ?? 'Map';
+    $defaultBrowseCourse = $_POST['defaultBrowseCourse'] ?? '';
 
 
     $settingGateway = $container->get(SettingGateway::class);
@@ -101,6 +103,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'studentEvidencePrompt', $studentEvidencePrompt);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'mentorshipAcceptancePrompt', $mentorshipAcceptancePrompt);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'evidenceOutstandingPrompt', $evidenceOutstandingPrompt);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'defaultBrowseView', $defaultBrowseView);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'defaultBrowseCourse', $defaultBrowseCourse);
 
         $URL .= $partialFail
             ? '&return=error2'

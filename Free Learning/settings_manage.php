@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -140,6 +141,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $col->addCodeEditor($setting['name'])->setMode('twig')->setValue($setting['value']);
 
     $form->addRow()->addHeading(__('Display Settings'));
+
+    $viewOptions = [
+        'map' => __('Map'),
+        'grid' => __('Grid'),
+        'list' => __('List'),
+    ];
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'defaultBrowseView', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addSelect($setting['name'])->fromArray($viewOptions)->required()->selected($setting['value']);
+
+    $courses = $container->get(UnitGateway::class)->selectAllCourses()->fetchKeyPair();
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'defaultBrowseCourse', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addSelect($setting['name'])->fromArray($courses)->placeholder()->selected($setting['value']);
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'disableOutcomes', true);
     $row = $form->addRow();
