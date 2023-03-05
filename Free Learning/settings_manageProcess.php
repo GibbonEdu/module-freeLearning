@@ -47,6 +47,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $certificatesAvailable = $_POST['certificatesAvailable'] ?? '';
     $certificateTemplate = $_POST['certificateTemplate'] ?? '';
     $certificateOrientation = $_POST['certificateOrientation'] ?? '';
+    $collapsedSmartBlocks = $_POST['collapsedSmartBlocks'] ?? '';
     $disableOutcomes = $_POST['disableOutcomes'] ?? '';
     $disableExemplarWork = $_POST['disableExemplarWork'] ?? '';
     $disableParentEvidence = $_POST['disableParentEvidence'] ?? '';
@@ -92,6 +93,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificatesAvailable', $certificatesAvailable);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateTemplate', $certificateTemplate);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'certificateOrientation', $certificateOrientation);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'collapsedSmartBlocks', $collapsedSmartBlocks);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableOutcomes', $disableOutcomes);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableExemplarWork', $disableExemplarWork);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableParentEvidence', $disableParentEvidence);

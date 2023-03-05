@@ -2178,3 +2178,9 @@ $sql[$count][0] = '5.21.09';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'defaultBrowseView', 'Default View in Browse Units', 'Which view should the browse units page default to?', 'Map');end
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'defaultBrowseCourse', 'Default Course in Browse Units', 'If set, the Browse Units page will show a certain course by default.', '');end";
+
+//v5.21.10
+++$count;
+$sql[$count][0] = '5.21.10';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'collapsedSmartBlocks', 'Collapsed Smart Blocks', 'Should Smart Blocks be collapsed when viewing a unit?', 'N');end";

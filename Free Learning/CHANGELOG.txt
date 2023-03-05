@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.10
+--------
+Added setting for collapsed smart blocks (off by default)
+
 v5.21.09
 --------
 Added settings to choose a default view and/or default course for Browse Units.

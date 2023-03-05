@@ -157,6 +157,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addSelect($setting['name'])->fromArray($courses)->placeholder()->selected($setting['value']);
+    
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'collapsedSmartBlocks', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'disableOutcomes', true);
     $row = $form->addRow();

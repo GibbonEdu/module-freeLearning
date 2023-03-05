@@ -602,9 +602,15 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 $templateView = $container->get(View::class);
                                 $resourceContents = '';
 
+                                if ($settingGateway->getSettingByScope('Free Learning', 'collapsedSmartBlocks') == "Y") {
+                                    $template = "unitBlockCollapsed.twig.html";
+                                } else {
+                                    $template = "unitBlock.twig.html";
+                                }
+
                                 $blockCount = 0;
                                 foreach ($blocks as $block) {
-                                    echo $templateView->fetchFromTemplate('unitBlock.twig.html', $block + [
+                                    echo $templateView->fetchFromTemplate($template, $block + [
                                         'roleCategory' => $roleCategory,
                                         'gibbonPersonID' => $session->get('username') ?? '',
                                         'blockCount' => $blockCount
