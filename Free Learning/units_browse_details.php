@@ -604,6 +604,31 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                                 if ($settingGateway->getSettingByScope('Free Learning', 'collapsedSmartBlocks') == "Y") {
                                     $template = "unitBlockCollapsed.twig.html";
+
+                                    echo "<div class='linkTop mt-2 mb-4'>";
+                                        echo "<a id='showAll' >".__m('Expand All')."<img class='ml-1' src='".$session->get('absoluteURL')."/themes/".$session->get('gibbonThemeName')."/img/plus.png'/></a>";
+                                        echo "<a id='hideAll' style='display: none'>".__m('Collapse All')."<img class='ml-1' src='".$session->get('absoluteURL')."/themes/".$session->get('gibbonThemeName')."/img/minus.png'/></a>";
+                                    echo "</div>";
+
+                                    echo "<script type='text/javascript'>";
+                                        echo "$(document).ready(function(){";
+                                            echo "$('#showAll').click(function(){";
+                                                echo "$('#showAll').css('display','none');";
+                                                echo "$('#hideAll').css('display','inline');";
+                                                echo "$('.content').css('display','block');";
+                                                echo "$('.show').css('display','none');";
+                                                echo "$('.hide').css('display','inline');";
+                                            echo "});";
+                                            echo "$('#hideAll').click(function(){";
+                                                echo "$('#showAll').css('display','inline');";
+                                                echo "$('#hideAll').css('display','none');";
+                                                echo "$('.content').css('display','none');";
+                                                echo "$('.show').css('display','inline');";
+                                                echo "$('.hide').css('display','none');";
+                                            echo "});";
+                                        echo "});";
+                                    echo "</script>";
+
                                 } else {
                                     $template = "unitBlock.twig.html";
                                 }

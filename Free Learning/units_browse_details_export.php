@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         try {
             $data = array('freeLearningUnitID' => $freeLearningUnitID);
-            $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
+            $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList FROM freeLearningUnit LEFT JOIN freeLearningUnitPrerequisite ON freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID WHERE freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
             $result = $connection2->prepare($sql);
             $result->execute($data);
         } catch (PDOException $e) {
@@ -113,7 +113,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             }
             $output .= '</td>';
             $output .= '</tr>';
-
 
             $output .= '<tr style="">';
             $output .= "<td style=\"padding-top: 15px; vertical-align: top; border-top: 1px solid #000\">";

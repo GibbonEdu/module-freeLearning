@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.21.11
+--------
+Added Expend/Collapse All link for collapsed smart blocks
+Fixed unit export bug
+
 v5.21.10
 --------
 Added setting for collapsed smart blocks (off by default)

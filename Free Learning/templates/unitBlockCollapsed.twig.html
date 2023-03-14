@@ -16,8 +16,8 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
             </span>
             {% endif %}
             <span class="mt-1" id="showHide-{{ freeLearningUnitBlockID }}">
-                <img id="show-{{ freeLearningUnitBlockID }}" src="{{ absoluteURL }}/themes/{{ gibbonThemeName }}/img/plus.png"/>
-                <img id="hide-{{ freeLearningUnitBlockID }}" style='display: none' src="{{ absoluteURL }}/themes/{{ gibbonThemeName }}/img/minus.png"/>
+                <img class="show" id="show-{{ freeLearningUnitBlockID }}" src="{{ absoluteURL }}/themes/{{ gibbonThemeName }}/img/plus.png"/>
+                <img class="hide" id="hide-{{ freeLearningUnitBlockID }}" style='display: none' src="{{ absoluteURL }}/themes/{{ gibbonThemeName }}/img/minus.png"/>
             </span>
         </div>
     </div>
@@ -32,7 +32,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
     </div>
     {% endif %}
 
-    <div id="content-{{ freeLearningUnitBlockID }}" style='display: none'>
+    <div id="content-{{ freeLearningUnitBlockID }}" style='display: none' class="content mt-4">
         <div class="text-base">
             {{ contents|raw }}
         </div>
