@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.12
+--------
+Adjusted links in unit Resources tab to open in new tab
+
 v5.21.11
 --------
 Added Expend/Collapse All link for collapsed smart blocks

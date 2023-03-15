@@ -666,7 +666,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             @$dom->loadHTML($resourceContents);
                             foreach ($dom->getElementsByTagName('a') as $node) {
                                 if ($node->nodeValue != '') {
-                                    $linksArray[$linksCount] = "<li><a href='".$node->getAttribute('href')."'>".$node->nodeValue.'</a></li>';
+                                    $linksArray[$linksCount] = "<li><a target='_blank' href='".$node->getAttribute('href')."'>".$node->nodeValue.'</a></li>';
                                     ++$linksCount;
                                 }
                             }
