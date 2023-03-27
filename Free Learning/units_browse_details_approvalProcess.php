@@ -274,7 +274,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $markbookEntryGateway = $container->get(MarkbookEntryGateway::class);
 
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
-                                    $gibbonMarkbookEntry = $markbookEntryGateway->selectBy(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent, 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
+                                    $gibbonMarkbookEntry = $markbookEntryGateway->selectBy(['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDStudent' => $gibbonPersonIDStudent]);
 
                                     if ($gibbonMarkbookEntry->rowCount() == 1) { // Update existing row
                                         $gibbonMarkbookEntryID = $gibbonMarkbookEntry->fetch()['gibbonMarkbookEntryID'];
