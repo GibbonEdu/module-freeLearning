@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.14
+--------
+Added notifications for collaborators of enrolling learner
+
 v5.21.13
 --------
 Fixed copy to markbook creating duplicate records in classes with more than one teacher

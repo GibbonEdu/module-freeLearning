@@ -384,6 +384,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         } catch (PDOException $e) {
                                             $partialFail = true;
                                         }
+
+                                        //Notify internal mentors by gibbon
+                                        $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
+                                        $notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
+                                        $notificationText = sprintf(__m('A learner has enrolled you as a collaborator for the Free Learning unit %1$s.'), $unit);
+                                        $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&tab=1&sidebar=true";
+                                        $notificationSender->addNotification($collaborator, $notificationText, 'Free Learning', $actionLink);
+                                        $notificationSender->sendNotifications();
+
                                     }
                                 }
 

@@ -242,12 +242,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         } else {
             $description = '';
 
-            $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
-            if ($collaborativeAssessment == 'Y' AND  !empty($rowEnrol['collaborationKey'])) {
+            if (!empty($rowEnrol['collaborationKey'])) {
                 $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($rowEnrol['collaborationKey'])->fetchAll();
                 $collaborators = Format::nameListArray($collaborators, 'Student');
 
-                $description .= Format::alert(__m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.') .'<br/><br/>'. __m('Your Group').': '. implode(', ', $collaborators), 'message');
+                $description .=  Format::alert(__m('Your Group').': '. implode(', ', $collaborators), 'message');
+                
+                $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
+                if ($collaborativeAssessment == 'Y') {
+                    $description .= Format::alert(__m('Collaborative Assessment is enabled: by submitting this work, you will be submitting on behalf of your collaborators as well as yourself.'), 'message');
+                }
+
+
             }
 
             if ($rowEnrol['status'] == 'Current') {
