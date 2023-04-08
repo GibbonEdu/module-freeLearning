@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.15
+--------
+Added Term filter to My Unit History
+
 v5.21.14
 --------
 Added notifications for collaborators of enrolling learner

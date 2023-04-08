@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\School\SchoolYearTermGateway;
 use Gibbon\Module\FreeLearning\Tables\UnitHistory;
 
 // Module includes
@@ -28,13 +30,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
-    //Get action with highest precendence
+    // Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         // Filter
         $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
+        $gibbonSchoolYearTermID = $_GET['gibbonSchoolYearTermID'] ?? null;
 
         $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
         $form->setFactory(DatabaseFormFactory::create($pdo));
@@ -47,18 +50,42 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $row = $form->addRow();
             $row->addLabel('gibbonSchoolYearID', __('School Year'));
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->selected($gibbonSchoolYearID);
+        
+        $settingGateway = $container->get(SettingGateway::class);
+        $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+        if ($bigDataSchool == "Y") {
+            $dataSelect = [];
+            $sqlSelect = "SELECT gibbonSchoolYear.gibbonSchoolYearID as chainedTo, gibbonSchoolYearTerm.gibbonSchoolYearTermID as value, gibbonSchoolYearTerm.name FROM gibbonSchoolYearTerm JOIN gibbonSchoolYear ON (gibbonSchoolYearTerm.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) ORDER BY gibbonSchoolYearTerm.sequenceNumber";
+            $rowFilter = $form->addRow();
+                $rowFilter->addLabel('gibbonSchoolYearTermID', __('Term'));
+                $rowFilter->addSelect('gibbonSchoolYearTermID')
+                    ->fromQueryChained($pdo, $sqlSelect, $dataSelect, 'gibbonSchoolYearID')
+                    ->placeholder()
+                    ->selected($gibbonSchoolYearTermID);
+        }
 
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
 
-        //Proceed!
+        // Proceed!
         $page->scripts->add('chart');
 
         $page->breadcrumbs->add(__m('My Unit History'));
 
-        $table = $container->get(UnitHistory::class)->create($session->get('gibbonPersonID'), false, true, false, $gibbonSchoolYearID);
+        // Convert term ID into start and end dates
+        $dateStart = null;
+        $dateEnd = null;
+        if (!is_null($gibbonSchoolYearTermID)) {
+            $schoolYearTermGateway = $container->get(SchoolYearTermGateway::class);
+            $term = $schoolYearTermGateway->getByID($gibbonSchoolYearTermID);
+            $dateStart = $term['firstDay'];
+            $dateEnd = $term['lastDay'];
+        }
+
+        $table = $container->get(UnitHistory::class)->create($session->get('gibbonPersonID'), false, true, false, $gibbonSchoolYearID, $dateStart, $dateEnd);
+
         echo $table;
     }
 }
