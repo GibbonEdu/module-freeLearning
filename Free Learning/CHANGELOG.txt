@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.21.16
+--------
+Updated Afrikaans translations
+Fixed translation case issue
+
 v5.21.15
 --------
 Added Term filter to My Unit History

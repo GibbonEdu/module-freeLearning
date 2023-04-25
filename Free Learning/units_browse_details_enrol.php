@@ -308,7 +308,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $form->addHiddenValue('freeLearningUnitID', $freeLearningUnitID);
             $form->addHiddenValue('freeLearningUnitStudentID', $rowEnrol['freeLearningUnitStudentID']);
 
-            $form->addRow()->addHeading(__m('Submit your Evidence'));
+            $form->addRow()->addHeading(__m('Submit Your Evidence'));
 
             $row = $form->addRow();
                 $row->addLabel('status', __('Status'));
