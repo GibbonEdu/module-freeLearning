@@ -22,6 +22,7 @@ use Gibbon\Services\Format;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Students\StudentGateway;
+use Gibbon\Domain\School\SchoolYearTermGateway;
 use Gibbon\Module\FreeLearning\Tables\UnitHistory;
 
 // Module includes
@@ -47,8 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
         $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? (($bigDataSchool == "Y") ? $session->get('gibbonSchoolYearID') : null);
-        $dateStart = $_GET['dateStart'] ?? (($bigDataSchool == "Y") ? Format::date(date('Y-m-d', strtotime(' - 1 months'))) : null);
-        $dateEnd = $_GET['dateEnd'] ?? (($bigDataSchool == "Y") ? Format::date(date('Y-m-d')) : null);
+        $gibbonSchoolYearTermID = !empty($_GET['gibbonSchoolYearTermID']) ? $_GET['gibbonSchoolYearTermID'] : null;
 
         // FORM
         $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
@@ -87,13 +87,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->selected($gibbonSchoolYearID);
 
         if ($bigDataSchool == "Y") {
-            $row = $form->addRow();
-                $row->addLabel('dateStart', __('Start Date'));
-                $row->addDate('dateStart')->setValue($dateStart);
-
-            $row = $form->addRow();
-                $row->addLabel('dateEnd', __('End Date'));
-                $row->addDate('dateEnd')->setValue($dateEnd);
+            $dataSelect = [];
+            $sqlSelect = "SELECT gibbonSchoolYear.gibbonSchoolYearID as chainedTo, gibbonSchoolYearTerm.gibbonSchoolYearTermID as value, gibbonSchoolYearTerm.name FROM gibbonSchoolYearTerm JOIN gibbonSchoolYear ON (gibbonSchoolYearTerm.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) ORDER BY gibbonSchoolYearTerm.sequenceNumber";
+            $rowFilter = $form->addRow();
+                $rowFilter->addLabel('gibbonSchoolYearTermID', __('Term'));
+                $rowFilter->addSelect('gibbonSchoolYearTermID')
+                    ->fromQueryChained($pdo, $sqlSelect, $dataSelect, 'gibbonSchoolYearID')
+                    ->placeholder()
+                    ->selected($gibbonSchoolYearTermID);
         }
 
         $row = $form->addRow();
@@ -113,6 +114,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         }
 
         $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
+
+        // Convert term ID into start and end dates
+        $dateStart = null;
+        $dateEnd = null;
+        if (!is_null($gibbonSchoolYearTermID)) {
+            $schoolYearTermGateway = $container->get(SchoolYearTermGateway::class);
+            $term = $schoolYearTermGateway->getByID($gibbonSchoolYearTermID);
+            $dateStart = $term['firstDay'];
+            $dateEnd = $term['lastDay'];
+        }
+
         echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd);
     }
 }

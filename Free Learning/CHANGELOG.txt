@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.17
+--------
+Added Term filter to Unit History by Student
+
 v5.21.16
 --------
 Updated Afrikaans translations

@@ -36,8 +36,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         // Filter
+        $settingGateway = $container->get(SettingGateway::class);
+        $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+
         $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
-        $gibbonSchoolYearTermID = $_GET['gibbonSchoolYearTermID'] ?? null;
+        $gibbonSchoolYearTermID = !empty($_GET['gibbonSchoolYearTermID']) ? $_GET['gibbonSchoolYearTermID'] : null;
 
         $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
         $form->setFactory(DatabaseFormFactory::create($pdo));
@@ -51,8 +54,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $row->addLabel('gibbonSchoolYearID', __('School Year'));
             $row->addSelectSchoolYear('gibbonSchoolYearID', 'Recent')->selected($gibbonSchoolYearID);
         
-        $settingGateway = $container->get(SettingGateway::class);
-        $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
         if ($bigDataSchool == "Y") {
             $dataSelect = [];
             $sqlSelect = "SELECT gibbonSchoolYear.gibbonSchoolYearID as chainedTo, gibbonSchoolYearTerm.gibbonSchoolYearTermID as value, gibbonSchoolYearTerm.name FROM gibbonSchoolYearTerm JOIN gibbonSchoolYear ON (gibbonSchoolYearTerm.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID) ORDER BY gibbonSchoolYearTerm.sequenceNumber";
