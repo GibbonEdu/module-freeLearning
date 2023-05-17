@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.21.19
+--------
+Changed most recent submission date in Browse Unit's Manage Enrolment tab to relative time
+
 v5.21.18
 --------
 Added most recent submission date to Submissions column in Browse Unit's Manage Enrolment tab

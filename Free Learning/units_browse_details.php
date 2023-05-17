@@ -484,7 +484,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->notSortable()
                                 ->description(__m('Most Recent'))
                                 ->format(function ($student) {
-                                    return $student['submissions'] . '<br/>' . Format::small(Format::date($student['timestampCompletePending']));
+                                    return $student['submissions'] . '<br/>' . Format::small(Format::relativeTime($student['timestampCompletePending']));
                                 });
 
                             $table->addColumn('classMentor', __m('Class/Mentor'))

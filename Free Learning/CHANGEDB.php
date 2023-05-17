@@ -2224,3 +2224,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.21.18';
 $sql[$count][1] = "";
+
+//v5.21.19
+++$count;
+$sql[$count][0] = '5.21.19';
+$sql[$count][1] = "";
