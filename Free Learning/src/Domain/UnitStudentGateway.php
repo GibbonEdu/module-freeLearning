@@ -508,6 +508,27 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runSelect($query);
     }
 
+    public function selectCourseEnrolmentByStudent($gibbonPersonID, $gibbonSchoolYearID = null)
+    {
+        $query = $this
+            ->newSelect()
+            ->cols(['gibbonCourse.gibbonCourseID', 'gibbonCourse.nameShort'])
+            ->from('gibbonCourse')
+            ->innerJoin('gibbonCourseClass', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
+            ->innerJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
+            ->innerJoin('gibbonSchoolYear', 'gibbonCourse.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID')
+            ->where('gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->orderBy(['gibbonSchoolYear.sequenceNumber', 'gibbonCourse.nameShort']);
+
+            if (!empty($gibbonSchoolYearID)) {
+                $query->where('gibbonCourse.gibbonSchoolYearID=:gibbonSchoolYearID')
+                    ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
+            }
+
+        return $this->runSelect($query);
+    }
+
     public function selectUnitCollaboratorsByKey($collaborationKey)
     {
         $query = $this

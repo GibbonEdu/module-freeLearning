@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.22.00
+--------
+Added Unit History chart option
+Updated Afrikaans translations
+
 v5.21.19
 --------
 Changed most recent submission date in Browse Unit's Manage Enrolment tab to relative time

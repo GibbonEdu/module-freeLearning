@@ -28,7 +28,7 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 /**
  * UnitHistory
  *
- * @version v5.13.18
+ * @version v5.22.00
  * @since   v5.13.18
  */
 class UnitHistory
@@ -41,7 +41,7 @@ class UnitHistory
         $this->templateView = $templateView;
     }
 
-    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null)
+    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null, $unitHistoryChart = 'Doughnut')
     {
         $criteria = $this->unitStudentGateway->newQueryCriteria()
             ->sortBy(['freeLearningUnitStudent.timestampJoined', 'schoolYear'], 'DESC')
@@ -58,36 +58,44 @@ class UnitHistory
             ? DataTable::createPaginated('unitHistory', $criteria)->withData($units)
             : DataTable::create('unitHistory')->withData($units);
 
-        $output = '';
-        // Render chart
-        $output .= "<h3>".__('Overview')."</h3>";
+        if ($unitHistoryChart == 'Doughnut' or $unitHistoryChart == 'Stacked Bar Chart') {
+            $output = '';
+            // Render chart
+            $output .= "<h3>".__('Overview')."</h3>";
 
-        $unitStats = [
-            "Current - Pending" => 0,
-            "Current" => 0,
-            "Complete - Pending" => 0,
-            "Evidence Not Yet Approved" => 0,
-            "Complete - Approved" => 0,
-            "Exempt" => 0,
-        ];
-        foreach ($units as $unit) {
-            ++$unitStats[$unit['status']];
+            if ($unitHistoryChart == 'Stacked Bar Chart') {        
+                $courses = $this->unitStudentGateway->selectCourseEnrolmentByStudent($gibbonPersonID, $gibbonSchoolYearID)->fetchAll();
+
+                print_r($courses);
+            }
+
+            $unitStats = [
+                "Current - Pending" => 0,
+                "Current" => 0,
+                "Complete - Pending" => 0,
+                "Evidence Not Yet Approved" => 0,
+                "Complete - Approved" => 0,
+                "Exempt" => 0,
+            ];
+            foreach ($units as $unit) {
+                ++$unitStats[$unit['status']];
+            }
+
+            $chart = Chart::create('unitStats'.$gibbonPersonID, 'doughnut')
+                ->setOptions([
+                    'height' => 80,
+                    'legend' => [
+                        'position' => 'right',
+                    ]
+                ])
+                ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
+                ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+
+            $chart->addDataset('pie')
+                ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
+
+            $output .= $chart->render();
         }
-
-        $chart = Chart::create('unitStats'.$gibbonPersonID, 'doughnut')
-            ->setOptions([
-                'height' => 80,
-                'legend' => [
-                    'position' => 'right',
-                ]
-            ])
-            ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
-            ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
-
-        $chart->addDataset('pie')
-            ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
-
-        $output .= $chart->render();
 
         $output .= "<h3>".__('Details')."</h3>";
 

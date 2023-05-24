@@ -45,6 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
         $settingGateway = $container->get(SettingGateway::class);
         $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+        $unitHistoryChart = $settingGateway->getSettingByScope('Free Learning', 'unitHistoryChart');
 
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
         $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? (($bigDataSchool == "Y") ? $session->get('gibbonSchoolYearID') : null);
@@ -125,6 +126,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $dateEnd = $term['lastDay'];
         }
 
-        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd);
+        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd, $unitHistoryChart);
     }
 }
