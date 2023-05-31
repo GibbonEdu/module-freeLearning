@@ -34,6 +34,7 @@ use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 class UnitHistory
 {
     protected $unitStudentGateway;
+    protected $templateView;
 
     public function __construct(UnitStudentGateway $unitStudentGateway, View $templateView)
     {
@@ -53,46 +54,104 @@ class UnitHistory
         }
 
         $units = $this->unitStudentGateway->queryUnitsByStudent($criteria, $gibbonPersonID, $gibbonSchoolYearID, $dateStart, $dateEnd);
+        $flCourses = $this->unitStudentGateway->selectCoursesByStudent($gibbonPersonID, $gibbonSchoolYearID)->fetchGroupedUnique();
 
         $table = !$summary
             ? DataTable::createPaginated('unitHistory', $criteria)->withData($units)
             : DataTable::create('unitHistory')->withData($units);
 
+        $output = '';
+
         if ($unitHistoryChart == 'Doughnut' or $unitHistoryChart == 'Stacked Bar Chart') {
-            $output = '';
             // Render chart
             $output .= "<h3>".__('Overview')."</h3>";
 
             if ($unitHistoryChart == 'Stacked Bar Chart') {        
                 $courses = $this->unitStudentGateway->selectCourseEnrolmentByStudent($gibbonPersonID, $gibbonSchoolYearID)->fetchAll();
 
-                print_r($courses);
+                // Omit timetable courses that do not have a corresponding fl course
+                $courses = array_filter($courses, function ($course) use (&$flCourses) {
+                    return isset($flCourses[$course['name']]);
+                });
+
+                $unitStats = [
+                    "Complete - Approved" => [],
+                    "Evidence Not Yet Approved" => [],
+                    "Complete - Pending" => [],
+                    "Current" => [],
+                    "Current - Pending" => [],
+                    "Incomplete" => [],
+                ];
+
+                $statuses = array_keys($unitStats);
+
+                foreach ($courses as $index => $course) {
+                    $unitTotal = 0;
+
+                    foreach ($statuses as $status) {
+                        $unitStats[$status][$index] = 0;
+
+                        // Count the unit stats for this status
+                        foreach ($units as $unit) {
+                            if ($unit['status'] != $status) continue;
+
+                            if ($unit['status'] == 'Exempt') $unit['status'] = 'Complete - Approved';
+
+                            if ($unit['flCourse'] == $course['name']) {
+                                $unitStats[$unit['status']][$index]++;
+                                $unitTotal++;
+                            }
+                        }
+                    }
+
+                    $unitStats['Incomplete'][$index] = $flCourses[$course['name']]['total'] - $unitTotal;
+                }
+
+                $chart = Chart::create('unitStats'.$gibbonPersonID, 'bar')
+                    ->setOptions([
+                        'height' => '340px',
+                        'scales' => [
+                            'x' => [
+                                'stacked' => 'true',
+                            ],
+                            'y' => [
+                                'stacked' => 'true',
+                            ]
+                        ],
+                    ])
+                    ->setLabels(array_column($courses, 'nameShort'))
+                    ->setColors(['#6EE7B7', '#FFD2A8', '#DCC5f4', '#BAE6FD', '#FAF089', '#dddddd']);
+
+                foreach($statuses as $status) {
+                    $chart->addDataset($status, __($status))->setData($unitStats[$status] ?? []);
+                }
+            } else {
+
+                $unitStats = [
+                    "Current - Pending" => 0,
+                    "Current" => 0,
+                    "Complete - Pending" => 0,
+                    "Evidence Not Yet Approved" => 0,
+                    "Complete - Approved" => 0,
+                    "Exempt" => 0,
+                ];
+                foreach ($units as $unit) {
+                    ++$unitStats[$unit['status']];
+                }
+
+                $chart = Chart::create('unitStats'.$gibbonPersonID, 'doughnut')
+                    ->setOptions([
+                        'height' => 80,
+                        'legend' => [
+                            'position' => 'right',
+                        ]
+                    ])
+                    ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
+                    ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+
+                $chart->addDataset('pie')
+                    ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
             }
-
-            $unitStats = [
-                "Current - Pending" => 0,
-                "Current" => 0,
-                "Complete - Pending" => 0,
-                "Evidence Not Yet Approved" => 0,
-                "Complete - Approved" => 0,
-                "Exempt" => 0,
-            ];
-            foreach ($units as $unit) {
-                ++$unitStats[$unit['status']];
-            }
-
-            $chart = Chart::create('unitStats'.$gibbonPersonID, 'doughnut')
-                ->setOptions([
-                    'height' => 80,
-                    'legend' => [
-                        'position' => 'right',
-                    ]
-                ])
-                ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
-                ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
-
-            $chart->addDataset('pie')
-                ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
 
             $output .= $chart->render();
         }

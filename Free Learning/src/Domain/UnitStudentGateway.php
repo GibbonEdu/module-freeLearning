@@ -493,7 +493,8 @@ class UnitStudentGateway extends QueryableGateway
     {
         $query = $this
             ->newSelect()
-            ->cols(['course as value', 'course as name', "'".__m('Enrolled Course')."' as groupBy"])
+            ->distinct()
+            ->cols(['course as value', 'course as name', "'".__m('Enrolled Course')."' as groupBy", "(SELECT COUNT(*) FROM freeLearningUnit as unit WHERE unit.course=freeLearningUnit.course AND unit.active='Y') as total"])
             ->from('freeLearningUnit')
             ->innerJoin('freeLearningUnitStudent', 'freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
             ->where("freeLearningUnit.active='Y'")
@@ -512,12 +513,13 @@ class UnitStudentGateway extends QueryableGateway
     {
         $query = $this
             ->newSelect()
-            ->cols(['gibbonCourse.gibbonCourseID', 'gibbonCourse.nameShort'])
+            ->cols(['gibbonCourse.gibbonCourseID', 'gibbonCourse.nameShort', 'gibbonCourse.name'])
             ->from('gibbonCourse')
             ->innerJoin('gibbonCourseClass', 'gibbonCourseClass.gibbonCourseID=gibbonCourse.gibbonCourseID')
             ->innerJoin('gibbonCourseClassPerson', 'gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID')
             ->innerJoin('gibbonSchoolYear', 'gibbonCourse.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID')
             ->where('gibbonCourseClassPerson.gibbonPersonID=:gibbonPersonID')
+            ->where('gibbonCourseClassPerson.role NOT LIKE "%LEFT"')
             ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->orderBy(['gibbonSchoolYear.sequenceNumber', 'gibbonCourse.nameShort']);
 
