@@ -125,6 +125,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $dateEnd = $term['lastDay'];
         }
 
-        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd, $unitHistoryChart);
+        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd);
     }
 }
