@@ -24,6 +24,7 @@ use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\Domain\System\SettingGateway;
 
 /**
  * UnitHistory
@@ -35,14 +36,16 @@ class UnitHistory
 {
     protected $unitStudentGateway;
     protected $templateView;
+    protected $unitHistoryChart;
 
-    public function __construct(UnitStudentGateway $unitStudentGateway, View $templateView)
+    public function __construct(UnitStudentGateway $unitStudentGateway, SettingGateway $settingGateway, View $templateView)
     {
         $this->unitStudentGateway = $unitStudentGateway;
         $this->templateView = $templateView;
+        $this->unitHistoryChart = $settingGateway->getSettingByScope('Free Learning', 'unitHistoryChart');
     }
 
-    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null, $unitHistoryChart = 'Doughnut')
+    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null)
     {
         $criteria = $this->unitStudentGateway->newQueryCriteria()
             ->sortBy(['freeLearningUnitStudent.timestampJoined', 'schoolYear'], 'DESC')
@@ -62,17 +65,11 @@ class UnitHistory
 
         $output = '';
 
-        if ($unitHistoryChart == 'Doughnut' or $unitHistoryChart == 'Stacked Bar Chart') {
+        if ($this->unitHistoryChart == 'Doughnut' or $this->unitHistoryChart == 'Stacked Bar Chart') {
             // Render chart
             $output .= "<h3>".__('Overview')."</h3>";
 
-            if ($unitHistoryChart == 'Stacked Bar Chart') {        
-                $courses = $this->unitStudentGateway->selectCourseEnrolmentByStudent($gibbonPersonID, $gibbonSchoolYearID)->fetchAll();
-
-                // Omit timetable courses that do not have a corresponding fl course
-                $courses = array_filter($courses, function ($course) use (&$flCourses) {
-                    return isset($flCourses[$course['name']]);
-                });
+            if ($this->unitHistoryChart == 'Stacked Bar Chart') {        
 
                 $unitStats = [
                     "Complete - Approved" => [],
@@ -85,7 +82,7 @@ class UnitHistory
 
                 $statuses = array_keys($unitStats);
 
-                foreach ($courses as $index => $course) {
+                foreach ($flCourses as $index => $course) {
                     $unitTotal = 0;
 
                     foreach ($statuses as $status) {
@@ -119,7 +116,7 @@ class UnitHistory
                             ]
                         ],
                     ])
-                    ->setLabels(array_column($courses, 'nameShort'))
+                    ->setLabels(array_column($flCourses, 'name'))
                     ->setColors(['#6EE7B7', '#FFD2A8', '#DCC5f4', '#BAE6FD', '#FAF089', '#dddddd']);
 
                 foreach($statuses as $status) {

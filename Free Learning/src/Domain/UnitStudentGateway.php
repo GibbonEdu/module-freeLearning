@@ -500,11 +500,14 @@ class UnitStudentGateway extends QueryableGateway
             ->where("freeLearningUnit.active='Y'")
             ->where('NOT course IS NULL')
             ->where('NOT course=\'\'')
-            ->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
-            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->where('freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonIDStudent')
             ->bindValue('gibbonPersonIDStudent', $gibbonPersonIDStudent)
-            ->orderBy(['course']);
+            ->orderBy(['freeLearningUnit.course']);
+
+        if (!empty($gibbonSchoolYearID)) {
+            $query->where('freeLearningUnitStudent.gibbonSchoolYearID=:gibbonSchoolYearID')
+                ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
+        }
 
         return $this->runSelect($query);
     }
