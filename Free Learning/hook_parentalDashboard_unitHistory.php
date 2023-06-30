@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
     $page->scripts->add('chart');
     $page->stylesheets->add('module-freeLearning', 'modules/Free Learning/css/module.css');
-    $returnInt .= $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, $disableParentEvidence);
+    $returnInt .= $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, $disableParentEvidence, $session->get('gibbonSchoolYearID'));
 }
 
 return $returnInt;

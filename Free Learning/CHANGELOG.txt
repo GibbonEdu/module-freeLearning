@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.01
+--------
+Restricted parent and student dashboard hooks to current year's data
+
 v5.22.00
 --------
 Added Unit History chart option

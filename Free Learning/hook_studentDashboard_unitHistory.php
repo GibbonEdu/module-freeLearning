@@ -32,6 +32,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= __('You do not have access to this action.');
     $returnInt .= '</div>';
 } else {
+    $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
+
     $returnInt .= "<p class='text-right mb-4 text-xs'>";
     $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a class='button' href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
     $returnInt .= sprintf(__m('%1$sBrowse Units%2$s'), "<a class='button ml-2' href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_browse.php'>", '</a>');
@@ -48,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
     $page->scripts->add('chart');
     $page->stylesheets->add('module-freeLearning', 'modules/Free Learning/css/module.css');
-    $returnInt .= $container->get(UnitHistory::class)->create($gibbonPersonID, true);
+    $returnInt .= $container->get(UnitHistory::class)->create($gibbonPersonID, true, $canBrowse, false, $session->get('gibbonSchoolYearID'));
 }
 
 return $returnInt;

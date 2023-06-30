@@ -52,10 +52,6 @@ class UnitHistory
             ->sortBy(['freeLearningUnitStudent.status', 'freeLearningUnit.name'])
             ->fromPOST('unitHistory');
 
-        if ($summary) {
-            $criteria->pageSize(8);
-        }
-
         $units = $this->unitStudentGateway->queryUnitsByStudent($criteria, $gibbonPersonID, $gibbonSchoolYearID, $dateStart, $dateEnd);
         $flCourses = $this->unitStudentGateway->selectCoursesByStudent($gibbonPersonID, $gibbonSchoolYearID)->fetchGroupedUnique();
 

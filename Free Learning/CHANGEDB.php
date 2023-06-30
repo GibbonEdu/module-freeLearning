@@ -2235,3 +2235,8 @@ $sql[$count][1] = "";
 $sql[$count][0] = '5.22.00';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'unitHistoryChart', 'Unit History Chart', 'Which chart type should be used in the Unit History table?', 'Doughnut');end";
+
+//v5.22.01
+++$count;
+$sql[$count][0] = '5.22.01';
+$sql[$count][1] = "";
