@@ -36,57 +36,62 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     $URL .= '&return=error0';
     header("Location: {$URL}");
 } else {
-    // Proceed!
-    $action = $_REQUEST['action'] ?? '';
-    $name = $_REQUEST['name'] ?? [];
-    $freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? [];
-    $freeLearningUnitIDList = is_array($freeLearningUnitID) ? $freeLearningUnitID : [$freeLearningUnitID];
-    $partialFail = false;
-
-    if (empty($action)) {
-        $URL .= '&return=error1';
+    $highestAction = getHighestGroupedAction($guid, $session->get('address'), $connection2);
+    if ($highestAction == false) {
+        $URL .= '&return=error0';
         header("Location: {$URL}");
-        exit;
-    }
-
-    if ($action == 'Export') {
-
-        // Export zip contents of units
-        $exporter = $container->get(UnitExporter::class);
-        $exporter->setFilename(!empty($name)? $name : 'FreeLearningUnits');
-
-        foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
-            $exporter->addUnitToExport($freeLearningUnitID);
-        }
-
-        $exporter->output();
-        exit;
-
-    } else if ($action == 'Duplicate') {
-
-        $duplicator = $container->get(UnitDuplicator::class);
-
-        foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
-            $partialFail = $duplicator->duplicateUnit($freeLearningUnitID);
-        }
-
-    } else if ($action == 'Lock' or $action == 'Unlock') {
-
-        $unitGateway = $container->get(UnitGateway::class);
-
-        foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
-            $partialFail = !$unitGateway->update($freeLearningUnitID, ['editLock' => ($action == 'Lock' ? 'Y' : 'N')]);
-        }
-
     } else {
-        $URL .= '&return=error1';
+        // Proceed!
+        $action = $_REQUEST['action'] ?? '';
+        $name = $_REQUEST['name'] ?? [];
+        $freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? [];
+        $freeLearningUnitIDList = is_array($freeLearningUnitID) ? $freeLearningUnitID : [$freeLearningUnitID];
+        $partialFail = false;
+
+        if (empty($action)) {
+            $URL .= '&return=error1';
+            header("Location: {$URL}");
+            exit;
+        }
+
+        if ($action == 'Export') {
+
+            // Export zip contents of units
+            $exporter = $container->get(UnitExporter::class);
+            $exporter->setFilename(!empty($name)? $name : 'FreeLearningUnits');
+
+            foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
+                $exporter->addUnitToExport($freeLearningUnitID);
+            }
+
+            $exporter->output();
+            exit;
+
+        } else if ($action == 'Duplicate') {
+
+            $duplicator = $container->get(UnitDuplicator::class);
+
+            foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
+                $partialFail = $duplicator->duplicateUnit($freeLearningUnitID);
+            }
+
+        } else if (($action == 'Lock' or $action == 'Unlock') and $highestAction == 'Manage Units_all') {
+
+            $unitGateway = $container->get(UnitGateway::class);
+
+            foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
+                $partialFail = !$unitGateway->update($freeLearningUnitID, ['editLock' => ($action == 'Lock' ? 'Y' : 'N')]);
+            }
+
+        } else {
+            $URL .= '&return=error1';
+            header("Location: {$URL}");
+            exit;
+        }
+
+        $URL .= $partialFail
+            ? '&return=warning1'
+            : '&return=success0';
         header("Location: {$URL}");
-        exit;
     }
-
-    $URL .= $partialFail
-        ? '&return=warning1'
-        : '&return=success0';
-    header("Location: {$URL}");
-
 }

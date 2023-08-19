@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.02
+--------
+Removed bulk Lock/Unlock from Manage Units_learningAreas
+
 v5.22.01
 --------
 Restricted parent and student dashboard hooks to current year's data
