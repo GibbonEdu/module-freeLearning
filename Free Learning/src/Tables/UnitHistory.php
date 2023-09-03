@@ -52,7 +52,8 @@ class UnitHistory
             ->sortBy(['freeLearningUnitStudent.status', 'freeLearningUnit.name'])
             ->fromPOST('unitHistory');
 
-        $units = $this->unitStudentGateway->queryUnitsByStudent($criteria, $gibbonPersonID, $gibbonSchoolYearID, $dateStart, $dateEnd);
+        $inactiveUnits = ($this->unitHistoryChart == 'Stacked Bar Chart') ? false : true;
+        $units = $this->unitStudentGateway->queryUnitsByStudent($criteria, $gibbonPersonID, $gibbonSchoolYearID, $dateStart, $dateEnd, $inactiveUnits);
         $flCourses = $this->unitStudentGateway->selectCoursesByStudent($gibbonPersonID, $gibbonSchoolYearID)->fetchGroupedUnique();
 
         $table = !$summary

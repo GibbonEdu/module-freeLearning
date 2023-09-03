@@ -100,7 +100,7 @@ class UnitStudentGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function queryUnitsByStudent(QueryCriteria $criteria, $gibbonPersonID, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null)
+    public function queryUnitsByStudent(QueryCriteria $criteria, $gibbonPersonID, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null, $includeInactive = true)
     {
         $query = $this
             ->newQuery()
@@ -152,6 +152,11 @@ class UnitStudentGateway extends QueryableGateway
             $query->where("(CASE WHEN (timestampCompleteApproved IS NOT NULL AND timestampCompleteApproved > timestampCompletePending) THEN timestampCompleteApproved WHEN timestampCompletePending IS NOT NULL THEN timestampCompletePending ELSE timestampJoined END)<=:dateEnd")
                 ->bindValue('dateEnd', Format::dateConvert($dateEnd)." 23:59:59");
         }
+
+        if (!$includeInactive) {
+            $query->where("active='Y'");
+        }
+        
 
         $criteria->addFilterRules([
             'department' => function ($query, $department) {
