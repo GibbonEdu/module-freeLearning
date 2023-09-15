@@ -130,7 +130,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         }
 
         // ACCESS
-        $form->addRow()->addHeading(__m('Access'))->append(__m('Users with permission to manage units can override avaiability preferences.'));
+        $form->addRow()->addHeading(__m('Access'))->append(__m('Users with permission to manage units can override availability preferences.'));
 
         $row = $form->addRow();
             $row->addLabel('active', __('Active'));
