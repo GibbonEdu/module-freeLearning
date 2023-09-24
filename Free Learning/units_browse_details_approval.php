@@ -58,7 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         'freeLearningUnitStudentID' => $freeLearningUnitStudentID,
         'freeLearningUnitID'        => $freeLearningUnitID,
         'showInactive'              => $_GET['showInactive'] ?? 'N',
-        'gibbonDepartmentID'        => $_GET['gibbonDepartmentID'] ?? '',
+        'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
         'difficulty'                => $_GET['difficulty'] ?? '',
         'name'                      => $_GET['name'] ?? '',
         'view'                      => $_GET['view'] ?? '',

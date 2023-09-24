@@ -36,7 +36,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
          ->add(__m('Student Progress By Class'));
 
     $gibbonCourseClassID = $_GET['gibbonCourseClassID'] ?? null;
-    $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? null;
+    $gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? null;
 
     echo "<p>".__m("This report returns all enrolments from the specified class, as well as all school and external mentorship enrolments from the current school year.")."</p>";
 

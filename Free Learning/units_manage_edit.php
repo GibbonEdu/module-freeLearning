@@ -45,7 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $showInactive = $_GET['showInactive'];
         }
 
-        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
         $gibbonYearGroupIDMinimum = $_GET['gibbonYearGroupIDMinimum'] ?? '';

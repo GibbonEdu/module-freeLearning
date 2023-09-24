@@ -35,7 +35,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
-        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
         $gibbonYearGroupIDMinimum = $_GET['gibbonYearGroupIDMinimum'] ?? '';

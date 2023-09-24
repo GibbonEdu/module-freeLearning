@@ -37,7 +37,7 @@ $freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all';
 
 $showInactive = $canManage and isset($_GET['showInactive']) ? $_GET['showInactive'] : $showInactive;
-$gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+$gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
 $difficulty = $_GET['difficulty'] ?? '';
 $name = $_GET['name'] ?? '';
 $view = $_GET['view'] ?? '';

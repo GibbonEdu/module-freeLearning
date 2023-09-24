@@ -44,7 +44,7 @@ if ($session->exists('gibbonPersonID')) {
 //Get params
 $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
 $showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
-$gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+$gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
 $difficulty = $_GET['difficulty'] ?? '';
 $name = $_GET['name'] ?? '';
 $view = $_GET['view'] ?? '';

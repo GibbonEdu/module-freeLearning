@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.04
+--------
+Learning Area filter fix
+
 v5.22.03
 --------
 Adjusted Stacked Bar Chart to exclude inactive units

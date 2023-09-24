@@ -90,7 +90,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
             ? $_GET['showInactive']
             : 'N';
 
-        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? $defaultBrowseCourse;
+        $gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? $defaultBrowseCourse;
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
 

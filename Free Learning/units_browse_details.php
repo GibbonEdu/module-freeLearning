@@ -61,7 +61,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $showInactive = $canManage && isset($_GET['showInactive'])
             ? $_GET['showInactive']
             : 'N';
-        $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
+        $gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
         $difficulty = $_GET['difficulty'] ?? '';
         $name = $_GET['name'] ?? '';
 
