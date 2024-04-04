@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.05
+--------
+Improved Learning Activity graphing
+
 v5.22.04
 --------
 Learning Area filter fix

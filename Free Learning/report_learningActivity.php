@@ -67,12 +67,16 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
         echo __('Report Data');
         echo '</h2>';
 
+        echo '<p>';
+        echo __m('Figures for Complete - Pending, Complete - Approved and Evidence Not Yet Approved are calculated from only those units joined within the specified time period. Due to the possibility of multiple submissions for any given unit, a single unit joined may result in multiple other statuses.');
+        echo '</p>';
+
         try {
             $data = array();
             if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
-                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY)';
+                $sql = 'SELECT freeLearningUnitStudentID, timestampJoined, GROUP_CONCAT(timestamp) AS timestamps, GROUP_CONCAT(type) AS types FROM freeLearningUnitStudent LEFT JOIN gibbonDiscussion ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND foreignTable=\'freeLearningUnitStudent\') WHERE timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY) GROUP BY freeLearningUnitStudentID';
             } else if ($timePeriod == "Last 12 Months") {
-                $sql = 'SELECT timestampJoined, timestampCompleteApproved, status FROM freeLearningUnitStudent WHERE timestampCompleteApproved>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH) OR timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH)';
+                $sql = 'SELECT freeLearningUnitStudentID, timestampJoined, GROUP_CONCAT(timestamp) AS timestamps, GROUP_CONCAT(type) AS types FROM freeLearningUnitStudent LEFT JOIN gibbonDiscussion ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND foreignTable=\'freeLearningUnitStudent\') WHERE timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH) GROUP BY freeLearningUnitStudentID';
             }
             $result = $connection2->prepare($sql);
             $result->execute($data);
@@ -80,7 +84,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
             echo "<div class='error'>".$e->getMessage().'</div>';
         }
 
-        if ($result->rowCount() < 1) {
+       if ($result->rowCount() < 1) {
             echo "<div class='error'>";
             echo __('There are no records to display.');
             echo '</div>';
@@ -102,28 +106,54 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                     <?php
                     $countJoinedTotal = 0;
                     $countApprovedTotal = 0 ;
+                    $countNYATotal = 0;
+                    $countSubmittedTotal = 0;
+                    
                     echo 'labels : [';
                         if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
                             $days = array();
                             for($i = 0; $i < $timePeriodLookup[$timePeriod]; $i++) {
                                 $countJoined = 0;
                                 $countApproved = 0 ;
+                                $countNYA = 0 ;
+                                $countSubmitted = 0 ;
                                 $d = date("d", strtotime('-'. $i .' days'));
                                 $m = date("m", strtotime('-'. $i .' days'));
                                 foreach ($rows as $row) {
                                     if (is_numeric(strpos($row['timestampJoined'], $m."-".$d))) {
                                         $countJoined++ ;
                                     }
-                                    if (is_numeric(strpos($row['timestampCompleteApproved'], $m."-".$d)) && $row['status'] == 'Complete - Approved') {
-                                        $countApproved++ ;
-                                    }
+
+                                    $count = 0;
+                                    $timestamps =  explode(',', $row['timestamps']);
+                                    $types =  explode(',', $row['types']);
+
+                                    foreach ($timestamps as $timestamp) {
+                                        $type = $types[$count];
+
+                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Complete - Approved') {
+                                            $countApproved++ ;
+                                        }
+                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Evidence Not Yet Approved') {
+                                            $countNYA++ ;
+                                        }
+                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Complete - Pending') {
+                                            $countSubmitted++ ;
+                                        }
+
+                                        $count ++;
+                                    } 
                                 }
+
                                 $countJoinedTotal += $countJoined;
                                 $countApprovedTotal += $countApproved;
+                                $countNYATotal += $countNYA;
+                                $countSubmittedTotal += $countSubmitted;
+
                                 if ($i == 0) {
-                                    array_unshift($days, array(0 => '(Today) '.$d.'/'.$m, 1 => $countJoined, 2 => $countApproved));
+                                    array_unshift($days, array(0 => '(Today) '.$d.'/'.$m, 1 => $countJoined, 2 => $countApproved, 3 => $countNYA, 4 => $countSubmitted));
                                 } else {
-                                    array_unshift($days, array(0 => $d.'/'.$m, 1 => $countJoined, 2 => $countApproved));
+                                    array_unshift($days, array(0 => $d.'/'.$m, 1 => $countJoined, 2 => $countApproved, 3 => $countNYA, 4 => $countSubmitted));
                                 }
                             }
                             $labels = '';
@@ -136,22 +166,45 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                             for($i = 0; $i < $timePeriodLookup[$timePeriod]; $i++) {
                                 $countJoined = 0;
                                 $countApproved = 0 ;
+                                $countNYA = 0 ;
+                                $countSubmitted = 0 ;
                                 $m = date("m", strtotime('-'. $i .' months'));
                                 $Y = date("Y", strtotime('-'. $i .' months'));
                                 foreach ($rows as $row) {
                                     if (is_numeric(strpos($row['timestampJoined'], $Y."-".$m))) {
                                         $countJoined++ ;
                                     }
-                                    if (is_numeric(strpos($row['timestampCompleteApproved'], $Y."-".$m)) && $row['status'] == 'Complete - Approved') {
-                                        $countApproved++ ;
-                                    }
+
+                                    $count = 0;
+                                    $timestamps =  explode(',', $row['timestamps']);
+                                    $types =  explode(',', $row['types']);
+
+                                    foreach ($timestamps as $timestamp) {
+                                        $type = $types[$count];
+
+                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Complete - Approved') {
+                                            $countApproved++ ;
+                                        }
+                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Evidence Not Yet Approved') {
+                                            $countNYA++ ;
+                                        }
+                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Complete - Pending') {
+                                            $countSubmitted++ ;
+                                        }
+
+                                        $count ++;
+                                    } 
                                 }
+                                
                                 $countJoinedTotal += $countJoined;
                                 $countApprovedTotal += $countApproved;
+                                $countNYATotal += $countNYA;
+                                $countSubmittedTotal += $countSubmitted;
+
                                 if ($i == 0) {
-                                    array_unshift($months, array(0 => '(Today) '.$m.'/'.$Y, 1 => $countJoined, 2 => $countApproved));
+                                    array_unshift($months, array(0 => '(Today) '.$m.'/'.$Y, 1 => $countJoined, 2 => $countApproved, 3 => $countNYA, 4 => $countSubmitted));
                                 } else {
-                                    array_unshift($months, array(0 => $m.'/'.$Y, 1 => $countJoined, 2 => $countApproved));
+                                    array_unshift($months, array(0 => $m.'/'.$Y, 1 => $countJoined, 2 => $countApproved, 3 => $countNYA, 4 => $countSubmitted));
                                 }
                             }
                             $labels = '';
@@ -166,12 +219,12 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                     datasets : [
                         {
                             label: "<?php echo __m("Units Joined") ?>",
-                            backgroundColor : "rgba(253, 226, 255, 0.5)",
-                            borderColor : "rgba(169, 60, 179,1)",
-                            hoverBorderColor : "rgba(169, 60, 179,1)",
-                            pointColor : "rgba(169, 60, 179,1)",
-                            pointBorderColor : "rgba(169, 60, 179,1)",
-                            pointBackgroundColor : "rgba(169, 60, 179,1)",
+                            backgroundColor : "rgba(186, 230, 253, 0.5)",
+                            borderColor : "rgba(2, 132, 199, 1)",
+                            hoverBorderColor : "rgba(2, 132, 199, 1)",
+                            pointColor : "rgba(2, 132, 199, 1)",
+                            pointBorderColor : "rgba(2, 132, 199, 1)",
+                            pointBackgroundColor : "rgba(2, 132, 199, 1)",
                             lineTension: 0.3,
                             data : [
                                 <?php
@@ -190,13 +243,38 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                             ]
                         },
                         {
-                            label: "<?php echo __m("Units Approved") ?>",
-                            backgroundColor : "rgba(198, 246, 213,0.5",
-                            borderColor : "rgba(47, 133, 90,1)",
-                            hoverBorderColor : "rgba(47, 133, 90,1)",
-                            pointColor : "rgba(47, 133, 90,1)",
-                            pointBorderColor : "rgba(47, 133, 90,1)",
-                            pointBackgroundColor : "rgba(47, 133, 90,1)",
+                            label: "<?php echo __m("Complete - Pending") ?>",
+                            backgroundColor : "rgb(220, 197, 244, 0.5)",
+                            borderColor : "rgb(99, 63, 134)",
+                            hoverBorderColor : "rgb(99, 63, 134)",
+                            pointColor : "rgb(99, 63, 134)",
+                            pointBorderColor : "rgb(99, 63, 134)",
+                            pointBackgroundColor : "rgb(99, 63, 134)",
+                            lineTension: 0.3,
+                            data : [
+                                <?php
+                                $data = '';
+                                if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
+                                    foreach ($days AS $day) {
+                                        $data .= $day[4].',';
+                                    }
+                                } else if ($timePeriod == "Last 12 Months") {
+                                    foreach ($months AS $month) {
+                                        $data .= $month[4].',';
+                                    }
+                                }
+                                echo substr($data, 0, -1);
+                                ?>
+                            ]
+                        },
+                        {
+                            label: "<?php echo __m("Complete - Approved") ?>",
+                            backgroundColor : "rgba(198, 246, 213, 0.5)",
+                            borderColor : "rgb(47, 133, 90)",
+                            hoverBorderColor : "rgb(47, 133, 90)",
+                            pointColor : "rgb(47, 133, 90)",
+                            pointBorderColor : "rgb(47, 133, 90)",
+                            pointBackgroundColor : "rgb(47, 133, 90)",
                             lineTension: 0.3,
                             data : [
                                 <?php
@@ -208,6 +286,31 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                                 } else if ($timePeriod == "Last 12 Months") {
                                     foreach ($months AS $month) {
                                         $data .= $month[2].',';
+                                    }
+                                }
+                                echo substr($data, 0, -1);
+                                ?>
+                            ]
+                        },
+                        {
+                            label: "<?php echo __m("Evidence Not Yet Approved") ?>",
+                            backgroundColor : "rgba(255, 210, 168, 0.5)",
+                            borderColor : "rgb(212, 86, 2)",
+                            hoverBorderColor : "rgb(212, 86, 2)",
+                            pointColor : "rgb(212, 86, 2)",
+                            pointBorderColor : "rgb(212, 86, 2)",
+                            pointBackgroundColor : "rgb(212, 86, 2)",
+                            lineTension: 0.3,
+                            data : [
+                                <?php
+                                $data = '';
+                                if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
+                                    foreach ($days AS $day) {
+                                        $data .= $day[3].',';
+                                    }
+                                } else if ($timePeriod == "Last 12 Months") {
+                                    foreach ($months AS $month) {
+                                        $data .= $month[3].',';
                                     }
                                 }
                                 echo substr($data, 0, -1);
