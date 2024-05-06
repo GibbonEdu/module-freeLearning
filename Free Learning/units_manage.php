@@ -88,7 +88,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         if ($highestAction == 'Manage Units_all') {
             $units = $unitGateway->queryAllUnits($criteria, $session->get('gibbonPersonID'));
-        } else {
+        } else  {
             $units = $unitGateway->queryUnitsByLearningAreaStaff($criteria, $session->get('gibbonPersonID'));
         }
 
