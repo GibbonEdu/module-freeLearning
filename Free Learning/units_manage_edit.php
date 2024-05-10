@@ -74,21 +74,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                         WHERE
                             freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
-            } else if ($highestAction == 'Manage Units_learningAreas') {
+            } else {
                 $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
-                $sql = "SELECT DISTINCT
-                            freeLearningUnit.*,
-                            GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
-                        FROM
-                            freeLearningUnit
-                        JOIN
-                            gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%'))
-                            LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                            JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
-                        WHERE
-                            gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID
-                            AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')
-                            AND freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList 
+                FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID
+                UNION
+                SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID";
             }
             $result = $connection2->prepare($sql);
             $result->execute($data);
@@ -392,7 +383,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     'length' => $rowBlocks['length'],
                     'contents' => $rowBlocks['contents'],
                     'teachersNotes' => $rowBlocks['teachersNotes'],
-                    'freeLearningUnitBlockID' => $rowBlocks['freeLearningUnitBlockID']
+                    'freeLearningUnitBlockID' => $rowBlocks['freeLearningUnitBlockID'],
+                    'orderName' => 'order',
                 );
                 $customBlocks->addBlock($rowBlocks['freeLearningUnitBlockID'], $smart);
             }
@@ -407,8 +399,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row = $blockTemplate->addRow()->addClass('w-full flex justify-between items-center mt-1 ml-2');
                 $row->addSelectStaff('gibbonPersonID')->photo(false)->setClass('flex-1 mr-1')->required()->placeholder()
                 ->append("<input type='hidden' id='freeLearningUnitAuthorID' name='freeLearningUnitAuthorID' value=''/>")
-                ->append("<input type='hidden' id='gibbonPersonIDOriginal' name='gibbonPersonIDOriginal' value=''/>");
-            
+                ->append("<input type='hidden' id='gibbonPersonIDOriginal' name='gibbonPersonIDOriginal' value=''/>")
+                ->append("<input type='hidden' id='surname' name='surname' value=''/>")
+                ->append("<input type='hidden' id='preferredName' name='preferredName' value=''/>");
+                 
             // Custom Blocks
             $row = $form->addRow();
             $customBlocks = $row->addCustomBlocks('authors', $session, true)
@@ -424,9 +418,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         'freeLearningUnitAuthorID' => $person['freeLearningUnitAuthorID'],
                         'gibbonPersonIDOriginal'   => $person['gibbonPersonID'],
                         'gibbonPersonID'           => $person['gibbonPersonID'],
+                        'surname' => $person['surname'],
+                        'preferredName' => $person['preferredName'],
                     ]);
             }
-
+            
             $form->loadAllValuesFrom($values);
 
             $row = $form->addRow();

@@ -41,8 +41,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             header("Location: {$URL}");
         } else {
             //Proceed!
-            $unitAuthorGateway = $container->get(UnitAuthorGateway::class);
-            
+            $unitAuthorGateway = $container->get(UnitAuthorGateway::class); 
+
             //Validate Inputs
             $name = $_POST['name'] ?? '';
             $difficulty = $_POST['difficulty'] ?? '';
@@ -84,10 +84,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
                         $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID
                         UNION
-                        SELECT DISTINCT freeLearningUnit.* 
-                        FROM freeLearningUnit JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) 
-                        WHERE freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID
-                        ORDER BY difficulty, name";
+                        SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID";
                     }
                     $result = $connection2->prepare($sql);
                     $result->execute($data);
@@ -155,25 +152,27 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     }
 
                     // Update the authors
-                    $authors = $_POST['authors'] ?? '';                    
+                    $authors = $_POST['authors'] ?? '';                  
                     $authorIDs = [];
-                        foreach ($authors as $person) {
-                            $authorData = [
-                                'freeLearningUnitID' => $freeLearningUnitID,
-                                'gibbonPersonID'     => $person['gibbonPersonID'], 
-                            ];
+                    foreach ($authors as $person) {
+                        $authorData = [
+                            'freeLearningUnitID' => $freeLearningUnitID,
+                            'gibbonPersonID'     => $person['gibbonPersonID'], 
+                            'surname' => $person['surname'],
+                            'preferredName' => $person['preferredName'],
+                        ]; 
 
-                            $freeLearningUnitAuthorID = $person['freeLearningUnitAuthorID'] ?? '';
+                        $freeLearningUnitAuthorID = $person['freeLearningUnitAuthorID'] ?? '';
 
-                            if (!empty($freeLearningUnitAuthorID)) {
-                              !$unitAuthorGateway->update($freeLearningUnitAuthorID, $authorData);
-                            } else {
-                                $freeLearningUnitAuthorID = $unitAuthorGateway->insert($authorData);
-                                $partialFail &= !$freeLearningUnitAuthorID;
-                            }
-                    
-                            $authorIDs[] = str_pad($freeLearningUnitAuthorID, 12, '0', STR_PAD_LEFT);
+                        if (!empty($freeLearningUnitAuthorID)) {
+                            !$unitAuthorGateway->update($freeLearningUnitAuthorID, $authorData);
+                        } else {
+                            $freeLearningUnitAuthorID = $unitAuthorGateway->insert($authorData);
+                            $partialFail &= !$freeLearningUnitAuthorID;
                         }
+                
+                        $authorIDs[] = str_pad($freeLearningUnitAuthorID, 12, '0', STR_PAD_LEFT);
+                    }
 
                     // Cleanup authors that have been deleted
                     $unitAuthorGateway->deleteAuthorsNotInList($freeLearningUnitID, $authorIDs);
@@ -237,7 +236,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     }
                     
                     //Update blocks
-                    $order = $_POST['authorOrder'] ?? [];
+                    $order = $_POST['order'] ?? [];
                     $sequenceNumber = 0;
                     $dataRemove = array();
                     $whereRemove = '';
