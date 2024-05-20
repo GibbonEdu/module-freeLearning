@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.06
+--------
+Removed Copy Block feature from Add/Edit unit for Big Data Schools
+
 v5.22.05
 --------
 Improved Learning Activity graphing

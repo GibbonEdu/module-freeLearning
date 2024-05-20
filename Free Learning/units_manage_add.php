@@ -251,35 +251,41 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             return $group;
         }, []);
 
-        $grid = $form->getFactory()
-            ->createGrid('selectGrid', 4);
+         if ($bigDataSchool == "N") {
+            $grid = $form->getFactory()
+                ->createGrid('selectGrid', 4);
 
-        $grid->addCell()
-            ->addClass('w-1/5')
-            ->addLabel('selectUnit', __m('Copy From Unit'))
-            ->description(__m('Select a unit to copy a block from'));
+            $grid->addCell()
+                ->addClass('w-1/5')
+                ->addLabel('selectUnit', __m('Copy From Unit'))
+                ->description(__m('Select a unit to copy a block from'));
 
-        $grid->addCell()
-            ->addClass('w-1/5')
-            ->addSelect('selectUnit')
-            ->placeholder(__m('Select Unit'))
-            ->fromArray($units);
+            $grid->addCell()
+                ->addClass('w-1/5')
+                ->addSelect('selectUnit')
+                ->placeholder(__m('Select Unit'))
+                ->fromArray($units);
 
-        $grid->addCell()
-            ->addClass('w-1/5 ml-5')
-            ->addLabel('selectBlock', __('Copy Block'))
-            ->description(__m('Select a block to copy'));
+            $grid->addCell()
+                ->addClass('w-1/5 ml-5')
+                ->addLabel('selectBlock', __('Copy Block'))
+                ->description(__m('Select a block to copy'));
 
-        $grid->addCell()
-            ->addClass('w-1/5')
-            ->addSelect('selectBlock')
-            ->fromArray($blocks)
-            ->chainedTo('selectUnit', $chainedTo);
+            $grid->addCell()
+                ->addClass('w-1/5')
+                ->addSelect('selectBlock')
+                ->fromArray($blocks)
+                ->chainedTo('selectUnit', $chainedTo);
 
-        $row = $form->addRow()->addClass('advanced');
-            $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid, $settingGateway)
-                ->addToolInput($blockCreator)
-                ->addToolInput($grid);
+            $row = $form->addRow();
+                $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid, $settingGateway)
+                    ->addToolInput($blockCreator)
+                    ->addToolInput($grid);
+        } else {
+            $row = $form->addRow();
+                $customBlocks = $row->addFreeLearningSmartBlocks('smart', $session, $guid, $settingGateway)
+                    ->addToolInput($blockCreator);
+        }
 
         $smartBlocksTemplate = $settingGateway->getSettingByScope('Free Learning', 'smartBlocksTemplate');
         if (!empty($smartBlocksTemplate)) { // Get blocks from template unit
