@@ -38,4 +38,25 @@ class UnitAuthorGateway extends QueryableGateway
 
         return $this->db()->select($sql, $data);
     }
+
+    public function selectAuthorDetailsByUnitID($freeLearningUnitID) {
+        $data = ['freeLearningUnitID' => $freeLearningUnitID];
+        $sql = "SELECT freeLearningUnitAuthor.freeLearningUnitAuthorID,gibbonPerson.gibbonPersonID, gibbonPerson.surname, gibbonPerson.preferredName
+                FROM freeLearningUnitAuthor
+                JOIN gibbonPerson ON (gibbonPerson.gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID) 
+                WHERE freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID
+                ORDER BY gibbonPerson.surname";
+
+        return $this->db()->select($sql, $data);
+    }
+
+    public function deleteAuthorsNotInList($freeLearningUnitID, $authorIDList)
+    {
+        $authorIDList = is_array($authorIDList) ? implode(',', $authorIDList) : $authorIDList;
+
+        $data = ['freeLearningUnitID' => $freeLearningUnitID, 'authorIDList' => $authorIDList];
+        $sql = "DELETE FROM freeLearningUnitAuthor WHERE freeLearningUnitID=:freeLearningUnitID AND NOT FIND_IN_SET(freeLearningUnitAuthorID, :authorIDList)";
+
+        return $this->db()->delete($sql, $data);
+    }
 }

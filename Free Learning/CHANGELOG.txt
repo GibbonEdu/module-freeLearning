@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.07
+--------
+Added the ability to modify authors of a unit
+
 v5.22.06
 --------
 Removed Copy Block feature from Add/Edit unit for Big Data Schools

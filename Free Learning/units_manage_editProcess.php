@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 
 require_once '../../gibbon.php';
 
@@ -40,6 +41,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             header("Location: {$URL}");
         } else {
             //Proceed!
+            $unitAuthorGateway = $container->get(UnitAuthorGateway::class); 
+
             //Validate Inputs
             $name = $_POST['name'] ?? '';
             $difficulty = $_POST['difficulty'] ?? '';
@@ -77,9 +80,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     if ($highestAction == 'Manage Units_all') {
                         $data = array('freeLearningUnitID' => $freeLearningUnitID);
                         $sql = 'SELECT * FROM freeLearningUnit WHERE freeLearningUnitID=:freeLearningUnitID';
-                    } elseif ($highestAction == 'Manage Units_learningAreas') {
+                    } else {
                         $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
-                        $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID ORDER BY difficulty, name";
+                        $sql = "SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID
+                        UNION
+                        SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID";
                     }
                     $result = $connection2->prepare($sql);
                     $result->execute($data);
@@ -146,6 +151,32 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         exit();
                     }
 
+                    // Update the authors
+                    $authors = $_POST['authors'] ?? '';                  
+                    $authorIDs = [];
+                    foreach ($authors as $person) {
+                        $authorData = [
+                            'freeLearningUnitID' => $freeLearningUnitID,
+                            'gibbonPersonID'     => $person['gibbonPersonID'], 
+                            'surname' => $person['surname'],
+                            'preferredName' => $person['preferredName'],
+                        ]; 
+
+                        $freeLearningUnitAuthorID = $person['freeLearningUnitAuthorID'] ?? '';
+
+                        if (!empty($freeLearningUnitAuthorID)) {
+                            !$unitAuthorGateway->update($freeLearningUnitAuthorID, $authorData);
+                        } else {
+                            $freeLearningUnitAuthorID = $unitAuthorGateway->insert($authorData);
+                            $partialFail &= !$freeLearningUnitAuthorID;
+                        }
+                
+                        $authorIDs[] = str_pad($freeLearningUnitAuthorID, 12, '0', STR_PAD_LEFT);
+                    }
+
+                    // Cleanup authors that have been deleted
+                    $unitAuthorGateway->deleteAuthorsNotInList($freeLearningUnitID, $authorIDs);
+
                     //Write author to database for major edits only
                     if ($majorEdit == 'Y') {
                         try {
@@ -156,6 +187,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         } catch (PDOException $e) {
                             $partialFail = true;
                         }
+
                         if ($result->rowCount() < 1) {
                             try {
                                 $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $session->get('gibbonPersonID'), 'surname' => $session->get('surname'), 'preferredName' => $session->get('preferredName'), 'website' => $session->get('website') ?? '');
@@ -167,7 +199,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             }
                         }
                     }
-
+                    
                     $disableOutcomes = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'disableOutcomes');
                     if ($disableOutcomes != 'Y') {
                         //Delete all outcomes
@@ -202,7 +234,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             }
                         }
                     }
-
+                    
                     //Update blocks
                     $order = $_POST['order'] ?? [];
                     $sequenceNumber = 0;

@@ -19,8 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
+use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
 
 // Module includes
@@ -32,7 +34,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
+    if (empty($highestAction)) {
         $page->addError(__('The highest grouped action cannot be determined.'));
     } else {
         $freeLearningUnitID = $_GET['freeLearningUnitID'];
@@ -72,21 +74,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                             LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
                         WHERE
                             freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
-            } elseif ($highestAction == 'Manage Units_learningAreas') {
+            } else {
                 $data = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitID' => $freeLearningUnitID);
-                $sql = "SELECT DISTINCT
-                            freeLearningUnit.*,
-                            GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList
-                        FROM
-                            freeLearningUnit
-                        JOIN
-                            gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%'))
-                            LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
-                            JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
-                        WHERE
-                            gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID
-                            AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')
-                            AND freeLearningUnit.freeLearningUnitID=:freeLearningUnitID";
+                $sql = "SELECT DISTINCT freeLearningUnit.*, GROUP_CONCAT(DISTINCT freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite SEPARATOR ',') as freeLearningUnitIDPrerequisiteList 
+                FROM freeLearningUnit JOIN gibbonDepartment ON (freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')) LEFT JOIN freeLearningUnitPrerequisite ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID AND (role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') AND freeLearningUnitID=:freeLearningUnitID
+                UNION
+                SELECT DISTINCT freeLearningUnit.* FROM freeLearningUnit JOIN freeLearningUnitAuthor ON (freeLearningUnitAuthor.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID AND freeLearningUnitAuthor.freeLearningUnitID=:freeLearningUnitID";
             }
             $result = $connection2->prepare($sql);
             $result->execute($data);
@@ -207,7 +200,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addLabel('majorEdit', __('Major Edit'))->description(__m('If checked, you will be added as an author.'));
                 $row->addCheckbox('majorEdit')->setValue('Y')->description(__('Yes'));
 
-
             // ACCESS
             $form->addRow()->addHeading(__m('Access'))->append(__m('Users with permission to manage units can override avaiability preferences.'));
 
@@ -321,9 +313,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
 
             // SMART BLOCKS
-
             $unitBlockGateway = $container->get(UnitBlockGateway::class);
-
 
             $form->addRow()->addHeading(__('Smart Blocks'))->append(__('Smart Blocks aid unit planning by giving teachers help in creating and maintaining new units, splitting material into smaller units which can be deployed to lesson plans. As well as predefined fields to fill, Smart Units provide a visual view of the content blocks that make up a unit. Blocks may be any kind of content, such as discussion, assessments, group work, outcome etc.'));
             $blockCreator = $form->getFactory()
@@ -393,12 +383,46 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     'length' => $rowBlocks['length'],
                     'contents' => $rowBlocks['contents'],
                     'teachersNotes' => $rowBlocks['teachersNotes'],
-                    'freeLearningUnitBlockID' => $rowBlocks['freeLearningUnitBlockID']
+                    'freeLearningUnitBlockID' => $rowBlocks['freeLearningUnitBlockID'],
+                    'orderName' => 'order',
                 );
                 $customBlocks->addBlock($rowBlocks['freeLearningUnitBlockID'], $smart);
             }
 
+            // AUTHORS
+            $form->addRow()->addHeading(__('Authors'))->append(__m('All authors have edit access to this unit.'));
+            
+            // Custom Block Template
+            $addBlockButton = $form->getFactory()->createButton(__m('Add Author'))->addClass('addBlock');
 
+            $blockTemplate = $form->getFactory()->createTable()->setClass('blank');
+            $row = $blockTemplate->addRow()->addClass('w-full flex justify-between items-center mt-1 ml-2');
+                $row->addSelectStaff('gibbonPersonID')->photo(false)->setClass('flex-1 mr-1')->required()->placeholder()
+                ->append("<input type='hidden' id='freeLearningUnitAuthorID' name='freeLearningUnitAuthorID' value=''/>")
+                ->append("<input type='hidden' id='gibbonPersonIDOriginal' name='gibbonPersonIDOriginal' value=''/>")
+                ->append("<input type='hidden' id='surname' name='surname' value=''/>")
+                ->append("<input type='hidden' id='preferredName' name='preferredName' value=''/>");
+                 
+            // Custom Blocks
+            $row = $form->addRow();
+            $customBlocks = $row->addCustomBlocks('authors', $session, true)
+                ->fromTemplate($blockTemplate)
+                ->settings(['inputNameStrategy' => 'object', 'addOnEvent' => 'click', 'orderName' => 'authorOrder'])
+                ->placeholder(__m('Authors will be listed here...'))
+                ->addToolInput($addBlockButton);
+
+            $authors = $container->get(UnitAuthorGateway::class)->selectAuthorDetailsByUnitID($freeLearningUnitID);
+            
+            while ($person = $authors->fetch()) {
+                $customBlocks->addBlock($person['freeLearningUnitAuthorID'], [
+                        'freeLearningUnitAuthorID' => $person['freeLearningUnitAuthorID'],
+                        'gibbonPersonIDOriginal'   => $person['gibbonPersonID'],
+                        'gibbonPersonID'           => $person['gibbonPersonID'],
+                        'surname' => $person['surname'],
+                        'preferredName' => $person['preferredName'],
+                    ]);
+            }
+            
             $form->loadAllValuesFrom($values);
 
             $row = $form->addRow();
@@ -408,6 +432,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             echo $form->getOutput();
         }
         ?>
+
         <script>
             // Temporary fix to disable selectors if the required core changes are not implemented.
             $(document).ready(function() {
