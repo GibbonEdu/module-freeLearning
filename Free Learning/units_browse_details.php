@@ -258,6 +258,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         ->format(function ($values) use ($connection2, $freeLearningUnitID) {
                             $output = '';
                             $authors = getAuthorsArray($connection2, $freeLearningUnitID);
+                            if (empty($authors)) return '';
+                            
                             foreach ($authors as $author) {
                                 if ($author[3] == '') {
                                     $output .= $author[1].'<br/>';
@@ -283,7 +285,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     $table->addColumn('gibbonYearGroupIDMinimum', __m('Minimum Year Group'))
                         ->format(function ($values) use ($guid, $connection2) {
-                            return getYearGroupsFromIDList($guid, $connection2, $values["gibbonYearGroupIDMinimum"]);
+                            return getYearGroupsFromIDList($guid, $connection2, $values["gibbonYearGroupIDMinimum"] ?? '');
                         });
 
                 echo $table->render([$values]);
