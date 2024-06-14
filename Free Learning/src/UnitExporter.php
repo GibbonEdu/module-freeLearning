@@ -121,8 +121,8 @@ class UnitExporter
             'unit' => $unit,
             'prerequisites' => $this->unitGateway->selectPrerequisiteNamesByUnitID($unit['freeLearningUnitID'])->fetchAll(\PDO::FETCH_COLUMN),
             'blocks' => $blocks,
-            'authors' => $this->unitAuthorGateway->selectAuthorsByUnit($freeLearningUnitID)->fetchAll(),
-        ];
+            'authors' => $this->unitGateway->selectUnitAuthorsByID($unit['freeLearningUnitID'])->fetchAll()
+        ]; 
     }
 
     public function output()
@@ -135,7 +135,7 @@ class UnitExporter
         // Add Files
         foreach ($this->files as $file) {
             if ($file['type'] == 'url') {
-                // Handle images from url by downloading them firsy
+                // Handle images from url by downloading them first
                 $context  = stream_context_create(['ssl' => ['verify_peer' => false]]);
                 $fileContents = @file_get_contents($file['location'], false, $context);
 

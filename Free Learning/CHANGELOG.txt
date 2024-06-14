@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+
+v5.22.08
+--------
+Fixed the bug to manage units according to the Learning Area
+
 v5.22.07
 --------
 Added the ability to modify authors of a unit

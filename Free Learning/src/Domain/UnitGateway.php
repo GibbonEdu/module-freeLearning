@@ -149,8 +149,11 @@ class UnitGateway extends QueryableGateway
             $query->bindValue('gibbonYearGroupIDMinimum', $criteria->getFilterValue('gibbonYearGroupIDMinimum'));
             $query->where("freeLearningUnit.gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum");
         }
+
+        $criteria->addFilterRules($this->getSharedFilterRules());
         
-        $query->union()
+        $this->unionWithCriteria($query, $criteria)
+        ->distinct()
         ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea"])
         ->from($this->getTableName())
         ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
@@ -159,8 +162,6 @@ class UnitGateway extends QueryableGateway
         ->where('(freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID)')
         ->bindValue('gibbonPersonID', $gibbonPersonID)
         ->groupBy(['freeLearningUnit.freeLearningUnitID']);
-
-        $criteria->addFilterRules($this->getSharedFilterRules());
 
         return $this->runQuery($query, $criteria);
     }
@@ -172,7 +173,7 @@ class UnitGateway extends QueryableGateway
                 name
             FROM
                 freeLearningUnitPrerequisite
-                JOIN freeLearningUnit ON (freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite=freeLearningUnit.freeLearningUnitID)
+                JOIN freeLearningUnit ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
             WHERE
                 freeLearningUnitPrerequisite.freeLearningUnitID=:freeLearningUnitID";
 
