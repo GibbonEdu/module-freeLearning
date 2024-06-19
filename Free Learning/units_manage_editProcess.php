@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\User\UserGateway;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 
@@ -150,22 +151,39 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         header("Location: {$URL}");
                         exit();
                     }
-
+                    
                     // Update the authors
-                    $authors = $_POST['authors'] ?? '';                  
                     $authorIDs = [];
-                    foreach ($authors as $person) {
-                        $authorData = [
-                            'freeLearningUnitID' => $freeLearningUnitID,
-                            'gibbonPersonID'     => $person['gibbonPersonID'], 
-                            'surname' => $person['surname'],
-                            'preferredName' => $person['preferredName'],
-                        ]; 
+                    $authorOrder = $_POST['authorOrder'] ?? [];
+                    
+                    foreach ($authorOrder as $order) {
 
-                        $freeLearningUnitAuthorID = $person['freeLearningUnitAuthorID'] ?? '';
+                        $author = $_POST['authors'][$order];
+
+                        $authorData['freeLearningUnitID'] = $freeLearningUnitID;
+
+                        $type = $author['category'] ?? 'Internal';
+
+                        if ($type == 'Internal') {
+                            $user = $container->get(UserGateway::class)->getByID($author['gibbonPersonID']);
+
+                            $authorData['gibbonPersonID'] = $author['gibbonPersonID'];
+                            $authorData['surname'] = $user['surname'];
+                            $authorData['preferredName'] = $user['preferredName'];
+                            $authorData['website']  = $user['website'];
+                        } else {
+                            $authorData['gibbonPersonID'] = null;
+                            $authorData['surname'] = $author['surname'];
+                            $authorData['preferredName'] = $author['preferredName'];
+                            $authorData['website']  = '';
+                        }
+
+                        unset($author['category']);
+
+                        $freeLearningUnitAuthorID = $author['freeLearningUnitAuthorID'] ?? '';
 
                         if (!empty($freeLearningUnitAuthorID)) {
-                            !$unitAuthorGateway->update($freeLearningUnitAuthorID, $authorData);
+                            $unitAuthorGateway->update($freeLearningUnitAuthorID, $authorData);
                         } else {
                             $freeLearningUnitAuthorID = $unitAuthorGateway->insert($authorData);
                             $partialFail &= !$freeLearningUnitAuthorID;

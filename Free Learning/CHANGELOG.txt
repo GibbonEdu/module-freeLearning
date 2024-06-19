@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v5.22.09
+--------
+Added the feature of adding Internal and External Authors
+Fixed the bug so that any staff in the same larning area can edit a unit and be an author
+
 v5.22.08
 --------
 Fixed the bug to manage units according to the Learning Area

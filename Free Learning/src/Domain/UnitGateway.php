@@ -140,7 +140,7 @@ class UnitGateway extends QueryableGateway
             ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea"])
             ->innerJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
             ->innerJoin('gibbonDepartmentStaff', 'gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID')
-            ->where("(role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)') ")
+            ->where("(role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher' OR role='Teacher (Curriculum)')")
             ->where('gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID')
             ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->groupBy(['freeLearningUnit.freeLearningUnitID']);

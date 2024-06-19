@@ -21,6 +21,7 @@ use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\User\UserGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
@@ -396,12 +397,32 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $addBlockButton = $form->getFactory()->createButton(__m('Add Author'))->addClass('addBlock');
 
             $blockTemplate = $form->getFactory()->createTable()->setClass('blank');
-            $row = $blockTemplate->addRow()->addClass('w-full flex justify-between items-center mt-1 ml-2');
-                $row->addSelectStaff('gibbonPersonID')->photo(false)->setClass('flex-1 mr-1')->required()->placeholder()
-                ->append("<input type='hidden' id='freeLearningUnitAuthorID' name='freeLearningUnitAuthorID' value=''/>")
-                ->append("<input type='hidden' id='gibbonPersonIDOriginal' name='gibbonPersonIDOriginal' value=''/>")
-                ->append("<input type='hidden' id='surname' name='surname' value=''/>")
-                ->append("<input type='hidden' id='preferredName' name='preferredName' value=''/>");
+
+            $row = $blockTemplate->addRow();
+            $row->addRadio('category')
+                ->inline()
+                ->alignLeft()
+                ->fromArray([
+                    'Internal' => __('Internal'),
+                    'External' => __('External')
+                ]);
+
+            $row = $blockTemplate->addRow()->addClass('hideShow');
+            $row->addSelectStaff('gibbonPersonID')->photo(false)->setClass('flex-1 mr-1')->placeholder()
+                    ->addClass('w-full flex justify-between items-center mt-1 ml-2')
+                    ->append("<input type='hidden' id='freeLearningUnitAuthorID' name='freeLearningUnitAuthorID' value=''/>")
+                    ->append("<input type='hidden' id='freeLearningUnitID' name='freeLearningUnitID' value=''/>");
+
+            $row = $blockTemplate->addRow()->addClass('showHide');
+            $row->addLabel('surname', __('Surname'));
+            $row->addTextField('surname')
+                ->maxLength(50)
+                ->addClass('flex justify-between items-center mt-1 ml-2');
+
+            $row->addLabel('preferredName', __('First Name'));
+            $row->addTextField('preferredName')
+                ->maxLength(50)
+                ->addClass('flex justify-between items-center mt-1 ml-2');
                  
             // Custom Blocks
             $row = $form->addRow();
@@ -411,16 +432,28 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 ->placeholder(__m('Authors will be listed here...'))
                 ->addToolInput($addBlockButton);
 
-            $authors = $container->get(UnitAuthorGateway::class)->selectAuthorDetailsByUnitID($freeLearningUnitID);
-            
-            while ($person = $authors->fetch()) {
-                $customBlocks->addBlock($person['freeLearningUnitAuthorID'], [
-                        'freeLearningUnitAuthorID' => $person['freeLearningUnitAuthorID'],
-                        'gibbonPersonIDOriginal'   => $person['gibbonPersonID'],
-                        'gibbonPersonID'           => $person['gibbonPersonID'],
-                        'surname' => $person['surname'],
-                        'preferredName' => $person['preferredName'],
-                    ]);
+            $customBlocks->addPredefinedBlock("Add Author", ['category' => 'Internal']);
+
+            $authors = $container->get(UnitAuthorGateway::class)->selectBy(['freeLearningUnitID' => $freeLearningUnitID]);
+
+            foreach ($authors as $author) {
+
+                if (!empty($author['gibbonPersonID'])) {
+
+                    $author['category'] = 'Internal';
+                    $author['gibbonPersonID'] = str_pad($author['gibbonPersonID'], 10, '0', STR_PAD_LEFT);
+                    $staffDetails = $container->get(UserGateway::class)->getByID($author['gibbonPersonID']);
+                    $staffStatus = $staffDetails['status'];
+
+                        if(!empty($staffStatus) && $staffStatus != 'Full') {
+                            $author['category'] = 'External';
+                            $author['gibbonPersonID'] = 'null';
+                        }
+                } else {
+                    $author['category'] = 'External';
+                }
+                
+                $customBlocks->addBlock($author['freeLearningUnitAuthorID'], $author);
             }
             
             $form->loadAllValuesFrom($values);
@@ -434,12 +467,32 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         ?>
 
         <script>
+
+            //Internal or External Author
+            var radio = 'input[type="radio"][name$="[category]"]';
+
+            function categorySwap() {
+                var block = $(this).closest('tbody');
+                if ($(this).prop('id').startsWith('category0')) {
+                    block.find('.showHide').hide();
+                    block.find('.hideShow').show();
+                } else {
+                    block.find('.showHide').show();
+                    block.find('.hideShow').hide();
+                }
+            }
+
             // Temporary fix to disable selectors if the required core changes are not implemented.
             $(document).ready(function() {
+                $(radio + ':checked').each(categorySwap);
+
                 if (!$('#smart').data('gibbonCustomBlocks')) {
                     $('#selectUnit').parents('tr').hide();
                 }
             });
+
+            //This supplements triggers for the Internal and External Author
+            $(document).on('change', radio, categorySwap);
 
             // Enable quicksaving blocks
             $(document).on('click', 'a.blockButton[data-event="quicksave"]', function (event) {
