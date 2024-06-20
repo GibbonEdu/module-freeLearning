@@ -321,24 +321,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 ->setValue(__('Click to create a new block'))
                 ->addClass('addBlock');
 
-            $allBlocks = $unitBlockGateway->selectAllBlocks();
-
-            $blocks = [];
-            $chainedTo = [];
-
-            $units = array_reduce($allBlocks->fetchAll(), function($group, $item) use (&$blocks, &$chainedTo) {
-                $group[$item['freeLearningUnitID']] = $item['unitName'];
-
-                $blocks[$item['freeLearningUnitID'].'_placeholder'] = '';
-                $blocks[$item['freeLearningUnitBlockID']] = $item['title'];
-                $chainedTo[$item['freeLearningUnitID'].'_placeholder'] = $item['freeLearningUnitID'];
-                $chainedTo[$item['freeLearningUnitBlockID']] = $item['freeLearningUnitID'];
-
-                return $group;
-            }, []);
-
-
             if ($bigDataSchool == "N") {
+                $allBlocks = $unitBlockGateway->selectAllBlocks();
+
+                $blocks = [];
+                $chainedTo = [];
+
+                $units = array_reduce($allBlocks->fetchAll(), function($group, $item) use (&$blocks, &$chainedTo) {
+                    $group[$item['freeLearningUnitID']] = $item['unitName'];
+
+                    $blocks[$item['freeLearningUnitID'].'_placeholder'] = '';
+                    $blocks[$item['freeLearningUnitBlockID']] = $item['title'];
+                    $chainedTo[$item['freeLearningUnitID'].'_placeholder'] = $item['freeLearningUnitID'];
+                    $chainedTo[$item['freeLearningUnitBlockID']] = $item['freeLearningUnitID'];
+
+                    return $group;
+                }, []);
+
                 $grid = $form->getFactory()
                     ->createGrid('selectGrid', 4);
     
