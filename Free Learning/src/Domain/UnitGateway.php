@@ -173,7 +173,7 @@ class UnitGateway extends QueryableGateway
                 name
             FROM
                 freeLearningUnitPrerequisite
-                JOIN freeLearningUnit ON (freeLearningUnitPrerequisite.freeLearningUnitID=freeLearningUnit.freeLearningUnitID)
+                JOIN freeLearningUnit ON (freeLearningUnitPrerequisite.freeLearningUnitIDPrerequisite=freeLearningUnit.freeLearningUnitID)
             WHERE
                 freeLearningUnitPrerequisite.freeLearningUnitID=:freeLearningUnitID";
 

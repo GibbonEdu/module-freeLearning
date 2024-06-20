@@ -2280,3 +2280,13 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.22.09';
 $sql[$count][1] = "";
+
+//v5.22.10
+++$count;
+$sql[$count][0] = '5.22.10';
+$sql[$count][1] = "
+ALTER TABLE freeLearningUnitAuthor MODIFY website varchar(255) DEFAULT NULL;end
+";
+
+
+

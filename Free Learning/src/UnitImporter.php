@@ -207,6 +207,7 @@ class UnitImporter
         foreach ($authors as $author) {
             $author['freeLearningUnitID'] = $freeLearningUnitID;
             $author['gibbonPersonID'] = null;
+            unset($author['title']);
 
             if (!empty($existingUnit)) {
                 $existingAuthor = $this->unitAuthorGateway->selectBy([

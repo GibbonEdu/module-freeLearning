@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+v5.22.10
+--------
+Fixed author and prerequisite export/import issues
 
 v5.22.09
 --------
