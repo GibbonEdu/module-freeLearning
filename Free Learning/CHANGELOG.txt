@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.22.11
+--------
+Fixed no-prerequisite edit issue
+Fixed no-map issue on fresh installs
+
 v5.22.10
 --------
 Fixed author and prerequisite export/import issues
