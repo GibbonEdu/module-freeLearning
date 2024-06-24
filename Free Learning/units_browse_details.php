@@ -247,7 +247,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $output = __m('No Learning Areas available.');
                         } else {
                             for ($i = 0; $i < count($learningAreas); $i = $i + 2) {
-                                if (is_numeric(strpos($values['gibbonDepartmentIDList'], $learningAreas[$i]))) {
+                                if (is_numeric(strpos($values['gibbonDepartmentIDList'] ?? '', $learningAreas[$i]))) {
                                     $output .= __($learningAreas[($i + 1)]).'<br/>';
                                 }
                             }
