@@ -2293,5 +2293,10 @@ ALTER TABLE freeLearningUnitAuthor MODIFY website varchar(255) DEFAULT NULL;end
 $sql[$count][0] = '5.22.11';
 $sql[$count][1] = "";
 
+//v5.22.12
+++$count;
+$sql[$count][0] = '5.22.12';
+$sql[$count][1] = "";
+
 
 

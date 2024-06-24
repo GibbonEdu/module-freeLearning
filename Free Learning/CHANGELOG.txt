@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.12
+--------
+Fixed the no-prerequisite fix from last version
+
 v5.22.11
 --------
 Fixed no-prerequisite edit issue

@@ -139,31 +139,30 @@ class UnitGateway extends QueryableGateway
             ->from($this->getTableName())
             ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea"])
             ->innerJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
-            ->innerJoin('gibbonDepartmentStaff', 'gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID')
+            ->innerJoin('gibbonDepartment as departmentStaff', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', departmentStaff.gibbonDepartmentID, '%')")
+            ->innerJoin('gibbonDepartmentStaff', 'gibbonDepartmentStaff.gibbonDepartmentID=departmentStaff.gibbonDepartmentID')
             ->where("(role='Coordinator' OR role='Assistant Coordinator' OR role='Teacher (Curriculum)')")
             ->where('gibbonDepartmentStaff.gibbonPersonID=:gibbonPersonID')
             ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->groupBy(['freeLearningUnit.freeLearningUnitID']);
-
+            
         if ($criteria->getFilterValue('gibbonYearGroupIDMinimum') != '') {
             $query->bindValue('gibbonYearGroupIDMinimum', $criteria->getFilterValue('gibbonYearGroupIDMinimum'));
             $query->where("freeLearningUnit.gibbonYearGroupIDMinimum=:gibbonYearGroupIDMinimum");
         }
 
         $criteria->addFilterRules($this->getSharedFilterRules());
-        
-        $this->unionWithCriteria($query, $criteria)
-        ->distinct()
-        ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea"])
-        ->from($this->getTableName())
-        ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
-        ->innerJoin('freeLearningUnitAuthor', 'freeLearningUnitAuthor.freeLearningUnitID=freeLearningUnit.freeLearningUnitID')
-        ->innerJoin('gibbonPerson', 'gibbonPerson.gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID')
-        ->where('(freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID)')
-        ->bindValue('gibbonPersonID', $gibbonPersonID)
-        ->groupBy(['freeLearningUnit.freeLearningUnitID']);
 
-        return $this->runQuery($query, $criteria);
+        $this->unionWithCriteria($query, $criteria)
+            ->distinct()
+            ->cols(['freeLearningUnit.*', "GROUP_CONCAT(gibbonDepartment.name SEPARATOR '<br/>') as learningArea"])
+            ->from($this->getTableName())
+            ->leftJoin('gibbonDepartment', "freeLearningUnit.gibbonDepartmentIDList LIKE CONCAT('%', gibbonDepartment.gibbonDepartmentID, '%')")
+            ->innerJoin('freeLearningUnitAuthor', 'freeLearningUnitAuthor.freeLearningUnitID=freeLearningUnit.freeLearningUnitID AND freeLearningUnitAuthor.gibbonPersonID=:gibbonPersonID')
+            ->innerJoin('gibbonPerson', 'gibbonPerson.gibbonPersonID=freeLearningUnitAuthor.gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
+            ->groupBy(['freeLearningUnit.freeLearningUnitID']);
+            return $this->runQuery($query, $criteria);
     }
     
     public function selectPrerequisiteNamesByUnitID($freeLearningUnitID)
