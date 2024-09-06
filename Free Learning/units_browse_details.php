@@ -343,7 +343,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 }
                 if ($values['outline'] != '') {
                     echo '<h3>';
-                    echo 'Outline';
+                    echo __m('Outline');
                     echo '</h3>';
                     echo '<p>';
                     echo $values['outline'];

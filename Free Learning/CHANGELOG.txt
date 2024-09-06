@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.22.13
+--------
+Wrapped interface string "Outline" for translation
+
 v5.22.12
 --------
 Fixed the no-prerequisite fix from last version
