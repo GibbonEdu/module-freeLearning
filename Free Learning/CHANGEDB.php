@@ -2302,3 +2302,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.22.13';
 $sql[$count][1] = "";
+
+//v5.23.00
+++$count;
+$sql[$count][0] = '5.23.00';
+$sql[$count][1] = "
+UPDATE gibbonModule SET author='Gibbon Foundation', url='https://gibbonedu.org' WHERE name='Free Learning';end
+";
