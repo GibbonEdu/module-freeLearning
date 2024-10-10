@@ -766,6 +766,11 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         echo '</div>';
                         if ($disableOutcomes != 'Y') {
                             echo "<div id='tabs5'>";
+                                $outcomesIntroduction = $settingGateway->getSettingByScope('Free Learning', 'outcomesIntroduction');
+                                if (!empty($outcomesIntroduction)) {
+                                    echo "<p>".$outcomesIntroduction."</p>";
+                                }
+                            
                                 //Spit out outcomes
                                 $unitOutcomeGateway = $container->get(UnitOutcomeGateway::class);
 
@@ -776,19 +781,26 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                                 $table = DataTable::createPaginated('outcomes', $criteria);
 
-                                $table->addExpandableColumn('content');
-                                $table->addColumn('scope', __('scope'));
-                                $table->addColumn('category', __('Category'));
-                                $table->addColumn('name', __('Name'))
-                                    ->format(function($outcome) {
-                                        $output = $outcome['nameShort']."<br/>";
-                                        $output .= "<div class=\"text-xxs\">".$outcome['name']."</div>";
-                                        return $output;
-                                    });
-                                $table->addColumn('yearGroups', __('Year Groups'))
-                                    ->format(function($outcome) use ($guid, $connection2) {
-                                        return getYearGroupsFromIDList($guid, $connection2, $outcome['gibbonYearGroupIDList']);
-                                    });
+                                $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+                                
+                                if ($bigDataSchool != 'Y') {
+                                    $table->addExpandableColumn('content');
+                                    $table->addColumn('scope', __('scope'));
+                                    $table->addColumn('category', __('Category'));
+                                    $table->addColumn('name', __('Name'))
+                                        ->format(function($outcome) {
+                                            $output = $outcome['nameShort']."<br/>";
+                                            $output .= "<div class=\"text-xxs\">".$outcome['name']."</div>";
+                                            return $output;
+                                        });
+                                    $table->addColumn('yearGroups', __('Year Groups'))
+                                        ->format(function($outcome) use ($guid, $connection2) {
+                                            return getYearGroupsFromIDList($guid, $connection2, $outcome['gibbonYearGroupIDList']);
+                                        });
+                                    } else {
+                                        $table->addColumn('name', __('Name'));
+                                        $table->addColumn('content', __('Description'));
+                                    }
 
                                 echo $table->render($outcomes);
                             echo '</div>';

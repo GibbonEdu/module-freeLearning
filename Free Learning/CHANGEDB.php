@@ -2309,3 +2309,11 @@ $sql[$count][0] = '5.23.00';
 $sql[$count][1] = "
 UPDATE gibbonModule SET author='Gibbon Foundation', url='https://gibbonedu.org' WHERE name='Free Learning';end
 ";
+
+//v5.23.01
+++$count;
+$sql[$count][0] = '5.23.01';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'outcomesIntroduction', 'Outcomes Introduction', 'Introductory HTML content to display before the data table on the unit details Outcomes tab.', '');end
+";
+

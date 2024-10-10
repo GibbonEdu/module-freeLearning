@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+v2.23.01
+-------
+Switched to simplied Outcomes tab in unit details view for Big Data Schools
+Added setting for Introductory text in Outcomes tab in unit details view
+Fixed CSS issue introduced in last release
+
 v2.23.00
 -------
 Transferred ownership from Ross Parker to Gibbon Foundation
