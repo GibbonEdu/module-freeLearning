@@ -28,6 +28,7 @@ use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\Markbook\MarkbookColumnGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\Module\FreeLearning\Domain\System\NotificationGateway;
 
 //  Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -129,6 +130,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $page->addError(__('The selected record does not exist, or you do not have access to it.'));
         return;
     }
+
+    // MARK ANY COMMENT NOTIFICATIONS AS READ
+    $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=$freeLearningUnitStudentID&sidebar=true";
+    $notificationGateway = $container->get(NotificationGateway::class);
+    $notificationGateway->archiveCommentNotificationsByEnrolment($session->get('gibbonPersonID'), $actionLink);
 
     // COPY TO MARKBOOK PREPARATION
     $gibbonMarkbookColumnID = null;

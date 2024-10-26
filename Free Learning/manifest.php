@@ -579,6 +579,23 @@ $actionRows[21]['categoryPermissionStudent'] = 'N';
 $actionRows[21]['categoryPermissionParent'] = 'N';
 $actionRows[21]['categoryPermissionOther'] = 'N';
 
+$actionRows[22]['name'] = 'Unread Comment Notifications';
+$actionRows[22]['precedence'] = '0';
+$actionRows[22]['category'] = 'Reports';
+$actionRows[22]['description'] = "Allows a user to see unread notifications relating to comments left on units.";
+$actionRows[22]['URLList'] = 'report_unreadComments.php';
+$actionRows[22]['entryURL'] = 'report_unreadComments.php';
+$actionRows[22]['entrySidebar'] = 'Y';
+$actionRows[22]['defaultPermissionAdmin'] = 'Y';
+$actionRows[22]['defaultPermissionTeacher'] = 'Y';
+$actionRows[22]['defaultPermissionStudent'] = 'N';
+$actionRows[22]['defaultPermissionParent'] = 'N';
+$actionRows[22]['defaultPermissionSupport'] = 'N';
+$actionRows[22]['categoryPermissionStaff'] = 'Y';
+$actionRows[22]['categoryPermissionStudent'] = 'N';
+$actionRows[22]['categoryPermissionParent'] = 'N';
+$actionRows[22]['categoryPermissionOther'] = 'N';
+
 $array = array();
 $array['toggleSettingName'] = 'publicUnits';
 $array['toggleSettingScope'] = 'Free Learning';

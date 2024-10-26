@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.24.00
+-------
+Added new report showing notifications for unread comments
+
 v2.23.01
 -------
 Switched to simplied Outcomes tab in unit details view for Big Data Schools
