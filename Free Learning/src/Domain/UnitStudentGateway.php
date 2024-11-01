@@ -435,7 +435,7 @@ class UnitStudentGateway extends QueryableGateway
     {
         $query = $this
             ->newSelect()
-            ->cols(['gibbonDiscussion.comment', 'gibbonDiscussion.type', 'gibbonDiscussion.tag', 'gibbonDiscussion.attachmentType', 'gibbonDiscussion.attachmentLocation', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240', 'gibbonPerson.username', 'gibbonPerson.email', 'gibbonRole.category', 'gibbonDiscussion.timestamp'])
+            ->cols(['gibbonDiscussionID', 'gibbonDiscussion.comment', 'gibbonDiscussion.type', 'gibbonDiscussion.tag', 'gibbonDiscussion.attachmentType', 'gibbonDiscussion.attachmentLocation', 'gibbonPerson.gibbonPersonID', 'gibbonPerson.title', 'gibbonPerson.surname', 'gibbonPerson.preferredName', 'gibbonPerson.image_240', 'gibbonPerson.username', 'gibbonPerson.email', 'gibbonRole.category', 'gibbonDiscussion.timestamp'])
             ->from('gibbonDiscussion')
             ->innerJoin('gibbonPerson', 'gibbonDiscussion.gibbonPersonID=gibbonPerson.gibbonPersonID')
             ->innerJoin('gibbonRole', 'gibbonRole.gibbonRoleID=gibbonPerson.gibbonRoleIDPrimary')
@@ -445,7 +445,7 @@ class UnitStudentGateway extends QueryableGateway
             ->bindValue('foreignTableID', $freeLearningUnitStudentID);
 
         $query->union()
-            ->cols(['freeLearningUnitStudent.commentApproval as comment', 'freeLearningUnitStudent.status as type', "(CASE WHEN freeLearningUnitStudent.status = 'Complete - Pending' THEN 'pending' WHEN freeLearningUnitStudent.status = 'Evidence Not Yet Approved' THEN 'warning' WHEN freeLearningUnitStudent.status = 'Complete - Approved' THEN 'success' ELSE 'dull' END) as tag", 'freeLearningUnitStudent.evidenceType as attachmentType', 'freeLearningUnitStudent.evidenceLocation as attachmentLocation', 'freeLearningUnitStudent.gibbonPersonIDStudent as gibbonPersonID', "'' as title", 'nameExternalMentor as surname', "'' as preferredName", '"" as image_240', '"" as email', "'Staff' as category", '"" as username', 'timestampCompleteApproved as timestamp'])
+            ->cols(['null AS gibbonDiscussionID', 'freeLearningUnitStudent.commentApproval as comment', 'freeLearningUnitStudent.status as type', "(CASE WHEN freeLearningUnitStudent.status = 'Complete - Pending' THEN 'pending' WHEN freeLearningUnitStudent.status = 'Evidence Not Yet Approved' THEN 'warning' WHEN freeLearningUnitStudent.status = 'Complete - Approved' THEN 'success' ELSE 'dull' END) as tag", 'freeLearningUnitStudent.evidenceType as attachmentType', 'freeLearningUnitStudent.evidenceLocation as attachmentLocation', 'freeLearningUnitStudent.gibbonPersonIDStudent as gibbonPersonID', "'' as title", 'nameExternalMentor as surname', "'' as preferredName", '"" as image_240', '"" as email', "'Staff' as category", '"" as username', 'timestampCompleteApproved as timestamp'])
             ->from('freeLearningUnitStudent')
             ->where('freeLearningUnitStudent.freeLearningUnitStudentID = :freeLearningUnitStudentID')
             ->bindValue('freeLearningUnitStudentID', $freeLearningUnitStudentID)

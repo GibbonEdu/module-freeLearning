@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\View\View;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
@@ -193,8 +194,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     //  DISCUSSION
     $logs = $unitStudentGateway->selectUnitStudentDiscussion($freeLearningUnitStudentID)->fetchAll();
 
-    $logs = array_map(function ($item) {
+    $url = $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_approvalAjax.php?mode=form';
+    $gibbonPersonIDUser = $session->get('gibbonPersonID');
+    $cuttoff = date('Y-m-d h:m:s', time()-172800);
+    $logs = array_map(function ($item) use ($url, $gibbonPersonIDUser, $cuttoff, $form) {
+        $url .= '&gibbonDiscussionID='.$item['gibbonDiscussionID'];
         $item['comment'] = Format::hyperlinkAll($item['comment']);
+        if ($item['gibbonPersonID'] == $gibbonPersonIDUser && $item['timestamp'] > $cuttoff) {
+            $item['extra'] = $form->getFactory()
+                ->createButton(__('Edit'))
+                ->setAttribute('hx-get', $url)
+                ->setAttribute('hx-target', 'next .discussion-comment')
+                ->setAttribute('hx-swap', 'innerHTML show:none scroll:top')
+                ->getOutput();
+        }
         return $item;
     }, $logs);
 
