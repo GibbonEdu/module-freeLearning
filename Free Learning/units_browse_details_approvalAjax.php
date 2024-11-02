@@ -21,6 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 $_POST['address'] = '/modules/Free Learning/units_browse_details_approval.php';
 
@@ -62,14 +63,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                     echo $form->getOutput();
                 } else {
-                    $data = [
-                        'comment' => $comment,
-                    ];
+                    $data = ['comment' => $comment];
                     $discussionGateway->update($gibbonDiscussionID, $data);
 
-                    echo $comment;
+                    if ($discussion['foreignTable'] == 'freeLearningUnitStudent') {
+                        $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                        $data = ['commentApproval' => $comment];
+                        $unitStudentGateway->update($discussion['foreignTableID'], $data);
+                    }
 
-                    //REMEMBER TO ALSO UPDATE freeLearningUnitStudent IF THIS IS AN APPROVAL!!!
+                    echo $comment;
                 }
             }
         }
