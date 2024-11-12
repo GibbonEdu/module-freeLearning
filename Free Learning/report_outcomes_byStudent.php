@@ -43,7 +43,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_outco
     $form->setTitle(__m('Choose Student'));
 
     $form->setFactory(DatabaseFormFactory::create($pdo));
-    $form->setClass('noIntBorder fullWidth');
+    $form->setClass('noIntBorder w-full');
     $form->addHiddenValue('q', '/modules/Free Learning/report_outcomes_byStudent.php');
 
     $row = $form->addRow();

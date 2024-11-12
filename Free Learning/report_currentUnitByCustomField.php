@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
 
         $form = Form::create('filter', $session->get('absoluteURL') . '/index.php', 'get');
         $form->setFactory(DatabaseFormFactory::create($pdo));
-        $form->setClass('noIntBorder fullWidth');
+        $form->setClass('noIntBorder w-full');
         $form->setTitle(__m('Choose Class'));
 
         $form->addHiddenValue('q', '/modules/' . $session->get('module') . '/report_currentUnitByCustomField.php');

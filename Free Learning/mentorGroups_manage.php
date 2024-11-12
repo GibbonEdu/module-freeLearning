@@ -49,7 +49,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
     $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
     $form->setTitle(__('Filter'));
 
-    $form->setClass('noIntBorder fullWidth');
+    $form->setClass('noIntBorder w-full');
     $form->addHiddenValue('q', '/modules/Free Learning/mentorGroups_manage.php');
 
     $row = $form->addRow();

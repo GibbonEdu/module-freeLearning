@@ -197,15 +197,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $url = $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_approvalAjax.php?mode=form';
     $gibbonPersonIDUser = $session->get('gibbonPersonID');
     $cuttoff = date('Y-m-d h:m:s', time()-172800);
-    $logs = array_map(function ($item) use ($url, $gibbonPersonIDUser, $cuttoff, $form) {
+    $index = 0;
+    $logs = array_map(function ($item) use ($url, $gibbonPersonIDUser, $cuttoff, $index, $form) {
         $url .= '&gibbonDiscussionID='.$item['gibbonDiscussionID'];
         $item['comment'] = Format::hyperlinkAll($item['comment']);
         if ($item['gibbonPersonID'] == $gibbonPersonIDUser && $item['timestamp'] > $cuttoff) {
             $item['extra'] = $form->getFactory()
-                ->createButton(__('Edit'))
+                ->createButton(__('Edit'))->setID('edit'.$index)
                 ->setAttribute('hx-get', $url)
                 ->setAttribute('hx-target', 'next .discussion-comment')
-                ->setAttribute('hx-swap', 'innerHTML show:none scroll:top')
+                ->setAttribute('hx-swap', 'innerHTML transition:false show:#edit'.$index.':top scroll:smooth')
+                ->setAttribute('hx-replace-url', 'false')
                 ->getOutput();
         }
         return $item;
@@ -259,9 +261,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         ->placeholder(__m('Leave a comment'))
         ->setClass('flex w-full')
         ->setRows(3);
-    $commentBox->addButton(__m('Add Comment'))
-        ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
-        ->setClass('button rounded-sm right');
+    $commentBox->addSubmit(__m('Add Comment'))
+        ->setColor('gray')
+        ->setClass('text-right mt-2');
 
     $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
         'discussion' => [[

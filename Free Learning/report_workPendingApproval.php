@@ -60,7 +60,7 @@ else {
     $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
     $form->setFactory(DatabaseFormFactory::create($pdo));
     $form->setTitle(__('Filter'));
-    $form->setClass('noIntBorder fullWidth');
+    $form->setClass('noIntBorder w-full');
 
     $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_workPendingApproval.php');
 

@@ -7,7 +7,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
 -->#}
 
 {% if prerequisitesMet != 'N' %}
-    <a href="{{ viewUnitURL }}&freeLearningUnitID={{ freeLearningUnitID }}" class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 hover:shadow-lg {{ statusClass|default('bg-gray-100 hover:bg-white hover:border-blue-500 hover:text-blue-500') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
+    <a href="{{ viewUnitURL }}&freeLearningUnitID={{ freeLearningUnitID }}" class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 hover:box-shadow-lg {{ statusClass|default('bg-gray-100 hover:bg-white hover:border-blue-500 hover:text-blue-500') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
 {% else %}
     <a href="{{ viewUnitURL }}&freeLearningUnitID={{ freeLearningUnitID }}" class="relative h-full flex flex-col w-48 rounded border overflow-hidden mx-4 {{ statusClass|default('bg-gray-100') }}" title="{{ __('Difficulty') }}: {{ difficulty }}. {{ blurb }}">
 {% endif %}

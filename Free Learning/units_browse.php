@@ -155,7 +155,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $form->setTitle(__('Filter'));
         $form->setFactory(DatabaseFormFactory::create($pdo));
 
-        $form->setClass('noIntBorder fullWidth');
+        $form->setClass('noIntBorder w-full');
         $form->addHiddenValue('q', '/modules/Free Learning/units_browse.php');
         $form->addHiddenValue('view', $viewForm);
 
@@ -548,6 +548,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                     ?>
                     <script type="text/javascript">
+                        htmx.onLoad(function (content) {
                         // https://visjs.org/docs/network/
 
                         //CREATE NODE ARRAY
@@ -611,6 +612,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             if (nodeNo != '') {
                                 window.location = '<?php echo $session->get('absoluteURL') ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&showInactive=<?php echo $showInactive; ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
                             }
+                        });
+
                         });
                     </script>
                     <?php

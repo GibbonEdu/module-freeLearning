@@ -286,9 +286,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     ->placeholder(__m('Leave a comment'))
                     ->setClass('flex w-full')
                     ->setRows(3);
-                $commentBox->addButton(__m('Add Comment'))
-                    ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
-                    ->setClass('button rounded-sm right');
+                $commentBox->addSubmit(__m('Add Comment'))
+                    ->setColor('gray')
+                    ->setClass('text-right mt-2');
 
                 $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
                     'discussion' => [[
@@ -363,6 +363,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $form = Form::create('enrolComment', $session->get('absoluteURL').'/modules/Free Learning/units_browse_details_commentProcess.php?'.http_build_query($urlParams));
         $form->setClass('blank');
+
         $form->setTitle(__m('Complete - Pending Approval'));
         $form->setDescription(__m('Your evidence, shown below, has been submitted to your teacher/mentor for approval. This screen will show a teacher comment, once approval has been given.'));
 
@@ -393,9 +394,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 ->placeholder(__m('Leave a comment'))
                 ->setClass('flex w-full')
                 ->setRows(3);
-            $commentBox->addButton(__m('Add Comment'))
-                ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
-                ->setClass('button rounded-sm right');
+            $commentBox->addSubmit(__m('Add Comment'))
+                ->setColor('gray')
+                ->setClass('text-right mt-2');
 
             $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
                 'discussion' => [[
@@ -457,9 +458,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             ->placeholder(__m('Leave a comment'))
             ->setClass('flex w-full')
             ->setRows(3);
-        $commentBox->addButton(__m('Add Comment'))
-            ->onClick('$(this).prop("disabled", true).wrap("<span class=\"submitted\"></span>");document.getElementById("enrolComment").submit()')
-            ->setClass('button rounded-sm right');
+        $commentBox->addSubmit(__m('Add Comment'))
+            ->setColor('gray')
+            ->setClass('text-right mt-2');
 
         $form->addRow()->addClass('-mt-4')->addContent($page->fetchFromTemplate('ui/discussion.twig.html', [
             'discussion' => [[

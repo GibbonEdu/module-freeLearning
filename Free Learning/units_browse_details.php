@@ -181,8 +181,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                     $table->addHeaderAction('export', __('Export'))
                         ->setExternalURL($session->get('absoluteURL')."/modules/Free Learning/units_manageProcessBulk.php?action=Export&freeLearningUnitID=$freeLearningUnitID&name=".$values['name'])
                         ->setIcon('delivery2')
-                        ->displayLabel()
-                        ->prepend(' | ');
+                        ->displayLabel();
                 }
 
                 $table->addColumn('name', '')->addClass('text-lg font-bold');

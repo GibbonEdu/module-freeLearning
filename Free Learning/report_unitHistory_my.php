@@ -48,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $form->setFactory(DatabaseFormFactory::create($pdo));
 
         $form->setTitle(__('Filter'));
-        $form->setClass('noIntBorder fullWidth');
+        $form->setClass('noIntBorder w-full');
 
         $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_unitHistory_my.php');
 

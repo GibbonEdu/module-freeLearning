@@ -57,7 +57,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $form->setTitle(__m('Choose Student'));
 
         $form->setFactory(DatabaseFormFactory::create($pdo));
-        $form->setClass('noIntBorder fullWidth');
+        $form->setClass('noIntBorder w-full');
         $form->addHiddenValue('q', '/modules/Free Learning/report_unitHistory_byStudent.php');
 
         $disableParentEvidence = false;

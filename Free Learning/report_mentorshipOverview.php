@@ -82,7 +82,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
     $form->setTitle(__('Filter'));
-    $form->setClass('noIntBorder fullWidth');
+    $form->setClass('noIntBorder w-full');
 
     $form->addHiddenValue('q', '/modules/'.$session->get('module').'/report_mentorshipOverview.php');
     $form->addHiddenValue('status', $status);

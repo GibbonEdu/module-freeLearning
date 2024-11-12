@@ -221,7 +221,7 @@ class FreeLearningFormFactory extends DatabaseFormFactory
                 ->setClass('w-3/4 readonly mt-1')
                 ->readonly();
 
-            $col = $blockTemplate->addRow()->addClass('showHide fullWidth')->addColumn();
+            $col = $blockTemplate->addRow()->addClass('showHide w-full')->addColumn();
             if ($allowOutcomeEditing == 'Y') {
                 $col->addTextArea('outcomecontents')->setRows(10)->addData('tinymce');
             } else {

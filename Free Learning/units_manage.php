@@ -61,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $form->setFactory(FreeLearningFormFactory::create($pdo));
         $form->setTitle(__('Filter'));
 
-        $form->setClass('noIntBorder fullWidth');
+        $form->setClass('noIntBorder w-full');
         $form->addHiddenValue('q', '/modules/Free Learning/units_manage.php');
 
         $learningAreas = $unitGateway->selectLearningAreasAndCourses($highestAction != 'Manage Units_all' ? $session->get('gibbonPersonID') : null, 'N', 'Staff', null, 'Browse Units_all', 'Manage');
@@ -113,8 +113,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->addParam('name', $name)
             ->addParam('gibbonYearGroupIDMinimum', $gibbonYearGroupIDMinimum)
             ->setURL('/modules/Free Learning/units_manage_add.php')
-            ->displayLabel()
-            ->append(' | ');
+            ->displayLabel();
 
         $table->addHeaderAction('import', __('Import'))
             ->setURL('/modules/Free Learning/units_manage_import.php')

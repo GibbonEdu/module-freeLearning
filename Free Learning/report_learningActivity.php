@@ -47,7 +47,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
 	$form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
 	$form->setTitle(__('Filter'));
 
-	$form->setClass('noIntBorder fullWidth');
+	$form->setClass('noIntBorder w-full');
 	$form->addHiddenValue('q', '/modules/Free Learning/report_learningActivity.php');
 
     $timePeriods = [
