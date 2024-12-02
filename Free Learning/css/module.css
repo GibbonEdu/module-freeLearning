@@ -36,6 +36,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     color: #B3801B;
 }
 
+.exempt {
+    border-color: #e520b7;
+    background-color: #f9dbf2;
+    color: #e520b7;
+}
+
 .vis-tooltip {
     margin-top: 4.5rem;
     margin-left: 0.5rem;

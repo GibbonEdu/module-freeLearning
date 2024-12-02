@@ -2330,3 +2330,8 @@ INSERT INTO `gibbonPermission` (`permissionID` ,`gibbonRoleID` ,`gibbonActionID`
 ++$count;
 $sql[$count][0] = '5.25.00';
 $sql[$count][1] = "";
+
+//v5.25.01
+++$count;
+$sql[$count][0] = '5.25.01';
+$sql[$count][1] = "";

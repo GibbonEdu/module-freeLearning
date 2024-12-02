@@ -266,7 +266,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                 switch ($unit['status']) {
                     case 'Complete - Approved':
                     case 'Exempt':
-                        $unit['statusClass'] = 'success';
+                        $unit['statusClass'] = 'exempt';
                         break;
                     case 'Current':
                         $unit['statusClass'] = 'currentUnit';
@@ -499,7 +499,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         }
 
                         if ($unit['status'] == 'Complete - Approved' or $unit['status'] == 'Exempt') {
-                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#390', background:'#D4F6DC'}, borderWidth: 2},";
+                            $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#e520b7', background:'#f9dbf2'}, borderWidth: 2},";
                         } elseif ($unit['status'] == 'Current') {
                             $nodeList .= '{id: '.$countNodes.", shape: 'circularImage', image: 'undefined', label: '".addSlashes($unit['name'])."', title: '".$title."', color: {border:'#0EA5E9', background:'#BAE6FD'}, borderWidth: 2},";
                         } elseif ($unit['status'] == 'Current - Pending') {

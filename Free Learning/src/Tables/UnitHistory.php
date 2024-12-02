@@ -75,6 +75,7 @@ class UnitHistory
                     "Current" => [],
                     "Current - Pending" => [],
                     "Incomplete" => [],
+                    "Exempt" => [],
                 ];
 
                 $statuses = array_keys($unitStats);
@@ -88,8 +89,6 @@ class UnitHistory
                         // Count the unit stats for this status
                         foreach ($units as $unit) {
                             if ($unit['status'] != $status) continue;
-
-                            if ($unit['status'] == 'Exempt') $unit['status'] = 'Complete - Approved';
 
                             if ($unit['flCourse'] == $course['name']) {
                                 $unitStats[$unit['status']][$index]++;
@@ -140,11 +139,11 @@ class UnitHistory
                             'position' => 'right',
                         ]
                     ])
-                    ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
-                    ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+                    ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved'), __m('Exempt')])
+                    ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7', '#f9dbf2']);
 
                 $chart->addDataset('pie')
-                    ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
+                    ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved'], $unitStats['Exempt']]);
             }
 
             $output .= $chart->render();
@@ -158,7 +157,7 @@ class UnitHistory
             if ($student['status'] == 'Evidence Not Yet Approved') $row->setClass('warning');
             if ($student['status'] == 'Complete - Pending') $row->setClass('pending');
             if ($student['status'] == 'Complete - Approved') $row->setClass('success');
-            if ($student['status'] == 'Exempt') $row->setClass('success');
+            if ($student['status'] == 'Exempt') $row->setClass('exempt');
             return $row;
         });
 
@@ -168,6 +167,7 @@ class UnitHistory
             'status:complete - pending'        => __('Status') .': '.__m('Complete - Pending'),
             'status:evidence not yet approved' => __('Status') .': '.__m('Evidence Not Yet Approved'),
             'status:complete - approved'       => __('Status') .': '.__m('Complete - Approved'),
+            'status:exempt'                    => __('Status') .': '.__m('Exempt'),
         ];
 
         $learningAreas = $this->unitStudentGateway->selectLearningAreasByStudent($gibbonPersonID)->fetchKeyPair();

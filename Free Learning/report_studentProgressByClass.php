@@ -119,7 +119,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
 
             $table->addColumn('exemptCount', __('Exempt'))
                 ->width('11%')
-                ->addClass('success');
+                ->addClass('exempt');
 
             $table->addColumn('totalCount', __('Total'))
                 ->width('11%');

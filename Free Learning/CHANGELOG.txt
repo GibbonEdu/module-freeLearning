@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.25.01
+-------
+Added new pink label colour for student units with status Exempt
+
 v2.25.00
 -------
 Added (v28 dependent) ability for teachers to edit their own comments within 48 hours

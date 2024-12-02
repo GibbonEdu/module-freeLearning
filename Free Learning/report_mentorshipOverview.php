@@ -180,11 +180,11 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
                     'position' => 'right',
                 ]
             ])
-            ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved')])
-            ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7']);
+            ->setLabels([__m('Current - Pending'), __m('Current'), __m('Complete - Pending'), __m('Evidence Not Yet Approved'), __m('Complete - Approved'), __m('Exempt')])
+            ->setColors(['#FAF089', '#BAE6FD', '#DCC5f4', '#FFD2A8', '#6EE7B7', '#f9dbf2']);
 
         $chart->addDataset('pie')
-            ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved']]);
+            ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved'], $unitStats['Exempt']]);
 
         echo $chart->render();
 
@@ -204,7 +204,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
         if ($student['status'] == 'Evidence Not Yet Approved') $row->addClass('warning');
         if ($student['status'] == 'Complete - Pending') $row->addClass('pending');
         if ($student['status'] == 'Complete - Approved') $row->addClass('success');
-        if ($student['status'] == 'Exempt') $row->addClass('success');
+        if ($student['status'] == 'Exempt') $row->addClass('exempt');
         return $row;
     });
 
