@@ -27,7 +27,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.25.01';
+$version = '5.25.02';
 $author = "Gibbon Foundation";
 $url = "https://gibbonedu.org";
 

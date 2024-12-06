@@ -32,7 +32,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
     </div>
     {% endif %}
 
-    <div id="content-{{ freeLearningUnitBlockID }}" style='display: none' class="content mt-4">
+    <div id="content-{{ freeLearningUnitBlockID }}" class="content mt-4">
         <div class="text-base">
             {{ contents|raw }}
         </div>
@@ -49,6 +49,11 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
 
     <script type='text/javascript'>
         $(document).ready(function(){
+
+            setTimeout(function() {
+                $("#content-{{ freeLearningUnitBlockID }}").hide();
+            }, 1000);
+
             $("#showHide-{{ freeLearningUnitBlockID }}").click(function(){
                 $("#content-{{ freeLearningUnitBlockID }}").toggle();
                 $("#show-{{ freeLearningUnitBlockID }}").toggle();
