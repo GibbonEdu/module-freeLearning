@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.25.04
+-------
+Fixed bug causing left students to show in unit approval view
+
 v2.25.03
 -------
 Fixed massively pink bug introducted in v2.25.01

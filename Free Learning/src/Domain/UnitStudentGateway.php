@@ -549,6 +549,7 @@ class UnitStudentGateway extends QueryableGateway
             ->from('freeLearningUnitStudent')
             ->innerJoin('gibbonPerson', 'freeLearningUnitStudent.gibbonPersonIDStudent=gibbonPerson.gibbonPersonID')
             ->where('freeLearningUnitStudent.collaborationKey = :collaborationKey')
+            ->where("gibbonPerson.status = 'Full'")
             ->bindValue('collaborationKey', $collaborationKey);
 
         return $this->runSelect($query);
