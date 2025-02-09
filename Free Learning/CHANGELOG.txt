@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.25.05
+-------
+Switched teacher Comment field in approval view from plain to rich text
+
 v2.25.04
 -------
 Fixed bug causing left students to show in unit approval view

@@ -257,10 +257,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     //  ADD COMMENT
     $commentBox = $form->getFactory()->createColumn()->addClass('flex flex-col');
-    $commentBox->addTextArea('addComment')
-        ->placeholder(__m('Leave a comment'))
-        ->setClass('flex w-full')
+    
+    $commentBox->addEditor('addComment', $guid)
+        ->showMedia()
+        ->required()
         ->setRows(3);
+    
     $commentBox->addSubmit(__m('Add Comment'))
         ->setColor('gray')
         ->setClass('text-right mt-2');
@@ -302,7 +304,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mr-2 mt-2') : '';
             $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($collaborator['gender']), 'dull mr-2 mt-2') : "";
             $dateStart = ($bigDataSchool == "Y" && !empty($collaborator['dateStart'])) ? Format::tag(__m("Joined {dateStart}", ["dateStart" => Format::date($collaborator['dateStart'])]), 'dull mr-2 mt-2') : "";
-            $col->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'], 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$collaborator['gibbonPersonID']."'>".Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
+            $col->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'] ?? '', 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$collaborator['gibbonPersonID']."'>".Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
         }
     } else {
         $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mr-2 mt-2') : '';
@@ -310,7 +312,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $dateStart = ($bigDataSchool == "Y" && !empty($values['dateStart'])) ? Format::tag(__m("Joined {dateStart}", ["dateStart" => Format::date($values['dateStart'])]), 'dull mr-2 mt-2') : "";
         $row = $form->addRow();
             $row->addLabel('student', __('Student'));
-            $row->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'], 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$values['gibbonPersonID']."'>".Format::name('', $values['preferredName'], $values['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
+            $row->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'] ?? '', 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$values['gibbonPersonID']."'>".Format::name('', $values['preferredName'], $values['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
     }
 
     $submissionLink = $values['evidenceType'] == 'Link'
