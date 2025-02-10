@@ -22,6 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Forms\Form;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\View\Page;
 
 $_POST['address'] = '/modules/Free Learning/units_browse_details_approval.php';
 
@@ -31,6 +32,9 @@ $mode = $_GET['mode'] ?? 'form';
 $mode = ($mode == 'form' || $mode == 'process') ? $mode : 'form';
 $gibbonDiscussionID = $_GET['gibbonDiscussionID'] ?? null;
 $comment = $_POST['comment'] ?? '';
+
+$twig = $container->get('twig');
+$page = $container->get('page');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php')) {
     if (!empty($gibbonDiscussionID)) {
@@ -56,7 +60,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     $form->addHiddenValue('address', $session->get('address'));
 
                     $row = $form->addRow();
-                        $row->addTextArea('comment')->setValue($discussion['comment'])->setRows(3)->required();
+                        $row->addEditor('comment', $guid)->setValue($discussion['comment'])->setRows(3)->required();
 
                     $row = $form->addRow();
                         $row->addSubmit(__('Update'))->addClass('text-right');

@@ -224,7 +224,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             if ($enrolmentMethod == 'class') { //Attempt to notify teacher(s) of class
                                 $data = array('gibbonCourseClassID' => $gibbonCourseClassID);
-                                $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant')";
+                                $sql = "SELECT gibbonPersonID FROM gibbonCourseClassPerson WHERE gibbonCourseClassID=:gibbonCourseClassID AND (role='Teacher' OR role='Assistant') AND reportable='Y'";
                                 $result = $pdo->select($sql, $data);
 
                                 $text = __m('{student} has requested unit completion approval and feedback ({unit}).', ['student' => $studentName, 'unit' => $name]);
