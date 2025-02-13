@@ -242,18 +242,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         $blocks = [];
         $chainedTo = [];
 
-        $units = array_reduce($allBlocks->fetchAll(), function($group, $item) use (&$blocks, &$chainedTo) {
-            $group[$item['freeLearningUnitID']] = $item['unitName'];
+        if ($bigDataSchool == "N") {
+            $units = array_reduce($allBlocks->fetchAll(), function($group, $item) use (&$blocks, &$chainedTo) {
+                $group[$item['freeLearningUnitID']] = $item['unitName'];
 
-            $blocks[$item['freeLearningUnitID'].'_placeholder'] = '';
-            $blocks[$item['freeLearningUnitBlockID']] = $item['title'];
-            $chainedTo[$item['freeLearningUnitID'].'_placeholder'] = $item['freeLearningUnitID'];
-            $chainedTo[$item['freeLearningUnitBlockID']] = $item['freeLearningUnitID'];
+                $blocks[$item['freeLearningUnitID'].'_placeholder'] = '';
+                $blocks[$item['freeLearningUnitBlockID']] = $item['title'];
+                $chainedTo[$item['freeLearningUnitID'].'_placeholder'] = $item['freeLearningUnitID'];
+                $chainedTo[$item['freeLearningUnitBlockID']] = $item['freeLearningUnitID'];
 
-            return $group;
-        }, []);
+                return $group;
+            }, []);
 
-         if ($bigDataSchool == "N") {
+         
             $grid = $form->getFactory()
                 ->createGrid('selectGrid', 4);
 
