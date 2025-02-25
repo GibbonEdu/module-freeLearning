@@ -492,7 +492,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             $table->addColumn('classMentor', __m('Class/Mentor'))
                                 ->description(__m('Grouping'))
-                                ->sortable(['course', 'class'])
+                                ->sortable(['course', 'class', 'surname', 'preferredName'])
                                 ->width('20%')
                                 ->format(function ($student) use (&$collaborationKeys) {
                                     $return = '';
