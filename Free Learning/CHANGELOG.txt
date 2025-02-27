@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.25.07
+-------
+Fixed PHP mangling in Unit Mentor files
+
 v5.25.06
 -------
 Improved performance of scripts with the Big Data setting turned on

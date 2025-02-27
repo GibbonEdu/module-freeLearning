@@ -1,7 +1,5 @@
 <?php
-
-use Gibbon\Domain\System\DiscussionGateway;
-use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+/*
 Gibbon: the flexible, open school platform
 Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
 Copyright © 2010, Gibbon Foundation
@@ -22,6 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 require_once '../../gibbon.php';
 
