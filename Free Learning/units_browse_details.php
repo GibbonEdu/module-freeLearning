@@ -395,7 +395,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $myClasses = $unitGateway->selectRelevantClassesByTeacher($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
 
                             $criteria = $unitStudentGateway->newQueryCriteria()
-                                ->sortBy(['statusSort', 'collaborationKey', 'surname', 'preferredName'])
+                                ->sortBy(['statusSort', 'surname', 'preferredName'])
                                 ->fromPOST()
                                 ->pageSize(50);
 
@@ -492,7 +492,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
 
                             $table->addColumn('classMentor', __m('Class/Mentor'))
                                 ->description(__m('Grouping'))
-                                ->sortable(['course', 'class'])
+                                ->sortable(['course', 'class', 'studentSort'])
                                 ->width('20%')
                                 ->format(function ($student) use (&$collaborationKeys) {
                                     $return = '';
