@@ -159,15 +159,17 @@ class UnitHistory
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
 
-                $dateStart = date_create(empty($dateStart) ? $result->fetch()["timestampJoined"] : $dateStart);
+                $rows = $result->fetchAll();
+
+                $dateStart = date_create(empty($dateStart) ? $rows[0]["timestampJoined"] : $dateStart);
                 $dateEnd = date_create($dateEnd ?? date('Y-m-d'));
                 $interval = date_diff($dateStart, $dateEnd);
                 $monthsInterval = ($interval->format('%y')*12)+$interval->format('%m');
             
-                $rows = $result->fetchAll();
+                echo $monthsInterval;
 
                 $months = array();
-                for($i = 0; $i < $monthsInterval; $i++) {
+                for($i = 0; $i <= ($monthsInterval+1); $i++) {
                     $countJoined = 0;
                     $countApproved = 0 ;
                     $countNYA = 0 ;
