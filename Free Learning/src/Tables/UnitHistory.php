@@ -232,27 +232,20 @@ class UnitHistory
                     ],
                 ])
                 ->setLabels(array_column($months, 'month'))
-                ->setColors(['#BAE6FD', '#6EE7B7', '#FFD2A8', '#DCC5f4']);;
+                ->setColors(['#BAE6FD', '#6EE7B7', '#FFD2A8', '#DCC5f4']);
 
-                $chart->addDataset('joined')
-                    ->setLabel(__m('Joined'))
-                    ->setProperties(['fill' => false, 'borderWidth' => 1])
-                    ->setData(array_column($months, 'joined'));
-                
-                $chart->addDataset('approved')
-                    ->setLabel(__m('Complete - Approved'))
-                    ->setProperties(['fill' => false, 'borderWidth' => 1])
-                    ->setData(array_column($months, 'approved'));
-                
-                $chart->addDataset('NYA')
-                    ->setLabel(__m('Evidence Not Yet Approved'))
-                    ->setProperties(['fill' => false, 'borderWidth' => 1])
-                    ->setData(array_column($months, 'NYA'));
-                
-                $chart->addDataset('submitted')
-                    ->setLabel(__m('Submissions'))
-                    ->setProperties(['fill' => false, 'borderWidth' => 1])
-                    ->setData(array_column($months, 'submitted'));
+                $sets = [
+                    'joined' => 'Units Joined',
+                    'approved' => 'Complete - Approved',
+                    'NYA' => 'Evidence Not Yet Approved',
+                    'submitted' => 'Submissions'
+                ];
+                foreach ($sets as $key => $value) {
+                    $chart->addDataset($key)
+                        ->setLabel(__m($value))
+                        ->setProperties(['fill' => false, 'borderWidth' => 1])
+                        ->setData(array_column($months, $key));
+                }
     
                 $output .= $chart->render();
 
