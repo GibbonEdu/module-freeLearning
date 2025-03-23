@@ -104,7 +104,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
 
         $row = $form->addRow();
             $row->addLabel('chart', __m('Chart'));
-            $row->addSelect('chart')->fromArray(array('Doughnut' => __m('Doughnut'), 'Stacked Bar Chart' => __m('Stacked Bar Chart'), 'Linear' => __m('Linear (All Data)'), 'None' => __('None')))->required()->selected($chart);
+            $row->addSelect('chart')->fromArray(array('Doughnut' => __m('Doughnut'), 'Stacked Bar Chart' => __m('Stacked Bar Chart'), 'Linear' => __m('Linear (All Time)'), 'None' => __('None')))->required()->selected($chart);
 
         $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
