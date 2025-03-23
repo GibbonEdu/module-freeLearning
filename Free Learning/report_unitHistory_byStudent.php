@@ -51,6 +51,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
         $gibbonSchoolYearID = $_GET['gibbonSchoolYearID'] ?? (($bigDataSchool == "Y") ? $session->get('gibbonSchoolYearID') : null);
         $gibbonSchoolYearTermID = !empty($_GET['gibbonSchoolYearTermID']) ? $_GET['gibbonSchoolYearTermID'] : null;
+       
+        $unitHistoryChart = $settingGateway->getSettingByScope('Free Learning', 'unitHistoryChart');
+        $chart = $_GET['chart'] ?? $unitHistoryChart;
 
         // FORM
         $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
@@ -100,6 +103,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
         }
 
         $row = $form->addRow();
+            $row->addLabel('chart', __m('Chart'));
+            $row->addSelect('chart')->fromArray(array('Doughnut' => __m('Doughnut'), 'Stacked Bar Chart' => __m('Stacked Bar Chart'), 'Linear' => __m('Linear (All Data)'), 'None' => __('None')))->required()->selected($chart);
+
+        $row = $form->addRow();
             $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
@@ -127,6 +134,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
             $dateEnd = $term['lastDay'];
         }
 
-        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd);
+        echo $container->get(UnitHistory::class)->create($gibbonPersonID, false, $canBrowse, $disableParentEvidence, $gibbonSchoolYearID, $dateStart, $dateEnd, $chart);
     }
 }

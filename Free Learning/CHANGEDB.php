@@ -2370,3 +2370,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.25.08';
 $sql[$count][1] = "";
+
+//v5.26.00
+++$count;
+$sql[$count][0] = '5.26.00';
+$sql[$count][1] = "";

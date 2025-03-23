@@ -203,7 +203,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $setting = $settingGateway->getSettingByScope('Free Learning', 'unitHistoryChart', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
-        $row->addSelect($setting['name'])->fromArray(array('Doughnut' => __m('Doughnut'), 'Stacked Bar Chart' => __m('Stacked Bar Chart'), 'None' => __('None')))->required()->selected($setting['value']);
+        $row->addSelect($setting['name'])->fromArray(array('Doughnut' => __m('Doughnut'), 'Stacked Bar Chart' => __m('Stacked Bar Chart'), 'Linear' => __m('Linear'), 'None' => __('None')))->required()->selected($setting['value']);
 
     $form->addRow()->addHeading(__m('Approval Settings'));
 

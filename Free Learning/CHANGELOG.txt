@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.26.00
+-------
+Added Linear chart option to Unit History by Student and My Unit History
+
 v5.25.08
 -------
 Improved ordering of student enrolment records within a unit

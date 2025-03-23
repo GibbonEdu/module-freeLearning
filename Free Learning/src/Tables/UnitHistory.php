@@ -23,8 +23,8 @@ use Gibbon\View\View;
 use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
-use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 /**
  * UnitHistory
@@ -45,8 +45,10 @@ class UnitHistory
         $this->unitHistoryChart = $settingGateway->getSettingByScope('Free Learning', 'unitHistoryChart');
     }
 
-    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null)
+    public function create($gibbonPersonID, $summary = false, $canBrowse = true, $disableParentEvidence = false, $gibbonSchoolYearID = null, $dateStart = null, $dateEnd = null, $chart = null)
     {
+        $this->unitHistoryChart = $chart ?? $this->unitHistoryChart;
+
         $criteria = $this->unitStudentGateway->newQueryCriteria()
             ->sortBy(['freeLearningUnitStudent.timestampJoined', 'schoolYear'], 'DESC')
             ->sortBy(['freeLearningUnitStudent.status', 'freeLearningUnit.name'])
@@ -62,7 +64,7 @@ class UnitHistory
 
         $output = '';
 
-        if ($this->unitHistoryChart == 'Doughnut' or $this->unitHistoryChart == 'Stacked Bar Chart') {
+        if ($this->unitHistoryChart == 'Doughnut' or $this->unitHistoryChart == 'Stacked Bar Chart' or $this->unitHistoryChart == 'Linear') {
             // Render chart
             $output .= "<h3>".__('Overview')."</h3>";
 
@@ -118,7 +120,9 @@ class UnitHistory
                 foreach($statuses as $status) {
                     $chart->addDataset($status, __($status))->setData($unitStats[$status] ?? []);
                 }
-            } else {
+
+                $output .= $chart->render();
+            } elseif ($this->unitHistoryChart == 'Doughnut') {
 
                 $unitStats = [
                     "Current - Pending" => 0,
@@ -144,9 +148,117 @@ class UnitHistory
 
                 $chart->addDataset('pie')
                     ->setData([$unitStats['Current - Pending'], $unitStats['Current'], $unitStats['Complete - Pending'], $unitStats['Evidence Not Yet Approved'], $unitStats['Complete - Approved'], $unitStats['Exempt']]);
+                
+                $output .= $chart->render();
+            } else {
+                
+                global $connection2, $container;
+
+                $data = array('gibbonPersonID' => $gibbonPersonID);
+                $sql = 'SELECT freeLearningUnitStudentID, timestampJoined, GROUP_CONCAT(timestamp) AS timestamps, GROUP_CONCAT(type) AS types FROM freeLearningUnitStudent LEFT JOIN gibbonDiscussion ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND foreignTable=\'freeLearningUnitStudent\') WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID GROUP BY freeLearningUnitStudentID ORDER BY timestampJoined';
+                $result = $connection2->prepare($sql);
+                $result->execute($data);
+
+                $dateStart = date_create(empty($dateStart) ? $result->fetch()["timestampJoined"] : $dateStart);
+                $dateEnd = date_create($dateEnd ?? date('Y-m-d'));
+                $interval = date_diff($dateStart, $dateEnd);
+                $monthsInterval = ($interval->format('%y')*12)+$interval->format('%m');
+            
+                $rows = $result->fetchAll();
+
+                $months = array();
+                for($i = 0; $i < $monthsInterval; $i++) {
+                    $countJoined = 0;
+                    $countApproved = 0 ;
+                    $countNYA = 0 ;
+                    $countSubmitted = 0 ;
+                    $m = date("m", strtotime('-'. $i .' months'));
+                    $Y = date("Y", strtotime('-'. $i .' months'));
+                    foreach ($rows as $row) {
+                        if (is_numeric(strpos($row['timestampJoined'], $Y."-".$m))) {
+                            $countJoined++ ;
+                        }
+
+                        $count = 0;
+                        $timestamps = explode(',', $row['timestamps'] ?? '');
+                        $types = explode(',', $row['types'] ?? '');
+
+                        foreach ($timestamps as $timestamp) {
+                            $type = $types[$count];
+
+                            if (is_numeric(strpos($timestamp, $Y."-".$m)) && $type == 'Complete - Approved') {
+                                $countApproved++ ;
+                            }
+                            if (is_numeric(strpos($timestamp, $Y."-".$m)) && $type == 'Evidence Not Yet Approved') {
+                                $countNYA++ ;
+                            }
+                            if (is_numeric(strpos($timestamp, $Y."-".$m)) && $type == 'Complete - Pending') {
+                                $countSubmitted++ ;
+                            }
+
+                            $count ++;
+                        } 
+                    }
+
+                    if ($i == 0) {
+                        array_unshift($months, array('month' => '(Today) '.$m.'/'.$Y, 'joined' => $countJoined, 'approved' => $countApproved, 'NYA' => $countNYA, 'submitted' => $countSubmitted));
+                    } else {
+                        array_unshift($months, array('month' => $m.'/'.$Y, 'joined' => $countJoined, 'approved' => $countApproved, 'NYA' => $countNYA, 'submitted' => $countSubmitted));
+                    }
+                }
+
+                $chart = Chart::create('attendance', 'line')
+                ->setOptions([
+                    'fill' => false,
+                    'showTooltips' => true,
+                    'tooltip' => [
+                        'mode' => 'single',
+                    ],
+                    'hover' => [
+                        'mode' => 'dataset',
+                    ],
+                    'scales' => [
+                        'x' => [
+                            'min' => 0,
+                            'ticks' => [
+                                'autoSkip'    => true,
+                                'maxRotation' => 0,
+                                'padding'     => 30,
+                            ]
+                        ],
+                        'y' => [
+                            'min' => 0,
+                        ],
+                    ],
+                ])
+                ->setLabels(array_column($months, 'month'))
+                ->setColors(['#BAE6FD', '#6EE7B7', '#FFD2A8', '#DCC5f4']);;
+
+                $chart->addDataset('joined')
+                    ->setLabel(__m('Joined'))
+                    ->setProperties(['fill' => false, 'borderWidth' => 1])
+                    ->setData(array_column($months, 'joined'));
+                
+                $chart->addDataset('approved')
+                    ->setLabel(__m('Complete - Approved'))
+                    ->setProperties(['fill' => false, 'borderWidth' => 1])
+                    ->setData(array_column($months, 'approved'));
+                
+                $chart->addDataset('NYA')
+                    ->setLabel(__m('Evidence Not Yet Approved'))
+                    ->setProperties(['fill' => false, 'borderWidth' => 1])
+                    ->setData(array_column($months, 'NYA'));
+                
+                $chart->addDataset('submitted')
+                    ->setLabel(__m('Submissions'))
+                    ->setProperties(['fill' => false, 'borderWidth' => 1])
+                    ->setData(array_column($months, 'submitted'));
+    
+                $output .= $chart->render();
+
             }
 
-            $output .= $chart->render();
+            
         }
 
         $output .= "<h3>".__('Details')."</h3>";
