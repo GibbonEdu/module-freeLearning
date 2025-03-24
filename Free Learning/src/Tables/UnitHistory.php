@@ -152,12 +152,9 @@ class UnitHistory
                 $output .= $chart->render();
             } else {
                 
-                global $connection2, $container;
-
-                $data = array('gibbonPersonID' => $gibbonPersonID);
-                $sql = 'SELECT freeLearningUnitStudentID, timestampJoined, GROUP_CONCAT(timestamp) AS timestamps, GROUP_CONCAT(type) AS types FROM freeLearningUnitStudent LEFT JOIN gibbonDiscussion ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND foreignTable=\'freeLearningUnitStudent\') WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID GROUP BY freeLearningUnitStudentID ORDER BY timestampJoined';
-                $result = $connection2->prepare($sql);
-                $result->execute($data);
+                global $container;
+                
+                $result = $this->unitStudentGateway->selectLearningActivityData($gibbonPersonID);
 
                 $rows = $result->fetchAll();
 
@@ -166,8 +163,6 @@ class UnitHistory
                 $interval = date_diff($dateStart, $dateEnd);
                 $monthsInterval = ($interval->format('%y')*12)+$interval->format('%m');
             
-                echo $monthsInterval;
-
                 $months = array();
                 for($i = 0; $i <= ($monthsInterval+1); $i++) {
                     $countJoined = 0;

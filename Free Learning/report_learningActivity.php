@@ -21,6 +21,7 @@ along with this program. If not, see <http:// www.gnu.org/licenses/>.
 
 use Gibbon\View\View;
 use Gibbon\Forms\Form;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 // Module includes
 include "./modules/" . $session->get('module') . "/moduleFunctions.php" ;
@@ -73,17 +74,13 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
         echo __m('Figures for Complete - Pending, Complete - Approved and Evidence Not Yet Approved are calculated from only those units joined within the specified time period. Due to the possibility of multiple submissions for any given unit, a single unit joined may result in multiple other statuses.');
         echo '</p>';
 
-        try {
-            $data = array();
-            if ($timePeriod == "Last 30 Days" OR $timePeriod == "Last 60 Days") {
-                $sql = 'SELECT freeLearningUnitStudentID, timestampJoined, GROUP_CONCAT(timestamp) AS timestamps, GROUP_CONCAT(type) AS types FROM freeLearningUnitStudent LEFT JOIN gibbonDiscussion ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND foreignTable=\'freeLearningUnitStudent\') WHERE timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' DAY) GROUP BY freeLearningUnitStudentID';
-            } else if ($timePeriod == "Last 12 Months") {
-                $sql = 'SELECT freeLearningUnitStudentID, timestampJoined, GROUP_CONCAT(timestamp) AS timestamps, GROUP_CONCAT(type) AS types FROM freeLearningUnitStudent LEFT JOIN gibbonDiscussion ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND foreignTable=\'freeLearningUnitStudent\') WHERE timestampJoined>=DATE_SUB(NOW(), INTERVAL '.$timePeriodLookup[$timePeriod].' MONTH) GROUP BY freeLearningUnitStudentID';
-            }
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            echo "<div class='error'>".$e->getMessage().'</div>';
+        $unitStudentGateway = $container->get(UnitStudentGateway::class);
+        if ($timePeriod == "Last 30 Days") {
+            $result = $unitStudentGateway->selectLearningActivityData(null, "DAY", 30);
+        } else if ($timePeriod == "Last 60 Days") {
+            $result = $unitStudentGateway->selectLearningActivityData(null, "DAY", 60);
+        } else if ($timePeriod == "Last 12 Months") {
+            $result = $unitStudentGateway->selectLearningActivityData(null, "MONTH", 12);
         }
 
        if ($result->rowCount() < 1) {
@@ -184,13 +181,13 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                                     foreach ($timestamps as $timestamp) {
                                         $type = $types[$count];
 
-                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Complete - Approved') {
+                                        if (is_numeric(strpos($timestamp, $Y."-".$m)) && $type == 'Complete - Approved') {
                                             $countApproved++ ;
                                         }
-                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Evidence Not Yet Approved') {
+                                        if (is_numeric(strpos($timestamp, $Y."-".$m)) && $type == 'Evidence Not Yet Approved') {
                                             $countNYA++ ;
                                         }
-                                        if (is_numeric(strpos($timestamp, $m."-".$d)) && $type == 'Complete - Pending') {
+                                        if (is_numeric(strpos($timestamp, $Y."-".$m)) && $type == 'Complete - Pending') {
                                             $countSubmitted++ ;
                                         }
 

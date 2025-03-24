@@ -790,4 +790,24 @@ class UnitStudentGateway extends QueryableGateway
 
         return $this->runSelect($query)->fetchAll();
     }
+    public function selectLearningActivityData($gibbonPersonID = null, $intervalType = null, $intervalValue = null)
+    {
+        $data = [];
+        $sql = 'SELECT freeLearningUnitStudentID, timestampJoined, GROUP_CONCAT(timestamp) AS timestamps, GROUP_CONCAT(type) AS types 
+                FROM freeLearningUnitStudent 
+                LEFT JOIN gibbonDiscussion ON (gibbonDiscussion.foreignTableID=freeLearningUnitStudent.freeLearningUnitStudentID AND foreignTable=\'freeLearningUnitStudent\')' ; 
+
+        if (!empty($gibbonPersonID)) {
+            $data = ['gibbonPersonID' => $gibbonPersonID];
+            $sql .= " WHERE freeLearningUnitStudent.gibbonPersonIDStudent=:gibbonPersonID";
+        }
+
+        if (!empty($intervalType) and !empty($intervalValue)) {
+            $sql .= " WHERE timestampJoined>=DATE_SUB(NOW(), INTERVAL $intervalValue $intervalType)";
+        }
+
+        $sql .= ' GROUP BY freeLearningUnitStudentID ORDER BY timestampJoined';
+
+        return $this->db()->select($sql, $data);
+    }
 }
