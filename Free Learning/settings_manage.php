@@ -207,6 +207,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
 
     $form->addRow()->addHeading(__m('Approval Settings'));
 
+    $setting = $settingGateway->getSettingByScope('Free Learning', 'defaultFeedback', true);
+    $col = $form->addRow()->addColumn();
+        $col->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $col->addEditor($setting['name'])->setValue($setting['value'])->setRows(4);
+
     $setting = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));

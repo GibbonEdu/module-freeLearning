@@ -2375,3 +2375,10 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.26.00';
 $sql[$count][1] = "";
+
+//v5.27.00
+++$count;
+$sql[$count][0] = '5.27.00';
+$sql[$count][1] = "
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'defaultFeedback', 'Default Feedback', 'A standard message to be included as a template for feedback.', '');end
+";

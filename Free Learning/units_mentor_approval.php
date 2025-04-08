@@ -162,9 +162,10 @@ if (!$block) {
                 'discussion' => $logs
             ]));
 
+            $defaultFeedback = $settingGateway->getSettingByScope('Free Learning', 'defaultFeedback');
             $col = $form->addRow()->addColumn();
                 $col->addLabel('commentApproval', __m('Mentor Comment'))->description(__m('Leave a comment on the student\'s progress.'));
-                $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required();
+                $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required()->setValue($defaultFeedback);;
 
             $statuses = [
                 'Complete - Approved' => __m('Complete - Approved'),

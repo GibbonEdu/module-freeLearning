@@ -323,10 +323,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $row->addLabel('submission', __m('Submission'));
         $row->addContent(Format::link($submissionLink, __m('View Submission'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
 
+    $defaultFeedback = $settingGateway->getSettingByScope('Free Learning', 'defaultFeedback');
     $row = $form->addRow();
         $col = $row->addColumn();
         $col->addLabel('commentApproval', __m('Teacher Comment'))->description(__m('Leave a comment on the student\'s progress.'));
-        $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required();
+        $col->addEditor('commentApproval', $guid)->setRows(15)->showMedia()->required()->setValue($defaultFeedback);
 
     $statuses = [
         'Complete - Approved' => __m('Complete - Approved'),

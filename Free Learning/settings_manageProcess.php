@@ -58,6 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
     $disableLearningAreaMentors = $_POST['disableLearningAreaMentors'] ?? '';
     $disableMyClasses = $_POST['disableMyClasses'] ?? '';
     $unitHistoryChart = $_POST['unitHistoryChart'] ?? '';
+    $defaultFeedback = $_POST['defaultFeedback'] ?? '';
     $enableManualBadges = $_POST['enableManualBadges'] ?? '';
     $genderOnFeedback = $_POST['genderOnFeedback'] ?? '';
     $studentEvidencePrompt = $_POST['studentEvidencePrompt'] ?? '';
@@ -106,6 +107,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableLearningAreaMentors', $disableLearningAreaMentors);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'disableMyClasses', $disableMyClasses);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'unitHistoryChart', $unitHistoryChart);
+        $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'defaultFeedback', $defaultFeedback);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'enableManualBadges', $enableManualBadges);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'genderOnFeedback', $genderOnFeedback);
         $partialFail = !$settingGateway->updateSettingByScope('Free Learning', 'studentEvidencePrompt', $studentEvidencePrompt);
