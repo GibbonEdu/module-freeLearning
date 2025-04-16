@@ -72,7 +72,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
                     ->placeholder()
                     ->selected($gibbonPersonID);
 		} elseif ($highestAction == 'Unit History By Student_myChildren') {
-            $disableParentEvidence = ($settingGateway->getSettingByScope('Free Learning', 'disableParentEvidence') == "Y");
+            $disableParentEvidence = is_numeric(strpos($settingGateway->getSettingByScope('Free Learning', 'disableParentEvidence'), $session->get('gibbonRoleIDCurrent')));
+            
             $children = $container->get(StudentGateway::class)
                 ->selectAnyStudentsByFamilyAdult($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))
                 ->fetchAll();

@@ -181,9 +181,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/settings_man
         $row->addYesNo($setting['name'])->required()->selected($setting['value']);
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'disableParentEvidence', true);
+    $sql = "SELECT gibbonRoleID as value, name FROM gibbonRole WHERE category='Parent' ORDER BY type, name";
     $row = $form->addRow();
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
-        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+        $row->addSelect($setting['name'])->fromQuery($pdo, $sql, array())->selected(explode(',', $setting['value']))->selectMultiple();
 
     $setting = $settingGateway->getSettingByScope('Free Learning', 'disableLearningAreas', true);
     $row = $form->addRow();

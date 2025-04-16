@@ -2382,3 +2382,10 @@ $sql[$count][0] = '5.27.00';
 $sql[$count][1] = "
 INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'defaultFeedback', 'Default Feedback', 'A standard message to be included as a template for feedback.', '');end
 ";
+
+//v5.28.00
+++$count;
+$sql[$count][0] = '5.28.00';
+$sql[$count][1] = "
+UPDATE gibbonSetting SET value=(CASE WHEN value = 'N' THEN '' WHEN value = 'Y' THEN '004' ELSE '' END) WHERE scope='Free Learning' AND name='disableParentEvidence';end
+";

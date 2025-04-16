@@ -36,8 +36,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= '</div>';
 } else {
     $canBrowse = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php');
-    $disableParentEvidence = ($container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'disableParentEvidence') == "Y");
-
+    $disableParentEvidence = is_numeric(strpos($container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'disableParentEvidence'), $session->get('gibbonRoleIDCurrent')));
+    
     $returnInt .= "<p class='text-right mb-4 text-xs'>";
     $returnInt .= sprintf(__m('%1$sView Showcase of Student Work%2$s'), "<a class='button' href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/showcase.php'>", '</a>');
     if ($canBrowse) {

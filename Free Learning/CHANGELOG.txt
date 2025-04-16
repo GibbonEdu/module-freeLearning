@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.28.00
+-------
+Updated Disable Parent Evidence setting to give per-role granularity
+
 v5.27.00
 -------
 Added Default Feedback setting

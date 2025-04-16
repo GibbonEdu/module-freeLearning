@@ -27,7 +27,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.27.00';
+$version = '5.28.00';
 $author = "Gibbon Foundation";
 $url = "https://gibbonedu.org";
 
@@ -185,7 +185,7 @@ $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`na
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'certificateTemplate', 'Certificate Template', 'HTML and Twig template for PDF certificates.', '<div style=\"text-align: center;\">\r\n <img style=\"height: 100px; width: 400px; background-color: #ffffff; padding: 4px;\" src=\"{{ absoluteURL }}/{{ organisationLogo }}\" />\r\n</div>\r\n\r\n<div style=\"padding-top: 30mm; font-style: italic; font-size: 150%; text-align: center;\">\r\n <p style=\"\">This document certifies that</p>\r\n \r\n <h1 style=\"font-size: 220%;\">{{ officialName }}</h1>\r\n \r\n <p>has successfully completed</p>\r\n \r\n <h1 style=\"font-size: 220%;\">{{ unitName }}</h1>\r\n \r\n <p>{% if length > 0 %}</p>\r\n <p>undertaking an estimated {{ length }} minutes work on</p>\r\n <p>{% endif %}</p>\r\n \r\n <h1 style=\"font-size: 220%;\">{{ organisationName }} Free Learning</h1>\r\n \r\n <p>Approved on {{ dateComplete }}</p>\r\n</div>');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'certificateOrientation', 'Certificate Orientation', 'Page orientation for PDF certificates.', 'P');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'autoAcceptMentorGroups', 'Enable Mentor Group Auto Accept', 'Should mentorship requests that are part of a mentor group be automatically accepted?', 'Y');";
-$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableParentEvidence', 'Disable Parent Evidence', 'Hide student evidence from parents?', 'N');";
+$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableParentEvidence', 'Disable Parent Evidence', 'Hide student evidence from parents?', '');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'enableManualBadges', 'Enable Manual Badges', 'Allow badges to be granted by hand during unit approval?', 'N');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableLearningAreas', 'Disable Learning Areas', 'Remove Learning Areas from Browse Units filters?', 'N');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Free Learning', 'disableMyClasses', 'Disable My Classes', 'Remove My Classes from Class menu in Enrolment tab?', 'N');";
