@@ -53,7 +53,7 @@ class NotificationGateway extends QueryableGateway
             ->innerJoin('gibbonModule', 'gibbonNotification.gibbonModuleID=gibbonModule.gibbonModuleID')
             ->where("gibbonModule.name='Free Learning'")
             ->where("gibbonNotification.status='New'")
-            ->where("gibbonNotification.text LIKE CONCAT('%','has added a comment to','%')")
+            ->where("(gibbonNotification.text LIKE CONCAT('%','has added a comment to','%') OR gibbonNotification.actionLink LIKE CONCAT('%','#comment', '%'))")
             ->where('gibbonNotification.gibbonPersonID=:gibbonPersonID')
             ->bindValue('gibbonPersonID', $gibbonPersonID);
 

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.28.01
+-------
+Fixed Unread Comments bug impacting non-English commenters
+
 v5.28.00
 -------
 Updated Disable Parent Evidence setting to give per-role granularity

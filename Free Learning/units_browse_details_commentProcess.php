@@ -106,7 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
     if ($canManage && $roleCategory != 'Student') {
         $event->setNotificationText(sprintf(__m('A teacher has added a comment to your current unit (%1$s).'), $unit['name']));
-        $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1");
+        $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1#comment");
         $event->addRecipient($values['gibbonPersonIDStudent']);
 
         $URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&'.http_build_query($urlParams);
@@ -117,7 +117,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $event->addScope('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);
         $event->setNotificationText(__m('{student} has added a comment to their current unit ({unit}).', ['student' => $studentName, 'unit' => $unit['name']]));
-        $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=$freeLearningUnitStudentID&sidebar=true");
+        $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=$freeLearningUnitStudentID&sidebar=true#comment");
 
         if ($values['enrolmentMethod'] == 'class') {
             // Attempt to notify teacher(s) of class
