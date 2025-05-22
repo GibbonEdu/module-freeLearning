@@ -19,11 +19,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
+
 require_once '../../gibbon.php';
 
 require_once  './moduleFunctions.php';
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/badges_manage_add.php&search='.$_GET['search'];
+$search = $_GET['search'] ?? '';
+$URL = Url::fromModuleRoute('Free Learning', 'badges_manage_add')->withQueryParams(["search" => $search]);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manage_add.php') == false) {
     //Fail 0

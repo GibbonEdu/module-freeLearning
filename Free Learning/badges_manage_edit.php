@@ -78,8 +78,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
                     $page->navigator->addSearchResultsAction(Url::fromModuleRoute('Free Learning', 'badges_manage.php')->withQueryParams(["search" => $search]));
                 }
 
-                $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module')."/badges_manage_editProcess.php?freeLearningBadgeID=$freeLearningBadgeID");
-
+                $form = Form::create('action', Url::fromModuleRoute('Free Learning', 'badges_manage_editProcess.php')->withQueryParams(["freeLearningBadgeID" => $freeLearningBadgeID, "search" => $search])->directLink());
+                
                 $form->addHiddenValue('address', $session->get('address'));
                 $form->addHiddenValue('q', "/modules/".$session->get('module')."/badges_manage_add.php");
 

@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
@@ -226,10 +227,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
             ->format(function($values) {
                 if ($values['enrolmentMethod'] == 'schoolMentor') {
                     $name = Format::name('', $values['mentorpreferredName'], $values['mentorsurname'], 'Student', false);
-                    $output = Format::link('./index.php?q=/modules/Free Learning/report_mentorshipOverview.php&gibbonPersonID='.$values['gibbonPersonIDSchoolMentor'], $name);
+                    $output = Format::link(Url::fromModuleRoute('Free Learning', 'report_mentorshipOverview')->withQueryParams(["gibbonPersonID" => $values['gibbonPersonIDSchoolMentor']]), $name);
                 } else if ($values['enrolmentMethod'] == 'class') {
                     $name = Format::name('', $values['teacherpreferredName'], $values['teachersurname'], 'Student', false);
-                    $output = Format::link('./index.php?q=/modules/Free Learning/report_mentorshipOverview.php&gibbonPersonID='.$values['teachergibbonPersonID'], $name);
+                    $output = Format::link(Url::fromModuleRoute('Free Learning', 'report_mentorshipOverview')->withQueryParams(["gibbonPersonID" => $values['teachergibbonPersonID']]), $name);
                 } else if ($values['enrolmentMethod'] == 'externalMentor') {
                     $output = $values['nameExternalMentor'];
                 }
@@ -243,10 +244,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
     $table->addColumn('unit', __m('Unit'))
         ->description(__m('Learning Area')."/".__m('Course'))
         ->format(function($values) use ($session) {
-             $output = "<a href='" . $session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
-             $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
-             $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
-             return $output;
+            $output = "<a href='" . Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams(["freeLearningUnitID" => $values["freeLearningUnitID"], "tab" => "2", "sidebar" => "true"])."'>" . $values["unit"] . "</a><br/>" ;
+            $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
+            $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
+            return $output;
         });
 
     $table->addColumn('student', __('Student'))

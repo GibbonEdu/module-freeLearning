@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
@@ -110,7 +111,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
             $table->addColumn('gibbonPersonID', __('Student'))
                 ->format(function ($row) use ($session, $container) {
 
-                    $output = '<a href="'.$session->get('absoluteURL')."/index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=".$row['gibbonPersonID'].'">'.Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a>';
+                    $output = '<a href="'.Url::fromModuleRoute('Students', 'student_view_details')->withQueryParams(["gibbonPersonID" => $row['gibbonPersonID']]).'">'.Format::name('', $row['preferredName'], $row['surname'], 'Student', true).'</a>';
 
                     //Check for custom field
                     $customField = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'customField');
@@ -155,7 +156,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
                     if ($row['enrolmentMethod'] == "schoolMentor" || $row['enrolmentMethod'] == "externalMentor") {
                         $output .= "<span class=\"float-right tag message border border-blue-300 ml-2\">".__m(ucfirst(preg_replace('/(?<!\ )[A-Z]/', ' $0', $row['enrolmentMethod'])))."</span>";
                     }
-                    $output .= "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&tab=2&freeLearningUnitID='.$row['freeLearningUnitID']."&gibbonDepartmentID=&difficulty=&name='>".htmlPrep($row['unitName']).'</a>';
+                    $output .= "<a href='".Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams(["sidebar" => "true", "tab" => "2", "freeLearningUnitID" => $row['freeLearningUnitID'], "gibbonDepartmentID" => "", "difficulty" => "", "name" => ""])."'>".htmlPrep($row['unitName']).'</a>';
                     $output .= "<br/><span style='font-size: 85%; font-style: italic'>".__m($row['status'] ?? '').'</span>';
                     //TODO: CHANGE FROM INLINE HTML TO OO FORMATTING :(
                     return $output;

@@ -48,16 +48,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/badges_manag
         $returns = array();
         $editLink = '';
         $search = $_GET['search'] ?? '';
-        if (isset($_GET['editID'])) {
-            $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/badges_manage_edit.php&freeLearningBadgeID='.$_GET['editID'].'&search='.$search;
+        $editID = $_GET['editID'] ?? '';
+        
+        if (!empty($editID)) {
+            $editLink =  Url::fromModuleRoute('Free Learning', 'badges_manage_edit')->withQueryParams(["search" => $search, "freeLearningBadgeID" => $editID]);
+            $page->return->setEditLink($editLink);
         }
-        $page->return->setEditLink($editLink);
 
         if ($search != '') {
             $page->navigator->addSearchResultsAction(Url::fromModuleRoute('Free Learning', 'badges_manage.php')->withQueryParams(["search" => $search]));
         }
 
-        $form = Form::create('action', $session->get('absoluteURL').'/modules/'.$session->get('module').'/badges_manage_addProcess.php');
+        $form = Form::create('action', Url::fromModuleRoute('Free Learning', 'badges_manage_addProcess.php')->withQueryParams(["search" => $search])->directLink());
 
         $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('q', "/modules/".$session->get('module')."/badges_manage_add.php");

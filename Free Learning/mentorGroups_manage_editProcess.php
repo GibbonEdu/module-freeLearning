@@ -19,15 +19,17 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Services\Format;
 use Gibbon\Module\FreeLearning\Domain\MentorGroupGateway;
 use Gibbon\Module\FreeLearning\Domain\MentorGroupPersonGateway;
 
 require_once '../../gibbon.php';
 
+$search = $_GET['search'] ?? '';
 $freeLearningMentorGroupID = $_POST['freeLearningMentorGroupID'] ?? '';
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage_edit.php&freeLearningMentorGroupID='.$freeLearningMentorGroupID;
+$URL = Url::fromModuleRoute('Free Learning', 'mentorGroups_manage_edit')->withQueryParams(["search" => $search, "freeLearningMentorGroupID" => $freeLearningMentorGroupID]);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups_manage_edit.php') == false) {
     $URL .= '&return=error0';

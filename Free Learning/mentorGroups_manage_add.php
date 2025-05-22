@@ -19,11 +19,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Domain\System\CustomFieldGateway;
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Domain\User\UserGateway;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\System\CustomFieldGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups_manage_add.php') == false) {
     // Access denied
@@ -34,8 +35,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         ->add(__m('Manage Mentor Groups'), 'mentorGroups_manage.php')
         ->add(__m('Add Mentor Group'));
 
-    if (!empty($_GET['editID'])) {
-        $page->return->setEditLink($session->get('absoluteURL').'/index.php?q=/modules/Free Learning/mentorGroups_manage_edit.php&freeLearningMentorGroupID='.$_GET['editID']);
+    $search = $_GET['search'] ?? '';
+    $editID = $_GET['editID'] ?? '';
+    if (!empty($editID)) {
+        $editLink =  Url::fromModuleRoute('Free Learning', 'mentorGroups_manage_edit')->withQueryParams(["search" => $search, "freeLearningMentorGroupID" => $editID]);
+        $page->return->setEditLink($editLink);
+    }
+    
+    if ($search != '') {
+        $page->navigator->addSearchResultsAction(Url::fromModuleRoute('Free Learning', 'mentorGroups_manage.php')->withQueryParams(["search" => $search]));
     }
 
     // Get a list of potential mentors
@@ -67,7 +75,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/mentorGroups
         }
     }
 
-    $form = Form::create('mentorship', $session->get('absoluteURL').'/modules/'.$session->get('module').'/mentorGroups_manage_addProcess.php');
+    $form = Form::create('mentorship', $URL = Url::fromModuleRoute('Free Learning', 'mentorGroups_manage_addProcess')->directLink()->withQueryParams(["search" => $search]));
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
     $form->addHiddenValue('address', $session->get('address'));

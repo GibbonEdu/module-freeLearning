@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
@@ -166,10 +167,10 @@ else {
     $table->addColumn('unit', __m('Unit'))
         ->description(__m('Learning Area')."/".__m('Course'))
         ->format(function($values) use ($session) {
-             $output = "<a href='" . $session->get("absoluteURL") . "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=" . $values["freeLearningUnitID"] . "&tab=2&sidebar=true'>" . $values["unit"] . "</a><br/>" ;
-             $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
-             $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
-             return $output;
+            $output = "<a href='" . Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams(["freeLearningUnitID" => $values["freeLearningUnitID"], "tab" => "2", "sidebar" => "true"])."'>" . $values["unit"] . "</a><br/>" ;
+            $output .= !empty($values['learningArea']) ? '<div class="text-xxs">'.$values['learningArea'].'</div>' : '';
+            $output .= !empty($values['flCourse']) && ($values['learningArea'] != $values['flCourse']) ? '<div class="text-xxs">'.$values['flCourse'].'</div>' : '';
+            return $output;
         });
 
     $table->addColumn('student', __('Student'))
@@ -178,7 +179,7 @@ else {
             // Name
             $output = "";
             if ($values['category'] == 'Student') {
-                $output .= "<a href='index.php?q=/modules/Students/student_view_details.php&gibbonPersonID=" . $values["gibbonPersonID"] . "'>" . Format::name("", $values["studentpreferredName"], $values["studentsurname"], "Student", true) . "</a>";
+                $output .= "<a href='" . Url::fromModuleRoute('Students', 'student_view_details')->withQueryParams(["gibbonPersonID" => $values["gibbonPersonID"]]) . "'>" . Format::name("", $values["studentpreferredName"], $values["studentsurname"], "Student", true) . "</a>";
             }
             else {
                 $output .= Format::name("", $values["studentpreferredName"], $values["studentsurname"], "Student", true);

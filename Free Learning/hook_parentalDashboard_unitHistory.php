@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Tables\UnitHistory;
 
@@ -47,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitH
     $returnInt .= "<p style='margin-top: 20px'>";
     $returnInt .= __m('This tab shows recent results and enrolment for Free Learning units studied by your child.');
     if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unitHistory_byStudent.php')) {
-        $returnInt .= " ".__m('Complete unit history information can be {link}viewed here{linkEnd}.', ['link' => "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Free Learning/report_unitHistory_byStudent.php&gibbonPersonID=$gibbonPersonID'>", 'linkEnd' => '</a>']);
+        $returnInt .= " ".__m('Complete unit history information can be {link}viewed here{linkEnd}.', ['link' => "<a href='".Url::fromModuleRoute('Free Learning', 'report_unitHistory_byStudent')->withQueryParams(["gibbonPersonID" => $gibbonPersonID])."'>", 'linkEnd' => '</a>']);
     }
     $returnInt .= '</p>';
 
