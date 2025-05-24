@@ -19,14 +19,25 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Domain\User\UserGateway;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 
 require_once '../../gibbon.php';
 
-$freeLearningUnitID = $_GET['freeLearningUnitID'];
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_edit.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_REQUEST['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'].'&showInactive='.$_GET['showInactive'];
+$freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
+
+$urlParams = [
+    'freeLearningUnitID'        => $freeLearningUnitID,
+    'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
+    'difficulty'                => $_GET['difficulty'] ?? '',
+    'name'                      => $_GET['name'] ?? '',
+    'gibbonYearGroupIDMinimum'  => $_GET['gibbonYearGroupIDMinimum'] ?? '',
+    'showInactive'              => $_GET['showInactive'] ?? '',
+];
+
+$URL = Url::fromModuleRoute('Free Learning', 'units_manage_edit')->withQueryParams($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_edit.php') == false) {
     //Fail 0

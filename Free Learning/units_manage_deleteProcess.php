@@ -19,12 +19,22 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
+
 require_once '../../gibbon.php';
 
+$freeLearningUnitID = $_REQUEST['freeLearningUnitID'] ?? '';
 
-$freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/units_manage_delete.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=".$_REQUEST['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'];
-$URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_manage.php&gibbonDepartmentID='.$_REQUEST['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'];
+$urlParams = [
+    'freeLearningUnitID'        => $freeLearningUnitID,
+    'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
+    'difficulty'                => $_GET['difficulty'] ?? '',
+    'name'                      => $_GET['name'] ?? '',
+    'gibbonYearGroupIDMinimum'  => $_GET['gibbonYearGroupIDMinimum'] ?? '',
+];
+
+$URL = Url::fromModuleRoute('Free Learning', 'units_manage_delete')->withQueryParams($urlParams);
+$URLDelete = Url::fromModuleRoute('Free Learning', 'units_manage')->withQueryParams($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_delete.php') == false) {
     //Fail 0

@@ -2394,3 +2394,8 @@ UPDATE gibbonSetting SET value=(CASE WHEN value = 'N' THEN '' WHEN value = 'Y' T
 ++$count;
 $sql[$count][0] = '5.28.01';
 $sql[$count][1] = "";
+
+//v5.29.00
+++$count;
+$sql[$count][0] = '5.29.00';
+$sql[$count][1] = "";

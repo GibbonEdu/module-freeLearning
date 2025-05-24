@@ -52,7 +52,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         $editLink = '';
         if (isset($_GET['editID'])) {
-            $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage_edit.php&freeLearningUnitID='.$_GET['editID'].'&'.http_build_query($urlParams);
+            $urlParams['freeLearningUnitID'] = $_GET['editID'];
+            $editLink = Url::fromModuleRoute('Free Learning', 'units_manage_edit')->withQueryParams($urlParams);
         }
         $page->return->setEditLink($editLink);
 

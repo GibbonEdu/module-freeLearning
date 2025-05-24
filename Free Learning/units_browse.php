@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\View\View;
 use Gibbon\Forms\Form;
 use Gibbon\Services\Format;
@@ -117,8 +118,8 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $urlParams = compact('showInactive', 'gibbonDepartmentID', 'difficulty', 'name', 'gibbonPersonID');
 
         $defaultImage = $session->get('absoluteURL').'/themes/'.$session->get('gibbonThemeName').'/img/anonymous_125.jpg';
-        $viewUnitURL = "./index.php?q=/modules/Free Learning/units_browse_details.php&".http_build_query($urlParams)."&view=$view&sidebar=true";
-        $browseUnitsURL = "./index.php?q=/modules/Free Learning/units_browse.php&".http_build_query($urlParams)."&sidebar=false";
+        $viewUnitURL = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams($urlParams)."&view=$view&sidebar=true";
+        $browseUnitsURL = Url::fromModuleRoute('Free Learning', 'units_browse')->withQueryParams($urlParams)."&sidebar=false";
 
         // CRITERIA
         $unitGateway = $container->get(UnitGateway::class);
@@ -614,7 +615,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                         network.on( 'click', function(properties) {
                             var nodeNo = properties.nodes ;
                             if (nodeNo != '') {
-                                window.location = '<?php echo $session->get('absoluteURL') ?>/index.php?q=/modules/Free Learning/units_browse_details.php&sidebar=true&freeLearningUnitID=' + ids[nodeNo] + '&gibbonDepartmentID=<?php echo $gibbonDepartmentID ?>&difficulty=<?php echo $difficulty ?>&showInactive=<?php echo $showInactive; ?>&name=<?php echo $name ?>&view=<?php echo $view ?>';
+                                window.location = '<?php echo Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams($urlParams)."&view=$view&sidebar=true"; ?>&freeLearningUnitID=' + ids[nodeNo];
                             }
                         });
 

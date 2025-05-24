@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Services\Format;
 use Gibbon\Comms\NotificationEvent;
 use Gibbon\Domain\User\UserGateway;
@@ -46,9 +47,10 @@ $urlParams = [
     'view'                      => $_GET['view'] ?? '',
     'sidebar'                   => 'true',
     'gibbonPersonID'            => $gibbonPersonID,
+    'tab'                       => "1",
 ];
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&tab=1&'.http_build_query($urlParams);
+$URL = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false) {
     $URL .= '&return=error0';
@@ -106,18 +108,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
     if ($canManage && $roleCategory != 'Student') {
         $event->setNotificationText(sprintf(__m('A teacher has added a comment to your current unit (%1$s).'), $unit['name']));
-        $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&sidebar=true&tab=1#comment");
+        
+        echo $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "sidebar" => "true", "tab" => "1"])."#comment";
+        $event->setActionLink($actionLink);
         $event->addRecipient($values['gibbonPersonIDStudent']);
 
-        $URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details_approval.php&'.http_build_query($urlParams);
-
+        unset($urlParams['tab']);    
+        $URL = Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withQueryParams($urlParams);
     } else {
         $user = $container->get(UserGateway::class)->getByID($session->get('gibbonPersonID'));
         $studentName = Format::name('', $user['preferredName'], $user['surname'], 'Student', false, true);
 
         $event->addScope('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);
         $event->setNotificationText(__m('{student} has added a comment to their current unit ({unit}).', ['student' => $studentName, 'unit' => $unit['name']]));
-        $event->setActionLink("/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=$freeLearningUnitStudentID&sidebar=true#comment");
+        $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "sidebar" => "true"])."#comment";
+        $event->setActionLink($actionLink);
 
         if ($values['enrolmentMethod'] == 'class') {
             // Attempt to notify teacher(s) of class

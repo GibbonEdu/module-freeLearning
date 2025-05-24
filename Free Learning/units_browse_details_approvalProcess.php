@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Domain\Markbook\MarkbookEntryGateway;
@@ -33,26 +34,24 @@ $publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits'
 
 $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
 
-// Get params
-$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
 $canManage = false;
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all') {
     $canManage = true;
 }
-$showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
-$gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
-$difficulty = $_GET['difficulty'] ?? '';
-$name = $_GET['name'] ?? '';
-$view = $_GET['view'] ?? '';
-if ($view != 'grid' and $view != 'map') {
-    $view = 'list';
-}
-$gibbonPersonID = '';
-if ($canManage and isset($_GET['gibbonPersonID'])) {
-    $gibbonPersonID = $_GET['gibbonPersonID'];
-}
+$urlParams = [
+    'freeLearningUnitStudentID' => $_POST['freeLearningUnitStudentID'] ?? '',
+    'freeLearningUnitID'        => $_REQUEST['freeLearningUnitID'] ?? '',
+    'showInactive'              => ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N',
+    'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
+    'difficulty'                => $_GET['difficulty'] ?? '',
+    'name'                      => $_GET['name'] ?? '',
+    'view'                      => in_array($_GET['view'] ?? '', ['list', 'grid', 'map']) ? $_GET['view'] : 'list',
+    'sidebar'                   => 'true',
+    'gibbonPersonID'            => ($canManage and isset($_GET['gibbonPersonID'])) ? $_GET['gibbonPersonID'] : '',
+    'tab'                       => "2",
+];
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&gibbonPersonID='.$gibbonPersonID.'&sidebar=true&tab=2&view='.$view;
+$URL = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_approval.php') == false) {
     // Fail 0
@@ -66,16 +65,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     } else {
         $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
-        $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
-        $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';
-
-        if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
+        if ($urlParams["freeLearningUnitID"] == '' or $urlParams["freeLearningUnitStudentID"] == '') {
             // Fail 3
             $URL .= '&return=error3';
             header("Location: {$URL}");
         } else {
             try {
-                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                $data = array('freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'freeLearningUnitStudentID' => $urlParams["freeLearningUnitStudentID"]);
                 $sql = "SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID AND (status='Complete - Pending' OR status='Complete - Approved' OR status='Evidence Not Yet Approved')";
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
@@ -94,7 +90,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             } else {
                 // Proceed!
                 $row = $result->fetch();
-                $name = $row['name'];
+                $urlParams["name"] = $row['name'];
                 $statusOriginal = $row['status'];
                 $commentApprovalOriginal = trim($row['commentApproval']);
 
@@ -131,7 +127,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 // Check to see if we are a mentor of this student
                 if ($row['enrolmentMethod'] == 'schoolMentor') { // Is teacher of this class?
                     try {
-                        $dataMentor = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                        $dataMentor = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'freeLearningUnitStudentID' => $urlParams["freeLearningUnitStudentID"]);
                         $sqlMentor = "SELECT freeLearningUnitStudentID FROM freeLearningUnitStudent WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID AND enrolmentMethod='schoolMentor' AND gibbonPersonIDSchoolMentor=:gibbonPersonID";
                         $resultMentor = $connection2->prepare($sqlMentor);
                         $resultMentor->execute($dataMentor);
@@ -177,7 +173,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             $data = [
                                 'foreignTable'         => 'freeLearningUnitStudent',
-                                'foreignTableID'       => $freeLearningUnitStudentID,
+                                'foreignTableID'       => $urlParams["freeLearningUnitStudentID"],
                                 'gibbonModuleID'       => getModuleIDFromName($connection2, 'Free Learning'),
                                 'gibbonPersonID'       => $session->get('gibbonPersonID'),
                                 'gibbonPersonIDTarget' => $gibbonPersonIDStudent,
@@ -201,7 +197,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         // Attempt to assemble list of students for notification and badges
                         $gibbonPersonIDStudents = [$gibbonPersonIDStudent];
                         if ($collaborativeAssessment == 'Y' AND  !empty($row['collaborationKey'])) {
-                            $dataNotification = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitStudentID' => $freeLearningUnitStudentID, 'collaborationKey' => $row['collaborationKey']);
+                            $dataNotification = array('freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'freeLearningUnitStudentID' => $urlParams["freeLearningUnitStudentID"], 'collaborationKey' => $row['collaborationKey']);
                             $sqlNotification = "SELECT gibbonPersonIDStudent FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND NOT freeLearningUnitStudentID=:freeLearningUnitStudentID AND (status='Complete - Pending' OR status='Complete - Approved' OR status='Evidence Not Yet Approved') AND collaborationKey=:collaborationKey";
                             $resultNotification = $pdo->select($sqlNotification, $dataNotification)->fetchAll();
 
@@ -227,7 +223,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     $file = $_FILES['file'] ?? null;
 
                                     // Upload the file, return the /uploads relative path
-                                    $attachment = $fileUploader->uploadFromPost($file, $name);
+                                    $attachment = $fileUploader->uploadFromPost($file, $urlParams["name"]);
 
                                     if (empty($attachment)) {
                                         $partialFail = true;
@@ -252,13 +248,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
                                 $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
                             } else {
-                                $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
+                                $updated = $unitStudentGateway->update($urlParams["freeLearningUnitStudentID"], $data);
                             }
 
                             // Attempt to notify the student and grant badges
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
-                                $text = sprintf(__m('A teacher has approved your request for unit completion (%1$s).'), $name);
-                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=&difficulty=&name=&showInactive=&sidebar=true&tab=1";
+                                $text = sprintf(__m('A teacher has approved your request for unit completion (%1$s).'), $urlParams["name"]);
+                                $urlParams["tab"] = "1";
+                                $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams($urlParams);
+                                $urlParams["tab"] = "2";
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
                                     $notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                                     if (isActionAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
@@ -315,7 +313,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE collaborationKey=:collaborationKey';
                                 }
                                 else {
-                                    $data['freeLearningUnitStudentID'] = $freeLearningUnitStudentID;
+                                    $data['freeLearningUnitStudentID'] = $urlParams["freeLearningUnitStudentID"];
                                     $sql = 'UPDATE freeLearningUnitStudent SET exemplarWork=:exemplarWork, exemplarWorkThumb=:exemplarWorkThumb, exemplarWorkLicense=:exemplarWorkLicense, status=:status, commentApproval=:commentApproval, gibbonPersonIDApproval=:gibbonPersonIDApproval, timestampCompleteApproved=:timestampCompleteApproved WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
 
                                 }
@@ -330,9 +328,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             // Attempt to notify the student
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
-                            	$text = sprintf(__('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $name);
-                                $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&sidebar=true&tab=1&view=$view";
-								foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
+                            	$text = sprintf(__('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $urlParams["name"]);
+                                $urlParams["tab"] = "1";
+                                $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams($urlParams);
+                                $urlParams["tab"] = "2";
+                                foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
 									$notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
 								}
 								$notificationSender->sendNotifications();

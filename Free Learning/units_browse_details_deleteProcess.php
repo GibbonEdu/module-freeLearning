@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Domain\System\SettingGateway;
 
 require_once '../../gibbon.php';
@@ -29,25 +30,23 @@ $publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free L
 
 $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details_approval.php', $connection2);
 
-//Get params
-$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all';
-$showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
-$gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
-$difficulty = $_GET['difficulty'] ?? '';
-$name = $_GET['name'] ?? '';
-$view = $_GET['view'] ?? '';
-if ($view != 'grid' and $view != 'map') {
-    $view = 'list';
-}
-$gibbonPersonID = $session->get('gibbonPersonID');
-if ($canManage and isset($_GET['gibbonPersonID'])) {
-    $gibbonPersonID = $_GET['gibbonPersonID'];
-}
 
+$urlParams = [
+    'freeLearningUnitStudentID' => $_POST['freeLearningUnitStudentID'] ?? '',
+    'freeLearningUnitID'        => $_REQUEST['freeLearningUnitID'] ?? '',
+    'showInactive'              => ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N',
+    'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
+    'difficulty'                => $_GET['difficulty'] ?? '',
+    'name'                      => $_GET['name'] ?? '',
+    'view'                      => in_array($_GET['view'] ?? '', ['list', 'grid', 'map']) ? $_GET['view'] : 'list',
+    'sidebar'                   => 'true',
+    'gibbonPersonID'            => ($canManage and isset($_GET['gibbonPersonID'])) ? $_GET['gibbonPersonID'] : '',
+    'tab'                       => "2",
+];
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_delete.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
-$URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&freeLearningUnitStudentID='.$_POST['freeLearningUnitStudentID'].'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&sidebar=true&tab=2&view='.$view;
+$URL = Url::fromModuleRoute('Free Learning', 'units_browse_details_delete')->withQueryParams($urlParams);
+$URLDelete = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details_delete.php') == false and !$canManage) {
     //Fail 0
@@ -61,16 +60,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     } else {
         $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
-        $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
-        $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';
-
-        if ($freeLearningUnitID == '' or $freeLearningUnitStudentID == '') {
+        if ($urlParams["freeLearningUnitID"] == '' or $urlParams["freeLearningUnitStudentID"] == '') {
             //Fail 3
             $URL .= '&return=error3';
             header("Location: {$URL}");
         } else {
             try {
-                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                $data = array('freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'freeLearningUnitStudentID' => $urlParams["freeLearningUnitStudentID"]);
                 $sql = 'SELECT * FROM freeLearningUnit JOIN freeLearningUnitStudent ON (freeLearningUnitStudent.freeLearningUnitID=freeLearningUnit.freeLearningUnitID) WHERE freeLearningUnitStudent.freeLearningUnitID=:freeLearningUnitID AND freeLearningUnitStudentID=:freeLearningUnitStudentID';
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
@@ -127,7 +123,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                 } else {
                     //Write to database
                     try {
-                        $data = array('freeLearningUnitStudentID' => $freeLearningUnitStudentID);
+                        $data = array('freeLearningUnitStudentID' => $urlParams["freeLearningUnitStudentID"]);
                         $sql = 'DELETE FROM freeLearningUnitStudent WHERE freeLearningUnitStudentID=:freeLearningUnitStudentID';
                         $result = $connection2->prepare($sql);
                         $result->execute($data);

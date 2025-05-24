@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Domain\System\SettingGateway;
 
 require_once '../../gibbon.php';
@@ -29,20 +30,21 @@ $publicUnits = $container->get(SettingGateway::class)->getSettingByScope('Free L
 
 $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_browse_details.php', $connection2);
 
-//Get params
-$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all';
-$showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
-$gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
-$difficulty = $_GET['difficulty'] ?? '';
-$name = $_GET['name'] ?? '';
-$view = $_GET['view'] ?? '';
-if ($view != 'grid' and $view != 'map') {
-    $view = 'list';
-}
-$gibbonPersonID = ($canManage and isset($_GET['gibbonPersonID'])) ? $_GET['gibbonPersonID'] : $session->get('gibbonPersonID');
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details_enrolMultiple.php&freeLearningUnitID='.$freeLearningUnitID.'&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&tab=2&view='.$view;
+$urlParams = [
+    'freeLearningUnitID'        => $_GET['freeLearningUnitID'] ?? '',
+    'showInactive'              => ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N',
+    'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
+    'difficulty'                => $_GET['difficulty'] ?? '',
+    'name'                      => $_GET['name'] ?? '',
+    'view'                      => in_array($_GET['view'] ?? '', ['list', 'grid', 'map']) ? $_GET['view'] : 'list',
+    'sidebar'                   => 'true',
+    'gibbonPersonID'            => ($canManage and isset($_GET['gibbonPersonID'])) ? $_GET['gibbonPersonID'] : '',
+    'tab'                       => "2"
+];
+
+$URL = Url::fromModuleRoute('Free Learning', 'units_browse_details_enrolMultiple')->withQueryParams($urlParams);
 
 if (!isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') || !isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php')) {
     //Fail 0
@@ -56,15 +58,14 @@ if (!isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brows
     } else {
         $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
 
-        $freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
-
-        if ($freeLearningUnitID == '') {
+        
+        if ($urlParams["freeLearningUnitID"] == '') {
             //Fail 3
             $URL .= '&return=error3';
             header("Location: {$URL}");
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
+                $unitList = getUnitList($connection2, $guid, $session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $urlParams["showInactive"], $publicUnits, $urlParams["freeLearningUnitID"], null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
@@ -97,7 +98,7 @@ if (!isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brows
                     foreach ($gibbonPersonIDMulti as $gibbonPersonID) {
                         //Write to database
                         try {
-                            $data = array('gibbonPersonID' => substr($gibbonPersonID, 9), 'freeLearningUnitID' => $freeLearningUnitID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
+                            $data = array('gibbonPersonID' => substr($gibbonPersonID, 9), 'freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonCourseClassID' => $gibbonCourseClassID, 'grouping' => 'Individual', 'status' => $status);
                             $sql = 'INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonID, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, gibbonCourseClassID=:gibbonCourseClassID, `grouping`=:grouping, status=:status';
                             $result = $connection2->prepare($sql);
                             $result->execute($data);

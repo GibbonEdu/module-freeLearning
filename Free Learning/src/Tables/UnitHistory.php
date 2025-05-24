@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 namespace Gibbon\Module\FreeLearning\Tables;
 
+use Gibbon\Http\Url;
 use Gibbon\View\View;
 use Gibbon\UI\Chart\Chart;
 use Gibbon\Services\Format;
@@ -312,7 +313,7 @@ class UnitHistory
             ->description(__m('Learning Area').'/'.__m('Course'))
             ->format(function($values) use ($canBrowse) {
                 if ($canBrowse) {
-                    $url = './index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=' . $values['freeLearningUnitID'] . '&freeLearningUnitStudentID='.$values['freeLearningUnitStudentID'].'&sidebar=true';
+                    $url = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams(["freeLearningUnitID" => $values['freeLearningUnitID'], "freeLearningUnitStudentID" => $values['freeLearningUnitStudentID'], "sidebar" => "true"]);
                     $output = Format::link($url, $values['unit']);
                 } else {
                     $output = $values['unit'];

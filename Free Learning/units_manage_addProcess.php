@@ -19,9 +19,18 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
+
 require_once '../../gibbon.php';
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage_add.php&gibbonDepartmentID='.$_REQUEST['gibbonDepartmentID'].'&difficulty='.$_GET['difficulty'].'&name='.$_GET['name'].'&gibbonYearGroupIDMinimum='.$_GET['gibbonYearGroupIDMinimum'];
+$urlParams = [
+    'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
+    'difficulty'                => $_GET['difficulty'] ?? '',
+    'name'                      => $_GET['name'] ?? '',
+    'gibbonYearGroupIDMinimum'  => $_GET['gibbonYearGroupIDMinimum'] ?? '',
+];
+
+$URL = Url::fromModuleRoute('Free Learning', 'units_manage_add')->withQueryParams($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_add.php') == false) {
     //Fail 0

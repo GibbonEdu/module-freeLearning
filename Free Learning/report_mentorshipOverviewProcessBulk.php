@@ -20,9 +20,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-$_POST['address'] = '/modules/Free Learning/report_mentorshipOverview.php';
+use Gibbon\Http\Url;
 
 require_once '../../gibbon.php';
+
+$_POST['address'] = '/modules/Free Learning/report_mentorshipOverview.php';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/report_mentorshipOverview.php';
 
@@ -78,7 +80,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_mento
                 //Notify student
 				$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
 				$notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been accepted.'), $unit);
-				$notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+				$actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "gibbonDepartmentID" => $gibbonDepartmentID, "difficulty" => $difficulty, "name" => $name, "sidebar" => "true", "tab" => "1" ]);
+				$notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', $actionLink);
 				$notificationSender->sendNotifications();
             }
         }

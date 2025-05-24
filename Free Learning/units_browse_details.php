@@ -457,7 +457,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 ->width('35%')
                                 ->format(function ($student) use ($canViewStudents, $customField) {
                                     $output = '';
-                                    $url = './index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$student['gibbonPersonID'];
+                                    $url = Url::fromModuleRoute('Students', 'student_view_details')->withPath(".")->withQueryParams(["gibbonPersonID" => $student['gibbonPersonID']]);
                                     $name = Format::name('', $student['preferredName'], $student['surname'], 'Student', true, true);
 
                                     $output = $canViewStudents

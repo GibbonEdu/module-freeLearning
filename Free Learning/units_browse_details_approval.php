@@ -133,7 +133,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     }
 
     // MARK ANY COMMENT NOTIFICATIONS AS READ
-    $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details_approval.php&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=$freeLearningUnitStudentID&sidebar=true";
+    $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "sidebar" => "true"])."#comment";
     $notificationGateway = $container->get(NotificationGateway::class);
     $notificationGateway->archiveCommentNotificationsByEnrolment($session->get('gibbonPersonID'), $actionLink);
 
@@ -167,7 +167,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     if ($bigDataSchool == "Y" && !empty($values['gibbonCourseClassID']) && !is_null($gibbonMarkbookColumnID) && $values['status'] == 'Complete - Approved') {
         $table->addColumn('linkToMarkbook', 'Markbook')->format(function ($unit) use ($values, $gibbonMarkbookColumnID) {
-            return Format::link('./index.php?q=/modules/Markbook/markbook_edit_data.php&gibbonCourseClassID='.$values['gibbonCourseClassID'].'&gibbonMarkbookColumnID='.$gibbonMarkbookColumnID.'#'.$values['gibbonPersonIDStudent'], __('Enter Data'));
+            $url = Url::fromModuleRoute('Markbook', 'markbook_edit_data')->withPath(".")->withQueryParams(["gibbonCourseClassID" => $values['gibbonCourseClassID'], "gibbonMarkbookColumnID" => $gibbonMarkbookColumnID ?? '']).'#'.$values['gibbonPersonIDStudent'];
+            return Format::link($url, __('Enter Data'));
         });
     }
 
@@ -215,7 +216,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
     $logs = array_map(function ($item) use ($gibbonHookID) {
         $item['url'] = !empty($item['gibbonPersonID']) && $item['category'] == 'Student'
-            ? './index.php?q=/modules/Students/student_view_details.php&gibbonPersonID='.$item['gibbonPersonID'].'&hook=Free Learning&module=Free Learning&action=Unit History By Student_all&gibbonHookID='.$gibbonHookID
+            ? Url::fromModuleRoute('Students', 'student_view_details')->withQueryParams(["gibbonPersonID" => $item['gibbonPersonID'], "hook" => "Free Learning", "module" => "Free Learning", "action" => "Unit History By Student_all", "gibbonHookID" => $gibbonHookID])
             : '';
         return $item;
     }, $logs);
@@ -304,7 +305,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mr-2 mt-2') : '';
             $gender = ($genderOnFeedback == "Y") ? Format::tag(Format::genderName($collaborator['gender']), 'dull mr-2 mt-2') : "";
             $dateStart = ($bigDataSchool == "Y" && !empty($collaborator['dateStart'])) ? Format::tag(__m("Joined {dateStart}", ["dateStart" => Format::date($collaborator['dateStart'])]), 'dull mr-2 mt-2') : "";
-            $col->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'] ?? '', 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$collaborator['gibbonPersonID']."'>".Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
+            $url = Url::fromModuleRoute('Free Learning', 'units_browse')->withQueryParams(["gibbonDepartmentID" => (!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'] ?? '', 0, 4)), "difficulty" => "", "name" => "", "view" => "", "sidebar" => "false", "gibbonPersonID" => $collaborator['gibbonPersonID']]);
+            $col->addContent("<a target='_blank' href='".$url."'>".Format::name('', $collaborator['preferredName'], $collaborator['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
         }
     } else {
         $in = ($values['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mr-2 mt-2') : '';
@@ -312,7 +314,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $dateStart = ($bigDataSchool == "Y" && !empty($values['dateStart'])) ? Format::tag(__m("Joined {dateStart}", ["dateStart" => Format::date($values['dateStart'])]), 'dull mr-2 mt-2') : "";
         $row = $form->addRow();
             $row->addLabel('student', __('Student'));
-            $row->addContent("<a target='_blank' href='".$session->get('absoluteURL')."\index.php?q=/modules/Free Learning/units_browse.php&gibbonDepartmentID=".(!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'] ?? '', 0, 4))."&difficulty=&name=&view=&sidebar=false&gibbonPersonID=".$values['gibbonPersonID']."'>".Format::name('', $values['preferredName'], $values['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
+            $url = Url::fromModuleRoute('Free Learning', 'units_browse')->withQueryParams(["gibbonDepartmentID" => (!empty($values['course']) ? $values['course'] : substr($values['gibbonDepartmentIDList'] ?? '', 0, 4)), "difficulty" => "", "name" => "", "view" => "", "sidebar" => "false", "gibbonPersonID" => $values['gibbonPersonID']]);
+            $row->addContent("<a target='_blank' href='".$url."'>".Format::name('', $values['preferredName'], $values['surname'], 'Student', false)."</a><br/>".$gender.$dateStart.$in)->wrap('<div class="ml-2 w-full text-left text-sm text-gray-900">', '</div>');
     }
 
     $submissionLink = $values['evidenceType'] == 'Link'

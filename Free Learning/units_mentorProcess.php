@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Domain\System\SettingGateway;
 
 require_once '../../gibbon.php';
@@ -64,7 +65,7 @@ if (@$session->get('systemSettingsSet') == false) {
 }
 
 //Set return URL
-$URL = $session->get('absoluteURL')."/index.php?q=/modules/Free Learning/units_mentor.php&sidebar=true&gibbonDepartmentID=$gibbonDepartmentID&difficulty=$difficulty&name=$name&showInactive=$showInactive&gibbonPersonID=$gibbonPersonID&view=$view";
+$URL = Url::fromModuleRoute('Free Learning', 'units_mentor')->withQueryParams(["sidebar" => "true", "gibbonDepartmentID" => $gibbonDepartmentID, "difficulty" => $difficulty, "name" => $name, "showInactive" => $showInactive, "gibbonPersonID" => $gibbonPersonID, "view" => $view]);
 
 if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '') {
     $URL .= '&return=error3';
@@ -109,7 +110,8 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
 
             //Notify student
             $notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been accepted.'), $unit);
-            $notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+            $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "gibbonDepartmentID" => $gibbonDepartmentID, "difficulty" => $difficulty, "name" => $name, "showInactive" => $showInactive, "sidebar" => "true", "tab" => "1", "view" => "view"]);
+            $notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', $actionLink);
 			$notificationSender->sendNotifications();
 
             //Return to thanks page
@@ -131,7 +133,8 @@ if ($response == '' or $freeLearningUnitStudentID == '' or $confirmationKey == '
             //Notify student
             $notificationText = sprintf(__m('Your mentorship request for the Free Learning unit %1$s has been declined. Your enrolment has been deleted.'), $unit);
             $notificationText .= (!empty($reason)) ? " ".sprintf(__m('The following reason was given: %1$s.'), $reason) : '' ;
-           	$notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', '/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID='.$freeLearningUnitID.'&freeLearningUnitStudentID='.$freeLearningUnitStudentID.'&gibbonDepartmentID=&difficulty=&name=&sidebar=true&tab=1');
+           	$actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "gibbonDepartmentID" => $gibbonDepartmentID, "difficulty" => $difficulty, "name" => $name, "showInactive" => $showInactive, "sidebar" => "true", "tab" => "1", "view" => "view"]);
+           	$notificationSender->addNotification($row['gibbonPersonIDStudent'], $notificationText, 'Free Learning', $actionLink);
 			$notificationSender->sendNotifications();
 
             //Return to thanks page

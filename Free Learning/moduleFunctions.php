@@ -546,7 +546,8 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
                 $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
 				$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
 				$notificationText = __m('Someone has granted you a badge.');
-				$notificationSender->addNotification($gibbonPersonID, $notificationText, 'Badges', "/index.php?q=/modules/Badges/badges_view.php&gibbonPersonID=$gibbonPersonID");
+				$actionLink = Url::fromModuleRoute('Badges', 'badges_view')->withPath("")->withQueryParams(["gibbonPersonID" => $gibbonPersonID]);
+				$notificationSender->addNotification($gibbonPersonID, $notificationText, 'Badges', $actionLink);
 				$notificationSender->sendNotifications();
             }
         }

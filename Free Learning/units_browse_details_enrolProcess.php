@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\View\View;
 use Gibbon\Services\Format;
 use Gibbon\Contracts\Comms\Mailer;
@@ -33,23 +34,19 @@ $publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits'
 
 $highestAction = getHighestGroupedAction($guid, $_POST['address'], $connection2);
 
-//Get params
-$freeLearningUnitID = $_GET['freeLearningUnitID'] ?? '';
-$canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') and $highestAction == 'Browse Units_all';
-$showInactive = ($canManage and isset($_GET['showInactive'])) ? $_GET['showInactive'] : 'N';
-$gibbonDepartmentID = $_REQUEST['gibbonDepartmentID'] ?? '';
-$difficulty = $_GET['difficulty'] ?? '';
-$name = $_GET['name'] ?? '';
-$view = $_GET['view'] ?? '';
-if ($view != 'grid' and $view != 'map') {
-    $view = 'list';
-}
-$gibbonPersonID = $session->get('gibbonPersonID');
-if ($canManage and isset($_GET['gibbonPersonID'])) {
-    $gibbonPersonID = $_GET['gibbonPersonID'];
-}
+$urlParams = [
+    'freeLearningUnitID'        => $_REQUEST['freeLearningUnitID'] ?? '',
+    'showInactive'              => 'N',
+    'gibbonDepartmentID'        => $_REQUEST['gibbonDepartmentID'] ?? '',
+    'difficulty'                => $_GET['difficulty'] ?? '',
+    'name'                      => $_GET['name'] ?? '',
+    'view'                      => in_array($_GET['view'] ?? '', ['list', 'grid', 'map']) ? $_GET['view'] : 'list',
+    'sidebar'                   => 'true',
+    'gibbonPersonID'            => $session->get('gibbonPersonID'),
+    'tab'                       => "1",
+];
 
-$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/units_browse_details.php&freeLearningUnitID='.$_POST['freeLearningUnitID'].'&sidebar=true&tab=1&gibbonDepartmentID='.$gibbonDepartmentID.'&difficulty='.$difficulty.'&name='.$name.'&showInactive='.$showInactive.'&view='.$view;
+$URL = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withQueryParams($urlParams);
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse_details.php') == false and !$canManage) {
     //Fail 0
@@ -79,15 +76,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
             exit;
         }
 
-        $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
-
-        if ($freeLearningUnitID == '') {
+        if ($urlParams["freeLearningUnitID"] == '') {
             //Fail 3
             $URL .= '&return=error3';
             header("Location: {$URL}");
         } else {
             try {
-                $unitList = getUnitList($connection2, $guid, $session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $showInactive, $publicUnits, $freeLearningUnitID, null);
+                $unitList = getUnitList($connection2, $guid, $session->get('gibbonPersonID'), $roleCategory, $highestAction, null, null, null, $urlParams["showInactive"], $publicUnits, $urlParams["freeLearningUnitID"], null);
                 $data = $unitList[0];
                 $sql = $unitList[1];
                 $result = $connection2->prepare($sql);
@@ -151,7 +146,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                     } elseif ($enrolmentMethod == 'schoolMentor') {
                         $gibbonPersonIDSchoolMentor = $_POST['gibbonPersonIDSchoolMentor'];
                         try {
-                            $dataInternal = array('freeLearningUnitID3' => $freeLearningUnitID, 'gibbonPersonID2' => $session->get('gibbonPersonID'), 'gibbonPersonIDSchoolMentor1' => $gibbonPersonIDSchoolMentor);
+                            $dataInternal = array('freeLearningUnitID3' => $urlParams["freeLearningUnitID"], 'gibbonPersonID2' => $session->get('gibbonPersonID'), 'gibbonPersonIDSchoolMentor1' => $gibbonPersonIDSchoolMentor);
                             $sqlInternal = "(SELECT DISTINCT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
                                 FROM gibbonPerson
                                     JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonPersonID=gibbonPerson.gibbonPersonID)
@@ -163,8 +158,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 )";
                             if ($row['schoolMentorCompletors'] == 'Y') {
                                 $dataInternal['gibbonPersonID1'] = $session->get('gibbonPersonID');
-                                $dataInternal['freeLearningUnitID1'] = $freeLearningUnitID;
-                                $dataInternal['freeLearningUnitID2'] = $freeLearningUnitID;
+                                $dataInternal['freeLearningUnitID1'] = $urlParams["freeLearningUnitID"];
+                                $dataInternal['freeLearningUnitID2'] = $urlParams["freeLearningUnitID"];
                                 $dataInternal['gibbonPersonIDSchoolMentor2'] = $gibbonPersonIDSchoolMentor;
                                 $sqlInternal .= " UNION DISTINCT
                                     (SELECT gibbonPerson.gibbonPersonID, gibbonPerson.preferredName, gibbonPerson.surname
@@ -301,7 +296,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         try {
                             $whereExtra = '' ;
                             if (count($collaborators) > 0) {
-                                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $session->get('gibbonPersonID'));
+                                $data = array('freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'gibbonPersonID' => $session->get('gibbonPersonID'));
                                 $collaboratorCount = 0;
                                 foreach ($collaborators AS $collaborator) {
                                     $data['gibbonPersonID'.$collaboratorCount] = $collaborator;
@@ -311,7 +306,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $sql = 'SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND (gibbonPersonIDStudent=:gibbonPersonID'.$whereExtra.')';
                             }
                             else {
-                                $data = array('freeLearningUnitID' => $freeLearningUnitID, 'gibbonPersonID' => $session->get('gibbonPersonID'));
+                                $data = array('freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'gibbonPersonID' => $session->get('gibbonPersonID'));
                                 $sql = 'SELECT * FROM freeLearningUnitStudent WHERE freeLearningUnitID=:freeLearningUnitID AND gibbonPersonIDStudent=:gibbonPersonID';
                             }
                             $result = $connection2->prepare($sql);
@@ -357,7 +352,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 }
                                 //Write to database
                                 try {
-                                    $data = array('gibbonPersonIDStudent' => $session->get('gibbonPersonID'), 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'status' => $status, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
+                                    $data = array('gibbonPersonIDStudent' => $session->get('gibbonPersonID'), 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'status' => $status, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
                                     $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, `grouping`=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status=:status, timestampJoined='".date('Y-m-d H:i:s')."'";
                                     $result = $connection2->prepare($sql);
                                     $result->execute($data);
@@ -379,7 +374,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     foreach ($collaborators as $collaborator) {
                                         //Write to database
                                         try {
-                                            $data = array('gibbonPersonIDStudent' => $collaborator, 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $freeLearningUnitID, 'status' => $status, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
+                                            $data = array('gibbonPersonIDStudent' => $collaborator, 'enrolmentMethod' => $enrolmentMethod, 'gibbonCourseClassID' => $gibbonCourseClassID, 'gibbonPersonIDSchoolMentor' => $gibbonPersonIDSchoolMentor, 'emailExternalMentor' => $emailExternalMentor, 'nameExternalMentor' => $nameExternalMentor, 'grouping' => $grouping, 'confirmationKey' => $confirmationKey, 'collaborationKey' => $collaborationKey, 'freeLearningUnitID' => $urlParams["freeLearningUnitID"], 'status' => $status, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
                                             $sql = "INSERT INTO freeLearningUnitStudent SET gibbonPersonIDStudent=:gibbonPersonIDStudent, enrolmentMethod=:enrolmentMethod, gibbonCourseClassID=:gibbonCourseClassID, gibbonPersonIDSchoolMentor=:gibbonPersonIDSchoolMentor, emailExternalMentor=:emailExternalMentor, nameExternalMentor=:nameExternalMentor, `grouping`=:grouping, confirmationKey=:confirmationKey, collaborationKey=:collaborationKey, freeLearningUnitID=:freeLearningUnitID, gibbonSchoolYearID=:gibbonSchoolYearID, status=:status, timestampJoined='".date('Y-m-d H:i:s')."'";
                                             $result = $connection2->prepare($sql);
                                             $result->execute($data);
@@ -391,7 +386,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                         $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
                                         $notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
                                         $notificationText = sprintf(__m('A learner has enrolled you as a collaborator for the Free Learning unit %1$s.'), $unit);
-                                        $actionLink = "/index.php?q=/modules/Free Learning/units_browse_details.php&freeLearningUnitID=$freeLearningUnitID&tab=1&sidebar=true";
+                                        $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams($urlParams);
                                         $notificationSender->addNotification($collaborator, $notificationText, 'Free Learning', $actionLink);
                                         $notificationSender->sendNotifications();
 
@@ -403,8 +398,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     $notificationGateway = new \Gibbon\Domain\System\NotificationGateway($pdo);
 									$notificationSender = new \Gibbon\Comms\NotificationSender($notificationGateway, $session);
 									$notificationText = sprintf(__m('A learner (or group of learners) has requested that you mentor them for the Free Learning unit %1$s.'), $unit);
-                                    $actionLink = "/index.php?q=/modules/Free Learning/units_mentor.php&mode=internal&freeLearningUnitID=$freeLearningUnitID&freeLearningUnitStudentID=".$AI."&confirmationKey=$confirmationKey";
-									$notificationSender->addNotification($gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', $actionLink);
+                                    $actionLink = Url::fromModuleRoute('Free Learning', 'units_mentor')->withPath("")->withQueryParams(["mode" => "internal", "freeLearningUnitID" => $urlParams["freeLearningUnitID"], "freeLearningUnitStudentID" => $AI, "confirmationKey" => $confirmationKey]);
+                                    $notificationSender->addNotification($gibbonPersonIDSchoolMentor, $notificationText, 'Free Learning', $actionLink);
 									$notificationSender->sendNotifications();
                                 }
 
@@ -412,8 +407,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 if (($enrolmentMethod == 'externalMentor' and $_POST['emailExternalMentor'] != '')) {
 
                                     $subject = sprintf(__m('Request For Mentorship via %1$s at %2$s'), $session->get('systemName'), $session->get('organisationNameShort'));
-                                    $buttonURL = "/modules/Free Learning/units_mentorProcess.php?freeLearningUnitStudentID=$AI&confirmationKey=$confirmationKey";
-
+                                    $buttonURL = Url::fromModuleRoute('Free Learning', 'units_mentorProcess')->withPath("")->withQueryParams(["freeLearningUnitStudentID" => $AI, "confirmationKey" => $confirmationKey]);
                                     $body = $container->get(View::class)->fetchFromTemplate('mentorRequest.twig.html', [
                                         'roleCategoryFull' => $roleCategory == 'Staff' ? __m('member of staff') : __(strtolower($roleCategory)),
                                         'unitName' => $unit,
