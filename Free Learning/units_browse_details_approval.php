@@ -133,7 +133,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     }
 
     // MARK ANY COMMENT NOTIFICATIONS AS READ
-    $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "sidebar" => "true"])."#comment";
+    $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "sidebar" => "true"])->withFragment('comment');
     $notificationGateway = $container->get(NotificationGateway::class);
     $notificationGateway->archiveCommentNotificationsByEnrolment($session->get('gibbonPersonID'), $actionLink);
 

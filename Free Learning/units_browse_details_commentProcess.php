@@ -109,7 +109,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($canManage && $roleCategory != 'Student') {
         $event->setNotificationText(sprintf(__m('A teacher has added a comment to your current unit (%1$s).'), $unit['name']));
         
-        echo $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "sidebar" => "true", "tab" => "1"])."#comment";
+        echo $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "sidebar" => "true", "tab" => "1"])->withFragment('comment');
         $event->setActionLink($actionLink);
         $event->addRecipient($values['gibbonPersonIDStudent']);
 
@@ -121,7 +121,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
         $event->addScope('gibbonPersonIDStudent', $values['gibbonPersonIDStudent']);
         $event->setNotificationText(__m('{student} has added a comment to their current unit ({unit}).', ['student' => $studentName, 'unit' => $unit['name']]));
-        $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "sidebar" => "true"])."#comment";
+        $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "freeLearningUnitStudentID" => $freeLearningUnitStudentID, "sidebar" => "true"])->withFragment('comment');
         $event->setActionLink($actionLink);
 
         if ($values['enrolmentMethod'] == 'class') {
