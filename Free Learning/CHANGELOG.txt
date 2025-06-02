@@ -2,7 +2,9 @@ CHANGELOG
 =========
 v5.29.01
 -------
+Fixed unit images with spaces not displaying in Grid view
 Replaced $gibbon->session to $session as "$gibbon->session" is now deprecated
+Replace deprecated calls to getRoleCategory 
 
 v5.29.00
 -------

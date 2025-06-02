@@ -61,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     $unitStudentGateway = $container->get(UnitStudentGateway::class);
     $discussionGateway = $container->get(DiscussionGateway::class);
     $collaborativeAssessment = $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'collaborativeAssessment');
-    $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
+    $roleCategory = $session->get('gibbonRoleIDCurrentCategory');
 
     // Validate the required values
     if (empty($freeLearningUnitID) || empty($freeLearningUnitStudentID) || empty($comment)) {

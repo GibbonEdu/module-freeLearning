@@ -52,7 +52,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
         $roleCategory = null ;
     } else {
         $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = $session->get('gibbonRoleIDCurrentCategory');
     }
     if ($highestAction == false) {
         $page->addError(__('The highest grouped action cannot be determined.'));

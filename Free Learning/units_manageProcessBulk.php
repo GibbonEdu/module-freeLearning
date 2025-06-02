@@ -23,8 +23,6 @@ use Gibbon\Module\FreeLearning\UnitExporter;
 use Gibbon\Module\FreeLearning\UnitDuplicator;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
-$_POST['address'] = '/modules/Free Learning/units_manage.php';
-
 require_once '../../gibbon.php';
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';

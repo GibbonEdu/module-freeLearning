@@ -58,7 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
-        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = $session->get('gibbonRoleIDCurrentCategory');
 
         // Get enrolment settings
         $autoAcceptMentorGroups = $settingGateway->getSettingByScope('Free Learning', 'autoAcceptMentorGroups');
@@ -234,7 +234,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         if ($enrolmentMethod == 'schoolMentor' or $enrolmentMethod == 'externalMentor') {
                             $spinCount = 0;
                             while ($spinCount < 100 and $unique != true) {
-                                $confirmationKey = randomPassword(20);
+                                $confirmationKey = bin2hex(random_bytes(16));
                                 $checkFail = false;
                                 try {
                                     $data = array('confirmationKey' => $confirmationKey);
@@ -266,7 +266,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         if (is_array($collaborators) && !empty($collaborators)) {
                             $spinCount = 0;
                             while ($spinCount < 100 and $unique != true) {
-                                $collaborationKey = randomPassword(20);
+                                $collaborationKey = bin2hex(random_bytes(16));
                                 $checkFail = false;
                                 try {
                                     $data = array('collaborationKey' => $collaborationKey);

@@ -28,8 +28,6 @@ $settingGateway = $container->get(SettingGateway::class);
 
 getSystemSettings($guid, $connection2);
 
-setCurrentSchoolYear($guid, $connection2);
-
 //Set up for i18n via gettext
 if (isset($session->get('i18n')['code']) and $session->get('i18n')['code'] != null) {
     putenv('LC_ALL='.$session->get('i18n')['code']);

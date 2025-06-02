@@ -24,8 +24,6 @@ use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 use Gibbon\View\Page;
 
-$_POST['address'] = '/modules/Free Learning/units_browse_details_approval.php';
-
 require_once '../../gibbon.php';
 
 $mode = $_GET['mode'] ?? 'form';

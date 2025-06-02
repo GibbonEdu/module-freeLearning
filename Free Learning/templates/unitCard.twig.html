@@ -31,7 +31,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
         </span>
     {% endif %}
 
-    <div class="w-48 h-48 overflow-hidden bg-cover bg-no-repeat bg-center {{ prerequisitesMet == 'N' ? 'opacity-25' }}" style="background-image: url({{ logo|default(defaultImage) }});">
+    <div class="w-48 h-48 overflow-hidden bg-cover bg-no-repeat bg-center {{ prerequisitesMet == 'N' ? 'opacity-25' }}" style="background-image: url('{{ logo|default(defaultImage) }}');">
     </div>
 
     <div class="flex-1 flex justify-center items-center text-sm sm:text-sm text-center {{ prerequisitesMet == 'N' ? 'text-gray-500' : 'text-gray-700' }} font-bold py-4 px-1">

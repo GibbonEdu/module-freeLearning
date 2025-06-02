@@ -98,11 +98,11 @@ class FreeLearningFormFactory extends DatabaseFormFactory
             $smartBlockTemplate = $settingGateway->getSettingByScope('Planner', 'smartBlockTemplate');
             $col = $blockTemplate->addRow()->addClass('showHide w-full')->addColumn();
                 $col->addLabel('contentsLabel', __('Block Contents'))->setClass('mt-3 -mb-2');
-                $col->addTextArea('contents', $guid)->setRows(25)->addData('tinymce')->addData('media', '1')->setValue($smartBlockTemplate);
+                $col->addTextArea('contents')->setRows(25)->addData('tinymce')->addData('media', '1')->setValue($smartBlockTemplate);
 
             $col = $blockTemplate->addRow()->addClass('showHide w-full')->addColumn();
                 $col->addLabel('teachersNotesLabel', __('Teacher\'s Notes'))->setClass('mt-3 -mb-2');
-                $col->addTextArea('teachersNotes', $guid)->setRows(10)->addData('tinymce')->addData('media', '1');
+                $col->addTextArea('teachersNotes')->setRows(10)->addData('tinymce')->addData('media', '1');
 
         return $blockTemplate;
     }

@@ -21,8 +21,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Module\FreeLearning\Domain\UnitBlockGateway;
 
-$_POST['address'] = '/modules/Free Learning/units_manage_edit.php';
-
 require_once '../../gibbon.php';
 
 if (empty($session->get('gibbonPersonID')) || empty($session->get('gibbonRoleIDPrimary'))

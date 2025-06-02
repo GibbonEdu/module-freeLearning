@@ -24,13 +24,10 @@ use Gibbon\Comms\NotificationSender;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
-$_POST['address'] = '/modules/Free Learning/report_workPendingApproval.php';
-
 require __DIR__.'/../../../gibbon.php';
 
 // Setup some of the globals
 getSystemSettings($guid, $connection2);
-setCurrentSchoolYear($guid, $connection2);
 Format::setupFromSession($container->get('session'));
 
 //Check for CLI, so this cannot be run through browser

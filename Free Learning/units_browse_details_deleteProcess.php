@@ -58,7 +58,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $URL .= '&return=error0';
         header("Location: {$URL}");
     } else {
-        $roleCategory = getRoleCategory($session->get('gibbonRoleIDCurrent'), $connection2);
+        $roleCategory = $session->get('gibbonRoleIDCurrentCategory');
 
         if ($urlParams["freeLearningUnitID"] == '' or $urlParams["freeLearningUnitStudentID"] == '') {
             //Fail 3
