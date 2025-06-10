@@ -444,7 +444,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 echo "<script type=\"text/javascript\">function assessAll() {".implode(';', $assessAll)."}</script>";
                                 unset($urlParams['sidebar']);
 
-                                $table->addHeaderAction('assessAll', __('Assess All'))
+                                $table->addHeaderAction('assessAll', __m('Assess All'))
                                     ->setURL('#')
                                     ->setIcon('edit')
                                     ->onClick('assessAll()')
