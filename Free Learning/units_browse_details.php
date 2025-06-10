@@ -35,6 +35,8 @@ require_once __DIR__ . '/moduleFunctions.php';
 
 $settingGateway = $container->get(SettingGateway::class);
 $publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
+$collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
+$bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
 $canManage = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php');
 $browseAll = isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse.php', 'Browse Units_all');
 
@@ -412,6 +414,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             // DATA TABLE
                             $table = DataTable::createPaginated('manageEnrolment', $criteria);
 
+                            // Add Multiple
                             if ($enrolmentType == 'staffEdit' || isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php', 'Manage Units_learningAreas')) {
                                 $table->addHeaderAction('addMultiple', __('Add Multiple'))
                                     ->setURL('/modules/Free Learning/units_browse_details_enrolMultiple.php')
@@ -425,6 +428,30 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                     ->displayLabel();
                             }
 
+                            // Assess All (Big Data Schools only)
+                            if ($bigDataSchool == 'Y') {
+                                $urlParams['sidebar'] = 'true';
+                                $assessAll = [];
+                                $lastKey = '';
+                                foreach ($students as $student) {
+                                    if ($collaborativeAssessment == "N" or ($collaborativeAssessment == "Y" and ($student['collaborationKey'] == '' OR $student['collaborationKey'] != $lastKey))) {
+                                        $urlParams['freeLearningUnitStudentID'] = $student['freeLearningUnitStudentID'] ;
+                                        $assessAll[] = "window.open(\"".(string) Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withQueryParams($urlParams)."\")";
+                                        unset($urlParams['freeLearningUnitStudentID']);
+                                    }
+                                    $lastKey = $student['collaborationKey'];
+                                }
+                                echo "<script type=\"text/javascript\">function assessAll() {".implode(';', $assessAll)."}</script>";
+                                unset($urlParams['sidebar']);
+
+                                $table->addHeaderAction('assessAll', __('Assess All'))
+                                    ->setURL('#')
+                                    ->setIcon('edit')
+                                    ->onClick('assessAll()')
+                                    ->displayLabel();
+                            }
+
+                            // Row styling
                             $table->modifyRows(function ($student, $row) {
                                 if ($student['status'] == 'Current - Pending') $row->addClass('currentPending');
                                 if ($student['status'] == 'Current') $row->addClass('currentUnit');
@@ -779,8 +806,6 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 $outcomes = $unitOutcomeGateway->selectOutcomesByUnit($freeLearningUnitID)->fetchAll();
 
                                 $table = DataTable::createPaginated('outcomes', $criteria);
-
-                                $bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
                                 
                                 if ($bigDataSchool != 'Y') {
                                     $table->addExpandableColumn('content');
