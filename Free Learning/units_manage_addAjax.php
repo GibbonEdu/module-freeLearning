@@ -25,7 +25,7 @@ $_POST['address'] = '/modules/Free Learning/units_manage_add.php';
 
 require_once '../../gibbon.php';
 
-if (empty($gibbon->session->get('gibbonPersonID')) || empty($gibbon->session->get('gibbonRoleIDPrimary'))
+if (empty($session->get('gibbonPersonID')) || empty($session->get('gibbonRoleIDPrimary'))
     || !isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage_add.php')) {
     die(__('Your request failed because you do not have access to this action.'));
 } else {

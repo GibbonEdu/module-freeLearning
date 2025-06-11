@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.01
+-------
+Replaced $gibbon->session to $session as "$gibbon->session" is now deprecated
+
 v5.29.00
 -------
 Refactoring of all URLs involving parameters
