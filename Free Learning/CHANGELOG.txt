@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.02
+-------
+Added Assess All button to Enrol tab in unit details
+
 v5.29.01
 -------
 Fixed unit images with spaces not displaying in Grid view
