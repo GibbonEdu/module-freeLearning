@@ -434,21 +434,25 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 $assessAll = [];
                                 $lastKey = '';
                                 foreach ($students as $student) {
-                                    if ($collaborativeAssessment == "N" or ($collaborativeAssessment == "Y" and ($student['collaborationKey'] == '' OR $student['collaborationKey'] != $lastKey))) {
-                                        $urlParams['freeLearningUnitStudentID'] = $student['freeLearningUnitStudentID'] ;
-                                        $assessAll[] = "window.open(\"".(string) Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withQueryParams($urlParams)."\")";
-                                        unset($urlParams['freeLearningUnitStudentID']);
+                                    if ($student['status'] == 'Complete - Pending') {
+                                        if ($collaborativeAssessment == "N" or ($collaborativeAssessment == "Y" and ($student['collaborationKey'] == '' OR $student['collaborationKey'] != $lastKey))) {
+                                            $urlParams['freeLearningUnitStudentID'] = $student['freeLearningUnitStudentID'] ;
+                                            $assessAll[] = "window.open(\"".(string) Url::fromModuleRoute('Free Learning', 'units_browse_details_approval')->withQueryParams($urlParams)."\")";
+                                            unset($urlParams['freeLearningUnitStudentID']);
+                                        }
+                                        $lastKey = $student['collaborationKey'];
                                     }
-                                    $lastKey = $student['collaborationKey'];
                                 }
-                                echo "<script type=\"text/javascript\">function assessAll() {".implode(';', $assessAll)."}</script>";
-                                unset($urlParams['sidebar']);
+                                if (count($assessAll) > 0) {
+                                    echo "<script type=\"text/javascript\">function assessAll() {".implode(';', $assessAll)."}</script>";
+                                    unset($urlParams['sidebar']);
 
-                                $table->addHeaderAction('assessAll', __m('Assess All'))
-                                    ->setURL('#')
-                                    ->setIcon('edit')
-                                    ->onClick('assessAll()')
-                                    ->displayLabel();
+                                    $table->addHeaderAction('assessAll', __m('Assess All'))
+                                        ->setURL('#')
+                                        ->setIcon('edit')
+                                        ->onClick('assessAll()')
+                                        ->displayLabel();
+                                }
                             }
 
                             // Row styling
