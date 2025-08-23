@@ -27,7 +27,7 @@ $description = "Free Learning is a module which enables a student-focused and st
 $entryURL = 'units_browse.php';
 $type = 'Additional';
 $category = 'Learn';
-$version = '5.29.03';
+$version = '5.29.04';
 $author = "Gibbon Foundation";
 $url = "https://gibbonedu.org";
 
@@ -132,7 +132,8 @@ $moduleTables[] = "CREATE TABLE `freeLearningUnitStudent` (
   PRIMARY KEY (`freeLearningUnitStudentID`),
   KEY `gibbonPersonIDStudent` (`gibbonPersonIDStudent`),
   KEY `freeLearningUnitID` (`freeLearningUnitID`),
-  KEY `status` (`status`)
+  KEY `status` (`status`),
+  KEY `studentUnit` (`gibbonPersonIDStudent`,`freeLearningUnitID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[] = "CREATE TABLE `freeLearningBadge` (

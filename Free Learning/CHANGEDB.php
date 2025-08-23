@@ -2414,3 +2414,11 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '5.29.03';
 $sql[$count][1] = "";
+
+//v5.29.04
+++$count;
+$sql[$count][0] = '5.29.04';
+$sql[$count][1] = "ALTER TABLE `freeLearningUnitStudent` ADD INDEX `studentUnit` (`gibbonPersonIDStudent`,`freeLearningUnitID`);end";
+
+
+
