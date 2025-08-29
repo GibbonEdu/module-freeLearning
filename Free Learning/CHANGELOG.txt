@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.05
+-------
+Fixed big that was breaking the manifest.php file
+
 v5.29.04
 -------
 Added database index to freeLearningUnitStudent
