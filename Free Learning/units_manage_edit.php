@@ -290,11 +290,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $disableOutcomes = $settingGateway->getSettingByScope('Free Learning', 'disableOutcomes');
             if ($disableOutcomes != 'Y') {
                 $form->addRow()->addHeading(__('Outcomes'))->append(__('Link this unit to outcomes (defined in the Manage Outcomes section of the Planner), and track which outcomes are being met in which units, classes and courses.'));
-                $allowOutcomeEditing = $settingGateway->getSettingByScope('Planner', 'allowOutcomeEditing');
-                $row = $form->addRow();
-                    $customBlocks = $row->addFreeLearningOutcomeBlocks('outcome', $session, implode(",", $values['gibbonDepartmentIDList'] ?? []), $allowOutcomeEditing);
 
-                $dataBlocks = array('freeLearningUnitID' => $freeLearningUnitID);
+                $allowOutcomeEditing = $settingGateway->getSettingByScope('Planner', 'allowOutcomeEditing');
+                $gibbonDepartmentIDList = $values['gibbonDepartmentIDList'] ?? [];
+                if (!is_array($gibbonDepartmentIDList)) {
+                    $gibbonDepartmentIDList = $gibbonDepartmentIDList !== '' ? [$gibbonDepartmentIDList] : [];
+                }
+
+                $row = $form->addRow();
+                    $customBlocks = $row->addFreeLearningOutcomeBlocks('outcome', $session, implode(",", $gibbonDepartmentIDList), $allowOutcomeEditing);
+                    
+                $dataBlocks = ['freeLearningUnitID' => $freeLearningUnitID];
                 $sqlBlocks = "SELECT freeLearningUnitOutcome.*, scope, name, category FROM freeLearningUnitOutcome JOIN gibbonOutcome ON (freeLearningUnitOutcome.gibbonOutcomeID=gibbonOutcome.gibbonOutcomeID) WHERE freeLearningUnitID=:freeLearningUnitID AND active='Y' ORDER BY sequenceNumber";
                 $resultBlocks = $pdo->select($sqlBlocks, $dataBlocks);
 
@@ -308,7 +314,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     $customBlocks->addBlock($rowBlocks['gibbonOutcomeID'], $outcome);
                 }
             }
-
 
             // UNIT OUTLINE
             $form->addRow()->addHeading(__m('Unit Outline'))->append(__m('The contents of this field are viewable to all users, SO AVOID CONFIDENTIAL OR SENSITIVE DATA!'));

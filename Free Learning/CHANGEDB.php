@@ -2426,4 +2426,10 @@ $sql[$count][1] = "ALTER TABLE `freeLearningUnitStudent` ADD INDEX `studentUnit`
 $sql[$count][0] = '5.29.05';
 $sql[$count][1] = "";
 
+//v5.29.06
+++$count;
+$sql[$count][0] = '5.29.06';
+$sql[$count][1] = "";
+
+
 

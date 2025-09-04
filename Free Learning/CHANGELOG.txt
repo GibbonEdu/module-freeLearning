@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v5.29.06
+-------
+Fixed the bug that was giving type error when on edit unit page
+
 v5.29.05
 -------
-Fixed big that was breaking the manifest.php file
+Fixed bug that was breaking the manifest.php file
 
 v5.29.04
 -------
