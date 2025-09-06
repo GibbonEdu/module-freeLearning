@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\Http\Url;
 
 function getUnitList($connection2, $guid, $gibbonPersonID, $roleCategory, $highestAction, $gibbonDepartmentID = null, $difficulty = null, $name = null, $showInactive = null, $publicUnits = null, $freeLearningUnitID = null, $difficulties = null)
 {
