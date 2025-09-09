@@ -343,7 +343,7 @@ function getLearningAreas($connection2, $guid, $limit = false)
 }
 
 //Does not return errors, just does its best to get the job done
-function grantBadges($connection2, $guid, $gibbonPersonID) {
+function grantBadges($connection2, $guid, $gibbonPersonID, $settingGateway, $unitName) {
 
     global $session, $container, $pdo;
 
@@ -536,8 +536,9 @@ function grantBadges($connection2, $guid, $gibbonPersonID) {
 
             //GRANT AWARD
             if ($hitsNeeded > 0 AND $hitsActually == $hitsNeeded) {
+                $comment = (!empty($unitName)) ? __m('Free Learning').': '.$unitName : '';
                 try {
-                    $dataGrant = array('badgesBadgeID' => $row['badgesBadgeID'], 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonID, 'comment' => '', 'gibbonPersonIDCreator' => null);
+                    $dataGrant = array('badgesBadgeID' => $row['badgesBadgeID'], 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonID, 'comment' => $comment, 'gibbonPersonIDCreator' => null);
                     $sqlGrant = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                     $resultGrant = $connection2->prepare($sqlGrant);
                     $resultGrant->execute($dataGrant);

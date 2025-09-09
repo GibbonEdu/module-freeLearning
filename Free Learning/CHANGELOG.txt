@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.07
+-------
+Added unit name injection into badge comment during badge grant
+
 v5.29.06
 -------
 Fixed the bug that was giving type error when on edit unit page

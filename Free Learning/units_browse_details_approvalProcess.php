@@ -260,7 +260,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
                                     $notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                                     if (isActionAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
-                                        grantBadges($connection2, $guid, $gibbonPersonIDStudent, $settingGateway);
+                                        grantBadges($connection2, $guid, $gibbonPersonIDStudent, $settingGateway, $urlParams["name"]);
                                     }
                                 }
                                 $notificationSender->sendNotifications();
@@ -287,9 +287,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             // Deal with manually granted badges
                             $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');
-                            if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !is_null($badgesBadgeID)) {
+                            if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !empty($badgesBadgeID)) {
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
-                                    $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonIDStudent, 'comment' => '', 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
+                                    $comment = (!empty($urlParams["name"])) ? __m('Free Learning').': '.$urlParams["name"] : '';
+                                    $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $gibbonPersonIDStudent, 'comment' => $comment, 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
                                     $sql = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                                     $result = $connection2->prepare($sql);
                                     $result->execute($data);

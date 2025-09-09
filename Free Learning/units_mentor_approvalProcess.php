@@ -134,15 +134,16 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(["freeLearningUnitID" => $freeLearningUnitID, "gibbonDepartmentID" => $gibbonDepartmentID, "difficulty" => $difficulty, "name" => $name, "showInactive" => $showInactive, "sidebar" => "true", "tab" => "1", "view" => "view"]);
                 foreach ($collaborators as $collaborator) {
                     $notificationSender->addNotification($collaborator['gibbonPersonIDStudent'], $text, 'Free Learning', $actionLink);
-                    grantBadges($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $settingGateway);
+                    grantBadges($connection2, $guid, $collaborator['gibbonPersonIDStudent'], $settingGateway, $name);
                 }
                 $notificationSender->sendNotifications();
 
                 // Deal with manually granted badges
                 $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');
-                if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !is_null($badgesBadgeID)) {
+                if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !empty($badgesBadgeID)) {
                     foreach ($collaborators as $collaborator) {
-                        $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $collaborator['gibbonPersonIDStudent'], 'comment' => '', 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
+                        $comment = (!empty($name)) ? __m('Free Learning').': '.$name : '';
+                        $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $collaborator['gibbonPersonIDStudent'], 'comment' => $comment, 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
                         $sql = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                         $result = $connection2->prepare($sql);
                         $result->execute($data);
