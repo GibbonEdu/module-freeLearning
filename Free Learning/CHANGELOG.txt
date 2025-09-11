@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.08
+-------
+Added notification for manual badge grant
+
 v5.29.07
 -------
 Added unit name injection into badge comment during badge grant

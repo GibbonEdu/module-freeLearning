@@ -141,13 +141,21 @@ if ($freeLearningUnitStudentID == '' or $freeLearningUnitID == '' or $confirmati
                 // Deal with manually granted badges
                 $enableManualBadges = $settingGateway->getSettingByScope('Free Learning', 'enableManualBadges');
                 if ($enableManualBadges == 'Y' && isModuleAccessible($guid, $connection2, '/modules/Badges/badges_grant.php') && !empty($badgesBadgeID)) {
+                    $notificationText = __m('Someone has granted you a badge.');
+                    $actionLink = Url::fromModuleRoute('Badges', 'badges_view')->withPath("")->withQueryParams(["gibbonPersonID" => $gibbonPersonID]);    
+
                     foreach ($collaborators as $collaborator) {
                         $comment = (!empty($name)) ? __m('Free Learning').': '.$name : '';
                         $data = array('badgesBadgeID' => $badgesBadgeID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'date' => date('Y-m-d'), 'gibbonPersonID' => $collaborator['gibbonPersonIDStudent'], 'comment' => $comment, 'gibbonPersonIDCreator' => $session->get('gibbonPersonID',''));
                         $sql = 'INSERT INTO badgesBadgeStudent SET badgesBadgeID=:badgesBadgeID, gibbonSchoolYearID=:gibbonSchoolYearID, date=:date, gibbonPersonID=:gibbonPersonID, comment=:comment, gibbonPersonIDCreator=:gibbonPersonIDCreator';
                         $result = $connection2->prepare($sql);
                         $result->execute($data);
+
+                        //Notify User
+                        $notificationSender->addNotification($collaborator['gibbonPersonIDStudent'], $notificationText, 'Badges', $actionLink);
                     }
+
+                    $notificationSender->sendNotifications();
                 }
 
                 $URL .= '&return=success0';
