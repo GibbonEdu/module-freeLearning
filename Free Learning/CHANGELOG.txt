@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.09
+-------
+Improved student redirection after evidence approval
+
 v5.29.08
 -------
 Added notification for manual badge grant
