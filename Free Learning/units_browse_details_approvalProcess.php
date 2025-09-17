@@ -254,9 +254,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             // Attempt to notify the student and grant badges
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
                                 $text = sprintf(__m('A teacher has approved your request for unit completion (%1$s).'), $urlParams["name"]);
-                                $urlParams["tab"] = "1";
-                                $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams($urlParams);
-                                $urlParams["tab"] = "2";
+                                $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(['tab' => 1] + $urlParams);
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
                                     $notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
                                     if (isActionAccessible($guid, $connection2, '/modules/Badges/badges_grant.php')) {
@@ -337,13 +335,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             // Attempt to notify the student
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
                             	$text = sprintf(__('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $urlParams["name"]);
-                                $urlParams["tab"] = "1";
-                                $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams($urlParams);
+                                $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams(['tab' => 1] + $urlParams);
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
 									$notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
 								}
 								$notificationSender->sendNotifications();
-                                $urlParams["tab"] = "2";
                             }
 
                             // Success 0
