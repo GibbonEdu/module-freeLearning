@@ -339,11 +339,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             	$text = sprintf(__('A teacher has responded to your request for unit completion, but your evidence has not been approved (%1$s).', 'Free Learning'), $urlParams["name"]);
                                 $urlParams["tab"] = "1";
                                 $actionLink = Url::fromModuleRoute('Free Learning', 'units_browse_details')->withPath("")->withQueryParams($urlParams);
-                                $urlParams["tab"] = "2";
                                 foreach ($gibbonPersonIDStudents AS $gibbonPersonIDStudent) {
 									$notificationSender->addNotification($gibbonPersonIDStudent, $text, 'Free Learning', $actionLink);
 								}
 								$notificationSender->sendNotifications();
+                                $urlParams["tab"] = "2";
                             }
 
                             // Success 0

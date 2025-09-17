@@ -234,7 +234,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         if ($enrolmentMethod == 'schoolMentor' or $enrolmentMethod == 'externalMentor') {
                             $spinCount = 0;
                             while ($spinCount < 100 and $unique != true) {
-                                $confirmationKey = bin2hex(random_bytes(16));
+                                $confirmationKey = bin2hex(random_bytes(10));
                                 $checkFail = false;
                                 try {
                                     $data = array('confirmationKey' => $confirmationKey);
