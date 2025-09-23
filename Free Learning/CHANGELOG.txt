@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.10
+-------
+Improved the Gateway for consistency of formGroup
+
 v5.29.09
 -------
 Improved student redirection after evidence approval
