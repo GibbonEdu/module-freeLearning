@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.11
+-------
+Fixed the issue of student names not left aligned on approval page
+
 v5.29.10
 -------
 Improved the Gateway for consistency of formGroup
