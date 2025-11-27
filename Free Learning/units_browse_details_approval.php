@@ -299,7 +299,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($collaborativeAssessment == 'Y' && !empty($values['collaborationKey'])) {
         $row = $form->addRow();
             $row->addLabel('student', __('Students'));
-            $col = $row->addColumn()->setClass('flex-col');
+            $col = $row->addColumn()->setClass('flex-col items-stretch');
         $collaborators = $unitStudentGateway->selectUnitCollaboratorsByKey($values['collaborationKey'])->fetchAll();
         foreach ($collaborators as $index => $collaborator) {
             $in = ($collaborator['inCount'] > 0 && isActionAccessible($guid, $connection2, "/modules/Individual Needs/in_view.php")) ? Format::tag(__('Individual Needs'), 'message mr-2 mt-2') : '';
