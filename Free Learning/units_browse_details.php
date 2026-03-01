@@ -397,7 +397,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                             $myClasses = $unitGateway->selectRelevantClassesByTeacher($session->get('gibbonSchoolYearID'), $session->get('gibbonPersonID'))->fetchAll(PDO::FETCH_COLUMN, 0);
 
                             $criteria = $unitStudentGateway->newQueryCriteria()
-                                ->sortBy(['statusSort', 'surname', 'preferredName'])
+                                ->sortBy(['statusSort', 'timestampCompletePending', 'surname', 'preferredName'])
                                 ->fromPOST()
                                 ->pageSize(50);
 
@@ -443,11 +443,12 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                         $lastKey = $student['collaborationKey'];
                                     }
                                 }
+                                $assessAll = array_slice($assessAll, 0, 10);
                                 if (count($assessAll) > 0) {
                                     echo "<script type=\"text/javascript\">function assessAll() {".implode(';', $assessAll)."}</script>";
                                     unset($urlParams['sidebar']);
 
-                                    $table->addHeaderAction('assessAll', __m('Assess All'))
+                                    $table->addHeaderAction('assessAll', __m('Assess Ten'))
                                         ->setURL('#')
                                         ->setIcon('edit')
                                         ->onClick('assessAll()')

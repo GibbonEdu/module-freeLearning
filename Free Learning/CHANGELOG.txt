@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.29.12
+-------
+Adjusted the Manage Enrolment Assess All (Big Data School) feature to become Assess Ten
+Adjusted the Manage Enrolment screen to order by submission date (ascending) after unit status
+
 v5.29.11
 -------
 Fixed the issue of student names not left aligned on approval page
