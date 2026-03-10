@@ -19,9 +19,10 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Http\Url;
-use Gibbon\Domain\User\UserGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\User\UserGateway;
+use Gibbon\Http\Url;
 use Gibbon\Module\FreeLearning\Domain\UnitAuthorGateway;
 
 require_once '../../gibbon.php';
@@ -125,6 +126,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                     //Move attached file, if there is one
                     $partialFail = false;
                     $attachment = null;
+                    $fileMetaData = null;
 
                     if (!empty($_FILES['file']['tmp_name'])) {
                         $fileUploader = new Gibbon\FileUploader($pdo, $session);
@@ -137,6 +139,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
                         if (empty($attachment)) {
                             $partialFail = true;
+                        } else {
+                            $fileMetaData = $fileUploader->getFileMetaData($attachment);
                         }
 
                         if ($attachment != null) {
@@ -163,6 +167,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                         $URL .= '&return=error2';
                         header("Location: {$URL}");
                         exit();
+                    }
+
+                    // Handle file deletion when user removes logo
+                    if (empty($attachment) && !empty($row['logo'])) {
+                        $deleted = $container->get(FileHandler::class)->deleteFile('freeLearningUnit', $freeLearningUnitID, 'logo');
+                    }
+
+                    // Record file tracking for logo
+                    if (!empty($fileMetaData) && !empty($freeLearningUnitID)) {
+                        $gibbonFileID = $container->get(FileHandler::class)->recordFileUpload($fileMetaData, 'freeLearningUnit', $freeLearningUnitID, 'logo');
+
+                        if (empty($gibbonFileID)) {
+                            $partialFail = true;
+                        }
                     }
                     
                     // Update the authors
