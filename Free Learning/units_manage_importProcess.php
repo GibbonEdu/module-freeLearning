@@ -47,6 +47,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         exit;
     }
 
+    // NOTE: File tracking not implemented - ZIP is temporary, processed by UnitImporter class - Implement later
+
     $fileUploader = new FileUploader($pdo, $session);
     $zipFile = $fileUploader->uploadFromPost($_FILES['file']);
 
@@ -67,5 +69,4 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         ? '&return=warning1'
         : '&return=success0';
     header("Location: {$URL}");
-
 }
