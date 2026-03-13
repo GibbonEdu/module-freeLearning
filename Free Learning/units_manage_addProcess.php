@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Http\Url;
 
 require_once '../../gibbon.php';
@@ -82,6 +83,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
                 //Move attached file, if there is one
                 $attachment = null;
+                $fileMetaData = null;
                 if (!empty($_FILES['file']['tmp_name'])) {
                     $fileUploader = new Gibbon\FileUploader($pdo, $session);
                     $fileUploader->getFileExtensions('Graphics/Design');
@@ -93,6 +95,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
                     if (empty($attachment)) {
                         $partialFail = true;
+                    } else {
+                        $fileMetaData = $fileUploader->getFileMetaData($attachment);
                     }
                 }
                 if ($attachment != null) {
@@ -111,6 +115,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
                 }
 
                 $AI = str_pad($inserted, 10, '0', STR_PAD_LEFT);
+
+                // Record file tracking for logo (UL072)
+                if (!empty($fileMetaData) && !empty($AI)) {
+                    $gibbonFileID = $container->get(FileHandler::class)->recordFileUpload($fileMetaData, 'freeLearningUnit', $AI, 'logo');
+
+                    if (empty($gibbonFileID)) {
+                        $partialFail = true;
+                    }
+                }
 
                 // Write author to database
                 $data = array('freeLearningUnitID' => $AI, 'gibbonPersonID' => $session->get('gibbonPersonID'), 'surname' => $session->get('surname'), 'preferredName' => $session->get('preferredName'), 'website' => $session->get('website') ?? '');
