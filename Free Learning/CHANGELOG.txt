@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+
+v5.29.13
+-------
+Added comprehensive file upload tracking system to monitor and manage all file uploads across the system
+
 v5.29.12
 -------
 Adjusted the Manage Enrolment Assess All (Big Data School) feature to become Assess Ten
