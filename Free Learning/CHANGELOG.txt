@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.13
+-------
+Adjusted Copy to Markbook to hit students in same course, rather than just same class
+
 v5.29.12
 -------
 Adjusted the Manage Enrolment Assess All (Big Data School) feature to become Assess Ten
