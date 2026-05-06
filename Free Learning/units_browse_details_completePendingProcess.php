@@ -19,13 +19,14 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Http\Url;
-use Gibbon\View\View;
-use Gibbon\Services\Format;
 use Gibbon\Contracts\Comms\Mailer;
-use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Http\Url;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
+use Gibbon\Services\Format;
+use Gibbon\View\View;
 
 require_once '../../gibbon.php';
 
@@ -146,6 +147,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             } else {
                                 //Attempt file upload
                                 $partialFail = false;
+                                $fileMetaData = null;
 
                                 //Move attached image  file, if there is one
                                 if (!empty($_FILES['file']['tmp_name'])) {
@@ -158,6 +160,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                     if (empty($location)) {
                                         $partialFail = true;
+                                    } else {
+                                        $fileMetaData = $fileUploader->getFileMetaData($location);
                                     }
                                 }
                                 else {
@@ -174,6 +178,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                         } else {
                             // Write to database
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                            $fileHandler = $container->get(FileHandler::class);
                             $collaborativeAssessment = $settingGateway->getSettingByScope('Free Learning', 'collaborativeAssessment');
 
                             $data = [
@@ -183,12 +188,36 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 'evidenceLocation' => $location,
                                 'timestampCompletePending' => date('Y-m-d H:i:s')
                             ];
+
                             if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
                                 $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
-                            } else {
-                                $updated = $unitStudentGateway->update($urlParams["freeLearningUnitStudentID"], $data);
-                            }
 
+                                // Record file tracking for ALL collaborators
+                                if (!empty($fileMetaData)) {
+                                    $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
+                                
+                                    foreach ($collaborators as $collaborator) {
+                                        $gibbonFileID = $fileHandler->recordFileUpload($fileMetaData, 'freeLearningUnitStudent', $collaborator['freeLearningUnitStudentID'], 'exemplarWorkThumb');
+                                        
+                                        if (empty($gibbonFileID)) {
+                                            $partialFail = true;
+                                        }
+                                    }
+                                }
+                            } else {
+                                $freeLearningUnitStudentID = $urlParams["freeLearningUnitStudentID"];
+                                $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
+
+                                // Record file tracking for single student
+                                if (!empty($fileMetaData) && !empty($freeLearningUnitStudentID)) {
+                                    $gibbonFileID = $fileHandler->recordFileUpload($fileMetaData, 'freeLearningUnitStudent', $freeLearningUnitStudentID, 'exemplarWorkThumb');
+
+                                    if (empty($gibbonFileID)) {
+                                        $partialFail = true;
+                                    }
+                                }
+                            }
+                            
                             // Insert discussion records
                             $discussionGateway = $container->get(DiscussionGateway::class);
 

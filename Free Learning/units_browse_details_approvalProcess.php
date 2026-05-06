@@ -19,10 +19,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
-use Gibbon\Http\Url;
-use Gibbon\Domain\System\SettingGateway;
-use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Domain\Markbook\MarkbookEntryGateway;
+use Gibbon\Domain\System\DiscussionGateway;
+use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Http\Url;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 require_once '../../gibbon.php';
@@ -214,6 +215,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                             if ($exemplarWork == 'Y') {
                                 $attachment = $row['exemplarWorkThumb'];
                                 $time = time();
+                                $fileMetaData = null;
 
                                 // Move attached image  file, if there is one
                                 if (!empty($_FILES['file']['tmp_name'])) {
@@ -227,12 +229,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                     if (empty($attachment)) {
                                         $partialFail = true;
+                                    } else {
+                                        $fileMetaData = $fileUploader->getFileMetaData($attachment);
                                     }
                                 }
                             }
 
                             // Write to database
                             $unitStudentGateway = $container->get(UnitStudentGateway::class);
+                            $fileHandler = $container->get(FileHandler::class);
 
                             $data = [
                                 'status' => $status,
@@ -247,10 +252,33 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                             if ($collaborativeAssessment == 'Y' AND !empty($row['collaborationKey'])) {
                                 $updated = $unitStudentGateway->updateWhere(['collaborationKey' => $row['collaborationKey']], $data);
-                            } else {
-                                $updated = $unitStudentGateway->update($urlParams["freeLearningUnitStudentID"], $data);
-                            }
 
+                                // Record file tracking for ALL collaborators
+                                if (!empty($fileMetaData)) {
+                                    $collaborators = $unitStudentGateway->selectBy(['collaborationKey' => $row['collaborationKey']])->fetchAll();
+                                
+                                    foreach ($collaborators as $collaborator) {
+                                        $gibbonFileID = $fileHandler->recordFileUpload($fileMetaData, 'freeLearningUnitStudent', $collaborator['freeLearningUnitStudentID'], 'exemplarWorkThumb');
+                                        
+                                        if (empty($gibbonFileID)) {
+                                            $partialFail = true;
+                                        }
+                                    }
+                                }
+                            } else {
+                                $freeLearningUnitStudentID = $urlParams['freeLearningUnitStudentID'];
+                                $updated = $unitStudentGateway->update($freeLearningUnitStudentID, $data);
+
+                                // Record file tracking for single student
+                                if (!empty($fileMetaData) && !empty($freeLearningUnitStudentID)) {
+                                    $gibbonFileID = $fileHandler->recordFileUpload($fileMetaData, 'freeLearningUnitStudent', $freeLearningUnitStudentID, 'exemplarWorkThumb');
+
+                                    if (empty($gibbonFileID)) {
+                                        $partialFail = true;
+                                    }
+                                }
+                            }
+                            
                             // Attempt to notify the student and grant badges
                             if ($statusOriginal != $status or $commentApprovalOriginal != $commentApproval) { // Only if status or comment has changed.
                                 $text = sprintf(__m('A teacher has approved your request for unit completion (%1$s).'), $urlParams["name"]);
