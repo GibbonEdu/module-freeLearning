@@ -87,22 +87,27 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $enrolmentMethodSelected = '';
         $enrolmentMethods = [];
 
+        $checked = '';
+
         if ($enableExternalMentorEnrolment == 'Y') {
             $enrolmentMethodSelected = 'class';
             $enrolmentMethods['externalMentor'] = __m('External Mentor');
+            $checked = 'externalMentor';
         }
         if ($enableSchoolMentorEnrolment == 'Y') {
             $enrolmentMethodSelected = 'class';
             $enrolmentMethods['schoolMentor'] = __m('School Mentor');
+            $checked = 'schoolMentor';
         }
         if ($enableClassEnrolment == 'Y') {
             $enrolmentMethodSelected = 'class';
             $enrolmentMethods['class'] = __m('Timetable Class');
+            $checked = 'class';
         }
 
         $row = $form->addRow();
             $row->addLabel('enrolmentMethod', __m('Enrolment Method'));
-            $row->addRadio('enrolmentMethod')->fromArray(array_reverse($enrolmentMethods))->required();
+            $row->addRadio('enrolmentMethod')->fromArray(array_reverse($enrolmentMethods))->required()->checked($checked);
 
         // CLASS ENROLMENT
         if ($enableClassEnrolment == 'Y') {
