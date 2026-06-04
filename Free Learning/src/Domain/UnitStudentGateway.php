@@ -652,6 +652,12 @@ class UnitStudentGateway extends QueryableGateway
                 WHERE status='Full'
                     AND NOT gibbonPerson.gibbonPersonID=:gibbonPersonID
                 ORDER BY surname, preferredName";
+        } else if ($roleCategory == 'Other') {
+            $data = ['gibbonPersonID' => $gibbonPersonID];
+            $sql = "SELECT DISTINCT gibbonPerson.gibbonPersonID, preferredName, surname
+                FROM gibbonPerson
+                WHERE gibbonPerson.gibbonPersonID=:gibbonPersonID
+                LIMIT 0";
         }
 
         return $this->db()->select($sql, $data);
