@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.16
+-------
+Fixed Copy to Markbook issue with collaborators
+
 v5.29.15
 -------
 Fixed PHP error for users with role category Other on collaborative units
