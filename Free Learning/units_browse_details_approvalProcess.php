@@ -273,7 +273,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
 
                                 try {
                                     $dataMarkbook = array('gibbonMarkbookColumnID' => $gibbonMarkbookColumnID);
-                                    $sqlMarkbook = "SELECT gibbonMarkbookColumn.gibbonMarkbookColumnID, gibbonCourseClassPerson.gibbonPersonID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseID=(SELECT gibbonCourseID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonMarkbookColumn.name=(SELECT gibbonMarkbookColumn.name FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonCourseClassPerson.gibbonPersonID IN ("."'".implode("','", $gibbonPersonIDStudents)."'".")";
+                                    // Sanitize student IDs
+                                    $safeStudentIDs = array_map('intval', $gibbonPersonIDStudents);
+                                    $inClause = "'" . implode("','", $safeStudentIDs) . "'";
+                                    
+                                    $sqlMarkbook = "SELECT gibbonMarkbookColumn.gibbonMarkbookColumnID, gibbonCourseClassPerson.gibbonPersonID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseID=(SELECT gibbonCourseID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonMarkbookColumn.name=(SELECT gibbonMarkbookColumn.name FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonCourseClassPerson.gibbonPersonID IN ($inClause)";
                                     $resultMarkbook = $connection2->prepare($sqlMarkbook);
                                     $resultMarkbook->execute($dataMarkbook);
                                 } catch (PDOException $e) { }
@@ -286,7 +290,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                     } else { //Insert new row, overwriting comment
                                         $markbookEntryGateway->insert(['gibbonMarkbookColumnID' => $rowMarkbook['gibbonMarkbookColumnID'], 'gibbonPersonIDStudent' => $rowMarkbook['gibbonPersonID'], 'comment' => html_entity_decode(strip_tags($commentApproval)), 'gibbonPersonIDLastEdit' => $session->get('gibbonPersonID')]);
                                     }
-
                                 }
                             }
 

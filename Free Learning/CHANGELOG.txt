@@ -2,6 +2,10 @@ CHANGELOG
 =========
 v5.29.16
 -------
+Fixed the issue of Non-Parameterised Input
+
+v5.29.16
+-------
 Fixed Copy to Markbook issue with collaborators
 
 v5.29.15
