@@ -272,14 +272,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $markbookEntryGateway = $container->get(MarkbookEntryGateway::class);
 
                                 try {
-                                    $dataMarkbook = array('gibbonMarkbookColumnID' => $gibbonMarkbookColumnID);
-                                    // Sanitize student IDs
-                                    $safeStudentIDs = array_map('intval', $gibbonPersonIDStudents);
-                                    $inClause = "'" . implode("','", $safeStudentIDs) . "'";
+                                    $dataMarkbook = ['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID];
                                     
-                                    $sqlMarkbook = "SELECT gibbonMarkbookColumn.gibbonMarkbookColumnID, gibbonCourseClassPerson.gibbonPersonID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseID=(SELECT gibbonCourseID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonMarkbookColumn.name=(SELECT gibbonMarkbookColumn.name FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonCourseClassPerson.gibbonPersonID IN ($inClause)";
-                                    $resultMarkbook = $connection2->prepare($sqlMarkbook);
-                                    $resultMarkbook->execute($dataMarkbook);
+                                    $validStudentIDs = [];
+                                    foreach ($gibbonPersonIDStudents as $studentID) {
+                                        if (is_numeric($studentID)) {
+                                            $validStudentIDs[] = $studentID;
+                                        }
+                                    }
+
+                                    if (!empty($validStudentIDs)) {
+                                        $placeholders = [];
+                                        $count = 0;
+                                        foreach ($validStudentIDs as $studentID) {
+                                            $paramName = 'student' . $count;
+                                            $dataMarkbook[$paramName] = $studentID;
+                                            $placeholders[] = ':' . $paramName;
+                                            $count++;
+                                        }
+            
+                                        $inClause = implode(',', $placeholders);
+                                        
+                                        $sqlMarkbook = "SELECT gibbonMarkbookColumn.gibbonMarkbookColumnID, gibbonCourseClassPerson.gibbonPersonID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseID=(SELECT gibbonCourseID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonMarkbookColumn.name=(SELECT gibbonMarkbookColumn.name FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonCourseClassPerson.gibbonPersonID IN ($inClause)";
+                                        $resultMarkbook = $connection2->prepare($sqlMarkbook);
+                                        $resultMarkbook->execute($dataMarkbook);
+                                    }
                                 } catch (PDOException $e) { }
 
                                 foreach ($resultMarkbook as $rowMarkbook) {
