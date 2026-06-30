@@ -272,31 +272,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
                                 $markbookEntryGateway = $container->get(MarkbookEntryGateway::class);
 
                                 try {
-                                    $dataMarkbook = ['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID];
-                                    
-                                    $validStudentIDs = [];
-                                    foreach ($gibbonPersonIDStudents as $studentID) {
-                                        if (is_numeric($studentID)) {
-                                            $validStudentIDs[] = $studentID;
-                                        }
-                                    }
-
-                                    if (!empty($validStudentIDs)) {
-                                        $placeholders = [];
-                                        $count = 0;
-                                        foreach ($validStudentIDs as $studentID) {
-                                            $paramName = 'student' . $count;
-                                            $dataMarkbook[$paramName] = $studentID;
-                                            $placeholders[] = ':' . $paramName;
-                                            $count++;
-                                        }
-            
-                                        $inClause = implode(',', $placeholders);
-                                        
-                                        $sqlMarkbook = "SELECT gibbonMarkbookColumn.gibbonMarkbookColumnID, gibbonCourseClassPerson.gibbonPersonID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseID=(SELECT gibbonCourseID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonMarkbookColumn.name=(SELECT gibbonMarkbookColumn.name FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonCourseClassPerson.gibbonPersonID IN ($inClause)";
-                                        $resultMarkbook = $connection2->prepare($sqlMarkbook);
-                                        $resultMarkbook->execute($dataMarkbook);
-                                    }
+                                    $dataMarkbook = ['gibbonMarkbookColumnID' => $gibbonMarkbookColumnID, 'gibbonPersonIDs' => implode(',', $gibbonPersonIDStudents)];
+                                    $sqlMarkbook = "SELECT gibbonMarkbookColumn.gibbonMarkbookColumnID, gibbonCourseClassPerson.gibbonPersonID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) JOIN gibbonCourseClassPerson ON (gibbonCourseClassPerson.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonCourseID=(SELECT gibbonCourseID FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND gibbonMarkbookColumn.name=(SELECT gibbonMarkbookColumn.name FROM gibbonMarkbookColumn JOIN gibbonCourseClass ON (gibbonMarkbookColumn.gibbonCourseClassID=gibbonCourseClass.gibbonCourseClassID) WHERE gibbonMarkbookColumnID=:gibbonMarkbookColumnID) AND FIND_IN_SET(gibbonCourseClassPerson.gibbonPersonID, :gibbonPersonIDs)";
+                                    $resultMarkbook = $connection2->prepare($sqlMarkbook);
+                                    $resultMarkbook->execute($dataMarkbook);
                                 } catch (PDOException $e) { }
 
                                 foreach ($resultMarkbook as $rowMarkbook) {
