@@ -326,6 +326,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
         $row->addLabel('submission', __m('Submission'));
         $row->addContent(Format::link($submissionLink, __m('View Submission'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']));
 
+    // Related Reports for Big Data Schools
+    if ($bigDataSchool == "Y") {
+        $relatedReports = '' ;
+        if (isActionAccessible($guid, $connection2, '/modules/Behaviour/behaviour_view_details.php')) {
+            $url = Url::fromModuleRoute('Behaviour', 'behaviour_view_details.php')->withQueryParams(['gibbonPersonID' => $values['gibbonPersonIDStudent']]);
+            $relatedReports = Format::link($url, __m('Behaviour'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']);
+        }
+    
+        $row = $form->addRow();
+            $row->addLabel('relatedReports', __m('Related Reports'));
+            $row->addContent($relatedReports);
+    }
+
     $defaultFeedback = $settingGateway->getSettingByScope('Free Learning', 'defaultFeedback');
     $row = $form->addRow();
         $col = $row->addColumn();
