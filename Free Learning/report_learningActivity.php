@@ -19,7 +19,6 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http:// www.gnu.org/licenses/>.
 */
 
-use Gibbon\View\View;
 use Gibbon\Forms\Form;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
@@ -36,7 +35,10 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
     $page->breadcrumbs
         ->add(__m('Learning Activity'));
 
-    $timePeriod = $_GET['timePeriod'] ?? 'Last 30 Days';
+    $timePeriod = $_GET['timePeriod'] ?? '';
+    if ($timePeriod == '') {
+        $timePeriod = 'Last 30 Days';
+    }
 
     $timePeriodLookup = [
         "Last 30 Days" => "30",
@@ -124,8 +126,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                                     }
 
                                     $count = 0;
-                                    $timestamps =  explode(',', $row['timestamps']);
-                                    $types =  explode(',', $row['types']);
+                                    $timestamps =  explode(',', $row['timestamps'] ?? '');
+                                    $types =  explode(',', $row['types'] ?? '');
 
                                     foreach ($timestamps as $timestamp) {
                                         $type = $types[$count];
@@ -175,8 +177,8 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_learn
                                     }
 
                                     $count = 0;
-                                    $timestamps =  explode(',', $row['timestamps']);
-                                    $types =  explode(',', $row['types']);
+                                    $timestamps =  explode(',', $row['timestamps'] ?? '');
+                                    $types =  explode(',', $row['types'] ?? '');
 
                                     foreach ($timestamps as $timestamp) {
                                         $type = $types[$count];

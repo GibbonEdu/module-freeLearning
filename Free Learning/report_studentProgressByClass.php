@@ -19,12 +19,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\Timetable\CourseClassGateway;
+use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Forms\Form;
+use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
-use Gibbon\Forms\DatabaseFormFactory;
-use Gibbon\Domain\Timetable\CourseGateway;
-use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -71,8 +71,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_stude
         echo __('Report Data');
         echo '</h2>';
 
-        $courseGateway = $container->get(CourseGateway::class);
-        $values = $courseGateway->getCourseClassByID($gibbonCourseClassID);
+        $courseClassGateway = $container->get(CourseClassGateway::class);
+        $values = $courseClassGateway->getCourseClassByID($gibbonCourseClassID);
 
         if (!is_array($values)) {
             echo "<div class='error'>";
