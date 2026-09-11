@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.18
+-------
+Fixed the a UI bug in Approval page and updated the Gateway name
+
 v5.29.17
 -------
 Added link to from Approval to Behaviour as "Related Reports" 

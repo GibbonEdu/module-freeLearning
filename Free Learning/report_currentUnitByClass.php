@@ -19,14 +19,14 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Http\Url;
+use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\Timetable\CourseClassGateway;
+use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Forms\Form;
+use Gibbon\Http\Url;
+use Gibbon\Module\FreeLearning\Domain\UnitClassGateway;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
-use Gibbon\Forms\DatabaseFormFactory;
-use Gibbon\Domain\System\SettingGateway;
-use Gibbon\Domain\Timetable\CourseGateway;
-use Gibbon\Module\FreeLearning\Domain\UnitClassGateway;
 
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
@@ -67,8 +67,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_curre
     echo $form->getOutput();
 
     if ($gibbonCourseClassID != '') {
-        $courseGateway = $container->get(CourseGateway::class);
-        $values = $courseGateway->getCourseClassByID($gibbonCourseClassID);
+        $courseClassGateway = $container->get(CourseClassGateway::class);
+        $values = $courseClassGateway->getCourseClassByID($gibbonCourseClassID);
 
         if (!is_array($values)) {
             $page->addError(__('There are no records to display.'));
