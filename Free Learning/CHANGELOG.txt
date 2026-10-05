@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.19
+-------
+Updated the height of pie-chart
+
 v5.29.18
 -------
 Fixed the a UI bug in Approval page and updated the Gateway name

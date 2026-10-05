@@ -176,7 +176,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Free Learning/report_mento
 
         $chart = Chart::create('unitStats', 'doughnut')
             ->setOptions([
-                'height' => 80,
+                'height' => '240px',
                 'legend' => [
                     'position' => 'right',
                 ]
