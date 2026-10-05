@@ -139,7 +139,7 @@ class UnitHistory
 
                 $chart = Chart::create('unitStats'.$gibbonPersonID, 'doughnut')
                     ->setOptions([
-                        'height' => 80,
+                        'height' => '240px',
                         'legend' => [
                             'position' => 'right',
                         ]
