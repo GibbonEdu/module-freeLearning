@@ -30,6 +30,10 @@ use Gibbon\Module\FreeLearning\Forms\FreeLearningFormFactory;
 // Module includes
 require_once __DIR__ . '/moduleFunctions.php';
 
+$settingGateway = $container->get(SettingGateway::class);
+
+$bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
+
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') == false) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
@@ -69,7 +73,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             $row->addLabel('gibbonDepartmentID', __('Learning Area & Course'));
             $row->addSelect('gibbonDepartmentID')->fromResults($learningAreas, 'groupBy')->selected($gibbonDepartmentID)->placeholder();
 
-        $difficulties = array_map('trim', explode(',', $container->get(SettingGateway::class)->getSettingByScope('Free Learning', 'difficultyOptions')));
+        $difficulties = array_map('trim', explode(',', $settingGateway->getSettingByScope('Free Learning', 'difficultyOptions')));
         $row = $form->addRow();
             $row->addLabel('difficulty', __('Difficulty'));
             $row->addSelect('difficulty')->fromArray($difficulties)->selected($difficulty)->placeholder();
@@ -96,7 +100,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
 
         $form = BulkActionForm::create('bulkAction', $session->get('absoluteURL').'/modules/Free Learning/units_manageProcessBulk.php');
 
-        $bulkActions = ['Export' => __('Export'), 'Duplicate' => __('Duplicate')];
+        $bulkActions = ['Duplicate' => __('Duplicate')];
+        if (($bigDataSchool == "Y" AND $highestAction == 'Manage Units_all') OR $bigDataSchool == "N") {
+            $bulkActions['Export'] = __('Export');
+        }
+        
+        
         if ($highestAction == 'Manage Units_all') {
             $bulkActions += ['Lock' => __m('Lock'), 'Unlock' => __m('Unlock')];
         }
@@ -115,9 +124,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
             ->setURL('/modules/Free Learning/units_manage_add.php')
             ->displayLabel();
 
-        $table->addHeaderAction('import', __('Import'))
-            ->setURL('/modules/Free Learning/units_manage_import.php')
-            ->displayLabel();
+        if (($bigDataSchool == "Y" AND $highestAction == 'Manage Units_all') OR $bigDataSchool == "N") {    
+            $table->addHeaderAction('import', __('Import'))
+                ->setURL('/modules/Free Learning/units_manage_import.php')
+                ->displayLabel();
+        }
 
         $table->modifyRows(function ($unit, $row) {
             if ($unit['active'] != 'Y') $row->addClass('error');

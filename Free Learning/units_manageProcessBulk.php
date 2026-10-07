@@ -19,11 +19,17 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\UnitExporter;
 use Gibbon\Module\FreeLearning\UnitDuplicator;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 
 require_once '../../gibbon.php';
+
+$settingGateway = $container->get(SettingGateway::class);
+
+$bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
 
@@ -55,17 +61,21 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
         }
 
         if ($action == 'Export') {
+            if (!(($bigDataSchool == "Y" AND $highestAction == 'Manage Units_all') OR $bigDataSchool == "N")) {
+                $URL .= '&return=error0';
+                header("Location: {$URL}");
+            } else {
+                // Export zip contents of units
+                $exporter = $container->get(UnitExporter::class);
+                $exporter->setFilename(!empty($name)? $name : 'FreeLearningUnits');
 
-            // Export zip contents of units
-            $exporter = $container->get(UnitExporter::class);
-            $exporter->setFilename(!empty($name)? $name : 'FreeLearningUnits');
+                foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
+                    $exporter->addUnitToExport($freeLearningUnitID);
+                }
 
-            foreach ($freeLearningUnitIDList as $freeLearningUnitID) {
-                $exporter->addUnitToExport($freeLearningUnitID);
+                $exporter->output();
+                exit;
             }
-
-            $exporter->output();
-            exit;
 
         } else if ($action == 'Duplicate') {
 

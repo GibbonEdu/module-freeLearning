@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.20
+-------
+Restricted Import/Export access on Big Data Schools
+
 v5.29.19
 -------
 Updated the height of pie-chart

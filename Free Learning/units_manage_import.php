@@ -21,46 +21,60 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Forms\DatabaseFormFactory;
+use Gibbon\Domain\System\SettingGateway;
+
+$settingGateway = $container->get(SettingGateway::class);
+
+$bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
 
 if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage.php') == false) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
-    $page->breadcrumbs
-        ->add(__m('Manage Units'), 'units_manage.php')
-        ->add(__m('Import Units'));
+    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_manage.php', $connection2);
+    if ($highestAction == false) {
+        $page->addError(__('The highest grouped action cannot be determined.'));
+    } else {
+        if (!(($bigDataSchool == "Y" AND $highestAction == 'Manage Units_all') OR $bigDataSchool == "N")) {
+            $page->addError(__('You do not have access to this action.'));
+        } else {
+            $page->breadcrumbs
+                ->add(__m('Manage Units'), 'units_manage.php')
+                ->add(__m('Import Units'));
 
-    $form = Form::create('importUnits', $session->get('absoluteURL').'/modules/Free Learning/units_manage_importProcess.php');
-    $form->setTitle(__m('Import Units'));
-    $form->setDescription(__m('This page lets you import zip archives that have been created with the unit export tool.'));
-    $form->addHiddenValue('address', $session->get('address'));
-    $form->addHiddenValue('gibbonSchoolYearID', $session->get('gibbonSchoolYearID'));
+            $form = Form::create('importUnits', $session->get('absoluteURL').'/modules/Free Learning/units_manage_importProcess.php');
+            $form->setTitle(__m('Import Units'));
+            $form->setDescription(__m('This page lets you import zip archives that have been created with the unit export tool.'));
+            $form->addHiddenValue('address', $session->get('address'));
+            $form->addHiddenValue('gibbonSchoolYearID', $session->get('gibbonSchoolYearID'));
 
-    $row = $form->addRow();
-        $row->addLabel('file', __('ZIP File'));
-        $row->addFileUpload('file')->required()->accepts('.zip');
+            $row = $form->addRow();
+                $row->addLabel('file', __('ZIP File'));
+                $row->addFileUpload('file')->required()->accepts('.zip');
 
-    $sql = "SELECT gibbonDepartmentID as value, name FROM gibbonDepartment WHERE type='Learning Area' ORDER BY name";
-    $row = $form->addRow();
-        $row->addLabel('gibbonDepartmentIDList', __('Learning Areas'))->description(__m('Optionally add all units to the selected Learning Area.'));
-        $row->addSelect('gibbonDepartmentIDList')->fromQuery($pdo, $sql)->selectMultiple()->setSize(5);
+            $sql = "SELECT gibbonDepartmentID as value, name FROM gibbonDepartment WHERE type='Learning Area' ORDER BY name";
+            $row = $form->addRow();
+                $row->addLabel('gibbonDepartmentIDList', __('Learning Areas'))->description(__m('Optionally add all units to the selected Learning Area.'));
+                $row->addSelect('gibbonDepartmentIDList')->fromQuery($pdo, $sql)->selectMultiple()->setSize(5);
 
-    $row = $form->addRow();
-        $row->addLabel('course', __m('Course'))->description(__m('Optionally add all units to the selected Course.'));
-        $row->addTextField('course');
+            $row = $form->addRow();
+                $row->addLabel('course', __m('Course'))->description(__m('Optionally add all units to the selected Course.'));
+                $row->addTextField('course');
 
-    $row = $form->addRow();
-        $row->addLabel('override', __m('Allow override?'))->description(__m('Units with the same name will be updated with the imported content.'));
-        $row->addCheckbox('override')->setValue('Y');
+            $row = $form->addRow();
+                $row->addLabel('override', __m('Allow override?'))->description(__m('Units with the same name will be updated with the imported content.'));
+                $row->addCheckbox('override')->setValue('Y');
 
-    $form->toggleVisibilityByClass('delete')->onCheckbox('override')->when('Y');
-    $row = $form->addRow()->addClass('delete');;
-        $row->addLabel('delete', __m('Delete Existing Smart Blocks?'));
-        $row->addCheckbox('delete')->setValue('Y');
+            $form->toggleVisibilityByClass('delete')->onCheckbox('override')->when('Y');
+            $row = $form->addRow()->addClass('delete');;
+                $row->addLabel('delete', __m('Delete Existing Smart Blocks?'));
+                $row->addCheckbox('delete')->setValue('Y');
 
-    $row = $form->addRow();
-        $row->addFooter();
-        $row->addSubmit();
+            $row = $form->addRow();
+                $row->addFooter();
+                $row->addSubmit();
 
-    echo $form->getOutput();
+            echo $form->getOutput();
+        }
+    }
 }

@@ -20,9 +20,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\FileUploader;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\FreeLearning\UnitImporter;
 
 require_once '../../gibbon.php';
+
+$settingGateway = $container->get(SettingGateway::class);
+
+$bigDataSchool = $settingGateway->getSettingByScope('Free Learning', 'bigDataSchool');
 
 $URL = $session->get('absoluteURL').'/index.php?q=/modules/Free Learning/units_manage.php';
 
@@ -35,37 +40,47 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     $URL .= '&return=error0';
     header("Location: {$URL}");
 } else {
-    // Proceed!
-    $gibbonDepartmentIDList = isset($_POST['gibbonDepartmentIDList']) ? implode(',', $_POST['gibbonDepartmentIDList']) : '';
-    $course = $_POST['course'] ?? '';
-    $override = $_POST['override'] ?? false;
-    $delete = $_POST['delete'] ?? false;
-
-    if (empty($_FILES['file'])) {
-        $URL .= '&return=error1';
+    $highestAction = getHighestGroupedAction($guid, '/modules/Free Learning/units_manage.php', $connection2);
+    if ($highestAction == false) {
+        $URL .= '&return=error0';
         header("Location: {$URL}");
-        exit;
-    }
+    } else {
+        if (!(($bigDataSchool == "Y" AND $highestAction == 'Manage Units_all') OR $bigDataSchool == "N")) {
+            $URL .= '&return=error0';
+            header("Location: {$URL}");
+        } else {
+            // Proceed!
+            $gibbonDepartmentIDList = isset($_POST['gibbonDepartmentIDList']) ? implode(',', $_POST['gibbonDepartmentIDList']) : '';
+            $course = $_POST['course'] ?? '';
+            $override = $_POST['override'] ?? false;
+            $delete = $_POST['delete'] ?? false;
 
-    $fileUploader = new FileUploader($pdo, $session);
-    $zipFile = $fileUploader->uploadFromPost($_FILES['file']);
+            if (empty($_FILES['file'])) {
+                $URL .= '&return=error1';
+                header("Location: {$URL}");
+                exit;
+            }
 
-    if (empty($zipFile)) {
-        $URL .= '&return=error1';
-        header("Location: {$URL}");
-        exit;
-    }
+            $fileUploader = new FileUploader($pdo, $session);
+            $zipFile = $fileUploader->uploadFromPost($_FILES['file']);
 
-    $importer = $container->get(UnitImporter::class);
-    $importer->setDefaults($gibbonDepartmentIDList, $course);
-    $importer->setOverride($override == 'Y');
-    $importer->setDelete($delete == 'Y');
+            if (empty($zipFile)) {
+                $URL .= '&return=error1';
+                header("Location: {$URL}");
+                exit;
+            }
 
-    $success = $importer->importFromFile($session->get('absolutePath').'/'.$zipFile);
+            $importer = $container->get(UnitImporter::class);
+            $importer->setDefaults($gibbonDepartmentIDList, $course);
+            $importer->setOverride($override == 'Y');
+            $importer->setDelete($delete == 'Y');
 
-    $URL .= !$success
-        ? '&return=warning1'
-        : '&return=success0';
-    header("Location: {$URL}");
+            $success = $importer->importFromFile($session->get('absolutePath').'/'.$zipFile);
 
+            $URL .= !$success
+                ? '&return=warning1'
+                : '&return=success0';
+            header("Location: {$URL}");
+        }  
+    } 
 }
