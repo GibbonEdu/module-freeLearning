@@ -22,6 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace Gibbon\Module\FreeLearning;
 
 use ZipArchive;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Domain\User\RoleGateway;
 use Gibbon\Contracts\Services\Session;
 use Gibbon\Domain\School\YearGroupGateway;
@@ -125,14 +126,33 @@ class UnitImporter
 
     protected function uploadImportedFiles($data, $zipFilePath) {
         $this->files = [];
+        if (empty($data['files']) || !is_array($data['files'])) {
+            return $this->files;
+        }
+
+        global $container;
+        $fileHandler = $container->get(FileHandler::class);
+        $root = $this->session->get('absolutePath');
+        $uploadsFolder = 'uploads/'.date('Y').'/'.date('m');
+        if (!is_dir($root.'/'.$uploadsFolder)) {
+            mkdir($root.'/'.$uploadsFolder, 0755, true);
+        }
 
         foreach ($data['files'] as $filename) {
-            $uploadsFolder = 'uploads/'.date('Y').'/'.date('m');
-            $destinationPath = $this->session->get('absolutePath').'/'.$uploadsFolder.'/'.$filename;
+            $filename = basename(str_replace('\\', '/', (string) $filename));
+            $relativePath = $uploadsFolder.'/'.$filename;
+            $destinationPath = $root.'/'.$relativePath;
 
-            if (@copy('zip://'.$zipFilePath.'#files/'.$filename, $destinationPath)) {
-                $this->files[$filename] = $this->session->get('absoluteURL').'/'.$uploadsFolder.'/'.$filename;
+            if (!@copy('zip://'.$zipFilePath.'#files/'.$filename, $destinationPath)) {
+                continue;
             }
+
+            if ($fileHandler->resolveStoredPath($root, $relativePath) === null) {
+                @unlink($destinationPath);
+                continue;
+            }
+
+            $this->files[$filename] = $this->session->get('absoluteURL').'/'.$relativePath;
         }
 
         return $this->files;

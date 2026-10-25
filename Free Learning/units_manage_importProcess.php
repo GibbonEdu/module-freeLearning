@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\FileUploader;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Module\FreeLearning\UnitImporter;
 
 require_once '../../gibbon.php';
@@ -63,7 +64,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_manage
     $importer->setOverride($override == 'Y');
     $importer->setDelete($delete == 'Y');
 
-    $success = $importer->importFromFile($session->get('absolutePath').'/'.$zipFile);
+    $zipRealPath = $container->get(FileHandler::class)->resolveStoredPath((string) $session->get('absolutePath'), (string) $zipFile);
+    if ($zipRealPath === null) {
+        $URL .= '&return=error1';
+        header("Location: {$URL}");
+        exit;
+    }
+
+    $success = $importer->importFromFile($zipRealPath);
 
     $URL .= !$success
         ? '&return=warning1'
