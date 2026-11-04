@@ -56,10 +56,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/report_unrea
              ->format(function ($row, $actions) {
                  $actions->addAction('view', __('Action & Archive'))
                          ->addParam('action', urlencode($row['actionLink']))
-                         ->setURL('/notificationsActionProcess.php');
+                         ->setURL('/notificationsActionProcess.php')
+                         ->directLink();
              });
      
      
          echo $table->render($notifications);
-
 }

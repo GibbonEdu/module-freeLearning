@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.29.21
+-------
+Fixed process scripts so a direct link cannot run them
+Fixed the staff course list so it uses the browse action
+
 v5.29.20
 -------
 Restricted Import/Export access on Big Data Schools

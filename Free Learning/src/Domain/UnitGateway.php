@@ -302,7 +302,7 @@ class UnitGateway extends QueryableGateway
                 WHERE active='Y'
                 AND NOT course IS NULL
                 AND NOT course=''";
-                if ($highestAction = 'Browse Units_prerequisites') {
+                if ($highestAction == 'Browse Units_prerequisites') {
                     $course .= "AND freeLearningUnit.availableStaff='Y'";
                 }
                 $course .= ")";
