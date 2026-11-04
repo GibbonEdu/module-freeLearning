@@ -24,12 +24,15 @@ use Gibbon\Services\Format;
 use Gibbon\Comms\NotificationEvent;
 use Gibbon\Domain\User\UserGateway;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Data\Validator;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitGateway;
 use Gibbon\Domain\Timetable\CourseEnrolmentGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 require_once '../../gibbon.php';
+
+$_POST = $container->get(Validator::class)->sanitize($_POST, ['addComment' => 'HTML']);
 
 $freeLearningUnitID = $_POST['freeLearningUnitID'] ?? '';
 $freeLearningUnitStudentID = $_POST['freeLearningUnitStudentID'] ?? '';

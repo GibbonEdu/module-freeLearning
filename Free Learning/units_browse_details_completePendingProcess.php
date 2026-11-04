@@ -24,10 +24,13 @@ use Gibbon\View\View;
 use Gibbon\Services\Format;
 use Gibbon\Contracts\Comms\Mailer;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Data\Validator;
 use Gibbon\Domain\System\DiscussionGateway;
 use Gibbon\Module\FreeLearning\Domain\UnitStudentGateway;
 
 require_once '../../gibbon.php';
+
+$_POST = $container->get(Validator::class)->sanitize($_POST, ['commentStudent' => 'HTML']);
 
 $settingGateway = $container->get(SettingGateway::class);
 $publicUnits = $settingGateway->getSettingByScope('Free Learning', 'publicUnits');
