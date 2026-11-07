@@ -331,8 +331,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($bigDataSchool == "Y") {
         $relatedReports = '' ;
         if (isActionAccessible($guid, $connection2, '/modules/Behaviour/behaviour_view_details.php')) {
-            $url = Url::fromModuleRoute('Behaviour', 'behaviour_view_details.php')->withQueryParams(['gibbonPersonID' => $values['gibbonPersonIDStudent']]);
-            $relatedReports = Format::link($url, __m('Behaviour'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']);
+            $url = Url::fromModuleRoute('Students', 'student_view_details.php')->withQueryParams(['gibbonPersonID' => $values['gibbonPersonIDStudent'], 'subpage' => 'Markbook']);
+            $relatedReports .= Format::link($url, __('Behaviour'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']);
+        }
+
+        if (isActionAccessible($guid, $connection2, '/modules/Markbook/markbook_view.php')) {
+            $url = Url::fromModuleRoute('Students', 'student_view_details.php')->withQueryParams(['gibbonPersonID' => $values['gibbonPersonIDStudent'], 'subpage' => 'Markbook']);
+            $relatedReports .= Format::link($url, __('Markbook'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']);
         }
     
         $row = $form->addRow();

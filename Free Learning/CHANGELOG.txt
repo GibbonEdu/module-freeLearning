@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v5.29.21
+-------
+Added validation to student comment to fix character encoding issue
+Added link to from Approval to Markbook as "Related Reports" 
+
 v5.29.20
 -------
 Restricted Import/Export access on Big Data Schools
