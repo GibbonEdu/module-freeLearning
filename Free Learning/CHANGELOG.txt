@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.22
+-------
+Fixed Behaviour link broken in last version
+
 v5.29.21
 -------
 Added validation to student comment to fix character encoding issue

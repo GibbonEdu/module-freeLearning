@@ -331,7 +331,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Free Learning/units_browse
     if ($bigDataSchool == "Y") {
         $relatedReports = '' ;
         if (isActionAccessible($guid, $connection2, '/modules/Behaviour/behaviour_view_details.php')) {
-            $url = Url::fromModuleRoute('Students', 'student_view_details.php')->withQueryParams(['gibbonPersonID' => $values['gibbonPersonIDStudent'], 'subpage' => 'Markbook']);
+            $url = Url::fromModuleRoute('Students', 'student_view_details.php')->withQueryParams(['gibbonPersonID' => $values['gibbonPersonIDStudent'], 'subpage' => 'Behaviour']);
             $relatedReports .= Format::link($url, __('Behaviour'), ['class' => 'w-full ml-2 underline', 'target' => '_blank']);
         }
 
