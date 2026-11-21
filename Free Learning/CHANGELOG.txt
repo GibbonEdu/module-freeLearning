@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v5.29.23
+-------
+Fixed sort by Student column in Manage Enrolment
+
 v5.29.22
 -------
 Fixed Behaviour link broken in last version

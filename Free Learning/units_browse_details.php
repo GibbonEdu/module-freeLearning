@@ -485,7 +485,7 @@ if (!(isActionAccessible($guid, $connection2, '/modules/Free Learning/units_brow
                                 });
 
                             $table->addColumn('student', __('Student'))
-                                ->sortable(['surname', 'preferredName'])
+                                ->sortable(['studentSort'])
                                 ->width('35%')
                                 ->format(function ($student) use ($canViewStudents, $customField) {
                                     $output = '';
